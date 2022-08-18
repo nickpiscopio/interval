@@ -3,7 +3,7 @@ import { StyleSheet, TextInput } from "react-native";
 
 import { View } from "./Themed";
 
-export default function IntervalInput({
+export function IntervalInput({
   defaultText,
 }: {
   defaultText: string;
