@@ -7,6 +7,8 @@ import { View } from "../components/Themed";
 import { RootStackScreenProps } from "../types";
 import Colors from "../constants/Colors";
 import Spacing from "../constants/Spacing";
+import { PrimaryButton } from "../components/PrimaryButton";
+import { Spacer } from "../components/Spacer";
 
 export default function SelectTimerScreen({
   navigation,
@@ -55,11 +57,25 @@ export default function SelectTimerScreen({
       </ScrollView>
       <View style={styles.stats}>
         <View style={styles.inputs}>
-          <Input title="Name" style={styles.nameInput}/>
-          <Input title="Rounds" prefix="x" style={styles.roundsInput}/>
+          <Input title="Name" style={styles.nameInput} />
+          <Input
+            title="Rounds"
+            prefix="x"
+            style={styles.roundsInput}
+            leftAlignText={false}
+          />
         </View>
         <View style={styles.separator}></View>
-        <Button title="Start" onPress={() => navigation.navigate("Timer")} />
+        <View style={styles.statsButtons}>
+          <Button title="Delete" />
+          <Spacer />
+          <Button title="Save" />
+          <PrimaryButton
+            title="Start"
+            onPress={() => navigation.navigate("Timer")}
+            styles={styles.startButton}
+          />
+        </View>
       </View>
     </View>
   );
@@ -83,13 +99,19 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.shadow,
   },
   inputs: {
-    flexDirection: "row"
+    flexDirection: "row",
   },
   nameInput: {
-    flex: 1,
-    marginRight: Spacing.input.margin
+    flex: 2.5,
+    marginRight: Spacing.input.margin,
   },
   roundsInput: {
-    flex: 1
+    flex: 1,
+  },
+  statsButtons: {
+    flexDirection: "row",
+  },
+  startButton: {
+    marginLeft: Spacing.window.small
   }
 });

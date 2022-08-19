@@ -6,6 +6,7 @@ const SMALL = 10;
 export default {
   window: {
     padding: LARGE,
+    small: SMALL,
   },
   button: {
     vertical: NORMAL,
