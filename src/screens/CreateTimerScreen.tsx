@@ -9,6 +9,8 @@ import Colors from "../constants/Colors";
 import Spacing from "../constants/Spacing";
 import { PrimaryButton } from "../components/PrimaryButton";
 import { Spacer } from "../components/Spacer";
+import { ImageButton } from "../components/ImageButton";
+import { ImageSrc } from "../enum/ImageSrc";
 
 export default function SelectTimerScreen({
   navigation,
@@ -67,9 +69,9 @@ export default function SelectTimerScreen({
         </View>
         <View style={styles.separator}></View>
         <View style={styles.statsButtons}>
-          <Button title="Delete" />
+          <ImageButton imageButtonSrc={ImageSrc.DELETE} onPress={() => {}} />
           <Spacer />
-          <Button title="Save" />
+          <ImageButton imageButtonSrc={ImageSrc.SAVE} onPress={() => {}} />
           <PrimaryButton
             title="Start"
             onPress={() => navigation.navigate("Timer")}
@@ -112,6 +114,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
   },
   startButton: {
-    marginLeft: Spacing.window.small
-  }
+    marginLeft: Spacing.window.small,
+  },
 });

@@ -15,7 +15,7 @@ export default function useCachedResources() {
         // Load fonts
         await Font.loadAsync({
           ...FontAwesome.font,
-          "open-sans": require('../assets/fonts/OpenSans-VariableFont_wdth,wght.ttf'),
+          "open-sans": require('../../assets/fonts/OpenSans-VariableFont_wdth,wght.ttf'),
         });
       } catch (e) {
         // We might want to provide this error information to an error reporting service
