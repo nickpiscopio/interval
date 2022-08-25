@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { Button, StyleSheet, View, Text } from "react-native";
 
+import Colors from "../constants/Colors";
 import { RootStackScreenProps } from "../types";
 
 export default function TimerScreen({ route }: RootStackScreenProps<"Timer">) {
@@ -79,6 +80,11 @@ export default function TimerScreen({ route }: RootStackScreenProps<"Timer">) {
     return Math.ceil(currentInterval.durationLeftInMillis / 1000);
   }
 
+  function getCurrentIntervalBackgroundColor(): string {
+    const currentInterval = getCurrentInterval();
+    return currentInterval ? currentInterval.color : "";
+  }
+
   function getCurrentIntervalName(): string {
     const currentInterval = getCurrentInterval();
     return currentInterval ? currentInterval.name : "";
@@ -105,7 +111,6 @@ export default function TimerScreen({ route }: RootStackScreenProps<"Timer">) {
   function performChecksToAddSound(): void {}
 
   function pauseWorkout(): void {
-    console.log(isPausedRef.current);
     isPausedRef.current = !isPausedRef.current;
 
     if (isPausedRef.current) {
@@ -127,7 +132,12 @@ export default function TimerScreen({ route }: RootStackScreenProps<"Timer">) {
   }
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: getCurrentIntervalBackgroundColor() },
+      ]}
+    >
       <View style={[styles.timerBar, { height: timerBarHeight + "%" }]}></View>
       <Text style={styles.currentInterval}>{getCurrentIntervalName()}</Text>
       <Text style={styles.currentIntervalTimeRemaining}>
@@ -165,14 +175,17 @@ const styles = StyleSheet.create({
   currentInterval: {
     fontWeight: "bold",
     fontSize: 16,
+    color: Colors.timerText,
   },
   currentIntervalTimeRemaining: {
     marginTop: 50,
     marginBottom: 50,
     fontSize: 100,
+    color: Colors.timerText,
   },
   intervalsRemaining: {
     fontSize: 50,
+    color: Colors.timerText,
   },
   stats: {
     backgroundColor: "#FFFFFF",

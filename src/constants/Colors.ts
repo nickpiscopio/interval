@@ -23,6 +23,7 @@ export default {
   borderTitle: TEXT_MEDIUM,
   inputTitle: TEXT_MEDIUM,
   inputTitleBackground: WHITE,
+  timerText: TEXT_X_LIGHT,
   text: TEXT_DARK,
   textLight: TEXT_X_LIGHT,
   textPlaceholder: TEXT_LIGHT,
