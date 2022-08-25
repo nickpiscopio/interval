@@ -19,6 +19,45 @@ export default function SelectTimerScreen({
   const [lowIntervalName, setLowIntervalNameText] = useState("Low Interval");
   const [highInterval, setHighIntervalText] = useState("00m 00s");
 
+  const [intervals, setIntervals] = useState<Interval[]>([
+    {
+      color: "#1ACC6C",
+      name: "High Interval",
+      durationLeftInMillis: 3000,
+      totalDuration: 3000,
+    },
+    {
+      color: "#1A6CCC",
+      name: "Low Interval",
+      durationLeftInMillis: 4000,
+      totalDuration: 4000,
+    },
+    {
+      color: "#1ACC6C",
+      name: "High Interval",
+      durationLeftInMillis: 3000,
+      totalDuration: 3000,
+    },
+    {
+      color: "#1A6CCC",
+      name: "Low Interval",
+      durationLeftInMillis: 4000,
+      totalDuration: 4000,
+    },
+    {
+      color: "#1ACC6C",
+      name: "High Interval",
+      durationLeftInMillis: 3000,
+      totalDuration: 3000,
+    },
+    {
+      color: "#1A6CCC",
+      name: "Low Interval",
+      durationLeftInMillis: 4000,
+      totalDuration: 4000,
+    },
+  ]);
+
   return (
     <View style={styles.container}>
       <ScrollView style={styles.scrollView}>
@@ -74,7 +113,7 @@ export default function SelectTimerScreen({
           <ImageButton imageButtonSrc={ImageSrc.SAVE} onPress={() => {}} />
           <PrimaryButton
             title="Start"
-            onPress={() => navigation.navigate("Timer")}
+            onPress={() => navigation.navigate("Timer", { intervals: intervals })}
             styles={styles.startButton}
           />
         </View>

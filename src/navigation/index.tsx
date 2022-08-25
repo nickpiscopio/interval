@@ -35,7 +35,7 @@ function RootNavigator() {
       screenOptions={{ headerTitleAlign: 'center', presentation: 'formSheet' }}>
       <Stack.Screen name="Root" component={SelectTimerScreen} options={{ title: 'Select Timer' }} />
       <Stack.Screen name="CreateTimer" component={CreateTimerScreen} options={{ title: 'Create Timer' }} />
-      <Stack.Screen name="Timer" component={TimerScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Timer" component={TimerScreen} options={{ headerShown: false }} initialParams={{ intervals: []}} />
       <Stack.Screen name="NotFound" component={NotFoundScreen} options={{ title: 'Oops!' }} />
     </Stack.Navigator>
   );
