@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, ScrollView, StyleSheet } from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
 import { IntervalInput } from "../components/IntervalInput";
 import { Input } from "../components/Input";
 
@@ -10,7 +10,7 @@ import Spacing from "../constants/Spacing";
 import { PrimaryButton } from "../components/PrimaryButton";
 import { Spacer } from "../components/Spacer";
 import { ImageButton } from "../components/ImageButton";
-import { ImageSrc } from "../enum/ImageSrc";
+import { IntervalImage } from "../enum/IntervalImage";
 
 export default function SelectTimerScreen({
   navigation,
@@ -108,9 +108,9 @@ export default function SelectTimerScreen({
         </View>
         <View style={styles.separator}></View>
         <View style={styles.statsButtons}>
-          <ImageButton imageButtonSrc={ImageSrc.DELETE} onPress={() => {}} />
+          <ImageButton intervalImage={IntervalImage.delete} onPress={() => {}} />
           <Spacer />
-          <ImageButton imageButtonSrc={ImageSrc.SAVE} onPress={() => {}} />
+          <ImageButton intervalImage={IntervalImage.save} onPress={() => {}} />
           <PrimaryButton
             title="Start"
             onPress={() => navigation.navigate("Timer", { intervals: intervals })}

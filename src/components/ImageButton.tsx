@@ -1,14 +1,12 @@
-import { View, StyleSheet, ViewStyle, Pressable, Image } from "react-native";
-import { ImageSrc } from "../enum/ImageSrc";
-import { SvgUri } from 'react-native-svg';
-// import TestSvg from "../../assets/images/save.svg";          // SVG File
+import { View, StyleSheet, ViewStyle, Pressable } from "react-native";
+import { IntervalImage } from "../enum/IntervalImage";
 
 export function ImageButton({
-  imageButtonSrc,
+  intervalImage,
   onPress,
   style,
 }: {
-  imageButtonSrc: ImageSrc;
+  intervalImage: IntervalImage;
   onPress: Function;
   style?: ViewStyle | ViewStyle[];
 }) {
@@ -20,20 +18,9 @@ export function ImageButton({
     <View style={style}>
       <Pressable onPress={onPressHandler}>
         {({ pressed }) => (
-          <Image
-            source={imageButtonSrc}
-            style={[styles.image, pressed && styles.imageOpacity]}
-
-
-          />
-
-          // <testSvg />
-
-          // <SvgUri
-          // width="100%"
-          // height="100%"
-          // uri={testSvg}
-      // />
+          <View style={pressed && styles.imageOpacity}>
+            {intervalImage}
+          </View>
         )}
       </Pressable>
     </View>
