@@ -11,6 +11,7 @@ import { PrimaryButton } from "../components/PrimaryButton";
 import { Spacer } from "../components/Spacer";
 import { ImageButton } from "../components/ImageButton";
 import { IntervalImage } from "../enum/IntervalImage";
+import { IntervalImageGradient } from "../enum/IntervalImageGradient";
 
 export default function SelectTimerScreen({
   navigation,
@@ -108,9 +109,9 @@ export default function SelectTimerScreen({
         </View>
         <View style={styles.separator}></View>
         <View style={styles.statsButtons}>
-          <ImageButton intervalImage={IntervalImage.delete} onPress={() => {}} />
+          <ImageButton intervalImage={IntervalImage.delete} colors={IntervalImageGradient.colors.warning.asStrings} onPress={() => {}} />
           <Spacer />
-          <ImageButton intervalImage={IntervalImage.save} onPress={() => {}} />
+          <ImageButton intervalImage={IntervalImage.save} colors={IntervalImageGradient.colors.positive.asStrings} onPress={() => {}} />
           <PrimaryButton
             title="Start"
             onPress={() => navigation.navigate("Timer", { intervals: intervals })}

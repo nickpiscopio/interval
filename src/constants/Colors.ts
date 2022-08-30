@@ -1,21 +1,26 @@
-const WHITE = "#FFFFFF"
+const WHITE = "#FFFFFF";
+const BLACK = "#000000";
 const PRIMARY = "#1A6CCC";
 const PRIMARY_DARK = "#002080";
+const WARNING = "#CC1A1A";
+const WARNING_DARK = "#871212";
 const GRADIENT_PRIMARY = "#114582";
 const GRADIENT_PRIMARY_DARK = "#000036";
 const SHADOW = "#52006A";
-const TEXT_DARK = "#1a1a1a"
+const TEXT_DARK = "#1a1a1a";
 const TEXT_MEDIUM = "#4c4c4c";
 const TEXT_LIGHT = "#808080";
 const TEXT_X_LIGHT = "#FFFFFF";
 
 // Default from Expo.
-const tintColorLight = '#2f95dc';
-const tintColorDark = '#fff';
+const tintColorLight = "#2f95dc";
+const tintColorDark = "#fff";
 
 export default {
   primary: PRIMARY,
   primaryDark: PRIMARY_DARK,
+  warning: WARNING,
+  warningDark: WARNING_DARK,
   gradientPrimary: GRADIENT_PRIMARY,
   gradientPrimaryDark: GRADIENT_PRIMARY_DARK,
   shadow: SHADOW,
@@ -28,20 +33,27 @@ export default {
   textLight: TEXT_X_LIGHT,
   textPlaceholder: TEXT_LIGHT,
   textPrefix: TEXT_LIGHT,
-  backgroundImageButton: WHITE,
+  background: {
+    button: {
+      image: {
+        unpressed: WHITE,
+        pressedFullOpacity: BLACK,
+      },
+    },
+  },
   // Default from Expo.
   light: {
-    text: '#000',
-    background: '#fff',
+    text: "#000",
+    background: "#fff",
     tint: tintColorLight,
-    tabIconDefault: '#ccc',
+    tabIconDefault: "#ccc",
     tabIconSelected: tintColorLight,
   },
   dark: {
-    text: '#fff',
-    background: '#000',
+    text: "#fff",
+    background: "#000",
     tint: tintColorDark,
-    tabIconDefault: '#ccc',
+    tabIconDefault: "#ccc",
     tabIconSelected: tintColorDark,
   },
 };
