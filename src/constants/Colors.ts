@@ -1,4 +1,5 @@
 const WHITE = "#FFFFFF";
+const TRANSPARENT = "#00FFFFFF";
 const BLACK = "#000000";
 const PRIMARY = "#1A6CCC";
 const PRIMARY_DARK = "#002080";
@@ -37,6 +38,7 @@ export default {
     button: {
       image: {
         unpressed: WHITE,
+        transparent: TRANSPARENT,
         pressedFullOpacity: BLACK,
       },
     },

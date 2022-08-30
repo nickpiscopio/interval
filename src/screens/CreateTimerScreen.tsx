@@ -109,12 +109,22 @@ export default function SelectTimerScreen({
         </View>
         <View style={styles.separator}></View>
         <View style={styles.statsButtons}>
-          <ImageButton intervalImage={IntervalImage.delete} colors={IntervalImageGradient.colors.warning.asStrings} onPress={() => {}} />
+          <ImageButton
+            intervalImage={IntervalImage.delete}
+            gradientColors={IntervalImageGradient.colors.warning.asStrings}
+            onPress={() => {}}
+          />
           <Spacer />
-          <ImageButton intervalImage={IntervalImage.save} colors={IntervalImageGradient.colors.positive.asStrings} onPress={() => {}} />
+          <ImageButton
+            intervalImage={IntervalImage.save}
+            gradientColors={IntervalImageGradient.colors.positive.asStrings}
+            onPress={() => {}}
+          />
           <PrimaryButton
             title="Start"
-            onPress={() => navigation.navigate("Timer", { intervals: intervals })}
+            onPress={() =>
+              navigation.navigate("Timer", { intervals: intervals })
+            }
             styles={styles.startButton}
           />
         </View>

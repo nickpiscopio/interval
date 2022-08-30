@@ -1,8 +1,13 @@
 import { useEffect, useState, useRef } from "react";
-import { Button, StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View, Text, StatusBar } from "react-native";
 
 import Colors from "../constants/Colors";
+import { Spacer } from "../components/Spacer";
+import { ImageButton } from "../components/ImageButton";
+import { IntervalImage } from "../enum/IntervalImage";
+import { IntervalImageGradient } from "../enum/IntervalImageGradient";
 import { RootStackScreenProps } from "../types";
+import Spacing from "../constants/Spacing";
 
 export default function TimerScreen({ route }: RootStackScreenProps<"Timer">) {
   const [timeHasRunInMillis, setTimeHasRunInMillis] = useState<number>(0);
@@ -131,6 +136,14 @@ export default function TimerScreen({ route }: RootStackScreenProps<"Timer">) {
     return route.params.intervals;
   }
 
+  function getIntervalImageButton(): IntervalImage {
+    return isPausedRef.current ? IntervalImage.pause : IntervalImage.play;
+  }
+
+  function askToCloseWorkout(): void {
+    // TODO: Need to implement.
+  }
+
   return (
     <View
       style={[
@@ -139,31 +152,58 @@ export default function TimerScreen({ route }: RootStackScreenProps<"Timer">) {
       ]}
     >
       <View style={[styles.timerBar, { height: timerBarHeight + "%" }]}></View>
-      <Text style={styles.currentInterval}>{getCurrentIntervalName()}</Text>
-      <Text style={styles.currentIntervalTimeRemaining}>
-        {getDurationLeftInInterval()}
-      </Text>
-      <Text style={styles.intervalsRemaining}>
-        {getCurrentIntervalIndex() + 1}/{getIntervals().length}
-      </Text>
-      <Button title="Pause/Play" onPress={() => pauseWorkout()} />
+
+      <View style={styles.containerHeader}>
+        <Spacer />
+        <ImageButton
+          intervalImage={IntervalImage.close}
+          backgroundColor={getCurrentIntervalBackgroundColor()}
+          onPress={() => askToCloseWorkout()}
+        />
+      </View>
+
+      <View style={styles.containerTimer}>
+        <Text style={styles.currentInterval}>{getCurrentIntervalName()}</Text>
+        <Text style={styles.currentIntervalTimeRemaining}>
+          {getDurationLeftInInterval()}
+        </Text>
+        <Text style={styles.intervalsRemaining}>
+          {getCurrentIntervalIndex() + 1}/{getIntervals().length}
+        </Text>
+      </View>
+      <View style={styles.containerPlayPause}>
+        <ImageButton
+          intervalImage={getIntervalImageButton()}
+          gradientColors={IntervalImageGradient.colors.solid.asStrings}
+          backgroundColor={getCurrentIntervalBackgroundColor()}
+          onPress={() => pauseWorkout()}
+        />
+      </View>
     </View>
   );
 }
 
-// function intervalHandler(text: string): void {
-//     setHighIntervalNameText(text);
-//   }
-
-//   function highIntervalInputHandler(interval: string): void {
-//     setHighIntervalText(interval);
-//   }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  containerHeader: {
+    marginTop: StatusBar.currentHeight,
+    marginHorizontal: Spacing.window.padding,
+    flexDirection: "row",
+  },
+  containerTimer: {
+    flex: 1,
+    flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
+  },
+  containerPlayPause: {
+    // flex: 1,
+    // flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: Spacing.window.padding,
   },
   timerBar: {
     position: "absolute",

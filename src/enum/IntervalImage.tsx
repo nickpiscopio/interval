@@ -28,4 +28,34 @@ export const IntervalImage = {
       name="content-save"
     />
   ),
+  play: (
+    <Icon
+      colors={IntervalImageGradient.colors.solid.asProps}
+      start={IntervalImageGradient.start}
+      end={IntervalImageGradient.end}
+      size={DEFAULT_ICON_SIZE}
+      type={DEFAULT_ICON_TYPE}
+      name="play"
+    />
+  ),
+  pause: (
+    <Icon
+      colors={IntervalImageGradient.colors.solid.asProps}
+      start={IntervalImageGradient.start}
+      end={IntervalImageGradient.end}
+      size={DEFAULT_ICON_SIZE}
+      type={DEFAULT_ICON_TYPE}
+      name="pause"
+    />
+  ),
+  close: (
+    <Icon
+      colors={IntervalImageGradient.colors.solid.asProps}
+      start={IntervalImageGradient.start}
+      end={IntervalImageGradient.end}
+      size={DEFAULT_ICON_SIZE}
+      type={DEFAULT_ICON_TYPE}
+      name="close"
+    />
+  ),
 } as const;

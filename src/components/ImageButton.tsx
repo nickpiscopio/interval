@@ -2,23 +2,45 @@ import { View, ViewStyle, Pressable, StyleSheet } from "react-native";
 
 import { IntervalImage } from "../enum/IntervalImage";
 import { LinearGradient } from "expo-linear-gradient";
-import Colors from "../constants/Colors";
 import Spacing from "../constants/Spacing";
 import { IntervalImageGradient } from "../enum/IntervalImageGradient";
+import Colors from "../constants/Colors";
 
 export function ImageButton({
   intervalImage,
-  colors,
+  gradientColors,
+  backgroundColor,
   onPress,
   style,
 }: {
   intervalImage: IntervalImage;
-  colors: string[];
+  gradientColors?: string[];
+  backgroundColor?: string;
   onPress: Function;
   style?: ViewStyle | ViewStyle[];
 }) {
   function onPressHandler() {
     onPress();
+  }
+
+  function getBackgroundColor(): string {
+    return backgroundColor
+      ? backgroundColor
+      : Colors.background.button.image.unpressed;
+  }
+
+  function getGradientColors(): string[] {
+    return gradientColors
+      ? gradientColors
+      : IntervalImageGradient.colors.transparent.asStrings;
+  }
+
+  function getButtonView() {
+    return (
+      <View style={[styles.image, { backgroundColor: getBackgroundColor() }]}>
+        {intervalImage}
+      </View>
+    );
   }
 
   return (
@@ -32,13 +54,17 @@ export function ImageButton({
             ]}
           >
             <LinearGradient
-              colors={colors}
+              colors={getGradientColors()}
               start={IntervalImageGradient.start}
               end={IntervalImageGradient.end}
-              style={styles.gradient}
+              style={[
+                styles.gradient,
+                { display: gradientColors ? "flex" : "none" },
+              ]}
             >
-              <View style={styles.image}>{intervalImage}</View>
+              {getButtonView()}
             </LinearGradient>
+            {!gradientColors && getButtonView()}
           </View>
         )}
       </Pressable>
@@ -49,7 +75,7 @@ export function ImageButton({
 const styles = StyleSheet.create({
   unpressedBackground: {
     opacity: 1,
-    backgroundColor: Colors.background.button.image.pressedFullOpacity,
+    // backgroundColor: Colors.background.button.image.pressedFullOpacity,
     borderRadius: Spacing.button.borderRadius,
   },
   pressedBackground: {
@@ -59,7 +85,7 @@ const styles = StyleSheet.create({
     borderRadius: Spacing.button.borderRadius,
   },
   image: {
-    backgroundColor: Colors.background.button.image.unpressed,
+    // backgroundColor: Colors.background.button.image.transparent,
     borderRadius: Spacing.button.borderRadius,
     margin: 3,
     padding: 10,
