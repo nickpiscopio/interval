@@ -28,6 +28,7 @@ export default {
   textLight: TEXT_X_LIGHT,
   textPlaceholder: TEXT_LIGHT,
   textPrefix: TEXT_LIGHT,
+  backgroundImageButton: WHITE,
   // Default from Expo.
   light: {
     text: '#000',
