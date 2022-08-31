@@ -10,11 +10,15 @@ import { RootStackScreenProps } from "../types";
 import Spacing from "../constants/Spacing";
 import Sounds from "../constants/Sounds";
 // import Sound from "react-native-sound";
+import { Audio } from "expo-av";
+import { Sound } from "expo-av/build/Audio";
 
 export default function TimerScreen({
   route,
   navigation,
 }: RootStackScreenProps<"Timer">) {
+  const [beep1, setBeep1] = useState<Sound>();
+  const [beep2, setBeep2] = useState<Sound>();
   const [timeHasRunInMillis, setTimeHasRunInMillis] = useState<number>(0);
   const [currentIntervalIndex, setCurrentIntervalIndex] = useState(-1);
   const [currentInterval, setCurrentInterval] = useState<Interval>();
@@ -24,17 +28,46 @@ export default function TimerScreen({
   const isPausedRef = useRef<boolean>(false);
   const playPauseImageButtonRef = useRef<IntervalImage>(IntervalImage.pause);
 
-  // const beep1 = new Sound(Sounds.beep1);
-  // const beep2 = new Sound(Sounds.beep2);
+  // const beep1 = new Sound(Sounds.beep1, Sound.MAIN_BUNDLE, (error) => {
+  //   if (error) {
+  //     console.log("Failed to load the beep1.", error);
+  //     return;
+  //   }
+  // });
+  // const beep2 = new Sound(Sounds.beep2, Sound.MAIN_BUNDLE, (error) => {
+  //   if (error) {
+  //     console.log("Failed to load the beep2", error);
+  //     return;
+  //   }
+  // });
 
   useEffect(() => {
+    loadSounds();
     setCurrentIntervalHandler();
     countDown();
 
     return () => {
       cancelTimer();
+      unloadSounds();
     };
   }, []);
+
+  async function loadSounds(): Promise<void> {
+    const beep1 = await Audio.Sound.createAsync(
+      require("../../assets/sounds/beep_1.mp3")
+    );
+    setBeep1(beep1.sound);
+
+    const beep2 = await Audio.Sound.createAsync(
+      require("../../assets/sounds/beep_2.mp3")
+    );
+    setBeep2(beep2.sound);
+  }
+
+  function unloadSounds(): void {
+    beep1?.unloadAsync();
+    beep2?.unloadAsync();
+  }
 
   function handleTimerBar(): void {
     const currentInterval = getCurrentInterval();
@@ -124,15 +157,15 @@ export default function TimerScreen({
     return currentIntervalIndexRef.current == getIntervals().length;
   }
 
-  function performChecksToPlaySound(): void {
+  async function performChecksToPlaySound(): Promise<void> {
     switch (getCurrentInterval()?.durationLeftInMillis) {
       case 3000:
       case 2000:
       case 1000:
-        // beep1.play();
+        await beep1?.playAsync();
         break;
       case 0:
-        // beep2.play();
+        await beep2?.playAsync();
         break;
       default:
         break;
