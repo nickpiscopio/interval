@@ -14,9 +14,10 @@ declare global {
 export type RootStackParamList = {
   Root: undefined;
   CreateTimer: undefined;
-  Timer: {intervals: Interval[]};
+  Timer: { intervals: Interval[] };
   Modal: undefined;
   NotFound: undefined;
 };
 
-export type RootStackScreenProps<Screen extends keyof RootStackParamList> = NativeStackScreenProps<RootStackParamList, Screen>;
+export type RootStackScreenProps<Screen extends keyof RootStackParamList> =
+  NativeStackScreenProps<RootStackParamList, Screen>;

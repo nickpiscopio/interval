@@ -31,5 +31,5 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 14,
     marginBottom: 20,
-  }
+  },
 });

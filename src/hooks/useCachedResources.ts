@@ -1,7 +1,7 @@
-import { FontAwesome } from '@expo/vector-icons';
-import * as Font from 'expo-font';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect, useState } from 'react';
+import { FontAwesome } from "@expo/vector-icons";
+import * as Font from "expo-font";
+import * as SplashScreen from "expo-splash-screen";
+import { useEffect, useState } from "react";
 
 export default function useCachedResources() {
   const [isLoadingComplete, setLoadingComplete] = useState(false);
@@ -15,7 +15,7 @@ export default function useCachedResources() {
         // Load fonts
         await Font.loadAsync({
           ...FontAwesome.font,
-          "open-sans": require('../../assets/fonts/OpenSans-VariableFont_wdth,wght.ttf'),
+          "open-sans": require("../../assets/fonts/OpenSans-VariableFont_wdth,wght.ttf"),
         });
       } catch (e) {
         // We might want to provide this error information to an error reporting service

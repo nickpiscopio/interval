@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { StyleSheet, View, Text, StatusBar } from "react-native";
+import { StyleSheet, View, Text, StatusBar, Alert } from "react-native";
 
 import Colors from "../constants/Colors";
 import { Spacer } from "../components/Spacer";
@@ -8,8 +8,13 @@ import { IntervalImage } from "../enum/IntervalImage";
 import { IntervalImageGradient } from "../enum/IntervalImageGradient";
 import { RootStackScreenProps } from "../types";
 import Spacing from "../constants/Spacing";
+import Sounds from "../constants/Sounds";
+// import Sound from "react-native-sound";
 
-export default function TimerScreen({ route }: RootStackScreenProps<"Timer">) {
+export default function TimerScreen({
+  route,
+  navigation,
+}: RootStackScreenProps<"Timer">) {
   const [timeHasRunInMillis, setTimeHasRunInMillis] = useState<number>(0);
   const [currentIntervalIndex, setCurrentIntervalIndex] = useState(-1);
   const [currentInterval, setCurrentInterval] = useState<Interval>();
@@ -17,6 +22,10 @@ export default function TimerScreen({ route }: RootStackScreenProps<"Timer">) {
   const currentIntervalIndexRef = useRef(currentIntervalIndex);
   const timerIdRef = useRef<NodeJS.Timer>();
   const isPausedRef = useRef<boolean>(false);
+  const playPauseImageButtonRef = useRef<IntervalImage>(IntervalImage.pause);
+
+  // const beep1 = new Sound(Sounds.beep1);
+  // const beep2 = new Sound(Sounds.beep2);
 
   useEffect(() => {
     setCurrentIntervalHandler();
@@ -46,6 +55,8 @@ export default function TimerScreen({ route }: RootStackScreenProps<"Timer">) {
   function countDown(): void {
     cancelTimer();
 
+    playPauseImageButtonRef.current = IntervalImage.pause;
+
     const intervalDurationInMillis = 50;
 
     timerIdRef.current = setInterval(() => {
@@ -61,7 +72,7 @@ export default function TimerScreen({ route }: RootStackScreenProps<"Timer">) {
         setCurrentInterval(interval);
       }
 
-      performChecksToAddSound();
+      performChecksToPlaySound();
 
       if (shouldChangeInterval()) {
         setCurrentIntervalHandler();
@@ -113,7 +124,20 @@ export default function TimerScreen({ route }: RootStackScreenProps<"Timer">) {
     return currentIntervalIndexRef.current == getIntervals().length;
   }
 
-  function performChecksToAddSound(): void {}
+  function performChecksToPlaySound(): void {
+    switch (getCurrentInterval()?.durationLeftInMillis) {
+      case 3000:
+      case 2000:
+      case 1000:
+        // beep1.play();
+        break;
+      case 0:
+        // beep2.play();
+        break;
+      default:
+        break;
+    }
+  }
 
   function pauseWorkout(): void {
     isPausedRef.current = !isPausedRef.current;
@@ -130,18 +154,41 @@ export default function TimerScreen({ route }: RootStackScreenProps<"Timer">) {
   function cancelTimer(): void {
     clearInterval(timerIdRef.current);
     timerIdRef.current == undefined;
+
+    playPauseImageButtonRef.current = IntervalImage.play;
   }
 
   function getIntervals(): Interval[] {
     return route.params.intervals;
   }
 
-  function getIntervalImageButton(): IntervalImage {
-    return isPausedRef.current ? IntervalImage.pause : IntervalImage.play;
+  function askToCloseWorkout(): void {
+    Alert.alert(
+      "Cancel Timer?",
+      "Are you sure you want to cancel this timer? This will go back to the previous screen.",
+      [
+        { text: "Stay Here", onPress: () => {}, style: "cancel" },
+        {
+          text: "Cancel Timer",
+          onPress: () => {
+            goBack();
+          },
+          style: "destructive",
+        },
+      ]
+    );
   }
 
-  function askToCloseWorkout(): void {
-    // TODO: Need to implement.
+  function goBack(): void {
+    navigation.goBack();
+  }
+
+  function shouldDisplayCloseButton(): boolean {
+    return isPausedRef.current;
+  }
+
+  function getPlayPauseButton(): IntervalImage {
+    return playPauseImageButtonRef.current;
   }
 
   return (
@@ -159,6 +206,7 @@ export default function TimerScreen({ route }: RootStackScreenProps<"Timer">) {
           intervalImage={IntervalImage.close}
           backgroundColor={getCurrentIntervalBackgroundColor()}
           onPress={() => askToCloseWorkout()}
+          style={{ display: shouldDisplayCloseButton() ? "flex" : "flex" }}
         />
       </View>
 
@@ -173,7 +221,7 @@ export default function TimerScreen({ route }: RootStackScreenProps<"Timer">) {
       </View>
       <View style={styles.containerPlayPause}>
         <ImageButton
-          intervalImage={getIntervalImageButton()}
+          intervalImage={getPlayPauseButton()}
           gradientColors={IntervalImageGradient.colors.solid.asStrings}
           backgroundColor={getCurrentIntervalBackgroundColor()}
           onPress={() => pauseWorkout()}
@@ -199,8 +247,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   containerPlayPause: {
-    // flex: 1,
-    // flexDirection: "column",
     alignItems: "center",
     justifyContent: "center",
     marginBottom: Spacing.window.padding,

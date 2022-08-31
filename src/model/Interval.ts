@@ -1,6 +1,6 @@
 interface Interval {
-    color: string;
-    name: string;
-    durationLeftInMillis: number;
-    totalDuration: number;
+  color: string;
+  name: string;
+  durationLeftInMillis: number;
+  totalDuration: number;
 }
