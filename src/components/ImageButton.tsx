@@ -29,10 +29,12 @@ export function ImageButton({
       : Colors.background.button.image.unpressed;
   }
 
-  function getGradientColors(): string[] {
-    return gradientColors
-      ? gradientColors
-      : IntervalImageGradient.colors.transparent.asStrings;
+  function getGradientColors(): [string, string, ...string[]] {
+    return (
+      gradientColors
+        ? gradientColors
+        : IntervalImageGradient.colors.transparent.asStrings
+    ) as [string, string, ...string[]];
   }
 
   function getButtonView() {

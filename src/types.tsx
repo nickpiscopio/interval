@@ -4,6 +4,7 @@
  */
 
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { Interval } from "./model/Interval";
 
 declare global {
   namespace ReactNavigation {

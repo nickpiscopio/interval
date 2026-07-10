@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { Interval } from "../model/Interval";
 import { StyleSheet, View, Text, StatusBar, Alert } from "react-native";
 
 import Colors from "../constants/Colors";
@@ -24,7 +25,7 @@ export default function TimerScreen({
   const [currentInterval, setCurrentInterval] = useState<Interval>();
   const [timerBarHeight, setTimerBarHeight] = useState(100);
   const currentIntervalIndexRef = useRef(currentIntervalIndex);
-  const timerIdRef = useRef<NodeJS.Timer>();
+  const timerIdRef = useRef<any>(undefined);
   const isPausedRef = useRef<boolean>(false);
   const playPauseImageButtonRef = useRef<IntervalImage>(IntervalImage.pause);
 
@@ -231,7 +232,7 @@ export default function TimerScreen({
         { backgroundColor: getCurrentIntervalBackgroundColor() },
       ]}
     >
-      <View style={[styles.timerBar, { height: timerBarHeight + "%" }]}></View>
+      <View style={[styles.timerBar, { height: `${timerBarHeight}%` as any }]}></View>
 
       <View style={styles.containerHeader}>
         <Spacer />

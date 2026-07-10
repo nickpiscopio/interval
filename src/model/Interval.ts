@@ -1,4 +1,4 @@
-interface Interval {
+export interface Interval {
   color: string;
   name: string;
   durationLeftInMillis: number;

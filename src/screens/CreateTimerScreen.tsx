@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Interval } from "../model/Interval";
 import { ScrollView, StyleSheet } from "react-native";
 import { IntervalInput } from "../components/IntervalInput";
 import { Input } from "../components/Input";

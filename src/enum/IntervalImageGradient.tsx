@@ -1,4 +1,8 @@
-import { colorProps } from "react-native-gradient-icon/src/Icon";
+interface colorProps {
+  color: string;
+  offset: string;
+  opacity: string;
+}
 import Colors from "../constants/Colors";
 
 enum IntervalImageButton {
