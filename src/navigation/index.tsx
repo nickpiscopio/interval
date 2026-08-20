@@ -17,6 +17,8 @@ import { RootStackParamList } from "../types";
 import LinkingConfiguration from "./LinkingConfiguration";
 import CreateTimerScreen from "../screens/CreateTimerScreen";
 import TimerScreen from "../screens/TimerScreen";
+import GenerateTimerScreen from "../screens/GenerateTimerScreen";
+import CompletionScreen from "../screens/CompletionScreen";
 
 export default function Navigation() {
   return (
@@ -51,7 +53,16 @@ function RootNavigator() {
         name="Timer"
         component={TimerScreen}
         options={{ headerShown: false }}
-        initialParams={{ intervals: [] }}
+      />
+      <Stack.Screen
+        name="GenerateTimer"
+        component={GenerateTimerScreen}
+        options={{ title: "Generate Timer" }}
+      />
+      <Stack.Screen
+        name="Completion"
+        component={CompletionScreen}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="NotFound"

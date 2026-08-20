@@ -20,7 +20,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.anonymous.interval"
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
@@ -36,8 +37,10 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "expo-status-bar",
-      "expo-web-browser"
-    ]
+      "expo-video"
+    ],
+    "runtimeVersion": {
+      "policy": "sdkVersion"
+    }
   }
 }

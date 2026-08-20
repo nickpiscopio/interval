@@ -1,265 +1,290 @@
-import { useEffect, useState, useRef } from "react";
-import { Interval } from "../model/Interval";
-import { StyleSheet, View, Text, StatusBar, Alert } from "react-native";
-
-import Colors from "../constants/Colors";
-import { Spacer } from "../components/Spacer";
-import { ImageButton } from "../components/ImageButton";
-import { IntervalImage } from "../enum/IntervalImage";
-import { IntervalImageGradient } from "../enum/IntervalImageGradient";
-import { RootStackScreenProps } from "../types";
-import Spacing from "../constants/Spacing";
-import Sounds from "../constants/Sounds";
-// import Sound from "react-native-sound";
+import React, { useEffect, useState, useRef } from "react";
+import { StyleSheet, View, Text, Alert, TouchableOpacity } from "react-native";
+import { StatusBar } from "expo-status-bar";
 import { Audio } from "expo-av";
-import { Sound } from "expo-av/build/Audio";
+import { Ionicons } from "@expo/vector-icons";
+import { useVideoPlayer, VideoView } from "expo-video";
+
+import { RootStackScreenProps } from "../types";
+import { Interval } from "../model/Interval";
+import { EXERCISE_CATALOG } from "../constants/exerciseCatalog";
+import { Exercise } from "../model/Exercise";
 
 export default function TimerScreen({
   route,
   navigation,
 }: RootStackScreenProps<"Timer">) {
-  const [beep1, setBeep1] = useState<Sound>();
-  const [beep2, setBeep2] = useState<Sound>();
-  const [timeHasRunInMillis, setTimeHasRunInMillis] = useState<number>(0);
-  const [currentIntervalIndex, setCurrentIntervalIndex] = useState(-1);
-  const [currentInterval, setCurrentInterval] = useState<Interval>();
-  const [timerBarHeight, setTimerBarHeight] = useState(100);
-  const currentIntervalIndexRef = useRef(currentIntervalIndex);
+  const { timer } = route.params;
+
+  // Sound State
+  const [beep1, setBeep1] = useState<Audio.Sound>();
+  const [beep2, setBeep2] = useState<Audio.Sound>();
+
+  // Flat list of intervals across all rounds
+  const [flatIntervals, setFlatIntervals] = useState<Interval[]>([]);
+  const [currentIntervalIndex, setCurrentIntervalIndex] = useState(0);
+  const [durationLeft, setDurationLeft] = useState(0);
+  const [totalDuration, setTotalDuration] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+
+  // Refs for timer loops
   const timerIdRef = useRef<any>(undefined);
-  const isPausedRef = useRef<boolean>(false);
-  const playPauseImageButtonRef = useRef<IntervalImage>(IntervalImage.pause);
+  const currentIndexRef = useRef(0);
+  const durationLeftRef = useRef(0);
+  const isPausedRef = useRef(false);
 
-  // const beep1 = new Sound(Sounds.beep1, Sound.MAIN_BUNDLE, (error) => {
-  //   if (error) {
-  //     console.log("Failed to load the beep1.", error);
-  //     return;
-  //   }
-  // });
-  // const beep2 = new Sound(Sounds.beep2, Sound.MAIN_BUNDLE, (error) => {
-  //   if (error) {
-  //     console.log("Failed to load the beep2", error);
-  //     return;
-  //   }
-  // });
+  const currentInterval = flatIntervals[currentIntervalIndex];
 
+  // Find Exercise metadata if referenced
+  let exercise: Exercise | undefined;
+  if (currentInterval?.exerciseId) {
+    exercise = EXERCISE_CATALOG.find((ex) => ex.id === currentInterval.exerciseId);
+  }
+
+  // Initialize expo-video player
+  const player = useVideoPlayer("", (playerInstance) => {
+    playerInstance.loop = true;
+    playerInstance.muted = true;
+  });
+
+  // Keep player in sync with current exercise and pause state
   useEffect(() => {
+    if (exercise?.videoUrl) {
+      player.replace(exercise.videoUrl);
+      player.loop = true;
+      player.muted = true;
+      if (!isPaused) {
+        player.play();
+      } else {
+        player.pause();
+      }
+    } else {
+      player.pause();
+    }
+  }, [exercise?.id, isPaused]);
+
+  // Initialize flat list of intervals
+  useEffect(() => {
+    const list: Interval[] = [];
+    for (let r = 0; r < timer.rounds; r++) {
+      timer.intervals.forEach((int) => {
+        list.push({
+          ...int,
+          // Store raw duration in milliseconds for runner
+          durationLeftInMillis: int.duration * 1000,
+          totalDuration: int.duration * 1000
+        });
+      });
+    }
+    setFlatIntervals(list);
+    
+    if (list.length > 0) {
+      setCurrentIntervalIndex(0);
+      currentIndexRef.current = 0;
+      setDurationLeft(list[0].duration);
+      durationLeftRef.current = list[0].duration * 1000;
+      setTotalDuration(list[0].duration * 1000);
+    }
+
     loadSounds();
-    setCurrentIntervalHandler();
-    countDown();
+    isPausedRef.current = false;
+    startCountDown();
 
     return () => {
-      cancelTimer();
+      clearInterval(timerIdRef.current);
       unloadSounds();
     };
-  }, []);
+  }, [timer]);
 
   async function loadSounds(): Promise<void> {
-    const beep1 = await Audio.Sound.createAsync(
-      require("../../assets/sounds/beep_1.mp3")
-    );
-    setBeep1(beep1.sound);
+    try {
+      const b1 = await Audio.Sound.createAsync(
+        require("../../assets/sounds/beep_1.mp3")
+      );
+      setBeep1(b1.sound);
 
-    const beep2 = await Audio.Sound.createAsync(
-      require("../../assets/sounds/beep_2.mp3")
-    );
-    setBeep2(beep2.sound);
-  }
-
-  function unloadSounds(): void {
-    beep1?.unloadAsync();
-    beep2?.unloadAsync();
-  }
-
-  function handleTimerBar(): void {
-    const currentInterval = getCurrentInterval();
-    if (currentInterval == undefined) {
-      return setTimerBarHeight(100);
+      const b2 = await Audio.Sound.createAsync(
+        require("../../assets/sounds/beep_2.mp3")
+      );
+      setBeep2(b2.sound);
+    } catch (e) {
+      console.warn("Failed to load audio beeps:", e);
     }
-
-    const timerBarPercentage =
-      (currentInterval.durationLeftInMillis / currentInterval.totalDuration) *
-      100;
-    setTimerBarHeight(timerBarPercentage);
   }
 
-  function setCurrentIntervalHandler(): void {
-    currentIntervalIndexRef.current += 1;
+  async function unloadSounds(): Promise<void> {
+    if (beep1) await beep1.unloadAsync();
+    if (beep2) await beep2.unloadAsync();
   }
 
-  function countDown(): void {
-    cancelTimer();
-
-    playPauseImageButtonRef.current = IntervalImage.pause;
-
-    const intervalDurationInMillis = 50;
+  function startCountDown(): void {
+    clearInterval(timerIdRef.current);
+    const tickMs = 100; // tick every 100ms for smoothness
 
     timerIdRef.current = setInterval(() => {
-      setTimeHasRunInMillis((timeRun) => timeRun + intervalDurationInMillis);
+      if (isPausedRef.current) return;
 
-      const currentInterval = getCurrentInterval();
-      handleTimerBar();
+      durationLeftRef.current -= tickMs;
 
-      if (currentInterval !== undefined) {
-        const interval = currentInterval;
-        interval.durationLeftInMillis =
-          currentInterval.durationLeftInMillis - intervalDurationInMillis;
-        setCurrentInterval(interval);
-      }
+      // Handle sound play at 3s, 2s, 1s remaining
+      const secLeft = Math.ceil(durationLeftRef.current / 1000);
+      const exactSecond = durationLeftRef.current % 1000 === 0;
 
-      performChecksToPlaySound();
-
-      if (shouldChangeInterval()) {
-        setCurrentIntervalHandler();
-        countDown();
-
-        if (isTimerDone()) {
-          // TODO: Post the workout is completed.
-
-          cancelTimer();
+      if (exactSecond) {
+        if (secLeft === 3 || secLeft === 2 || secLeft === 1) {
+          beep1?.replayAsync().catch(() => {});
+        } else if (secLeft === 0) {
+          beep2?.replayAsync().catch(() => {});
         }
       }
-    }, intervalDurationInMillis);
+
+      setDurationLeft(Math.max(0, secLeft));
+
+      if (durationLeftRef.current <= 0) {
+        // Move to next interval
+        const nextIdx = currentIndexRef.current + 1;
+        if (nextIdx >= flatIntervals.length) {
+          // Workout finished!
+          clearInterval(timerIdRef.current);
+          navigation.replace("Completion", { timer });
+        } else {
+          currentIndexRef.current = nextIdx;
+          setCurrentIntervalIndex(nextIdx);
+          const nextInt = flatIntervals[nextIdx];
+          durationLeftRef.current = (nextInt.duration || 0) * 1000;
+          setDurationLeft(nextInt.duration || 0);
+          setTotalDuration((nextInt.duration || 0) * 1000);
+        }
+      }
+    }, tickMs);
   }
 
-  function getDurationLeftInInterval(): number {
-    const currentInterval = getCurrentInterval();
-    if (getIntervals() == undefined || currentInterval == undefined) {
-      return 0;
-    }
+  // Calculate current round
+  const currentRound = currentInterval
+    ? Math.floor(currentIntervalIndex / timer.intervals.length) + 1
+    : 1;
 
-    return Math.ceil(currentInterval.durationLeftInMillis / 1000);
+  // Next up info
+  let nextInterval: Interval | undefined;
+  if (currentIntervalIndex + 1 < flatIntervals.length) {
+    nextInterval = flatIntervals[currentIntervalIndex + 1];
   }
 
-  function getCurrentIntervalBackgroundColor(): string {
-    const currentInterval = getCurrentInterval();
-    return currentInterval ? currentInterval.color : "";
+  function togglePlayPause() {
+    const nextPaused = !isPaused;
+    setIsPaused(nextPaused);
+    isPausedRef.current = nextPaused;
   }
 
-  function getCurrentIntervalName(): string {
-    const currentInterval = getCurrentInterval();
-    return currentInterval ? currentInterval.name : "";
-  }
+  function askToCloseWorkout() {
+    const wasPaused = isPausedRef.current;
+    isPausedRef.current = true;
+    setIsPaused(true);
 
-  function getCurrentInterval(): Interval | undefined {
-    return getIntervals()[getCurrentIntervalIndex()];
-  }
-
-  function getCurrentIntervalIndex(): number {
-    return currentIntervalIndexRef.current;
-  }
-
-  function shouldChangeInterval(): boolean {
-    const currentInterval = getCurrentInterval();
-    return currentInterval ? currentInterval.durationLeftInMillis < 0 : true;
-  }
-
-  function isTimerDone(): boolean {
-    // TODO: Need to make sure this is correct.
-    return currentIntervalIndexRef.current == getIntervals().length;
-  }
-
-  async function performChecksToPlaySound(): Promise<void> {
-    switch (getCurrentInterval()?.durationLeftInMillis) {
-      case 3000:
-      case 2000:
-      case 1000:
-        await beep1?.playAsync();
-        break;
-      case 0:
-        await beep2?.playAsync();
-        break;
-      default:
-        break;
-    }
-  }
-
-  function pauseWorkout(): void {
-    isPausedRef.current = !isPausedRef.current;
-
-    if (isPausedRef.current) {
-      cancelTimer();
-
-      return;
-    }
-
-    countDown();
-  }
-
-  function cancelTimer(): void {
-    clearInterval(timerIdRef.current);
-    timerIdRef.current == undefined;
-
-    playPauseImageButtonRef.current = IntervalImage.play;
-  }
-
-  function getIntervals(): Interval[] {
-    return route.params.intervals;
-  }
-
-  function askToCloseWorkout(): void {
     Alert.alert(
-      "Cancel Timer?",
-      "Are you sure you want to cancel this timer? This will go back to the previous screen.",
+      "Exit Workout?",
+      "Are you sure you want to stop this workout and return to the dashboard?",
       [
-        { text: "Stay Here", onPress: () => {}, style: "cancel" },
         {
-          text: "Cancel Timer",
+          text: "Stay Here",
+          style: "cancel",
           onPress: () => {
-            goBack();
-          },
-          style: "destructive",
+            setIsPaused(wasPaused);
+            isPausedRef.current = wasPaused;
+          }
         },
+        {
+          text: "Exit",
+          style: "destructive",
+          onPress: () => {
+            clearInterval(timerIdRef.current);
+            navigation.popToTop();
+          }
+        }
       ]
     );
   }
 
-  function goBack(): void {
-    navigation.goBack();
+  if (!currentInterval) {
+    return (
+      <View style={styles.loadingContainer}>
+        <StatusBar style="dark" />
+        <Text>Preparing workout...</Text>
+      </View>
+    );
   }
 
-  function shouldDisplayCloseButton(): boolean {
-    return isPausedRef.current;
-  }
-
-  function getPlayPauseButton(): IntervalImage {
-    return playPauseImageButtonRef.current;
-  }
+  // Calculate remaining timer bar height
+  const timerBarHeight = totalDuration > 0
+    ? (durationLeftRef.current / totalDuration) * 100
+    : 100;
 
   return (
-    <View
-      style={[
-        styles.container,
-        { backgroundColor: getCurrentIntervalBackgroundColor() },
-      ]}
-    >
-      <View style={[styles.timerBar, { height: `${timerBarHeight}%` as any }]}></View>
+    <View style={[styles.container, { backgroundColor: currentInterval.color }]}>
+      <StatusBar style="light" />
 
-      <View style={styles.containerHeader}>
-        <Spacer />
-        <ImageButton
-          intervalImage={IntervalImage.close}
-          backgroundColor={getCurrentIntervalBackgroundColor()}
-          onPress={() => askToCloseWorkout()}
-          style={{ display: shouldDisplayCloseButton() ? "flex" : "flex" }}
-        />
+      {/* Progress background bar */}
+      <View style={[styles.timerBar, { height: `${timerBarHeight}%` }]} />
+
+      {/* Header Panel */}
+      <View style={styles.header}>
+        <Text style={styles.workoutName}>{timer.name}</Text>
+        <TouchableOpacity style={styles.closeButton} onPress={askToCloseWorkout}>
+          <Ionicons name="close" size={24} color="#FFFFFF" />
+        </TouchableOpacity>
       </View>
 
-      <View style={styles.containerTimer}>
-        <Text style={styles.currentInterval}>{getCurrentIntervalName()}</Text>
-        <Text style={styles.currentIntervalTimeRemaining}>
-          {getDurationLeftInInterval()}
-        </Text>
-        <Text style={styles.intervalsRemaining}>
-          {getCurrentIntervalIndex() + 1}/{getIntervals().length}
-        </Text>
+      {/* Display Video Player if active exercise */}
+      <View style={styles.mediaContainer}>
+        {exercise ? (
+          <View style={styles.videoCard}>
+            <VideoView
+              player={player}
+              style={styles.videoPlayer}
+              allowsFullscreen={false}
+              nativeControls={false}
+            />
+          </View>
+        ) : (
+          <View style={styles.restPlaceholder}>
+            <Ionicons name="body-outline" size={60} color="#FFFFFF" style={styles.pulseIcon} />
+            <Text style={styles.restText}>Catch your breath</Text>
+          </View>
+        )}
       </View>
-      <View style={styles.containerPlayPause}>
-        <ImageButton
-          intervalImage={getPlayPauseButton()}
-          gradientColors={IntervalImageGradient.colors.solid.asStrings}
-          backgroundColor={getCurrentIntervalBackgroundColor()}
-          onPress={() => pauseWorkout()}
-        />
+
+      {/* Timer Details Panel */}
+      <View style={styles.detailsContainer}>
+        <Text style={styles.intervalName}>{currentInterval.name}</Text>
+        <Text style={styles.countdown}>{durationLeft}s</Text>
+        
+        <View style={styles.metaRow}>
+          <Text style={styles.metaText}>Round {currentRound} of {timer.rounds}</Text>
+          <Text style={styles.metaDivider}>•</Text>
+          <Text style={styles.metaText}>
+            Interval {currentIntervalIndex + 1}/{flatIntervals.length}
+          </Text>
+        </View>
+
+        {nextInterval && (
+          <View style={styles.nextUpCard}>
+            <Text style={styles.nextUpLabel}>NEXT UP</Text>
+            <Text style={styles.nextUpValue}>
+              {nextInterval.name} ({nextInterval.duration}s)
+            </Text>
+          </View>
+        )}
+      </View>
+
+      {/* Bottom Controls */}
+      <View style={styles.controlsContainer}>
+        <TouchableOpacity style={styles.controlBtn} onPress={togglePlayPause} activeOpacity={0.8}>
+          <Ionicons
+            name={isPaused ? "play" : "pause"}
+            size={28}
+            color={currentInterval.color}
+          />
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -268,50 +293,153 @@ export default function TimerScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: "space-between",
+    paddingTop: 50,
   },
-  containerHeader: {
-    marginTop: StatusBar.currentHeight,
-    marginHorizontal: Spacing.window.padding,
-    flexDirection: "row",
-  },
-  containerTimer: {
+  loadingContainer: {
     flex: 1,
-    flexDirection: "column",
-    alignItems: "center",
     justifyContent: "center",
-  },
-  containerPlayPause: {
     alignItems: "center",
-    justifyContent: "center",
-    marginBottom: Spacing.window.padding,
+    backgroundColor: "#F9FAFB",
   },
   timerBar: {
     position: "absolute",
     left: 0,
     bottom: 0,
     width: "100%",
-    backgroundColor: "rgba(0, 0, 0, 0.3)",
+    backgroundColor: "rgba(0, 0, 0, 0.25)",
   },
-  currentInterval: {
-    fontWeight: "bold",
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 24,
+    height: 48,
+    zIndex: 10,
+  },
+  workoutName: {
     fontSize: 16,
-    color: Colors.timerText,
+    fontFamily: "Poppins-Bold",
+    color: "#FFFFFF",
+    opacity: 0.9,
   },
-  currentIntervalTimeRemaining: {
-    marginTop: 50,
-    marginBottom: 50,
-    fontSize: 100,
-    color: Colors.timerText,
+  closeButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    justifyContent: "center",
+    alignItems: "center",
   },
-  intervalsRemaining: {
-    fontSize: 50,
-    color: Colors.timerText,
+  mediaContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 24,
+    zIndex: 10,
   },
-  stats: {
+  videoCard: {
+    width: "100%",
+    aspectRatio: 16 / 9,
+    backgroundColor: "#000000",
+    borderRadius: 24,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 6,
+  },
+  videoPlayer: {
+    width: "100%",
+    height: "100%",
+  },
+  restPlaceholder: {
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 12,
+  },
+  restText: {
+    fontSize: 18,
+    fontFamily: "Poppins-Bold",
+    color: "#FFFFFF",
+  },
+  pulseIcon: {
+    opacity: 0.8,
+  },
+  detailsContainer: {
+    alignItems: "center",
+    paddingHorizontal: 24,
+    zIndex: 10,
+  },
+  intervalName: {
+    fontSize: 22,
+    fontFamily: "Poppins-Bold",
+    color: "#FFFFFF",
+    textAlign: "center",
+  },
+  countdown: {
+    fontSize: 90,
+    fontFamily: "Poppins-Bold",
+    color: "#FFFFFF",
+    marginVertical: 10,
+    lineHeight: 100,
+  },
+  metaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    opacity: 0.9,
+  },
+  metaText: {
+    fontSize: 14,
+    fontFamily: "Poppins-Medium",
+    color: "#FFFFFF",
+  },
+  metaDivider: {
+    fontSize: 14,
+    color: "#FFFFFF",
+  },
+  nextUpCard: {
+    backgroundColor: "rgba(255, 255, 255, 0.15)",
+    borderRadius: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    marginTop: 20,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.25)",
+  },
+  nextUpLabel: {
+    fontSize: 10,
+    fontFamily: "Poppins-Bold",
+    color: "#FFFFFF",
+    opacity: 0.7,
+    letterSpacing: 1,
+  },
+  nextUpValue: {
+    fontSize: 13,
+    fontFamily: "Poppins-Bold",
+    color: "#FFFFFF",
+    marginTop: 2,
+  },
+  controlsContainer: {
+    height: 120,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 10,
+  },
+  controlBtn: {
+    width: 68,
+    height: 68,
+    borderRadius: 34,
     backgroundColor: "#FFFFFF",
-  },
-  separator: {
-    height: 1,
-    width: "80%",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.15,
+    shadowRadius: 10,
+    elevation: 4,
   },
 });
