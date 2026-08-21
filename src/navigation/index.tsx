@@ -37,7 +37,11 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 function RootNavigator() {
   return (
     <Stack.Navigator
-      screenOptions={{ headerTitleAlign: "center", presentation: "formSheet" }}
+      screenOptions={{
+        headerTitleAlign: "center",
+        presentation: "card",
+        animation: "slide_from_right",
+      }}
     >
       <Stack.Screen
         name="Root"

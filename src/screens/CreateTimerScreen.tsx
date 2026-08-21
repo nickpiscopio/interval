@@ -61,10 +61,20 @@ export default function CreateTimerScreen({
       );
       setSelectedIntervalIndex(0);
     } else {
-      setTimerName("My HIIT Timer");
+      setTimerName("");
       setRounds(3);
     }
   }, [editTimer]);
+
+  // Dynamic Navigation Header Title
+  useEffect(() => {
+    const isSaved = Boolean(editTimer && editTimer.createdAt && !isImportMode);
+    const fallbackTitle = isSaved ? "Edit Timer" : "Create Timer";
+    const trimmed = timerName.trim();
+    navigation.setOptions({
+      title: trimmed.length > 0 ? timerName : fallbackTitle,
+    });
+  }, [navigation, timerName, editTimer, isImportMode]);
 
   const selectedInterval = intervals[selectedIntervalIndex];
 
@@ -120,7 +130,7 @@ export default function CreateTimerScreen({
   // Save Timer to local database
   async function saveTimer() {
     if (!timerName.trim()) {
-      Alert.alert("Error", "Please enter a workout name.");
+      Alert.alert("Error", "Please enter a timer name.");
       return;
     }
 
@@ -164,7 +174,7 @@ export default function CreateTimerScreen({
     
     Alert.alert(
       "Delete Timer?",
-      "Are you sure you want to delete this entire workout?",
+      "Are you sure you want to delete this entire timer?",
       [
         { text: "Cancel", style: "cancel" },
         {
@@ -213,7 +223,7 @@ export default function CreateTimerScreen({
       {isImportMode && (
         <View style={styles.importBanner}>
           <Ionicons name="download-outline" size={16} color="#FFFFFF" />
-          <Text style={styles.importBannerText}>Review & Import Shared Workout</Text>
+          <Text style={styles.importBannerText}>Review & Import Shared Timer</Text>
         </View>
       )}
 
@@ -221,15 +231,15 @@ export default function CreateTimerScreen({
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Timer Config Section */}
         <View style={styles.configCard}>
-          <Text style={styles.sectionTitle}>Workout Details</Text>
+          <Text style={styles.sectionTitle}>Timer Details</Text>
           <View style={styles.inputRow}>
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Workout Name</Text>
+              <Text style={styles.inputLabel}>Timer Name</Text>
               <TextInput
                 style={styles.textInput}
                 value={timerName}
                 onChangeText={setTimerName}
-                placeholder="My HIIT Workout"
+                placeholder="Timer Name"
                 placeholderTextColor="#9CA3AF"
               />
             </View>
@@ -375,12 +385,12 @@ export default function CreateTimerScreen({
         {editTimer && !isImportMode && (
           <TouchableOpacity onPress={deleteTimer} style={styles.deleteWorkoutBtn}>
             <Ionicons name="trash-bin" size={20} color="#E63946" />
-            <Text style={styles.deleteWorkoutBtnText}>Delete Workout</Text>
+            <Text style={styles.deleteWorkoutBtnText}>Delete Timer</Text>
           </TouchableOpacity>
         )}
         <TouchableOpacity onPress={saveTimer} style={styles.saveWorkoutBtn}>
           <Text style={styles.saveWorkoutBtnText}>
-            {isImportMode ? "Import Workout" : "Save Workout"}
+            {isImportMode ? "Import Timer" : "Save Timer"}
           </Text>
         </TouchableOpacity>
       </View>
