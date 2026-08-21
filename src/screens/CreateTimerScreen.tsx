@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   StyleSheet,
   View,
@@ -9,8 +9,12 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  useWindowDimensions,
+  NativeSyntheticEvent,
+  NativeScrollEvent,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 
 import { RootStackScreenProps } from "../types";
@@ -18,6 +22,7 @@ import { Timer } from "../model/Timer";
 import { Interval } from "../model/Interval";
 import Spacing from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
+import Colors from "../constants/Colors";
 
 const STORAGE_KEY = "@hiit_timers";
 const COLOR_PALETTE = [
@@ -34,8 +39,13 @@ export default function CreateTimerScreen({
   route,
   navigation,
 }: RootStackScreenProps<"CreateTimer">) {
+  const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
+  const carouselRef = useRef<ScrollView>(null);
+  const [activeCardIndex, setActiveCardIndex] = useState<number>(0);
+
   const editTimer = route.params?.timer;
-  const isImportMode = editTimer && editTimer.id.startsWith("ai_") && !editTimer.createdAt;
+  const isImportMode = Boolean(editTimer && editTimer.id.startsWith("ai_") && !editTimer.createdAt);
 
   // Form State
   const [timerName, setTimerName] = useState("");
@@ -78,15 +88,32 @@ export default function CreateTimerScreen({
 
   const selectedInterval = intervals[selectedIntervalIndex];
 
-  // Action: Add Interval
+  // Navigate to Card
+  function scrollToCard(index: number) {
+    if (selectedInterval && selectedInterval.duration < 1) {
+      updateSelectedInterval({ duration: 1 });
+    }
+    setActiveCardIndex(index);
+    carouselRef.current?.scrollTo({ x: index * width, animated: true });
+  }
+
+  // Action: Select Interval (animates carousel to Interval Details)
+  function handleSelectInterval(idx: number) {
+    setSelectedIntervalIndex(idx);
+    scrollToCard(1);
+  }
+
+  // Action: Add Interval (animates carousel to Interval Details)
   function addInterval() {
     const newInterval: Interval = {
       name: "Work Interval",
       duration: 30,
       color: COLOR_PALETTE[intervals.length % COLOR_PALETTE.length]
     };
-    setIntervals([...intervals, newInterval]);
-    setSelectedIntervalIndex(intervals.length);
+    const newIntervals = [...intervals, newInterval];
+    setIntervals(newIntervals);
+    setSelectedIntervalIndex(newIntervals.length - 1);
+    scrollToCard(1);
   }
 
   // Action: Update Selected Interval Properties
@@ -168,6 +195,30 @@ export default function CreateTimerScreen({
     }
   }
 
+  // Start Timer directly from Timer Details
+  function startTimer() {
+    if (!timerName.trim()) {
+      Alert.alert("Error", "Please enter a timer name.");
+      return;
+    }
+
+    const mappedIntervals = intervals.map((int) => ({
+      ...int,
+      durationLeftInMillis: int.duration * 1000,
+      totalDuration: int.duration * 1000,
+    }));
+
+    navigation.navigate("Timer", {
+      timer: {
+        id: editTimer?.id || "temp",
+        name: timerName.trim(),
+        rounds: rounds,
+        intervals: mappedIntervals,
+        createdAt: Date.now(),
+      },
+    });
+  }
+
   // Delete entire Timer
   async function deleteTimer() {
     if (!editTimer) return;
@@ -198,19 +249,50 @@ export default function CreateTimerScreen({
     );
   }
 
-  // Parse seconds into minutes & seconds for display
+  // Handle Carousel Paging
+  function handleCarouselScroll(e: NativeSyntheticEvent<NativeScrollEvent>) {
+    const offsetX = e.nativeEvent.contentOffset.x;
+    const pageIndex = Math.round(offsetX / width);
+    if (pageIndex !== activeCardIndex && (pageIndex === 0 || pageIndex === 1)) {
+      setActiveCardIndex(pageIndex);
+    }
+  }
+
+  // Format seconds to display string (e.g. 5s, 1m 30s)
   function formatSeconds(sec: number): string {
-    const m = Math.floor(sec / 60);
+    const h = Math.floor(sec / 3600);
+    const m = Math.floor((sec % 3600) / 60);
     const s = sec % 60;
+    if (h > 0) return `${h}h ${m}m ${s}s`;
     if (m > 0) return `${m}m ${s}s`;
     return `${s}s`;
   }
 
-  // Change duration helpers
-  function adjustDuration(amount: number) {
-    if (!selectedInterval) return;
-    const newDuration = Math.max(5, selectedInterval.duration + amount);
-    updateSelectedInterval({ duration: newDuration });
+  // Format seconds into HH:MM:SS string
+  function formatHHMMSS(sec: number): string {
+    const h = Math.floor(sec / 3600);
+    const m = Math.floor((sec % 3600) / 60);
+    const s = sec % 60;
+    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+  }
+
+  // Handle Right-to-Left HH:MM:SS typing
+  function handleDurationChange(rawText: string) {
+    const cleanDigits = rawText.replace(/\D/g, "");
+    const trimmed = cleanDigits.slice(-6);
+    const padded = trimmed.padStart(6, "0");
+    const h = parseInt(padded.slice(0, 2), 10) || 0;
+    const m = parseInt(padded.slice(2, 4), 10) || 0;
+    const s = parseInt(padded.slice(4, 6), 10) || 0;
+    const totalSeconds = h * 3600 + m * 60 + s;
+    updateSelectedInterval({ duration: totalSeconds });
+  }
+
+  // Clamp duration to minimum 1s on blur
+  function handleDurationBlur() {
+    if (selectedInterval && selectedInterval.duration < 1) {
+      updateSelectedInterval({ duration: 1 });
+    }
   }
 
   return (
@@ -228,46 +310,11 @@ export default function CreateTimerScreen({
       )}
 
       {/* Interval List Scroll Area */}
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Timer Config Section */}
-        <View style={styles.configCard}>
-          <Text style={styles.sectionTitle}>Timer Details</Text>
-          <View style={styles.inputRow}>
-            <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Timer Name</Text>
-              <TextInput
-                style={styles.textInput}
-                value={timerName}
-                onChangeText={setTimerName}
-                placeholder="Timer Name"
-                placeholderTextColor="#9CA3AF"
-              />
-            </View>
-            <View style={[styles.inputGroup, { flex: 0.4 }]}>
-              <Text style={styles.inputLabel}>Rounds</Text>
-              <View style={styles.roundsControl}>
-                <TouchableOpacity
-                  onPress={() => setRounds(Math.max(1, rounds - 1))}
-                  style={styles.roundAdjustButton}
-                >
-                  <Ionicons name="remove" size={16} color="#4B5563" />
-                </TouchableOpacity>
-                <Text style={styles.roundsValue}>{rounds}</Text>
-                <TouchableOpacity
-                  onPress={() => setRounds(rounds + 1)}
-                  style={styles.roundAdjustButton}
-                >
-                  <Ionicons name="add" size={16} color="#4B5563" />
-                </TouchableOpacity>
-              </View>
-            </View>
-          </View>
-        </View>
-
+      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: Spacing["5xl"] * 4 + insets.bottom }]}>
         <View style={styles.intervalListHeader}>
           <Text style={styles.sectionTitle}>Interval Sequence</Text>
           <TouchableOpacity style={styles.addIntervalLink} onPress={addInterval}>
-            <Ionicons name="add-circle" size={18} color="#3B82F6" />
+            <Ionicons name="add-circle" size={18} color={Colors.primary} />
             <Text style={styles.addIntervalLinkText}>Add Interval</Text>
           </TouchableOpacity>
         </View>
@@ -279,7 +326,7 @@ export default function CreateTimerScreen({
             <TouchableOpacity
               key={idx}
               activeOpacity={0.9}
-              onPress={() => setSelectedIntervalIndex(idx)}
+              onPress={() => handleSelectInterval(idx)}
               style={[
                 styles.intervalItem,
                 isSelected && styles.intervalItemActive,
@@ -296,103 +343,188 @@ export default function CreateTimerScreen({
         })}
       </ScrollView>
 
-      {/* Editor Panel at bottom for focused interval */}
-      {selectedInterval && (
-        <View style={styles.editorPanel}>
-          <Text style={styles.editorTitle}>Edit Selected Interval</Text>
-          
-          <View style={styles.editorInputRow}>
-            {/* Interval Name */}
-            <TextInput
-              style={styles.editorTextInput}
-              value={selectedInterval.name}
-              onChangeText={(name) => updateSelectedInterval({ name })}
-              placeholder="Interval Name"
-            />
-            {/* Duration Adjuster */}
-            <View style={styles.durationAdjuster}>
-              <TouchableOpacity onPress={() => adjustDuration(-5)} style={styles.adjustBtn}>
-                <Text style={styles.adjustBtnText}>-5s</Text>
-              </TouchableOpacity>
-              <Text style={styles.durationDisplay}>{formatSeconds(selectedInterval.duration)}</Text>
-              <TouchableOpacity onPress={() => adjustDuration(5)} style={styles.adjustBtn}>
-                <Text style={styles.adjustBtnText}>+5s</Text>
-              </TouchableOpacity>
+      {/* Bottom Floating Cards Carousel & Navigation Panel */}
+      <View style={[styles.bottomContainer, { paddingBottom: Math.max(insets.bottom, Spacing.sm) }]}>
+        <ScrollView
+          ref={carouselRef}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          onMomentumScrollEnd={handleCarouselScroll}
+          scrollEventThrottle={16}
+          style={styles.carouselScrollView}
+          contentContainerStyle={styles.carouselContentContainer}
+        >
+          {/* Card 1: Timer Details */}
+          <View style={[styles.cardPage, { width }]}>
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Timer Details</Text>
+
+              <View style={styles.inputRow}>
+                <View style={styles.inputGroup}>
+                  <Text style={styles.inputLabel}>Timer Name</Text>
+                  <TextInput
+                    style={styles.textInput}
+                    value={timerName}
+                    onChangeText={setTimerName}
+                    placeholder="Timer Name"
+                    placeholderTextColor="#9CA3AF"
+                  />
+                </View>
+                <View style={[styles.inputGroup, { flex: 0.38 }]}>
+                  <Text style={styles.inputLabel}>Rounds</Text>
+                  <View style={styles.roundsControl}>
+                    <TouchableOpacity
+                      onPress={() => setRounds(Math.max(1, rounds - 1))}
+                      style={styles.roundAdjustButton}
+                    >
+                      <Ionicons name="remove" size={16} color="#4B5563" />
+                    </TouchableOpacity>
+                    <Text style={styles.roundsValue}>{rounds}</Text>
+                    <TouchableOpacity
+                      onPress={() => setRounds(rounds + 1)}
+                      style={styles.roundAdjustButton}
+                    >
+                      <Ionicons name="add" size={16} color="#4B5563" />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+
+              {/* Timer Icon-Only Actions */}
+              <View style={styles.timerActions}>
+                {editTimer && !isImportMode && (
+                  <TouchableOpacity onPress={deleteTimer} style={styles.deleteIconButton}>
+                    <Ionicons name="trash-outline" size={22} color="#E63946" />
+                  </TouchableOpacity>
+                )}
+                <TouchableOpacity onPress={saveTimer} style={styles.saveIconButton}>
+                  <Ionicons
+                    name={isImportMode ? "download-outline" : "bookmark-outline"}
+                    size={22}
+                    color="#4B5563"
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={startTimer} style={styles.startIconButton}>
+                  <Ionicons name="play" size={22} color="#FFFFFF" />
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
 
-          {/* Color Picker */}
-          <Text style={styles.label}>Interval Color</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.colorPalette}>
-            {COLOR_PALETTE.map((color) => {
-              const isSelected = selectedInterval.color === color;
-              return (
-                <TouchableOpacity
-                  key={color}
-                  onPress={() => updateSelectedInterval({ color })}
-                  style={[
-                    styles.colorOption,
-                    { backgroundColor: color },
-                    isSelected && styles.colorOptionSelected
-                  ]}
-                >
-                  {isSelected && <Ionicons name="checkmark" size={16} color="#FFFFFF" />}
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
+          {/* Card 2: Edit Selected Interval */}
+          <View style={[styles.cardPage, { width }]}>
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Edit Selected Interval</Text>
 
-          {/* Editor Action Buttons */}
-          <View style={styles.editorActions}>
-            <TouchableOpacity onPress={deleteSelectedInterval} style={styles.actionBtn}>
-              <Ionicons name="trash-outline" size={20} color="#E63946" />
-              <Text style={[styles.actionBtnText, { color: "#E63946" }]}>Delete</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity onPress={duplicateSelectedInterval} style={styles.actionBtn}>
-              <Ionicons name="copy-outline" size={20} color="#4B5563" />
-              <Text style={styles.actionBtnText}>Duplicate</Text>
-            </TouchableOpacity>
+              {selectedInterval ? (
+                <>
+                  <View style={styles.editorInputRow}>
+                    <View style={styles.inputGroup}>
+                      <Text style={styles.inputLabel}>Interval Name</Text>
+                      <TextInput
+                        style={styles.editorTextInput}
+                        value={selectedInterval.name}
+                        onChangeText={(name) => updateSelectedInterval({ name })}
+                        placeholder="Interval Name"
+                        placeholderTextColor="#9CA3AF"
+                      />
+                    </View>
 
+                    <View style={[styles.inputGroup, { flex: 0.55 }]}>
+                      <Text style={styles.inputLabel}>Duration</Text>
+                      <TextInput
+                        style={styles.timeInput}
+                        value={formatHHMMSS(selectedInterval.duration)}
+                        onChangeText={handleDurationChange}
+                        onBlur={handleDurationBlur}
+                        keyboardType="number-pad"
+                        selectTextOnFocus
+                      />
+                    </View>
+                  </View>
+
+                  <Text style={styles.label}>Interval Color</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.colorPalette}>
+                    {COLOR_PALETTE.map((color) => {
+                      const isSelected = selectedInterval.color === color;
+                      return (
+                        <TouchableOpacity
+                          key={color}
+                          onPress={() => updateSelectedInterval({ color })}
+                          style={[
+                            styles.colorOption,
+                            { backgroundColor: color },
+                            isSelected && styles.colorOptionSelected
+                          ]}
+                        >
+                          {isSelected && <Ionicons name="checkmark" size={16} color="#FFFFFF" />}
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </ScrollView>
+
+                  {/* Interval Icon-Only Actions */}
+                  <View style={styles.intervalActions}>
+                    <TouchableOpacity onPress={deleteSelectedInterval} style={styles.deleteIconButton}>
+                      <Ionicons name="trash-outline" size={22} color="#E63946" />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={duplicateSelectedInterval} style={styles.duplicateIconButton}>
+                      <Ionicons name="copy-outline" size={22} color="#4B5563" />
+                    </TouchableOpacity>
+                  </View>
+                </>
+              ) : (
+                <Text style={styles.noIntervalText}>Select an interval above to edit details.</Text>
+              )}
+            </View>
+          </View>
+        </ScrollView>
+
+        {/* External Bottom Navigation & Indicators Bar */}
+        <View style={styles.bottomNavBar}>
+          {/* Left: Timer Details link when on Card 2 */}
+          <View style={styles.navSideContainer}>
+            {activeCardIndex === 1 ? (
+              <TouchableOpacity
+                onPress={() => scrollToCard(0)}
+                style={styles.navButtonLeft}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <Ionicons name="chevron-back" size={16} color="#6B7280" />
+                <Text style={styles.navButtonText}>Timer Details</Text>
+              </TouchableOpacity>
+            ) : null}
+          </View>
+
+          {/* Center: Circular Pagination Dots */}
+          <View style={styles.paginationDots}>
             <TouchableOpacity
-              onPress={() => {
-                const mappedIntervals = intervals.map(int => ({
-                  ...int,
-                  durationLeftInMillis: int.duration * 1000,
-                  totalDuration: int.duration * 1000
-                }));
-                navigation.navigate("Timer", {
-                  timer: {
-                    id: editTimer?.id || "temp",
-                    name: timerName,
-                    rounds: rounds,
-                    intervals: mappedIntervals,
-                    createdAt: Date.now()
-                  }
-                });
-              }}
-              style={[styles.actionBtn, styles.startBtn]}
-            >
-              <Ionicons name="play" size={18} color="#FFFFFF" />
-              <Text style={[styles.actionBtnText, { color: "#FFFFFF" }]}>Start</Text>
-            </TouchableOpacity>
+              onPress={() => scrollToCard(0)}
+              style={[styles.dot, activeCardIndex === 0 ? styles.dotActive : styles.dotInactive]}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            />
+            <TouchableOpacity
+              onPress={() => scrollToCard(1)}
+              style={[styles.dot, activeCardIndex === 1 ? styles.dotActive : styles.dotInactive]}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            />
+          </View>
+
+          {/* Right: Edit Selected Interval link when on Card 1 */}
+          <View style={styles.navSideContainer}>
+            {activeCardIndex === 0 ? (
+              <TouchableOpacity
+                onPress={() => scrollToCard(1)}
+                style={styles.navButtonRight}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <Text style={styles.navButtonText}>Edit Selected Interval</Text>
+                <Ionicons name="chevron-forward" size={16} color="#6B7280" />
+              </TouchableOpacity>
+            ) : null}
           </View>
         </View>
-      )}
-
-      {/* Global Actions footer */}
-      <View style={styles.footer}>
-        {editTimer && !isImportMode && (
-          <TouchableOpacity onPress={deleteTimer} style={styles.deleteWorkoutBtn}>
-            <Ionicons name="trash-bin" size={20} color="#E63946" />
-            <Text style={styles.deleteWorkoutBtnText}>Delete Timer</Text>
-          </TouchableOpacity>
-        )}
-        <TouchableOpacity onPress={saveTimer} style={styles.saveWorkoutBtn}>
-          <Text style={styles.saveWorkoutBtnText}>
-            {isImportMode ? "Import Timer" : "Save Timer"}
-          </Text>
-        </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
   );
@@ -420,19 +552,112 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: Spacing.lg,
-    paddingBottom: Spacing["5xl"] * 4, // Leave space for the sticky editor panel
-  },
-  configCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: Spacing.radius.md,
-    padding: Spacing.md,
-    marginBottom: Spacing.lg,
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
   },
   sectionTitle: {
     fontSize: FontSize.md,
     lineHeight: FontSize.lineHeight.md,
+    fontFamily: "Poppins-Bold",
+    color: "#374151",
+  },
+  intervalListHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: Spacing.md,
+  },
+  addIntervalLink: {
+    flexDirection: "row",
+    alignItems: "center",
+    minHeight: Spacing.touchTarget.min,
+    gap: Spacing.xs,
+  },
+  addIntervalLinkText: {
+    fontSize: FontSize.sm,
+    lineHeight: FontSize.lineHeight.sm,
+    fontFamily: "Poppins-Bold",
+    color: Colors.primary,
+  },
+  intervalItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderRadius: Spacing.radius.sm,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    marginBottom: Spacing.sm,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    borderLeftWidth: 6,
+    minHeight: Spacing.touchTarget.min,
+  },
+  intervalItemActive: {
+    borderColor: Colors.primary,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  intervalInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+    gap: Spacing.sm,
+  },
+  colorIndicator: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+  },
+  intervalName: {
+    fontSize: FontSize.sm,
+    lineHeight: FontSize.lineHeight.sm,
+    fontFamily: "Poppins-Bold",
+    color: "#374151",
+    flex: 1,
+  },
+  intervalDuration: {
+    fontSize: FontSize.sm,
+    lineHeight: FontSize.lineHeight.sm,
+    fontFamily: "Poppins-Medium",
+    color: "#6B7280",
+    marginLeft: Spacing.sm,
+  },
+  bottomContainer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  carouselScrollView: {
+    overflow: "visible",
+  },
+  carouselContentContainer: {
+    paddingTop: 4,
+    paddingBottom: 2,
+  },
+  cardPage: {
+    paddingHorizontal: Spacing.md,
+    paddingTop: 2,
+    paddingBottom: 2,
+    justifyContent: "flex-end",
+  },
+  card: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: Spacing.radius.md,
+    padding: Spacing.md,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.07,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  cardTitle: {
+    fontSize: FontSize.sm,
+    lineHeight: FontSize.lineHeight.sm,
     fontFamily: "Poppins-Bold",
     color: "#374151",
     marginBottom: Spacing.sm,
@@ -440,6 +665,7 @@ const styles = StyleSheet.create({
   inputRow: {
     flexDirection: "row",
     gap: Spacing.md,
+    marginBottom: Spacing.md,
   },
   inputGroup: {
     flex: 1,
@@ -488,100 +714,55 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.sm,
     textAlign: "center",
   },
-  intervalListHeader: {
+  timerActions: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: Spacing.sm,
-  },
-  addIntervalLink: {
-    flexDirection: "row",
-    alignItems: "center",
-    minHeight: Spacing.touchTarget.min,
-    gap: Spacing.xs,
-  },
-  addIntervalLinkText: {
-    fontSize: FontSize.sm,
-    lineHeight: FontSize.lineHeight.sm,
-    fontFamily: "Poppins-Bold",
-    color: "#3B82F6",
-  },
-  intervalItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "#FFFFFF",
-    borderRadius: Spacing.radius.sm,
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.md,
-    marginBottom: Spacing.sm,
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-    borderLeftWidth: 6,
-    minHeight: Spacing.touchTarget.min,
-  },
-  intervalItemActive: {
-    borderColor: "#3B82F6",
-    shadowColor: "#3B82F6",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 3,
-  },
-  intervalInfo: {
-    flexDirection: "row",
-    alignItems: "center",
-    flex: 1,
     gap: Spacing.sm,
+    marginTop: Spacing.xs,
   },
-  colorIndicator: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-  },
-  intervalName: {
-    fontSize: FontSize.sm,
-    lineHeight: FontSize.lineHeight.sm,
-    fontFamily: "Poppins-Bold",
-    color: "#374151",
+  deleteIconButton: {
     flex: 1,
+    minHeight: Spacing.touchTarget.min,
+    borderRadius: Spacing.radius.sm,
+    borderWidth: 1,
+    borderColor: "#E63946",
+    backgroundColor: "#FFF5F5",
+    justifyContent: "center",
+    alignItems: "center",
   },
-  intervalDuration: {
-    fontSize: FontSize.sm,
-    lineHeight: FontSize.lineHeight.sm,
-    fontFamily: "Poppins-Medium",
-    color: "#6B7280",
-    marginLeft: Spacing.sm,
+  saveIconButton: {
+    flex: 1,
+    minHeight: Spacing.touchTarget.min,
+    borderRadius: Spacing.radius.sm,
+    borderWidth: 1,
+    borderColor: "#D1D5DB",
+    backgroundColor: "#F3F4F6",
+    justifyContent: "center",
+    alignItems: "center",
   },
-  editorPanel: {
-    position: "absolute",
-    bottom: Spacing.touchTarget.cta + Spacing.lg, // Above the global save footer
-    left: 0,
-    right: 0,
-    backgroundColor: "#FFFFFF",
-    borderTopWidth: 1,
-    borderColor: "#E5E7EB",
-    padding: Spacing.md,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 5,
+  startIconButton: {
+    flex: 1.5,
+    minHeight: Spacing.touchTarget.min,
+    borderRadius: Spacing.radius.sm,
+    backgroundColor: Colors.primary,
+    justifyContent: "center",
+    alignItems: "center",
   },
-  editorTitle: {
-    fontSize: FontSize.sm,
-    lineHeight: FontSize.lineHeight.sm,
-    fontFamily: "Poppins-Bold",
-    color: "#374151",
-    marginBottom: Spacing.sm,
+  duplicateIconButton: {
+    flex: 1,
+    minHeight: Spacing.touchTarget.min,
+    borderRadius: Spacing.radius.sm,
+    borderWidth: 1,
+    borderColor: "#D1D5DB",
+    backgroundColor: "#F3F4F6",
+    justifyContent: "center",
+    alignItems: "center",
   },
   editorInputRow: {
     flexDirection: "row",
     gap: Spacing.md,
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.sm,
   },
   editorTextInput: {
-    flex: 1,
     minHeight: Spacing.touchTarget.min,
     borderWidth: 1,
     borderColor: "#D1D5DB",
@@ -591,34 +772,21 @@ const styles = StyleSheet.create({
     lineHeight: FontSize.lineHeight.sm,
     fontFamily: "Poppins-Regular",
     color: "#1F2937",
+    backgroundColor: "#F9FAFB",
   },
-  durationAdjuster: {
-    flexDirection: "row",
-    alignItems: "center",
+  timeInput: {
+    minHeight: Spacing.touchTarget.min,
     borderWidth: 1,
     borderColor: "#D1D5DB",
     borderRadius: Spacing.radius.sm,
-    minHeight: Spacing.touchTarget.min,
-    overflow: "hidden",
-  },
-  adjustBtn: {
     paddingHorizontal: Spacing.md,
-    minHeight: Spacing.touchTarget.min,
-    justifyContent: "center",
-    backgroundColor: "#F3F4F6",
-  },
-  adjustBtnText: {
-    fontSize: FontSize.xs,
-    lineHeight: FontSize.lineHeight.xs,
-    fontFamily: "Poppins-Bold",
-    color: "#4B5563",
-  },
-  durationDisplay: {
     fontSize: FontSize.sm,
     lineHeight: FontSize.lineHeight.sm,
     fontFamily: "Poppins-Bold",
     color: "#1F2937",
-    paddingHorizontal: Spacing.md,
+    backgroundColor: "#F9FAFB",
+    textAlign: "center",
+    letterSpacing: 1,
   },
   label: {
     fontSize: FontSize.xs,
@@ -629,7 +797,7 @@ const styles = StyleSheet.create({
   },
   colorPalette: {
     flexDirection: "row",
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.sm,
   },
   colorOption: {
     width: 32,
@@ -643,82 +811,66 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "#1F2937",
   },
-  editorActions: {
+  intervalActions: {
     flexDirection: "row",
     gap: Spacing.sm,
+    marginTop: Spacing.xs,
   },
-  actionBtn: {
-    flex: 1,
-    minHeight: Spacing.touchTarget.min,
-    paddingVertical: Spacing.xs,
-    paddingHorizontal: Spacing.sm,
-    borderRadius: Spacing.radius.sm,
-    borderWidth: 1,
-    borderColor: "#D1D5DB",
+  noIntervalText: {
+    fontSize: FontSize.sm,
+    lineHeight: FontSize.lineHeight.sm,
+    fontFamily: "Poppins-Regular",
+    color: "#6B7280",
+    textAlign: "center",
+    paddingVertical: Spacing.lg,
+  },
+  bottomNavBar: {
     flexDirection: "row",
-    justifyContent: "center",
     alignItems: "center",
-    gap: Spacing.xs,
+    justifyContent: "space-between",
+    paddingHorizontal: Spacing.md,
+    paddingTop: 0,
+    minHeight: 28,
   },
-  actionBtnText: {
+  navSideContainer: {
+    flex: 1,
+    justifyContent: "center",
+  },
+  navButtonLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    minHeight: 28,
+    gap: Spacing.xs,
+    alignSelf: "flex-start",
+  },
+  navButtonRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    minHeight: 28,
+    gap: Spacing.xs,
+    alignSelf: "flex-end",
+  },
+  navButtonText: {
     fontSize: FontSize.xs,
     lineHeight: FontSize.lineHeight.xs,
-    fontFamily: "Poppins-Bold",
-    color: "#4B5563",
-    textAlign: "center",
+    fontFamily: "Poppins-Medium",
+    color: "#6B7280",
   },
-  startBtn: {
-    backgroundColor: "#3B82F6",
-    borderColor: "#3B82F6",
-  },
-  footer: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    minHeight: Spacing.touchTarget.cta + Spacing.md,
-    backgroundColor: "#FFFFFF",
-    borderTopWidth: 1,
-    borderColor: "#E5E7EB",
-    flexDirection: "row",
-    padding: Spacing.md,
-    gap: Spacing.md,
-  },
-  deleteWorkoutBtn: {
-    flex: 1,
-    minHeight: Spacing.touchTarget.min,
-    paddingVertical: Spacing.xs,
-    paddingHorizontal: Spacing.sm,
-    borderRadius: Spacing.radius.sm,
-    borderWidth: 1,
-    borderColor: "#E63946",
+  paginationDots: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    gap: Spacing.xs,
+    gap: Spacing.sm,
   },
-  deleteWorkoutBtnText: {
-    fontSize: FontSize.sm,
-    lineHeight: FontSize.lineHeight.sm,
-    fontFamily: "Poppins-Bold",
-    color: "#E63946",
-    textAlign: "center",
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
   },
-  saveWorkoutBtn: {
-    flex: 2,
-    minHeight: Spacing.touchTarget.min,
-    paddingVertical: Spacing.xs,
-    paddingHorizontal: Spacing.sm,
-    borderRadius: Spacing.radius.sm,
-    backgroundColor: "#1D4ED8",
-    justifyContent: "center",
-    alignItems: "center",
+  dotActive: {
+    backgroundColor: "#6B7280",
   },
-  saveWorkoutBtnText: {
-    fontSize: FontSize.sm,
-    lineHeight: FontSize.lineHeight.sm,
-    fontFamily: "Poppins-Bold",
-    color: "#FFFFFF",
-    textAlign: "center",
+  dotInactive: {
+    backgroundColor: "#D1D5DB",
   },
 });
