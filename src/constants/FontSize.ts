@@ -1,3 +1,9 @@
+export const FONT_FAMILY = {
+  regular: "Poppins-Regular",
+  medium: "Poppins-Medium",
+  bold: "Poppins-Bold",
+} as const;
+
 export const FONT_SIZE = {
   xs: 12,
   sm: 14,
@@ -25,6 +31,8 @@ export const LINE_HEIGHT = {
 export default {
   ...FONT_SIZE,
   lineHeight: LINE_HEIGHT,
+  fontFamily: FONT_FAMILY,
+
   // Backward compatibility mappings
   input: {
     title: FONT_SIZE.sm,

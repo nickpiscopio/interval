@@ -14,6 +14,7 @@ import { RootStackScreenProps } from "../types";
 import { generateWorkout, GeneratorParams } from "../services/timerGenerator";
 import Spacing from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
+import Colors from "../constants/Colors";
 
 export default function GenerateTimerScreen({
   navigation,
@@ -181,9 +182,9 @@ export default function GenerateTimerScreen({
         onPress={handleGenerate}
       >
         <LinearGradient
-          colors={["#10B981", "#3B82F6"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
+          colors={Colors.aiGradient}
+          start={Colors.aiGradientCoordinates.start}
+          end={Colors.aiGradientCoordinates.end}
           style={styles.generateButton}
         >
           <Ionicons name="sparkles" size={18} color="#FFFFFF" style={styles.buttonIcon} />

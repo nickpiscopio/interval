@@ -27,6 +27,11 @@ export default {
   ...SPACING,
   radius: RADIUS,
   touchTarget: TOUCH_TARGET,
+
+  // Layout Semantic Aliases
+  screen: SPACING.md, // 16px screen padding / margins
+  cardGap: SPACING.sm, // 8px gap between cards and list items
+
   // Backward compatibility mappings
   window: {
     padding: SPACING.lg, // 24

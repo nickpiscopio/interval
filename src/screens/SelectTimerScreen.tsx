@@ -19,6 +19,7 @@ import { Timer } from "../model/Timer";
 import { DEFAULT_AI_TIMERS } from "../constants/defaultTimers";
 import Spacing from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
+import Colors from "../constants/Colors";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const STORAGE_KEY = "@hiit_timers";
@@ -210,9 +211,9 @@ export default function SelectTimerScreen({
           onPress={() => navigation.navigate("GenerateTimer")}
         >
           <LinearGradient
-            colors={["#10B981", "#3B82F6"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
+            colors={Colors.aiGradient}
+            start={Colors.aiGradientCoordinates.start}
+            end={Colors.aiGradientCoordinates.end}
             style={styles.gradientButton}
           >
             <Ionicons name="sparkles" size={18} color="#FFFFFF" style={styles.buttonIcon} />
