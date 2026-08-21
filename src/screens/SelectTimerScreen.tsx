@@ -19,6 +19,7 @@ import { Timer } from "../model/Timer";
 import { DEFAULT_AI_TIMERS } from "../constants/defaultTimers";
 import Spacing from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const STORAGE_KEY = "@hiit_timers";
 const INITIALIZED_KEY = "@hiit_initialized";
@@ -28,7 +29,11 @@ export default function SelectTimerScreen({
 }: RootStackScreenProps<"Root">) {
   const [timers, setTimers] = useState<Timer[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [hasMoreBelow, setHasMoreBelow] = useState(false);
+  const [headerHeight, setHeaderHeight] = useState(120);
   const isFocused = useIsFocused();
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     if (isFocused) {
@@ -85,9 +90,25 @@ export default function SelectTimerScreen({
     <View style={styles.container}>
       <StatusBar style="dark" />
       
-      <View style={styles.header}>
+      {/* Dynamic Sticky Header */}
+      <View
+        onLayout={(e) => setHeaderHeight(e.nativeEvent.layout.height)}
+        style={[
+            styles.header,
+            isScrolled ? styles.headerScrolled : styles.headerUnscrolled,
+            { paddingTop: Math.max(insets.top, 20) + Spacing.sm },
+          ]}
+      >
         <Text style={styles.greeting}>Let's Workout! ⚡️</Text>
         <Text style={styles.subGreeting}>Choose or generate a HIIT timer to start</Text>
+
+        {isScrolled && (
+          <LinearGradient
+            colors={["rgba(0, 0, 0, 0.06)", "transparent"]}
+            style={styles.headerShadowGradient}
+            pointerEvents="none"
+          />
+        )}
       </View>
 
       {loading ? (
@@ -95,7 +116,7 @@ export default function SelectTimerScreen({
           <ActivityIndicator size="large" color="#3B82F6" />
         </View>
       ) : timers.length === 0 ? (
-        <View style={styles.emptyContainer}>
+        <View style={[styles.emptyContainer, { paddingTop: headerHeight + Spacing.md }]}>
           <View style={styles.emptyIconContainer}>
             <Ionicons name="stopwatch-outline" size={72} color="#9CA3AF" />
           </View>
@@ -105,7 +126,23 @@ export default function SelectTimerScreen({
           </Text>
         </View>
       ) : (
-        <ScrollView contentContainerStyle={styles.listContent}>
+        <ScrollView
+          contentContainerStyle={[
+            styles.listContent,
+            { paddingTop: headerHeight + Spacing.sm },
+          ]}
+          onScroll={(e) => {
+            const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
+            const offsetY = contentOffset.y;
+            setIsScrolled(offsetY > 2);
+            const remaining = contentSize.height - (offsetY + layoutMeasurement.height);
+            setHasMoreBelow(remaining > 10);
+          }}
+          onContentSizeChange={(_, contentHeight) => {
+            setHasMoreBelow(contentHeight > 550);
+          }}
+          scrollEventThrottle={16}
+        >
           {timers.map((timer) => (
             <TouchableOpacity
               key={timer.id}
@@ -149,7 +186,15 @@ export default function SelectTimerScreen({
       )}
 
       {/* Persistent Bottom Action Panel */}
-      <View style={styles.buttonPanel}>
+      <View
+        style={[
+          styles.buttonPanel,
+          {
+            borderTopColor: hasMoreBelow ? "#E5E7EB" : "transparent",
+            paddingBottom: Math.max(insets.bottom, 12) + Spacing.sm,
+          },
+        ]}
+      >
         <TouchableOpacity
           style={styles.createButton}
           activeOpacity={0.9}
@@ -185,9 +230,26 @@ const styles = StyleSheet.create({
     backgroundColor: "#F9FAFB",
   },
   header: {
-    paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.lg,
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    paddingHorizontal: Spacing.md,
     paddingBottom: Spacing.md,
+    zIndex: 10,
+  },
+  headerUnscrolled: {
+    backgroundColor: "#F9FAFB",
+  },
+  headerScrolled: {
+    backgroundColor: "#FFFFFF",
+  },
+  headerShadowGradient: {
+    position: "absolute",
+    bottom: -5,
+    left: 0,
+    right: 0,
+    height: 5,
   },
   greeting: {
     fontSize: FontSize["2xl"],
@@ -208,14 +270,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   listContent: {
-    padding: Spacing.lg,
-    paddingBottom: Spacing["5xl"] * 2, // Make room for floating bottom panel
+    padding: Spacing.md,
+    paddingBottom: Spacing["4xl"] * 2, // Make room for floating bottom panel
   },
   card: {
     backgroundColor: "#FFFFFF",
     borderRadius: Spacing.radius.md,
     padding: Spacing.md,
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.sm,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.05,
@@ -324,9 +386,8 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     flexDirection: "row",
-    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    backgroundColor: "#FFFFFF",
     borderTopWidth: 1,
-    borderColor: "#E5E7EB",
     paddingVertical: Spacing.md,
     paddingHorizontal: Spacing.lg,
     gap: Spacing.md,

@@ -42,7 +42,7 @@ function RootNavigator() {
       <Stack.Screen
         name="Root"
         component={SelectTimerScreen}
-        options={{ title: "Select Timer" }}
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="CreateTimer"
