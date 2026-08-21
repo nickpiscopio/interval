@@ -4,15 +4,17 @@ import {
   StyleSheet,
   View,
   Text,
-  ScrollView,
   TouchableOpacity,
   ActivityIndicator,
-  Alert,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useIsFocused } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
+import DraggableFlatList, {
+  RenderItemParams,
+  ScaleDecorator,
+} from "react-native-draggable-flatlist";
 
 import { RootStackScreenProps } from "../types";
 import { Timer } from "../model/Timer";
@@ -57,14 +59,10 @@ export default function SelectTimerScreen({
       const data = await AsyncStorage.getItem(STORAGE_KEY);
       if (data) {
         const parsed = JSON.parse(data) as Timer[];
-        // Sort by creation date descending
-        parsed.sort((a, b) => b.createdAt - a.createdAt);
         setTimers(parsed);
-      } else {
-        setTimers([]);
       }
     } catch (e) {
-      console.warn("Failed to load timers:", e);
+      console.warn("Failed to load timers from AsyncStorage:", e);
     } finally {
       setLoading(false);
     }
@@ -78,14 +76,73 @@ export default function SelectTimerScreen({
     return intervalsDuration * timer.rounds;
   }
 
-  function formatTime(totalSeconds: number): string {
-    const mins = Math.floor(totalSeconds / 60);
-    const secs = totalSeconds % 60;
+  function formatTime(seconds: number): string {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
     if (mins > 0) {
       return `${mins}m ${secs > 0 ? `${secs}s` : ""}`;
     }
     return `${secs}s`;
   }
+
+  const renderTimerCard = ({ item, drag, isActive }: RenderItemParams<Timer>) => (
+    <ScaleDecorator>
+      <TouchableOpacity
+        style={[
+          styles.card,
+          isActive && styles.cardDragging,
+          { marginBottom: Spacing.cardGap },
+        ]}
+        activeOpacity={0.8}
+        onPress={() => navigation.navigate("CreateTimer", { timer: item })}
+      >
+        <View style={styles.cardHeader}>
+          {/* Drag Handle on the Far Left inside the Card */}
+          <TouchableOpacity
+            onPressIn={drag}
+            style={styles.dragHandle}
+            hitSlop={{ top: 14, bottom: 14, left: 14, right: 14 }}
+          >
+            <MaterialIcons
+              name="drag-indicator"
+              size={22}
+              color={isActive ? Colors.primary : Colors.textScale.muted}
+            />
+          </TouchableOpacity>
+
+          <View style={styles.cardMetaContainer}>
+            <Text style={styles.cardTitle}>{item.name}</Text>
+            <View style={styles.badgeRow}>
+              {item.isAiGenerated && (
+                <View style={[styles.badge, styles.aiBadge]}>
+                  <Ionicons name="sparkles" size={12} color="#059669" />
+                  <Text style={[styles.badgeText, styles.aiBadgeText]}>AI</Text>
+                </View>
+              )}
+              <View style={styles.badge}>
+                <Ionicons name="repeat" size={12} color="#4B5563" />
+                <Text style={styles.badgeText}>{item.rounds} Rounds</Text>
+              </View>
+              <View style={[styles.badge, styles.durationBadge]}>
+                <Ionicons name="time-outline" size={12} color="#1D4ED8" />
+                <Text style={[styles.badgeText, styles.durationBadgeText]}>
+                  {formatTime(calculateTotalDuration(item))}
+                </Text>
+              </View>
+            </View>
+          </View>
+
+          <TouchableOpacity
+            style={styles.playButton}
+            activeOpacity={0.7}
+            onPress={() => navigation.navigate("Timer", { timer: item })}
+          >
+            <Ionicons name="play" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+        </View>
+      </TouchableOpacity>
+    </ScaleDecorator>
+  );
 
   return (
     <View style={styles.container}>
@@ -127,7 +184,14 @@ export default function SelectTimerScreen({
           </Text>
         </View>
       ) : (
-        <ScrollView
+        <DraggableFlatList
+          data={timers}
+          keyExtractor={(item) => item.id}
+          onDragEnd={({ data }) => {
+            setTimers(data);
+            AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+          }}
+          renderItem={renderTimerCard}
           contentContainerStyle={[
             styles.listContent,
             { paddingTop: headerHeight + Spacing.sm },
@@ -143,47 +207,7 @@ export default function SelectTimerScreen({
             setHasMoreBelow(contentHeight > 550);
           }}
           scrollEventThrottle={16}
-        >
-          {timers.map((timer) => (
-            <TouchableOpacity
-              key={timer.id}
-              style={styles.card}
-              activeOpacity={0.8}
-              onPress={() => navigation.navigate("CreateTimer", { timer })}
-            >
-              <View style={styles.cardHeader}>
-                <View style={styles.cardMetaContainer}>
-                  <Text style={styles.cardTitle}>{timer.name}</Text>
-                  <View style={styles.badgeRow}>
-                    {timer.isAiGenerated && (
-                      <View style={[styles.badge, styles.aiBadge]}>
-                        <Ionicons name="sparkles" size={12} color="#059669" />
-                        <Text style={[styles.badgeText, styles.aiBadgeText]}>AI</Text>
-                      </View>
-                    )}
-                    <View style={styles.badge}>
-                      <Ionicons name="repeat" size={12} color="#4B5563" />
-                      <Text style={styles.badgeText}>{timer.rounds} Rounds</Text>
-                    </View>
-                    <View style={[styles.badge, styles.durationBadge]}>
-                      <Ionicons name="time-outline" size={12} color="#1D4ED8" />
-                      <Text style={[styles.badgeText, styles.durationBadgeText]}>
-                        {formatTime(calculateTotalDuration(timer))}
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-                <TouchableOpacity
-                  style={styles.playButton}
-                  activeOpacity={0.7}
-                  onPress={() => navigation.navigate("Timer", { timer })}
-                >
-                  <Ionicons name="play" size={24} color="#FFFFFF" />
-                </TouchableOpacity>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
+        />
       )}
 
       {/* Persistent Bottom Action Panel */}
@@ -278,7 +302,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     borderRadius: Spacing.radius.md,
     padding: Spacing.md,
-    marginBottom: Spacing.sm,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.05,
@@ -287,11 +310,22 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#E5E7EB",
   },
+  cardDragging: {
+    borderColor: Colors.primary,
+    shadowColor: Colors.primary,
+    shadowOpacity: 0.25,
+    shadowRadius: 14,
+    elevation: 8,
+  },
   cardHeader: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
-    gap: Spacing.md,
+    gap: Spacing.sm,
+  },
+  dragHandle: {
+    paddingRight: Spacing.xs,
+    justifyContent: "center",
+    alignItems: "center",
   },
   cardMetaContainer: {
     flex: 1,
@@ -301,20 +335,21 @@ const styles = StyleSheet.create({
     lineHeight: FontSize.lineHeight.lg,
     fontFamily: "Poppins-Bold",
     color: "#1F2937",
-    marginBottom: Spacing.sm,
+    marginBottom: Spacing.xs,
   },
   badgeRow: {
     flexDirection: "row",
-    flexWrap: "wrap",
+    alignItems: "center",
     gap: Spacing.sm,
+    flexWrap: "wrap",
   },
   badge: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#F3F4F6",
-    borderRadius: Spacing.radius.sm,
-    paddingVertical: Spacing.xs,
     paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.xs,
+    borderRadius: Spacing.radius.sm,
     gap: Spacing.xs,
   },
   badgeText: {
@@ -325,8 +360,6 @@ const styles = StyleSheet.create({
   },
   aiBadge: {
     backgroundColor: "#ECFDF5",
-    borderWidth: 1,
-    borderColor: "#A7F3D0",
   },
   aiBadgeText: {
     color: "#059669",
@@ -337,26 +370,84 @@ const styles = StyleSheet.create({
   },
   durationBadgeText: {
     color: "#1D4ED8",
+    fontFamily: "Poppins-Bold",
   },
   playButton: {
     width: Spacing.touchTarget.min,
-    minHeight: Spacing.touchTarget.min,
+    height: Spacing.touchTarget.min,
     borderRadius: Spacing.touchTarget.min / 2,
-    backgroundColor: "#3B82F6",
+    backgroundColor: "#1D4ED8",
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#3B82F6",
+    shadowColor: "#1D4ED8",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.2,
     shadowRadius: 8,
-    elevation: 4,
+    elevation: 3,
+  },
+  buttonPanel: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: "#FFFFFF",
+    flexDirection: "row",
+    padding: Spacing.md,
+    gap: Spacing.md,
+    borderTopWidth: 1,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  createButton: {
+    flex: 1,
+    flexDirection: "row",
+    minHeight: Spacing.button.minHeight,
+    borderRadius: Spacing.radius.sm,
+    borderWidth: 1,
+    borderColor: "#D1D5DB",
+    backgroundColor: "#FFFFFF",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.xs,
+  },
+  createButtonText: {
+    fontSize: FontSize.sm,
+    lineHeight: FontSize.lineHeight.sm,
+    fontFamily: "Poppins-Bold",
+    color: "#374151",
+  },
+  generateButton: {
+    flex: 1.2,
+    minHeight: Spacing.button.minHeight,
+    borderRadius: Spacing.radius.sm,
+    overflow: "hidden",
+  },
+  gradientButton: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.xs,
+  },
+  generateButtonText: {
+    fontSize: FontSize.sm,
+    lineHeight: FontSize.lineHeight.sm,
+    fontFamily: "Poppins-Bold",
+    color: "#FFFFFF",
+  },
+  buttonIcon: {
+    marginRight: Spacing.xs,
   },
   emptyContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: Spacing["2xl"],
-    paddingBottom: Spacing["5xl"],
+    padding: Spacing["2xl"],
   },
   emptyIconContainer: {
     width: 120,
@@ -365,14 +456,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#F3F4F6",
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: Spacing.lg,
+    marginBottom: Spacing.md,
   },
   emptyTitle: {
     fontSize: FontSize.xl,
     lineHeight: FontSize.lineHeight.xl,
     fontFamily: "Poppins-Bold",
-    color: "#374151",
-    marginBottom: Spacing.sm,
+    color: "#1F2937",
+    marginBottom: Spacing.xs,
   },
   emptyText: {
     fontSize: FontSize.sm,
@@ -380,63 +471,6 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-Regular",
     color: "#6B7280",
     textAlign: "center",
-  },
-  buttonPanel: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    flexDirection: "row",
-    backgroundColor: "#FFFFFF",
-    borderTopWidth: 1,
-    paddingVertical: Spacing.md,
-    paddingHorizontal: Spacing.lg,
-    gap: Spacing.md,
-  },
-  createButton: {
-    flex: 1,
-    minHeight: Spacing.touchTarget.cta,
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.md,
-    borderRadius: Spacing.radius.md,
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1.5,
-    borderColor: "#3B82F6",
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  createButtonText: {
-    fontSize: FontSize.sm,
-    lineHeight: FontSize.lineHeight.sm,
-    fontFamily: "Poppins-Bold",
-    color: "#3B82F6",
-    textAlign: "center",
-  },
-  generateButton: {
-    flex: 1.2,
-    minHeight: Spacing.touchTarget.cta,
-    borderRadius: Spacing.radius.md,
-    overflow: "hidden",
-  },
-  gradientButton: {
-    width: "100%",
-    minHeight: Spacing.touchTarget.cta,
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.md,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  generateButtonText: {
-    fontSize: FontSize.sm,
-    lineHeight: FontSize.lineHeight.sm,
-    fontFamily: "Poppins-Bold",
-    color: "#FFFFFF",
-    textAlign: "center",
-  },
-  buttonIcon: {
-    marginRight: Spacing.xs,
+    maxWidth: 280,
   },
 });
-

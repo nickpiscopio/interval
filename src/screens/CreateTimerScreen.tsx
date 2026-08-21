@@ -15,7 +15,11 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import DraggableFlatList, {
+  RenderItemParams,
+  ScaleDecorator,
+} from "react-native-draggable-flatlist";
 
 import { RootStackScreenProps } from "../types";
 import { Timer } from "../model/Timer";
@@ -295,6 +299,49 @@ export default function CreateTimerScreen({
     }
   }
 
+  const renderIntervalItem = ({
+    item,
+    drag,
+    isActive,
+    getIndex,
+  }: RenderItemParams<Interval>) => {
+    const idx = getIndex() ?? 0;
+    const isSelected = idx === selectedIntervalIndex;
+    return (
+      <ScaleDecorator>
+        <TouchableOpacity
+          activeOpacity={0.9}
+          onPress={() => handleSelectInterval(idx)}
+          style={[
+            styles.intervalItem,
+            isSelected && styles.intervalItemActive,
+            isActive && styles.intervalItemDragging,
+            { borderLeftColor: item.color },
+          ]}
+        >
+          {/* 6-Dot Drag Handle inside on the Far Left */}
+          <TouchableOpacity
+            onPressIn={drag}
+            style={styles.intervalDragHandle}
+            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+          >
+            <MaterialIcons
+              name="drag-indicator"
+              size={20}
+              color={isActive ? Colors.primary : Colors.textScale.muted}
+            />
+          </TouchableOpacity>
+
+          <View style={styles.intervalInfo}>
+            <View style={[styles.colorIndicator, { backgroundColor: item.color }]} />
+            <Text style={styles.intervalName}>{item.name}</Text>
+          </View>
+          <Text style={styles.intervalDuration}>{formatSeconds(item.duration)}</Text>
+        </TouchableOpacity>
+      </ScaleDecorator>
+    );
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -309,39 +356,35 @@ export default function CreateTimerScreen({
         </View>
       )}
 
-      {/* Interval List Scroll Area */}
-      <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: Spacing["5xl"] * 4 + insets.bottom }]}>
-        <View style={styles.intervalListHeader}>
-          <Text style={styles.sectionTitle}>Interval Sequence</Text>
-          <TouchableOpacity style={styles.addIntervalLink} onPress={addInterval}>
-            <Ionicons name="add-circle" size={18} color={Colors.primary} />
-            <Text style={styles.addIntervalLinkText}>Add Interval</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Intervals Display */}
-        {intervals.map((int, idx) => {
-          const isSelected = idx === selectedIntervalIndex;
-          return (
-            <TouchableOpacity
-              key={idx}
-              activeOpacity={0.9}
-              onPress={() => handleSelectInterval(idx)}
-              style={[
-                styles.intervalItem,
-                isSelected && styles.intervalItemActive,
-                { borderLeftColor: int.color }
-              ]}
-            >
-              <View style={styles.intervalInfo}>
-                <View style={[styles.colorIndicator, { backgroundColor: int.color }]} />
-                <Text style={styles.intervalName}>{int.name}</Text>
-              </View>
-              <Text style={styles.intervalDuration}>{formatSeconds(int.duration)}</Text>
+      {/* Interval Draggable List Area */}
+      <DraggableFlatList
+        data={intervals}
+        keyExtractor={(_, index) => `interval_${index}`}
+        onDragEnd={({ data, from, to }) => {
+          setIntervals(data);
+          if (selectedIntervalIndex === from) {
+            setSelectedIntervalIndex(to);
+          } else if (from < selectedIntervalIndex && to >= selectedIntervalIndex) {
+            setSelectedIntervalIndex(selectedIntervalIndex - 1);
+          } else if (from > selectedIntervalIndex && to <= selectedIntervalIndex) {
+            setSelectedIntervalIndex(selectedIntervalIndex + 1);
+          }
+        }}
+        renderItem={renderIntervalItem}
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingBottom: Spacing["5xl"] * 4 + insets.bottom },
+        ]}
+        ListHeaderComponent={
+          <View style={styles.intervalListHeader}>
+            <Text style={styles.sectionTitle}>Interval Sequence</Text>
+            <TouchableOpacity style={styles.addIntervalLink} onPress={addInterval}>
+              <Ionicons name="add-circle" size={18} color={Colors.primary} />
+              <Text style={styles.addIntervalLinkText}>Add Interval</Text>
             </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
+          </View>
+        }
+      />
 
       {/* Bottom Floating Cards Carousel & Navigation Panel */}
       <View style={[styles.bottomContainer, { paddingBottom: Math.max(insets.bottom, Spacing.sm) }]}>
@@ -579,17 +622,22 @@ const styles = StyleSheet.create({
   },
   intervalItem: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: "#FFFFFF",
     borderRadius: Spacing.radius.sm,
     paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.md,
-    marginBottom: Spacing.sm,
+    paddingHorizontal: Spacing.sm,
+    marginBottom: Spacing.cardGap,
     borderWidth: 1,
     borderColor: "#E5E7EB",
     borderLeftWidth: 6,
     minHeight: Spacing.touchTarget.min,
+  },
+  intervalDragHandle: {
+    paddingRight: Spacing.xs,
+    paddingLeft: Spacing.xs,
+    justifyContent: "center",
+    alignItems: "center",
   },
   intervalItemActive: {
     borderColor: Colors.primary,
@@ -599,11 +647,19 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 3,
   },
+  intervalItemDragging: {
+    borderColor: Colors.primary,
+    shadowColor: Colors.primary,
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 8,
+  },
   intervalInfo: {
     flexDirection: "row",
     alignItems: "center",
     flex: 1,
     gap: Spacing.sm,
+    marginLeft: Spacing.xs,
   },
   colorIndicator: {
     width: 12,
@@ -622,7 +678,7 @@ const styles = StyleSheet.create({
     lineHeight: FontSize.lineHeight.sm,
     fontFamily: "Poppins-Medium",
     color: "#6B7280",
-    marginLeft: Spacing.sm,
+    marginRight: Spacing.xs,
   },
   bottomContainer: {
     position: "absolute",
