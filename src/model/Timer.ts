@@ -6,4 +6,6 @@ export interface Timer {
   rounds: number;
   intervals: Interval[];
   createdAt: number;
+  isAiGenerated?: boolean;
 }
+

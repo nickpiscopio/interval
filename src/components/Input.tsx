@@ -49,34 +49,35 @@ export function Input({
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 10,
+    marginTop: Spacing.md,
     borderColor: Colors.border,
     borderWidth: Spacing.input.border.width,
     borderRadius: Spacing.input.border.radius,
   },
   title: {
     position: "absolute",
-    marginTop: -12,
-    marginLeft: 5,
-    paddingHorizontal: 5,
+    marginTop: -10,
+    marginLeft: Spacing.sm,
+    paddingHorizontal: Spacing.xs,
     color: Colors.inputTitle,
     backgroundColor: Colors.inputTitleBackground,
     fontSize: FontSize.input.title,
   },
   inputContainer: {
     flexDirection: "row",
+    alignItems: "center",
+    minHeight: Spacing.input.minHeight,
   },
   prefix: {
-    marginTop: 2,
-    paddingTop: Spacing.input.padding,
+    paddingVertical: Spacing.input.padding,
     paddingLeft: Spacing.input.padding,
-    paddingBottom: Spacing.input.padding,
     color: Colors.textPrefix,
     fontSize: FontSize.input.prefix,
   },
   input: {
     flex: 1,
-    padding: Spacing.input.padding,
+    paddingVertical: Spacing.input.padding,
+    paddingHorizontal: Spacing.input.padding,
     color: Colors.text,
     fontSize: FontSize.input.text,
   },

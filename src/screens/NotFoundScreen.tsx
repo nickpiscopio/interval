@@ -2,6 +2,8 @@ import { StyleSheet, TouchableOpacity } from "react-native";
 
 import { Text, View } from "../components/Themed";
 import { RootStackScreenProps } from "../types";
+import Spacing from "../constants/Spacing";
+import FontSize from "../constants/FontSize";
 
 export default function NotFoundScreen({
   navigation,
@@ -24,18 +26,25 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    padding: 20,
+    padding: Spacing.lg,
   },
   title: {
-    fontSize: 20,
+    fontSize: FontSize.lg,
+    lineHeight: FontSize.lineHeight.lg,
     fontWeight: "bold",
+    textAlign: "center",
   },
   link: {
-    marginTop: 15,
-    paddingVertical: 15,
+    marginTop: Spacing.md,
+    paddingVertical: Spacing.md,
+    minHeight: Spacing.touchTarget.min,
+    justifyContent: "center",
+    alignItems: "center",
   },
   linkText: {
-    fontSize: 14,
+    fontSize: FontSize.sm,
+    lineHeight: FontSize.lineHeight.sm,
     color: "#2e78b7",
+    textAlign: "center",
   },
 });

@@ -129,13 +129,14 @@ export function generateWorkout(params: GeneratorParams): Timer {
     advanced: "Pro"
   };
 
-  const timerName = `AI: ${difficultyNames[experience]} ${areaNames[area]} ${goalNames[goal]}`;
+  const timerName = `${difficultyNames[experience]} ${areaNames[area]} ${goalNames[goal]}`;
 
   return {
     id: `ai_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
     name: timerName,
     rounds,
     intervals,
-    createdAt: Date.now()
+    createdAt: Date.now(),
+    isAiGenerated: true
   };
 }

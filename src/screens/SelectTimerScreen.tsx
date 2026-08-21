@@ -16,8 +16,12 @@ import { LinearGradient } from "expo-linear-gradient";
 
 import { RootStackScreenProps } from "../types";
 import { Timer } from "../model/Timer";
+import { DEFAULT_AI_TIMERS } from "../constants/defaultTimers";
+import Spacing from "../constants/Spacing";
+import FontSize from "../constants/FontSize";
 
 const STORAGE_KEY = "@hiit_timers";
+const INITIALIZED_KEY = "@hiit_initialized";
 
 export default function SelectTimerScreen({
   navigation,
@@ -35,6 +39,15 @@ export default function SelectTimerScreen({
   async function loadTimers() {
     try {
       setLoading(true);
+      const isInitialized = await AsyncStorage.getItem(INITIALIZED_KEY);
+      if (!isInitialized) {
+        // Initial app launch: seed default AI timers
+        await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_AI_TIMERS));
+        await AsyncStorage.setItem(INITIALIZED_KEY, "true");
+        setTimers([...DEFAULT_AI_TIMERS].sort((a, b) => b.createdAt - a.createdAt));
+        return;
+      }
+
       const data = await AsyncStorage.getItem(STORAGE_KEY);
       if (data) {
         const parsed = JSON.parse(data) as Timer[];
@@ -104,6 +117,12 @@ export default function SelectTimerScreen({
                 <View style={styles.cardMetaContainer}>
                   <Text style={styles.cardTitle}>{timer.name}</Text>
                   <View style={styles.badgeRow}>
+                    {timer.isAiGenerated && (
+                      <View style={[styles.badge, styles.aiBadge]}>
+                        <Ionicons name="sparkles" size={12} color="#059669" />
+                        <Text style={[styles.badgeText, styles.aiBadgeText]}>AI</Text>
+                      </View>
+                    )}
                     <View style={styles.badge}>
                       <Ionicons name="repeat" size={12} color="#4B5563" />
                       <Text style={styles.badgeText}>{timer.rounds} Rounds</Text>
@@ -166,20 +185,22 @@ const styles = StyleSheet.create({
     backgroundColor: "#F9FAFB",
   },
   header: {
-    paddingHorizontal: 20,
-    paddingTop: 24,
-    paddingBottom: 16,
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.lg,
+    paddingBottom: Spacing.md,
   },
   greeting: {
-    fontSize: 28,
+    fontSize: FontSize["2xl"],
+    lineHeight: FontSize.lineHeight["2xl"],
     fontFamily: "Poppins-Bold",
     color: "#111827",
   },
   subGreeting: {
-    fontSize: 14,
+    fontSize: FontSize.sm,
+    lineHeight: FontSize.lineHeight.sm,
     fontFamily: "Poppins-Regular",
     color: "#6B7280",
-    marginTop: 4,
+    marginTop: Spacing.xs,
   },
   centered: {
     flex: 1,
@@ -187,14 +208,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   listContent: {
-    padding: 20,
-    paddingBottom: 100, // Make room for floating bottom panel
+    padding: Spacing.lg,
+    paddingBottom: Spacing["5xl"] * 2, // Make room for floating bottom panel
   },
   card: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 16,
+    borderRadius: Spacing.radius.md,
+    padding: Spacing.md,
+    marginBottom: Spacing.md,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.05,
@@ -207,35 +228,46 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    gap: Spacing.md,
   },
   cardMetaContainer: {
     flex: 1,
-    marginRight: 12,
   },
   cardTitle: {
-    fontSize: 18,
+    fontSize: FontSize.lg,
+    lineHeight: FontSize.lineHeight.lg,
     fontFamily: "Poppins-Bold",
     color: "#1F2937",
-    marginBottom: 8,
+    marginBottom: Spacing.sm,
   },
   badgeRow: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: 8,
+    gap: Spacing.sm,
   },
   badge: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#F3F4F6",
-    borderRadius: 8,
-    paddingVertical: 4,
-    paddingHorizontal: 8,
-    gap: 4,
+    borderRadius: Spacing.radius.sm,
+    paddingVertical: Spacing.xs,
+    paddingHorizontal: Spacing.sm,
+    gap: Spacing.xs,
   },
   badgeText: {
-    fontSize: 12,
+    fontSize: FontSize.xs,
+    lineHeight: FontSize.lineHeight.xs,
     fontFamily: "Poppins-Medium",
     color: "#4B5563",
+  },
+  aiBadge: {
+    backgroundColor: "#ECFDF5",
+    borderWidth: 1,
+    borderColor: "#A7F3D0",
+  },
+  aiBadgeText: {
+    color: "#059669",
+    fontFamily: "Poppins-Bold",
   },
   durationBadge: {
     backgroundColor: "#EFF6FF",
@@ -244,9 +276,9 @@ const styles = StyleSheet.create({
     color: "#1D4ED8",
   },
   playButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: Spacing.touchTarget.min,
+    minHeight: Spacing.touchTarget.min,
+    borderRadius: Spacing.touchTarget.min / 2,
     backgroundColor: "#3B82F6",
     justifyContent: "center",
     alignItems: "center",
@@ -260,8 +292,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: 40,
-    paddingBottom: 80,
+    paddingHorizontal: Spacing["2xl"],
+    paddingBottom: Spacing["5xl"],
   },
   emptyIconContainer: {
     width: 120,
@@ -270,20 +302,21 @@ const styles = StyleSheet.create({
     backgroundColor: "#F3F4F6",
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: Spacing.lg,
   },
   emptyTitle: {
-    fontSize: 20,
+    fontSize: FontSize.xl,
+    lineHeight: FontSize.lineHeight.xl,
     fontFamily: "Poppins-Bold",
     color: "#374151",
-    marginBottom: 8,
+    marginBottom: Spacing.sm,
   },
   emptyText: {
-    fontSize: 14,
+    fontSize: FontSize.sm,
+    lineHeight: FontSize.lineHeight.sm,
     fontFamily: "Poppins-Regular",
     color: "#6B7280",
     textAlign: "center",
-    lineHeight: 20,
   },
   buttonPanel: {
     position: "absolute",
@@ -294,14 +327,16 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255, 255, 255, 0.9)",
     borderTopWidth: 1,
     borderColor: "#E5E7EB",
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    gap: 12,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.lg,
+    gap: Spacing.md,
   },
   createButton: {
     flex: 1,
-    height: 52,
-    borderRadius: 16,
+    minHeight: Spacing.touchTarget.cta,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    borderRadius: Spacing.radius.md,
     backgroundColor: "#FFFFFF",
     borderWidth: 1.5,
     borderColor: "#3B82F6",
@@ -310,29 +345,36 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   createButtonText: {
-    fontSize: 14,
+    fontSize: FontSize.sm,
+    lineHeight: FontSize.lineHeight.sm,
     fontFamily: "Poppins-Bold",
     color: "#3B82F6",
+    textAlign: "center",
   },
   generateButton: {
     flex: 1.2,
-    height: 52,
-    borderRadius: 16,
+    minHeight: Spacing.touchTarget.cta,
+    borderRadius: Spacing.radius.md,
     overflow: "hidden",
   },
   gradientButton: {
     width: "100%",
-    height: "100%",
+    minHeight: Spacing.touchTarget.cta,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
   },
   generateButtonText: {
-    fontSize: 14,
+    fontSize: FontSize.sm,
+    lineHeight: FontSize.lineHeight.sm,
     fontFamily: "Poppins-Bold",
     color: "#FFFFFF",
+    textAlign: "center",
   },
   buttonIcon: {
-    marginRight: 6,
+    marginRight: Spacing.xs,
   },
 });
+
