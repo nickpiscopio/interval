@@ -12,6 +12,7 @@ import {
   useWindowDimensions,
   NativeSyntheticEvent,
   NativeScrollEvent,
+  Animated,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -47,6 +48,11 @@ export default function CreateTimerScreen({
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const carouselRef = useRef<ScrollView>(null);
+  const listRef = useRef<any>(null);
+  const scrollX = useRef(new Animated.Value(0)).current;
+  const [card1Height, setCard1Height] = useState<number>(180);
+  const [card2Height, setCard2Height] = useState<number>(240);
+  const [navBarHeight, setNavBarHeight] = useState<number>(44);
   const [activeCardIndex, setActiveCardIndex] = useState<number>(0);
 
   const editTimer = route.params?.timer;
@@ -93,6 +99,16 @@ export default function CreateTimerScreen({
     });
   }, [navigation, timerName, editTimer, isImportMode]);
 
+  const bottomInset = Math.max(insets.bottom, Spacing.sm);
+  const card1BottomOffset = card1Height + navBarHeight + bottomInset;
+  const card2BottomOffset = card2Height + navBarHeight + bottomInset;
+
+  const dynamicListBottomMargin = scrollX.interpolate({
+    inputRange: [0, width],
+    outputRange: [card1BottomOffset, card2BottomOffset],
+    extrapolate: "clamp",
+  });
+
   const selectedInterval = intervals.find((int) => int.id === selectedIntervalId) || intervals[0];
 
   // Navigate to Card
@@ -122,6 +138,9 @@ export default function CreateTimerScreen({
     setIntervals(newIntervals);
     setSelectedIntervalId(newInterval.id);
     scrollToCard(1);
+    setTimeout(() => {
+      listRef.current?.scrollToEnd({ animated: true });
+    }, 50);
   }
 
   // Action: Update Selected Interval Properties
@@ -148,6 +167,13 @@ export default function CreateTimerScreen({
     updated.splice(index + 1, 0, duplicated);
     setIntervals(updated);
     setSelectedIntervalId(duplicated.id);
+    setTimeout(() => {
+      try {
+        listRef.current?.scrollToIndex({ index: index + 1, animated: true });
+      } catch {
+        listRef.current?.scrollToEnd({ animated: true });
+      }
+    }, 50);
   }
 
   // Action: Delete Selected Interval
@@ -363,171 +389,200 @@ export default function CreateTimerScreen({
       )}
 
       {/* Interval Draggable List Area */}
-      <DraggableFlatList
-        data={intervals}
-        keyExtractor={(item) => item.id}
-        onDragBegin={() => {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        }}
-        onDragEnd={({ data }) => {
-          setIntervals(data);
-        }}
-        renderItem={renderIntervalItem}
-        contentContainerStyle={[
-          styles.scrollContent,
-          { paddingBottom: Spacing["5xl"] * 4 + insets.bottom },
-        ]}
-        ListHeaderComponent={
-          <View style={styles.intervalListHeader}>
-            <Text style={styles.sectionTitle}>Interval Sequence</Text>
-            <TouchableOpacity style={styles.addIntervalLink} onPress={addInterval}>
-              <Ionicons name="add-circle" size={18} color={Colors.primary} />
-              <Text style={styles.addIntervalLinkText}>Add Interval</Text>
-            </TouchableOpacity>
-          </View>
-        }
-      />
-
-      {/* Bottom Floating Cards Carousel & Navigation Panel */}
-      <View style={[styles.bottomContainer, { paddingBottom: Math.max(insets.bottom, Spacing.sm) }]}>
-        <ScrollView
-          ref={carouselRef}
-          horizontal
-          pagingEnabled
-          showsHorizontalScrollIndicator={false}
-          onMomentumScrollEnd={handleCarouselScroll}
-          scrollEventThrottle={16}
-          style={styles.carouselScrollView}
-          contentContainerStyle={styles.carouselContentContainer}
-        >
-          {/* Card 1: Timer Details */}
-          <View style={[styles.cardPage, { width }]}>
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Timer Details</Text>
-
-              <View style={styles.inputRow}>
-                <View style={styles.inputGroup}>
-                  <Text style={styles.inputLabel}>Timer Name</Text>
-                  <TextInput
-                    style={styles.textInput}
-                    value={timerName}
-                    onChangeText={setTimerName}
-                    placeholder="Timer Name"
-                    placeholderTextColor="#9CA3AF"
-                  />
-                </View>
-                <View style={[styles.inputGroup, { flex: 0.38 }]}>
-                  <Text style={styles.inputLabel}>Rounds</Text>
-                  <View style={styles.roundsControl}>
-                    <TouchableOpacity
-                      onPress={() => setRounds(Math.max(1, rounds - 1))}
-                      style={styles.roundAdjustButton}
-                    >
-                      <Ionicons name="remove" size={16} color="#4B5563" />
-                    </TouchableOpacity>
-                    <Text style={styles.roundsValue}>{rounds}</Text>
-                    <TouchableOpacity
-                      onPress={() => setRounds(rounds + 1)}
-                      style={styles.roundAdjustButton}
-                    >
-                      <Ionicons name="add" size={16} color="#4B5563" />
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              </View>
-
-              {/* Timer Icon-Only Actions */}
-              <View style={styles.timerActions}>
-                {editTimer && !isImportMode && (
-                  <TouchableOpacity onPress={deleteTimer} style={styles.deleteIconButton}>
-                    <Ionicons name="trash-outline" size={22} color="#E63946" />
-                  </TouchableOpacity>
-                )}
-                <TouchableOpacity onPress={saveTimer} style={styles.saveIconButton}>
-                  <Ionicons
-                    name={isImportMode ? "download-outline" : "bookmark-outline"}
-                    size={22}
-                    color="#4B5563"
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={startTimer} style={styles.startIconButton}>
-                  <Ionicons name="play" size={22} color="#FFFFFF" />
-                </TouchableOpacity>
-              </View>
+      <Animated.View style={[styles.listContainer, { marginBottom: dynamicListBottomMargin }]}>
+        <DraggableFlatList
+          ref={listRef}
+          data={intervals}
+          keyExtractor={(item) => item.id}
+          onDragBegin={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          }}
+          onDragEnd={({ data }) => {
+            setIntervals(data);
+          }}
+          renderItem={renderIntervalItem}
+          contentContainerStyle={styles.scrollContent}
+          ListHeaderComponent={
+            <View style={styles.intervalListHeader}>
+              <Text style={styles.sectionTitle}>Interval Sequence</Text>
+              <TouchableOpacity style={styles.addIntervalLink} onPress={addInterval}>
+                <Ionicons name="add-circle" size={18} color={Colors.primary} />
+                <Text style={styles.addIntervalLinkText}>Add Interval</Text>
+              </TouchableOpacity>
             </View>
-          </View>
+          }
+        />
+      </Animated.View>
 
-          {/* Card 2: Edit Selected Interval */}
-          <View style={[styles.cardPage, { width }]}>
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>Edit Selected Interval</Text>
+      {/* Bottom Fixed-Anchor Cards Carousel & Navigation Panel */}
+      <View style={[styles.bottomContainer, { paddingBottom: bottomInset }]}>
+        <View style={{ height: Math.max(card1Height, card2Height) }}>
+          <Animated.ScrollView
+            ref={carouselRef as any}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            onScroll={Animated.event(
+              [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+              { useNativeDriver: false, listener: handleCarouselScroll }
+            )}
+            scrollEventThrottle={16}
+            style={styles.carouselScrollView}
+            contentContainerStyle={styles.carouselContentContainer}
+          >
+            {/* Card 1: Timer Details */}
+            <View style={[styles.cardPage, { width }]}>
+              <View
+                style={styles.card}
+                onLayout={(e) => {
+                  const h = e.nativeEvent.layout.height;
+                  if (h > 0 && Math.abs(h - card1Height) > 1) {
+                    setCard1Height(h);
+                  }
+                }}
+              >
+                <Text style={styles.cardTitle}>Timer Details</Text>
 
-              {selectedInterval ? (
-                <>
-                  <View style={styles.editorInputRow}>
-                    <View style={styles.inputGroup}>
-                      <Text style={styles.inputLabel}>Interval Name</Text>
-                      <TextInput
-                        style={styles.editorTextInput}
-                        value={selectedInterval.name}
-                        onChangeText={(name) => updateSelectedInterval({ name })}
-                        placeholder="Interval Name"
-                        placeholderTextColor="#9CA3AF"
-                      />
-                    </View>
-
-                    <View style={[styles.inputGroup, { flex: 0.55 }]}>
-                      <Text style={styles.inputLabel}>Duration</Text>
-                      <TextInput
-                        style={styles.timeInput}
-                        value={formatHHMMSS(selectedInterval.duration)}
-                        onChangeText={handleDurationChange}
-                        onBlur={handleDurationBlur}
-                        keyboardType="number-pad"
-                        selectTextOnFocus
-                      />
+                <View style={styles.inputRow}>
+                  <View style={styles.inputGroup}>
+                    <Text style={styles.inputLabel}>Timer Name</Text>
+                    <TextInput
+                      style={styles.textInput}
+                      value={timerName}
+                      onChangeText={setTimerName}
+                      placeholder="Timer Name"
+                      placeholderTextColor="#9CA3AF"
+                    />
+                  </View>
+                  <View style={[styles.inputGroup, { flex: 0.38 }]}>
+                    <Text style={styles.inputLabel}>Rounds</Text>
+                    <View style={styles.roundsControl}>
+                      <TouchableOpacity
+                        onPress={() => setRounds(Math.max(1, rounds - 1))}
+                        style={styles.roundAdjustButton}
+                      >
+                        <Ionicons name="remove" size={16} color="#4B5563" />
+                      </TouchableOpacity>
+                      <Text style={styles.roundsValue}>{rounds}</Text>
+                      <TouchableOpacity
+                        onPress={() => setRounds(rounds + 1)}
+                        style={styles.roundAdjustButton}
+                      >
+                        <Ionicons name="add" size={16} color="#4B5563" />
+                      </TouchableOpacity>
                     </View>
                   </View>
+                </View>
 
-                  <Text style={styles.label}>Interval Color</Text>
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.colorPalette}>
-                    {COLOR_PALETTE.map((color) => {
-                      const isSelected = selectedInterval.color === color;
-                      return (
-                        <TouchableOpacity
-                          key={color}
-                          onPress={() => updateSelectedInterval({ color })}
-                          style={[
-                            styles.colorOption,
-                            { backgroundColor: color },
-                            isSelected && styles.colorOptionSelected
-                          ]}
-                        >
-                          {isSelected && <Ionicons name="checkmark" size={16} color="#FFFFFF" />}
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </ScrollView>
-
-                  {/* Interval Icon-Only Actions */}
-                  <View style={styles.intervalActions}>
-                    <TouchableOpacity onPress={deleteSelectedInterval} style={styles.deleteIconButton}>
+                {/* Timer Icon-Only Actions */}
+                <View style={styles.timerActions}>
+                  {editTimer && !isImportMode && (
+                    <TouchableOpacity onPress={deleteTimer} style={styles.deleteIconButton}>
                       <Ionicons name="trash-outline" size={22} color="#E63946" />
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={duplicateSelectedInterval} style={styles.duplicateIconButton}>
-                      <Ionicons name="copy-outline" size={22} color="#4B5563" />
-                    </TouchableOpacity>
-                  </View>
-                </>
-              ) : (
-                <Text style={styles.noIntervalText}>Select an interval above to edit details.</Text>
-              )}
+                  )}
+                  <TouchableOpacity onPress={saveTimer} style={styles.saveIconButton}>
+                    <Ionicons
+                      name={isImportMode ? "download-outline" : "bookmark-outline"}
+                      size={22}
+                      color="#4B5563"
+                    />
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={startTimer} style={styles.startIconButton}>
+                    <Ionicons name="play" size={22} color="#FFFFFF" />
+                  </TouchableOpacity>
+                </View>
+              </View>
             </View>
-          </View>
-        </ScrollView>
+
+            {/* Card 2: Edit Selected Interval */}
+            <View style={[styles.cardPage, { width }]}>
+              <View
+                style={styles.card}
+                onLayout={(e) => {
+                  const h = e.nativeEvent.layout.height;
+                  if (h > 0 && Math.abs(h - card2Height) > 1) {
+                    setCard2Height(h);
+                  }
+                }}
+              >
+                <Text style={styles.cardTitle}>Edit Selected Interval</Text>
+
+                {selectedInterval ? (
+                  <>
+                    <View style={styles.editorInputRow}>
+                      <View style={styles.inputGroup}>
+                        <Text style={styles.inputLabel}>Interval Name</Text>
+                        <TextInput
+                          style={styles.editorTextInput}
+                          value={selectedInterval.name}
+                          onChangeText={(name) => updateSelectedInterval({ name })}
+                          placeholder="Interval Name"
+                          placeholderTextColor="#9CA3AF"
+                        />
+                      </View>
+
+                      <View style={[styles.inputGroup, { flex: 0.55 }]}>
+                        <Text style={styles.inputLabel}>Duration</Text>
+                        <TextInput
+                          style={styles.timeInput}
+                          value={formatHHMMSS(selectedInterval.duration)}
+                          onChangeText={handleDurationChange}
+                          onBlur={handleDurationBlur}
+                          keyboardType="number-pad"
+                          selectTextOnFocus
+                        />
+                      </View>
+                    </View>
+
+                    <Text style={styles.label}>Interval Color</Text>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.colorPalette}>
+                      {COLOR_PALETTE.map((color) => {
+                        const isSelected = selectedInterval.color === color;
+                        return (
+                          <TouchableOpacity
+                            key={color}
+                            onPress={() => updateSelectedInterval({ color })}
+                            style={[
+                              styles.colorOption,
+                              { backgroundColor: color },
+                              isSelected && styles.colorOptionSelected
+                            ]}
+                          >
+                            {isSelected && <Ionicons name="checkmark" size={16} color="#FFFFFF" />}
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </ScrollView>
+
+                    {/* Interval Icon-Only Actions */}
+                    <View style={styles.intervalActions}>
+                      <TouchableOpacity onPress={deleteSelectedInterval} style={styles.deleteIconButton}>
+                        <Ionicons name="trash-outline" size={22} color="#E63946" />
+                      </TouchableOpacity>
+                      <TouchableOpacity onPress={duplicateSelectedInterval} style={styles.duplicateIconButton}>
+                        <Ionicons name="copy-outline" size={22} color="#4B5563" />
+                      </TouchableOpacity>
+                    </View>
+                  </>
+                ) : (
+                  <Text style={styles.noIntervalText}>Select an interval above to edit details.</Text>
+                )}
+              </View>
+            </View>
+          </Animated.ScrollView>
+        </View>
 
         {/* External Bottom Navigation & Indicators Bar */}
-        <View style={styles.bottomNavBar}>
+        <View
+          style={styles.bottomNavBar}
+          onLayout={(e) => {
+            const h = e.nativeEvent.layout.height;
+            if (h > 0 && Math.abs(h - navBarHeight) > 1) {
+              setNavBarHeight(h);
+            }
+          }}
+        >
           {/* Left: Timer Details link when on Card 2 */}
           <View style={styles.navSideContainer}>
             {activeCardIndex === 1 ? (
@@ -580,6 +635,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F9FAFB",
   },
+  listContainer: {
+    flex: 1,
+  },
   importBanner: {
     flexDirection: "row",
     backgroundColor: "#10B981",
@@ -597,6 +655,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: Spacing.lg,
+    paddingBottom: 0,
   },
   sectionTitle: {
     fontSize: FontSize.md,
@@ -696,6 +755,7 @@ const styles = StyleSheet.create({
     paddingBottom: 2,
   },
   cardPage: {
+    height: "100%",
     paddingHorizontal: Spacing.md,
     paddingTop: 2,
     paddingBottom: 2,
