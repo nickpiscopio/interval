@@ -365,7 +365,6 @@ export default function CreateTimerScreen({
           </TouchableOpacity>
 
           <View style={styles.intervalInfo}>
-            <View style={[styles.colorIndicator, { backgroundColor: item.color }]} />
             <Text style={styles.intervalName}>{item.name}</Text>
           </View>
           <Text style={styles.intervalDuration}>{formatSeconds(item.duration)}</Text>
@@ -404,7 +403,7 @@ export default function CreateTimerScreen({
           contentContainerStyle={styles.scrollContent}
           ListHeaderComponent={
             <View style={styles.intervalListHeader}>
-              <Text style={styles.sectionTitle}>Interval Sequence</Text>
+              <Text style={styles.sectionTitle}>Intervals</Text>
               <TouchableOpacity style={styles.addIntervalLink} onPress={addInterval}>
                 <Ionicons name="add-circle" size={18} color={Colors.primary} />
                 <Text style={styles.addIntervalLinkText}>Add Interval</Text>
@@ -654,7 +653,8 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-Bold",
   },
   scrollContent: {
-    padding: Spacing.lg,
+    padding: Spacing.md,
+    paddingTop: Spacing.xs,
     paddingBottom: 0,
   },
   sectionTitle: {
@@ -667,7 +667,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: Spacing.md,
   },
   addIntervalLink: {
     flexDirection: "row",
@@ -687,7 +686,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     borderRadius: Spacing.radius.sm,
     paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.sm,
+    paddingRight: Spacing.sm,
     marginBottom: Spacing.cardGap,
     borderWidth: 1,
     borderColor: "#E5E7EB",
