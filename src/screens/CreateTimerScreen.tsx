@@ -16,6 +16,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import DraggableFlatList, {
   RenderItemParams,
   ScaleDecorator,
@@ -23,7 +24,7 @@ import DraggableFlatList, {
 
 import { RootStackScreenProps } from "../types";
 import { Timer } from "../model/Timer";
-import { Interval } from "../model/Interval";
+import { Interval, generateIntervalId, normalizeInterval } from "../model/Interval";
 import Spacing from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
 import Colors from "../constants/Colors";
@@ -55,28 +56,30 @@ export default function CreateTimerScreen({
   const [timerName, setTimerName] = useState("");
   const [rounds, setRounds] = useState(3);
   const [intervals, setIntervals] = useState<Interval[]>([
-    { name: "High Interval", duration: 30, color: "#1ACC6C" },
-    { name: "Low Interval", duration: 15, color: "#3B82F6" }
+    { id: "init_1", name: "High Interval", duration: 30, color: "#1ACC6C" },
+    { id: "init_2", name: "Low Interval", duration: 15, color: "#3B82F6" }
   ]);
-  const [selectedIntervalIndex, setSelectedIntervalIndex] = useState<number>(0);
+  const [selectedIntervalId, setSelectedIntervalId] = useState<string>("init_1");
 
   // Initialize form if in edit/import mode
   useEffect(() => {
     if (editTimer) {
       setTimerName(editTimer.name);
       setRounds(editTimer.rounds);
-      setIntervals(
-        editTimer.intervals.map((int) => ({
-          name: int.name,
-          duration: int.duration,
-          color: int.color,
-          exerciseId: int.exerciseId
-        }))
-      );
-      setSelectedIntervalIndex(0);
+      const normalized = editTimer.intervals.map((int, idx) => normalizeInterval(int, idx));
+      setIntervals(normalized);
+      if (normalized.length > 0) {
+        setSelectedIntervalId(normalized[0].id);
+      }
     } else {
       setTimerName("");
       setRounds(3);
+      const initial: Interval[] = [
+        { id: generateIntervalId(), name: "High Interval", duration: 30, color: "#1ACC6C" },
+        { id: generateIntervalId(), name: "Low Interval", duration: 15, color: "#3B82F6" }
+      ];
+      setIntervals(initial);
+      setSelectedIntervalId(initial[0].id);
     }
   }, [editTimer]);
 
@@ -90,7 +93,7 @@ export default function CreateTimerScreen({
     });
   }, [navigation, timerName, editTimer, isImportMode]);
 
-  const selectedInterval = intervals[selectedIntervalIndex];
+  const selectedInterval = intervals.find((int) => int.id === selectedIntervalId) || intervals[0];
 
   // Navigate to Card
   function scrollToCard(index: number) {
@@ -102,49 +105,49 @@ export default function CreateTimerScreen({
   }
 
   // Action: Select Interval (animates carousel to Interval Details)
-  function handleSelectInterval(idx: number) {
-    setSelectedIntervalIndex(idx);
+  function handleSelectInterval(id: string) {
+    setSelectedIntervalId(id);
     scrollToCard(1);
   }
 
   // Action: Add Interval (animates carousel to Interval Details)
   function addInterval() {
     const newInterval: Interval = {
+      id: generateIntervalId(),
       name: "Work Interval",
       duration: 30,
       color: COLOR_PALETTE[intervals.length % COLOR_PALETTE.length]
     };
     const newIntervals = [...intervals, newInterval];
     setIntervals(newIntervals);
-    setSelectedIntervalIndex(newIntervals.length - 1);
+    setSelectedIntervalId(newInterval.id);
     scrollToCard(1);
   }
 
   // Action: Update Selected Interval Properties
   function updateSelectedInterval(fields: Partial<Interval>) {
-    if (selectedIntervalIndex === -1) return;
-    const updated = [...intervals];
-    updated[selectedIntervalIndex] = {
-      ...updated[selectedIntervalIndex],
-      ...fields
-    };
-    setIntervals(updated);
+    if (!selectedInterval) return;
+    setIntervals((prev) =>
+      prev.map((int) => (int.id === selectedInterval.id ? { ...int, ...fields } : int))
+    );
   }
 
   // Action: Duplicate Interval
   function duplicateSelectedInterval() {
-    if (selectedIntervalIndex === -1) return;
-    const current = intervals[selectedIntervalIndex];
+    if (!selectedInterval) return;
+    const index = intervals.findIndex((int) => int.id === selectedInterval.id);
+    if (index === -1) return;
     const duplicated: Interval = {
-      name: `${current.name} (Copy)`,
-      duration: current.duration,
-      color: current.color,
-      exerciseId: current.exerciseId
+      id: generateIntervalId(),
+      name: `${selectedInterval.name} (Copy)`,
+      duration: selectedInterval.duration,
+      color: selectedInterval.color,
+      exerciseId: selectedInterval.exerciseId
     };
     const updated = [...intervals];
-    updated.splice(selectedIntervalIndex + 1, 0, duplicated);
+    updated.splice(index + 1, 0, duplicated);
     setIntervals(updated);
-    setSelectedIntervalIndex(selectedIntervalIndex + 1);
+    setSelectedIntervalId(duplicated.id);
   }
 
   // Action: Delete Selected Interval
@@ -153,9 +156,11 @@ export default function CreateTimerScreen({
       Alert.alert("Error", "You must have at least one interval in your timer.");
       return;
     }
-    const updated = intervals.filter((_, idx) => idx !== selectedIntervalIndex);
+    const index = intervals.findIndex((int) => int.id === selectedInterval?.id);
+    const updated = intervals.filter((int) => int.id !== selectedInterval?.id);
     setIntervals(updated);
-    setSelectedIntervalIndex(Math.max(0, selectedIntervalIndex - 1));
+    const fallbackIdx = Math.max(0, Math.min(index, updated.length - 1));
+    setSelectedIntervalId(updated[fallbackIdx].id);
   }
 
   // Save Timer to local database
@@ -303,15 +308,13 @@ export default function CreateTimerScreen({
     item,
     drag,
     isActive,
-    getIndex,
   }: RenderItemParams<Interval>) => {
-    const idx = getIndex() ?? 0;
-    const isSelected = idx === selectedIntervalIndex;
+    const isSelected = item.id === selectedInterval?.id;
     return (
       <ScaleDecorator>
         <TouchableOpacity
           activeOpacity={0.9}
-          onPress={() => handleSelectInterval(idx)}
+          onPress={() => handleSelectInterval(item.id)}
           style={[
             styles.intervalItem,
             isSelected && styles.intervalItemActive,
@@ -321,7 +324,10 @@ export default function CreateTimerScreen({
         >
           {/* 6-Dot Drag Handle inside on the Far Left */}
           <TouchableOpacity
-            onPressIn={drag}
+            onPressIn={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              drag();
+            }}
             style={styles.intervalDragHandle}
             hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
           >
@@ -359,16 +365,12 @@ export default function CreateTimerScreen({
       {/* Interval Draggable List Area */}
       <DraggableFlatList
         data={intervals}
-        keyExtractor={(_, index) => `interval_${index}`}
-        onDragEnd={({ data, from, to }) => {
+        keyExtractor={(item) => item.id}
+        onDragBegin={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        }}
+        onDragEnd={({ data }) => {
           setIntervals(data);
-          if (selectedIntervalIndex === from) {
-            setSelectedIntervalIndex(to);
-          } else if (from < selectedIntervalIndex && to >= selectedIntervalIndex) {
-            setSelectedIntervalIndex(selectedIntervalIndex - 1);
-          } else if (from > selectedIntervalIndex && to <= selectedIntervalIndex) {
-            setSelectedIntervalIndex(selectedIntervalIndex + 1);
-          }
         }}
         renderItem={renderIntervalItem}
         contentContainerStyle={[

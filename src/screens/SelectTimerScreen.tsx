@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import { useIsFocused } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import DraggableFlatList, {
@@ -18,6 +19,7 @@ import DraggableFlatList, {
 
 import { RootStackScreenProps } from "../types";
 import { Timer } from "../model/Timer";
+import { normalizeInterval } from "../model/Interval";
 import { DEFAULT_AI_TIMERS } from "../constants/defaultTimers";
 import Spacing from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
@@ -59,7 +61,11 @@ export default function SelectTimerScreen({
       const data = await AsyncStorage.getItem(STORAGE_KEY);
       if (data) {
         const parsed = JSON.parse(data) as Timer[];
-        setTimers(parsed);
+        const normalized = parsed.map((t) => ({
+          ...t,
+          intervals: t.intervals.map((int, idx) => normalizeInterval(int, idx)),
+        }));
+        setTimers(normalized);
       }
     } catch (e) {
       console.warn("Failed to load timers from AsyncStorage:", e);
@@ -99,7 +105,10 @@ export default function SelectTimerScreen({
         <View style={styles.cardHeader}>
           {/* Drag Handle on the Far Left inside the Card */}
           <TouchableOpacity
-            onPressIn={drag}
+            onPressIn={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              drag();
+            }}
             style={styles.dragHandle}
             hitSlop={{ top: 14, bottom: 14, left: 14, right: 14 }}
           >
@@ -187,6 +196,9 @@ export default function SelectTimerScreen({
         <DraggableFlatList
           data={timers}
           keyExtractor={(item) => item.id}
+          onDragBegin={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          }}
           onDragEnd={({ data }) => {
             setTimers(data);
             AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(data));

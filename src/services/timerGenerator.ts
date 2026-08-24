@@ -1,6 +1,6 @@
 import { EXERCISE_CATALOG } from "../constants/exerciseCatalog";
 import { Timer } from "../model/Timer";
-import { Interval } from "../model/Interval";
+import { Interval, generateIntervalId } from "../model/Interval";
 import { Exercise } from "../model/Exercise";
 
 export interface GeneratorParams {
@@ -91,6 +91,7 @@ export function generateWorkout(params: GeneratorParams): Timer {
   selectedExercises.forEach((ex, idx) => {
     // Add Active Exercise Interval
     intervals.push({
+      id: generateIntervalId(),
       name: ex.name,
       duration: activeDuration,
       color: colorMap[ex.category] || "#1ACC6C",
@@ -100,6 +101,7 @@ export function generateWorkout(params: GeneratorParams): Timer {
     // Add Rest Interval (if it is not the very last interval of the loop)
     if (idx < selectedExercises.length - 1) {
       intervals.push({
+        id: generateIntervalId(),
         name: "Rest",
         duration: restDuration,
         color: "#4B5563" // Slate Gray
