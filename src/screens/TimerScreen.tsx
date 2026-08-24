@@ -18,12 +18,12 @@ export default function TimerScreen({
 }: RootStackScreenProps<"Timer">) {
   const { timer } = route.params;
 
-  // Sound State
-  const [beep1, setBeep1] = useState<Audio.Sound>();
-  const [beep2, setBeep2] = useState<Audio.Sound>();
+  // Sound Ref
+  const beepSoundRef = useRef<Audio.Sound | null>(null);
 
   // Flat list of intervals across all rounds
   const [flatIntervals, setFlatIntervals] = useState<Interval[]>([]);
+  const flatIntervalsRef = useRef<Interval[]>([]);
   const [currentIntervalIndex, setCurrentIntervalIndex] = useState(0);
   const [durationLeft, setDurationLeft] = useState(0);
   const [totalDuration, setTotalDuration] = useState(0);
@@ -65,6 +65,30 @@ export default function TimerScreen({
     }
   }, [exercise?.id, isPaused]);
 
+  async function loadSounds(): Promise<void> {
+    try {
+      const { sound } = await Audio.Sound.createAsync(
+        require("../../assets/sounds/beep.mp3")
+      );
+      beepSoundRef.current = sound;
+    } catch (e) {
+      console.warn("Failed to load audio beep:", e);
+    }
+  }
+
+  async function unloadSounds(): Promise<void> {
+    if (beepSoundRef.current) {
+      await beepSoundRef.current.unloadAsync().catch(() => {});
+      beepSoundRef.current = null;
+    }
+  }
+
+  function playBeep(): void {
+    if (beepSoundRef.current) {
+      beepSoundRef.current.replayAsync().catch(() => {});
+    }
+  }
+
   // Initialize flat list of intervals
   useEffect(() => {
     const list: Interval[] = [];
@@ -78,6 +102,7 @@ export default function TimerScreen({
         });
       });
     }
+    flatIntervalsRef.current = list;
     setFlatIntervals(list);
     
     if (list.length > 0) {
@@ -88,7 +113,9 @@ export default function TimerScreen({
       setTotalDuration(list[0].duration * 1000);
     }
 
-    loadSounds();
+    loadSounds().then(() => {
+      playBeep();
+    });
     isPausedRef.current = false;
     startCountDown();
 
@@ -98,27 +125,6 @@ export default function TimerScreen({
     };
   }, [timer]);
 
-  async function loadSounds(): Promise<void> {
-    try {
-      const b1 = await Audio.Sound.createAsync(
-        require("../../assets/sounds/beep_1.mp3")
-      );
-      setBeep1(b1.sound);
-
-      const b2 = await Audio.Sound.createAsync(
-        require("../../assets/sounds/beep_2.mp3")
-      );
-      setBeep2(b2.sound);
-    } catch (e) {
-      console.warn("Failed to load audio beeps:", e);
-    }
-  }
-
-  async function unloadSounds(): Promise<void> {
-    if (beep1) await beep1.unloadAsync();
-    if (beep2) await beep2.unloadAsync();
-  }
-
   function startCountDown(): void {
     clearInterval(timerIdRef.current);
     const tickMs = 100; // tick every 100ms for smoothness
@@ -127,35 +133,25 @@ export default function TimerScreen({
       if (isPausedRef.current) return;
 
       durationLeftRef.current -= tickMs;
-
-      // Handle sound play at 3s, 2s, 1s remaining
       const secLeft = Math.ceil(durationLeftRef.current / 1000);
-      const exactSecond = durationLeftRef.current % 1000 === 0;
-
-      if (exactSecond) {
-        if (secLeft === 3 || secLeft === 2 || secLeft === 1) {
-          beep1?.replayAsync().catch(() => {});
-        } else if (secLeft === 0) {
-          beep2?.replayAsync().catch(() => {});
-        }
-      }
-
       setDurationLeft(Math.max(0, secLeft));
 
       if (durationLeftRef.current <= 0) {
         // Move to next interval
         const nextIdx = currentIndexRef.current + 1;
-        if (nextIdx >= flatIntervals.length) {
+        const intervalsList = flatIntervalsRef.current;
+        if (nextIdx >= intervalsList.length) {
           // Workout finished!
           clearInterval(timerIdRef.current);
           navigation.replace("Completion", { timer });
         } else {
           currentIndexRef.current = nextIdx;
           setCurrentIntervalIndex(nextIdx);
-          const nextInt = flatIntervals[nextIdx];
+          const nextInt = intervalsList[nextIdx];
           durationLeftRef.current = (nextInt.duration || 0) * 1000;
           setDurationLeft(nextInt.duration || 0);
           setTotalDuration((nextInt.duration || 0) * 1000);
+          playBeep();
         }
       }
     }, tickMs);
@@ -176,6 +172,9 @@ export default function TimerScreen({
     const nextPaused = !isPaused;
     setIsPaused(nextPaused);
     isPausedRef.current = nextPaused;
+    if (!nextPaused) {
+      playBeep();
+    }
   }
 
   function askToCloseWorkout() {
