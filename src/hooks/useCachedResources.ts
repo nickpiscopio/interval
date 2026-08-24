@@ -16,6 +16,9 @@ export default function useCachedResources() {
         await Font.loadAsync({
           ...FontAwesome.font,
           "open-sans": require("../../assets/fonts/OpenSans-VariableFont_wdth,wght.ttf"),
+          "Poppins-Regular": require("../../assets/fonts/Poppins-Regular.ttf"),
+          "Poppins-Medium": require("../../assets/fonts/Poppins-Medium.ttf"),
+          "Poppins-Bold": require("../../assets/fonts/Poppins-Bold.ttf"),
         });
       } catch (e) {
         // We might want to provide this error information to an error reporting service

@@ -63,11 +63,15 @@ const componentStyles = StyleSheet.create({
   button: {
     paddingHorizontal: Spacing.button.horizontal,
     paddingVertical: Spacing.button.vertical,
+    minHeight: Spacing.button.minHeight,
+    justifyContent: "center",
+    alignItems: "center",
   },
   buttonText: {
     color: "#ffffff",
     fontWeight: "bold",
-    fontSize: FontSize.button.title
+    fontSize: FontSize.button.title,
+    textAlign: "center",
   },
   linearGradient: {
     borderRadius: Spacing.button.borderRadius,

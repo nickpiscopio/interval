@@ -29,10 +29,12 @@ export function ImageButton({
       : Colors.background.button.image.unpressed;
   }
 
-  function getGradientColors(): string[] {
-    return gradientColors
-      ? gradientColors
-      : IntervalImageGradient.colors.transparent.asStrings;
+  function getGradientColors(): [string, string, ...string[]] {
+    return (
+      gradientColors
+        ? gradientColors
+        : IntervalImageGradient.colors.transparent.asStrings
+    ) as [string, string, ...string[]];
   }
 
   function getButtonView() {
@@ -75,7 +77,6 @@ export function ImageButton({
 const styles = StyleSheet.create({
   unpressedBackground: {
     opacity: 1,
-    // backgroundColor: Colors.background.button.image.pressedFullOpacity,
     borderRadius: Spacing.button.borderRadius,
   },
   pressedBackground: {
@@ -85,9 +86,12 @@ const styles = StyleSheet.create({
     borderRadius: Spacing.button.borderRadius,
   },
   image: {
-    // backgroundColor: Colors.background.button.image.transparent,
     borderRadius: Spacing.button.borderRadius,
-    margin: 3,
-    padding: 10,
+    margin: Spacing.xs,
+    padding: Spacing.sm,
+    minWidth: Spacing.touchTarget.min,
+    minHeight: Spacing.touchTarget.min,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

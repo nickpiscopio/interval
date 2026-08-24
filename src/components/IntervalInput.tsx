@@ -3,6 +3,8 @@ import { StyleSheet, TextInput } from "react-native";
 
 import { View } from "./Themed";
 
+import Spacing from "../constants/Spacing";
+
 export function IntervalInput({
   defaultText,
 }: {
@@ -39,20 +41,23 @@ export function IntervalInput({
 
 const styles = StyleSheet.create({
   input: {
-    
+    paddingVertical: Spacing.xs,
+    paddingHorizontal: Spacing.sm,
   },
   interval: {
     flex: 1,
   },
   row: {
     flexDirection: "row",
+    alignItems: "center",
+    minHeight: Spacing.touchTarget.min,
   },
   card: {
     width: "100%",
     backgroundColor: "white",
-    borderRadius: 10,
-    padding: 15,
-    marginVertical: 10,
+    borderRadius: Spacing.radius.md,
+    padding: Spacing.md,
+    marginVertical: Spacing.sm,
   },
   shadowProp: {
     shadowColor: "#171717",
@@ -65,7 +70,7 @@ const styles = StyleSheet.create({
     shadowColor: "#52006A",
   },
   separator: {
-    marginVertical: 30,
+    marginVertical: Spacing.xl,
     height: 1,
     width: "80%",
   },

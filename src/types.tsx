@@ -4,6 +4,7 @@
  */
 
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { Timer } from "./model/Timer";
 
 declare global {
   namespace ReactNavigation {
@@ -13,8 +14,10 @@ declare global {
 
 export type RootStackParamList = {
   Root: undefined;
-  CreateTimer: undefined;
-  Timer: { intervals: Interval[] };
+  CreateTimer: { timer?: Timer } | undefined;
+  Timer: { timer: Timer };
+  GenerateTimer: undefined;
+  Completion: { timer: Timer };
   Modal: undefined;
   NotFound: undefined;
 };
