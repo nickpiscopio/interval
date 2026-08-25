@@ -16,58 +16,28 @@ export default function CompletionScreen({
 }: RootStackScreenProps<"Completion">) {
   const { timer } = route.params;
 
-  // Play celebratory 8-beep fanfare (4 beeps, 300ms delay, 4 beeps)
+  // Play single completion beep on mount
   useEffect(() => {
-    let isCancelled = false;
-    let sounds: Audio.Sound[] = [];
-    const segmentBeepThreshold = 250;
-    const interBeepThreshold = 150;
+    let sound: Audio.Sound | null = null;
 
-    async function playCelebrationBeeps() {
+    async function playCompletionBeep() {
       try {
-        // Preload pool of 4 sounds to guarantee rapid staccato playback without collision
-        const loadedSounds = await Promise.all([
-          Audio.Sound.createAsync(require("../../assets/sounds/beep.mp3")),
-          Audio.Sound.createAsync(require("../../assets/sounds/beep.mp3")),
-          Audio.Sound.createAsync(require("../../assets/sounds/beep.mp3")),
-          Audio.Sound.createAsync(require("../../assets/sounds/beep.mp3")),
-        ]);
-        sounds = loadedSounds.map((item) => item.sound);
-
-        if (isCancelled) return;
-
-        const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-        // Burst 1: 4 beeps at 80ms interval
-        for (let i = 0; i < 4; i++) {
-          if (isCancelled) break;
-          sounds[i].replayAsync().catch(() => {});
-          if (i < 3) await sleep(interBeepThreshold);
-        }
-
-        if (isCancelled) return;
-
-        // 300ms pause after the 4th beep
-        await sleep(segmentBeepThreshold);
-
-        if (isCancelled) return;
-
-        // Burst 2: 4 beeps at 80ms interval
-        for (let i = 0; i < 4; i++) {
-          if (isCancelled) break;
-          sounds[i].replayAsync().catch(() => {});
-          if (i < 3) await sleep(interBeepThreshold);
-        }
+        const loaded = await Audio.Sound.createAsync(
+          require("../../assets/sounds/beep_3.mp3")
+        );
+        sound = loaded.sound;
+        await sound.replayAsync().catch(() => {});
       } catch (e) {
-        console.warn("Failed to play completion fanfare:", e);
+        console.warn("Failed to play completion beep:", e);
       }
     }
 
-    playCelebrationBeeps();
+    playCompletionBeep();
 
     return () => {
-      isCancelled = true;
-      sounds.forEach((s) => s.unloadAsync().catch(() => {}));
+      if (sound) {
+        sound.unloadAsync().catch(() => {});
+      }
     };
   }, []);
 

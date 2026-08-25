@@ -9,9 +9,6 @@ We decided to use mutable sequence refs in the timer runner to guarantee seamles
 2. **Interval Audio Cue**:
    - Single `beep.mp3` sound plays on initial countdown start, on every interval transition, and when unpausing/resuming playback.
 
-3. **Celebration Fanfare**:
-   - When the final interval finishes and [CompletionScreen.tsx](file:///Users/nickpiscopio/Documents/workarea/nick/interval/src/screens/CompletionScreen.tsx) opens, an 8-beep fanfare plays automatically using a 4-instance sound pool to prevent seek/buffer dropouts:
-     - Burst 1: 4 rapid beeps at an 80ms tempo.
-     - Inter-burst pause: 300ms delay.
-     - Burst 2: 4 rapid beeps at an 80ms tempo.
-   - All audio resources are cleaned up safely on screen unmount.
+3. **Completion Audio Cue**:
+   - When the final interval finishes and [CompletionScreen.tsx](file:///Users/nickpiscopio/Documents/workarea/nick/interval/src/screens/CompletionScreen.tsx) opens, `beep.mp3` plays once.
+   - Audio resources are cleaned up safely on screen unmount.

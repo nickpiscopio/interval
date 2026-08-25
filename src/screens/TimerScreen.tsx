@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { StyleSheet, View, Text, Alert, TouchableOpacity } from "react-native";
+import { StyleSheet, View, Text, Alert, TouchableOpacity, Animated, Easing } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Audio } from "expo-av";
 import { Ionicons } from "@expo/vector-icons";
@@ -21,12 +21,16 @@ export default function TimerScreen({
   // Sound Ref
   const beepSoundRef = useRef<Audio.Sound | null>(null);
 
+  // Animated background progress (1 -> 0 over interval duration in ms)
+  const progressAnim = useRef(new Animated.Value(1)).current;
+
   // Flat list of intervals across all rounds
   const [flatIntervals, setFlatIntervals] = useState<Interval[]>([]);
   const flatIntervalsRef = useRef<Interval[]>([]);
   const [currentIntervalIndex, setCurrentIntervalIndex] = useState(0);
   const [durationLeft, setDurationLeft] = useState(0);
   const [totalDuration, setTotalDuration] = useState(0);
+  const totalDurationRef = useRef(0);
   const [isPaused, setIsPaused] = useState(false);
 
   // Refs for timer loops
@@ -89,6 +93,17 @@ export default function TimerScreen({
     }
   }
 
+  function startProgressAnim(durationMs: number, fromFraction = 1) {
+    progressAnim.stopAnimation();
+    progressAnim.setValue(fromFraction);
+    Animated.timing(progressAnim, {
+      toValue: 0,
+      duration: durationMs,
+      easing: Easing.linear,
+      useNativeDriver: false,
+    }).start();
+  }
+
   // Initialize flat list of intervals
   useEffect(() => {
     const list: Interval[] = [];
@@ -110,7 +125,9 @@ export default function TimerScreen({
       currentIndexRef.current = 0;
       setDurationLeft(list[0].duration);
       durationLeftRef.current = list[0].duration * 1000;
+      totalDurationRef.current = list[0].duration * 1000;
       setTotalDuration(list[0].duration * 1000);
+      startProgressAnim(list[0].duration * 1000, 1);
     }
 
     loadSounds().then(() => {
@@ -121,20 +138,21 @@ export default function TimerScreen({
 
     return () => {
       clearInterval(timerIdRef.current);
+      progressAnim.stopAnimation();
       unloadSounds();
     };
   }, [timer]);
 
   function startCountDown(): void {
     clearInterval(timerIdRef.current);
-    const tickMs = 100; // tick every 100ms for smoothness
+    const tickMs = 100; // tick every 100ms for accurate countdown calculations
 
     timerIdRef.current = setInterval(() => {
       if (isPausedRef.current) return;
 
       durationLeftRef.current -= tickMs;
       const secLeft = Math.ceil(durationLeftRef.current / 1000);
-      setDurationLeft(Math.max(0, secLeft));
+      setDurationLeft((prevSec) => (prevSec !== secLeft ? Math.max(0, secLeft) : prevSec));
 
       if (durationLeftRef.current <= 0) {
         // Move to next interval
@@ -143,14 +161,18 @@ export default function TimerScreen({
         if (nextIdx >= intervalsList.length) {
           // Workout finished!
           clearInterval(timerIdRef.current);
+          progressAnim.stopAnimation();
           navigation.replace("Completion", { timer });
         } else {
           currentIndexRef.current = nextIdx;
           setCurrentIntervalIndex(nextIdx);
           const nextInt = intervalsList[nextIdx];
-          durationLeftRef.current = (nextInt.duration || 0) * 1000;
+          const nextDurationMs = (nextInt.duration || 0) * 1000;
+          durationLeftRef.current = nextDurationMs;
+          totalDurationRef.current = nextDurationMs;
           setDurationLeft(nextInt.duration || 0);
-          setTotalDuration((nextInt.duration || 0) * 1000);
+          setTotalDuration(nextDurationMs);
+          startProgressAnim(nextDurationMs, 1);
           playBeep();
         }
       }
@@ -172,8 +194,12 @@ export default function TimerScreen({
     const nextPaused = !isPaused;
     setIsPaused(nextPaused);
     isPausedRef.current = nextPaused;
-    if (!nextPaused) {
+    if (nextPaused) {
+      progressAnim.stopAnimation();
+    } else {
       playBeep();
+      const fraction = totalDurationRef.current > 0 ? durationLeftRef.current / totalDurationRef.current : 1;
+      startProgressAnim(durationLeftRef.current, fraction);
     }
   }
 
@@ -181,6 +207,7 @@ export default function TimerScreen({
     const wasPaused = isPausedRef.current;
     isPausedRef.current = true;
     setIsPaused(true);
+    progressAnim.stopAnimation();
 
     Alert.alert(
       "Exit Workout?",
@@ -192,6 +219,10 @@ export default function TimerScreen({
           onPress: () => {
             setIsPaused(wasPaused);
             isPausedRef.current = wasPaused;
+            if (!wasPaused) {
+              const fraction = totalDurationRef.current > 0 ? durationLeftRef.current / totalDurationRef.current : 1;
+              startProgressAnim(durationLeftRef.current, fraction);
+            }
           }
         },
         {
@@ -199,6 +230,7 @@ export default function TimerScreen({
           style: "destructive",
           onPress: () => {
             clearInterval(timerIdRef.current);
+            progressAnim.stopAnimation();
             navigation.popToTop();
           }
         }
@@ -215,17 +247,22 @@ export default function TimerScreen({
     );
   }
 
-  // Calculate remaining timer bar height
-  const timerBarHeight = totalDuration > 0
-    ? (durationLeftRef.current / totalDuration) * 100
-    : 100;
-
   return (
     <View style={[styles.container, { backgroundColor: currentInterval.color }]}>
       <StatusBar style="light" />
 
-      {/* Progress background bar */}
-      <View style={[styles.timerBar, { height: `${timerBarHeight}%` }]} />
+      {/* Fluid continuous 60fps progress background bar */}
+      <Animated.View
+        style={[
+          styles.timerBar,
+          {
+            height: progressAnim.interpolate({
+              inputRange: [0, 1],
+              outputRange: ["0%", "100%"],
+            }),
+          },
+        ]}
+      />
 
       {/* Header Panel */}
       <View style={styles.header}>
