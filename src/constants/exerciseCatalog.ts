@@ -6,7 +6,6 @@ export const EXERCISE_CATALOG: Exercise[] = [
     name: "Jumping Jacks",
     category: "cardio",
     difficulty: "beginner",
-    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
     instructions: [
       "Stand upright with your feet together and arms at your sides.",
       "Jump up, spreading your feet wider than shoulder-width while raising your arms above your head.",
@@ -19,7 +18,6 @@ export const EXERCISE_CATALOG: Exercise[] = [
     name: "Pushups",
     category: "upper",
     difficulty: "beginner",
-    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
     instructions: [
       "Place your hands on the floor slightly wider than shoulder-width.",
       "Extend your legs straight behind you, supporting weight on toes.",
@@ -32,7 +30,6 @@ export const EXERCISE_CATALOG: Exercise[] = [
     name: "Air Squats",
     category: "lower",
     difficulty: "beginner",
-    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
     instructions: [
       "Stand with feet shoulder-width apart, toes pointing slightly out.",
       "Lower your hips back and down as if sitting in a chair.",
@@ -45,7 +42,6 @@ export const EXERCISE_CATALOG: Exercise[] = [
     name: "Forearm Plank",
     category: "abs",
     difficulty: "beginner",
-    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
     instructions: [
       "Place your forearms on the floor, elbows aligned under shoulders.",
       "Extend your body in a straight line from head to heels.",
@@ -58,7 +54,6 @@ export const EXERCISE_CATALOG: Exercise[] = [
     name: "Burpees",
     category: "total",
     difficulty: "advanced",
-    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4",
     instructions: [
       "Start in a standing position.",
       "Drop into a squat with hands on the ground.",
@@ -72,7 +67,6 @@ export const EXERCISE_CATALOG: Exercise[] = [
     name: "Mountain Climbers",
     category: "cardio",
     difficulty: "intermediate",
-    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
     instructions: [
       "Begin in a high plank position.",
       "Drive one knee toward your chest, then return it.",
@@ -85,7 +79,6 @@ export const EXERCISE_CATALOG: Exercise[] = [
     name: "Abdominal Crunches",
     category: "abs",
     difficulty: "beginner",
-    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
     instructions: [
       "Lie on your back with knees bent and feet flat on the floor.",
       "Place your hands lightly behind your head.",
@@ -98,7 +91,6 @@ export const EXERCISE_CATALOG: Exercise[] = [
     name: "Alternating Lunges",
     category: "lower",
     difficulty: "beginner",
-    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
     instructions: [
       "Stand tall with feet hip-width apart.",
       "Step forward with one leg and lower your hips.",
@@ -111,7 +103,6 @@ export const EXERCISE_CATALOG: Exercise[] = [
     name: "Pike Pushups",
     category: "upper",
     difficulty: "intermediate",
-    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
     instructions: [
       "Start in a downward dog position with hips high.",
       "Bend your elbows to lower the top of your head toward the floor.",
@@ -124,7 +115,6 @@ export const EXERCISE_CATALOG: Exercise[] = [
     name: "Russian Twists",
     category: "abs",
     difficulty: "intermediate",
-    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4",
     instructions: [
       "Sit on the floor, bend your knees, and lean back slightly.",
       "Lift your feet off the floor and balance on your tailbone.",

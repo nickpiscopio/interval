@@ -3,12 +3,9 @@ import { StyleSheet, View, Text, Alert, TouchableOpacity, Animated, Easing } fro
 import { StatusBar } from "expo-status-bar";
 import { Audio } from "expo-av";
 import { Ionicons } from "@expo/vector-icons";
-import { useVideoPlayer, VideoView } from "expo-video";
 
 import { RootStackScreenProps } from "../types";
 import { Interval } from "../model/Interval";
-import { EXERCISE_CATALOG } from "../constants/exerciseCatalog";
-import { Exercise } from "../model/Exercise";
 import Spacing from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
 
@@ -40,34 +37,6 @@ export default function TimerScreen({
   const isPausedRef = useRef(false);
 
   const currentInterval = flatIntervals[currentIntervalIndex];
-
-  // Find Exercise metadata if referenced
-  let exercise: Exercise | undefined;
-  if (currentInterval?.exerciseId) {
-    exercise = EXERCISE_CATALOG.find((ex) => ex.id === currentInterval.exerciseId);
-  }
-
-  // Initialize expo-video player
-  const player = useVideoPlayer("", (playerInstance) => {
-    playerInstance.loop = true;
-    playerInstance.muted = true;
-  });
-
-  // Keep player in sync with current exercise and pause state
-  useEffect(() => {
-    if (exercise?.videoUrl) {
-      player.replace(exercise.videoUrl);
-      player.loop = true;
-      player.muted = true;
-      if (!isPaused) {
-        player.play();
-      } else {
-        player.pause();
-      }
-    } else {
-      player.pause();
-    }
-  }, [exercise?.id, isPaused]);
 
   async function loadSounds(): Promise<void> {
     try {
@@ -272,26 +241,7 @@ export default function TimerScreen({
         </TouchableOpacity>
       </View>
 
-      {/* Display Video Player if active exercise */}
-      <View style={styles.mediaContainer}>
-        {exercise ? (
-          <View style={styles.videoCard}>
-            <VideoView
-              player={player}
-              style={styles.videoPlayer}
-              allowsFullscreen={false}
-              nativeControls={false}
-            />
-          </View>
-        ) : (
-          <View style={styles.restPlaceholder}>
-            <Ionicons name="body-outline" size={60} color="#FFFFFF" style={styles.pulseIcon} />
-            <Text style={styles.restText}>Catch your breath</Text>
-          </View>
-        )}
-      </View>
-
-      {/* Timer Details Panel */}
+      {/* Timer Details Panel - Hero Centered */}
       <View style={styles.detailsContainer}>
         <Text style={styles.intervalName}>{currentInterval.name}</Text>
         <Text style={styles.countdown}>{durationLeft}s</Text>
@@ -372,45 +322,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginLeft: Spacing.sm,
   },
-  mediaContainer: {
+  detailsContainer: {
     flex: 1,
     justifyContent: "center",
-    alignItems: "center",
-    paddingHorizontal: Spacing.lg,
-    zIndex: 10,
-  },
-  videoCard: {
-    width: "100%",
-    aspectRatio: 16 / 9,
-    backgroundColor: "#000000",
-    borderRadius: Spacing.radius.lg,
-    overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.15,
-    shadowRadius: 16,
-    elevation: 6,
-  },
-  videoPlayer: {
-    width: "100%",
-    height: "100%",
-  },
-  restPlaceholder: {
-    justifyContent: "center",
-    alignItems: "center",
-    gap: Spacing.md,
-  },
-  restText: {
-    fontSize: FontSize.lg,
-    lineHeight: FontSize.lineHeight.lg,
-    fontFamily: "Poppins-Bold",
-    color: "#FFFFFF",
-    textAlign: "center",
-  },
-  pulseIcon: {
-    opacity: 0.8,
-  },
-  detailsContainer: {
     alignItems: "center",
     paddingHorizontal: Spacing.lg,
     zIndex: 10,
@@ -423,11 +337,11 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   countdown: {
-    fontSize: 88,
-    lineHeight: 96,
+    fontSize: 96,
+    lineHeight: 104,
     fontFamily: "Poppins-Bold",
     color: "#FFFFFF",
-    marginVertical: Spacing.sm,
+    marginVertical: Spacing.md,
     textAlign: "center",
   },
   metaRow: {
