@@ -26,6 +26,9 @@ import FontSize from "../constants/FontSize";
 import Colors from "../constants/Colors";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { getUserStats } from "../services/badgeService";
+import { UserStats } from "../model/Badge";
+
 const STORAGE_KEY = "@hiit_timers";
 const INITIALIZED_KEY = "@hiit_initialized";
 
@@ -33,6 +36,7 @@ export default function SelectTimerScreen({
   navigation,
 }: RootStackScreenProps<"Root">) {
   const [timers, setTimers] = useState<Timer[]>([]);
+  const [userStats, setUserStats] = useState<UserStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [isScrolled, setIsScrolled] = useState(false);
   const [hasMoreBelow, setHasMoreBelow] = useState(false);
@@ -43,6 +47,7 @@ export default function SelectTimerScreen({
   useEffect(() => {
     if (isFocused) {
       loadTimers();
+      getUserStats().then(setUserStats);
     }
   }, [isFocused]);
 
@@ -161,13 +166,33 @@ export default function SelectTimerScreen({
       <View
         onLayout={(e) => setHeaderHeight(e.nativeEvent.layout.height)}
         style={[
-            styles.header,
-            isScrolled ? styles.headerScrolled : styles.headerUnscrolled,
-            { paddingTop: Math.max(insets.top, 20) + Spacing.sm },
-          ]}
+          styles.header,
+          isScrolled ? styles.headerScrolled : styles.headerUnscrolled,
+          { paddingTop: Math.max(insets.top, 20) + Spacing.sm },
+        ]}
       >
-        <Text style={styles.greeting}>Let's Workout! ⚡️</Text>
-        <Text style={styles.subGreeting}>Choose or generate a HIIT timer to start</Text>
+        <View style={styles.headerTopRow}>
+          <View style={styles.headerTitles}>
+            <Text style={styles.greeting}>Let's Workout! ⚡️</Text>
+            <Text style={styles.subGreeting}>Choose or generate a HIIT timer to start</Text>
+          </View>
+          <TouchableOpacity
+            style={styles.trophyButton}
+            activeOpacity={0.8}
+            onPress={() => navigation.navigate("Awards")}
+          >
+            {userStats && userStats.currentStreak > 0 ? (
+              <View style={styles.streakBadge}>
+                <Text style={styles.streakBadgeEmoji}>🔥</Text>
+                <Text style={styles.streakBadgeCount}>{userStats.currentStreak}</Text>
+              </View>
+            ) : (
+              <View style={styles.trophyIconWrap}>
+                <Ionicons name="trophy" size={22} color="#F59E0B" />
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
 
         {isScrolled && (
           <LinearGradient
@@ -287,6 +312,50 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 5,
+  },
+  headerTopRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  headerTitles: {
+    flex: 1,
+    paddingRight: Spacing.sm,
+  },
+  trophyButton: {
+    minHeight: Spacing.touchTarget.min,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  trophyIconWrap: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "#FEF3C7",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#FDE68A",
+  },
+  streakBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FEF3C7",
+    borderRadius: Spacing.radius.md,
+    paddingVertical: 6,
+    paddingHorizontal: Spacing.sm,
+    borderWidth: 1,
+    borderColor: "#FDE68A",
+    gap: 4,
+  },
+  streakBadgeEmoji: {
+    fontSize: 16,
+  },
+  streakBadgeCount: {
+    fontSize: FontSize.sm,
+    lineHeight: FontSize.lineHeight.sm,
+    fontFamily: "Poppins-Bold",
+    color: "#D97706",
   },
   greeting: {
     fontSize: FontSize["2xl"],

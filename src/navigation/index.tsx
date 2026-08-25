@@ -19,6 +19,7 @@ import CreateTimerScreen from "../screens/CreateTimerScreen";
 import TimerScreen from "../screens/TimerScreen";
 import GenerateTimerScreen from "../screens/GenerateTimerScreen";
 import CompletionScreen from "../screens/CompletionScreen";
+import AwardsScreen from "../screens/AwardsScreen";
 
 export default function Navigation() {
   return (
@@ -66,6 +67,11 @@ function RootNavigator() {
       <Stack.Screen
         name="Completion"
         component={CompletionScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Awards"
+        component={AwardsScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen
