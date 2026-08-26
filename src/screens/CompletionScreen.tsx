@@ -98,8 +98,8 @@ export default function CompletionScreen({
       const base64Data = encodeBase64(JSON.stringify(sharePayload));
       const deepLink = `interval://import?data=${base64Data}`;
       
-      const appStoreLink = "https://apps.apple.com/app/hiit-interval-timer/id12345678";
-      const playStoreLink = "https://play.google.com/store/apps/details?id=com.interval.hiittimer";
+      const appStoreLink = "https://apps.apple.com/app/interval-hiit-timer/id12345678";
+      const playStoreLink = "https://play.google.com/store/apps/details?id=com.plyonest.interval";
 
       const streakText = userStats && userStats.currentStreak > 0 ? `\nStreak: 🔥 ${userStats.currentStreak}-Day Streak` : "";
       const badgeText = newlyUnlockedBadges.length > 0 ? `\nUnlocked: 🏆 ${newlyUnlockedBadges.map(b => b.name).join(", ")}` : "";
@@ -127,8 +127,8 @@ export default function CompletionScreen({
 
   async function handleShareBadge(badge: Badge) {
     try {
-      const appStoreLink = "https://apps.apple.com/app/hiit-interval-timer/id12345678";
-      const playStoreLink = "https://play.google.com/store/apps/details?id=com.interval.hiittimer";
+      const appStoreLink = "https://apps.apple.com/app/interval-hiit-timer/id12345678";
+      const playStoreLink = "https://play.google.com/store/apps/details?id=com.plyonest.interval";
       
       const streakText = userStats && userStats.currentStreak > 0 ? ` (🔥 ${userStats.currentStreak}-Day Streak!)` : "";
       const message = `🏆 I just earned the "${badge.name}" badge${streakText} on Interval!\n\n"${badge.description}"\n\nCrush your fitness goals with custom HIIT interval timers:\nApp Store: ${appStoreLink}\nPlay Store: ${playStoreLink}`;

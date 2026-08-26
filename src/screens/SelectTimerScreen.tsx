@@ -114,8 +114,8 @@ export default function SelectTimerScreen({
       const base64Data = encodeBase64(JSON.stringify(sharePayload));
       const deepLink = `interval://import?data=${base64Data}`;
       
-      const appStoreLink = "https://apps.apple.com/app/hiit-interval-timer/id12345678";
-      const playStoreLink = "https://play.google.com/store/apps/details?id=com.interval.hiittimer";
+      const appStoreLink = "https://apps.apple.com/app/interval-hiit-timer/id12345678";
+      const playStoreLink = "https://play.google.com/store/apps/details?id=com.plyonest.interval";
 
       const totalSec = calculateTotalDuration(timer);
       const shareMessage = `🔥 Try my custom HIIT workout "${timer.name}" on Interval!\n\nWorkout details: ${timer.rounds} rounds, ${formatTime(totalSec)} total time.\n\n1. Download Interval:\nApp Store: ${appStoreLink}\nPlay Store: ${playStoreLink}\n\n2. Open this link to load the timer:\n${deepLink}`;

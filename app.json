@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "interval",
+    "name": "Interval",
     "slug": "interval",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "interval",
     "userInterfaceStyle": "automatic",
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -14,14 +14,15 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.plyonest.interval"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.anonymous.interval"
+      "package": "com.plyonest.interval"
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
@@ -36,8 +37,7 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
-      ],
-      "expo-video"
+      ]
     ],
     "runtimeVersion": {
       "policy": "sdkVersion"

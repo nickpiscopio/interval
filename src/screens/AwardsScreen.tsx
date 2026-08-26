@@ -45,8 +45,8 @@ export default function AwardsScreen({ navigation }: RootStackScreenProps<"Award
 
   async function handleShareBadge(badge: Badge) {
     try {
-      const appStoreLink = "https://apps.apple.com/app/hiit-interval-timer/id12345678";
-      const playStoreLink = "https://play.google.com/store/apps/details?id=com.interval.hiittimer";
+      const appStoreLink = "https://apps.apple.com/app/interval-hiit-timer/id12345678";
+      const playStoreLink = "https://play.google.com/store/apps/details?id=com.plyonest.interval";
       
       const streakText = stats && stats.currentStreak > 0 ? ` (🔥 ${stats.currentStreak}-Day Streak!)` : "";
       const message = `🏆 I just earned the "${badge.name}" badge${streakText} on Interval!\n\n"${badge.description}"\n\nCrush your fitness goals with custom HIIT interval timers:\nApp Store: ${appStoreLink}\nPlay Store: ${playStoreLink}`;
@@ -72,8 +72,8 @@ export default function AwardsScreen({ navigation }: RootStackScreenProps<"Award
 
   async function handleShareApp() {
     try {
-      const appStoreLink = "https://apps.apple.com/app/hiit-interval-timer/id12345678";
-      const playStoreLink = "https://play.google.com/store/apps/details?id=com.interval.hiittimer";
+      const appStoreLink = "https://apps.apple.com/app/interval-hiit-timer/id12345678";
+      const playStoreLink = "https://play.google.com/store/apps/details?id=com.plyonest.interval";
       const message = `🔥 Join me on Interval — the cleanest, most powerful HIIT timer for workouts and training!\n\nDownload for free:\nApp Store: ${appStoreLink}\nPlay Store: ${playStoreLink}`;
 
       const result = await Share.share({
