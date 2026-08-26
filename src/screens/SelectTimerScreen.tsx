@@ -6,6 +6,7 @@ import {
   Text,
   TouchableOpacity,
   ActivityIndicator,
+  Share,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
@@ -21,12 +22,13 @@ import { RootStackScreenProps } from "../types";
 import { Timer } from "../model/Timer";
 import { normalizeInterval } from "../model/Interval";
 import { DEFAULT_AI_TIMERS } from "../constants/defaultTimers";
+import { encodeBase64 } from "../utils/base64";
 import Spacing from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
 import Colors from "../constants/Colors";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { getUserStats } from "../services/badgeService";
+import { getUserStats, recordShare } from "../services/badgeService";
 import { UserStats } from "../model/Badge";
 
 const STORAGE_KEY = "@hiit_timers";
@@ -96,6 +98,42 @@ export default function SelectTimerScreen({
     return `${secs}s`;
   }
 
+  async function handleShareTimer(timer: Timer) {
+    try {
+      const sharePayload = {
+        name: timer.name,
+        rounds: timer.rounds,
+        intervals: timer.intervals.map((int) => ({
+          name: int.name,
+          duration: int.duration,
+          color: int.color,
+          exerciseId: int.exerciseId,
+        })),
+      };
+
+      const base64Data = encodeBase64(JSON.stringify(sharePayload));
+      const deepLink = `interval://import?data=${base64Data}`;
+      
+      const appStoreLink = "https://apps.apple.com/app/hiit-interval-timer/id12345678";
+      const playStoreLink = "https://play.google.com/store/apps/details?id=com.interval.hiittimer";
+
+      const totalSec = calculateTotalDuration(timer);
+      const shareMessage = `🔥 Try my custom HIIT workout "${timer.name}" on Interval!\n\nWorkout details: ${timer.rounds} rounds, ${formatTime(totalSec)} total time.\n\n1. Download Interval:\nApp Store: ${appStoreLink}\nPlay Store: ${playStoreLink}\n\n2. Open this link to load the timer:\n${deepLink}`;
+
+      const result = await Share.share({
+        message: shareMessage,
+        title: `Share Timer: ${timer.name}`,
+      });
+
+      if (result.action === Share.sharedAction) {
+        const { stats } = await recordShare(result.activityType);
+        setUserStats(stats);
+      }
+    } catch (e) {
+      console.warn("Failed to share timer:", e);
+    }
+  }
+
   const renderTimerCard = ({ item, drag, isActive }: RenderItemParams<Timer>) => (
     <ScaleDecorator>
       <TouchableOpacity
@@ -146,13 +184,24 @@ export default function SelectTimerScreen({
             </View>
           </View>
 
-          <TouchableOpacity
-            style={styles.playButton}
-            activeOpacity={0.7}
-            onPress={() => navigation.navigate("Timer", { timer: item })}
-          >
-            <Ionicons name="play" size={24} color="#FFFFFF" />
-          </TouchableOpacity>
+          <View style={styles.cardActionsRow}>
+            <TouchableOpacity
+              style={styles.cardShareButton}
+              activeOpacity={0.7}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              onPress={() => handleShareTimer(item)}
+            >
+              <Ionicons name="share-outline" size={20} color="#6B7280" />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.playButton}
+              activeOpacity={0.7}
+              onPress={() => navigation.navigate("Timer", { timer: item })}
+            >
+              <Ionicons name="play" size={24} color="#FFFFFF" />
+            </TouchableOpacity>
+          </View>
         </View>
       </TouchableOpacity>
     </ScaleDecorator>
@@ -452,6 +501,19 @@ const styles = StyleSheet.create({
   durationBadgeText: {
     color: "#1D4ED8",
     fontFamily: "Poppins-Bold",
+  },
+  cardActionsRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.xs,
+  },
+  cardShareButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "#F3F4F6",
+    justifyContent: "center",
+    alignItems: "center",
   },
   playButton: {
     width: Spacing.touchTarget.min,

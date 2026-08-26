@@ -16,6 +16,10 @@ export const DEFAULT_USER_STATS: UserStats = {
   totalWorkouts: 0,
   totalSeconds: 0,
   totalIntervals: 0,
+  totalShares: 0,
+  sharedViaSms: false,
+  sharedViaEmailOrLink: false,
+  importedSharedWorkouts: 0,
   unlockedBadgeIds: [],
 };
 
@@ -111,6 +115,8 @@ export async function recordWorkoutCompletion(
   const totalWorkouts = stats.totalWorkouts + 1;
   const totalSeconds = stats.totalSeconds + workoutSeconds;
   const totalIntervals = stats.totalIntervals + timer.intervals.length * timer.rounds;
+  const isImportedTimer = Boolean(timer.id.startsWith("ai_") && !timer.createdAt);
+  const importedSharedWorkouts = stats.importedSharedWorkouts + (isImportedTimer ? 1 : 0);
 
   const currentUnlocked = new Set(stats.unlockedBadgeIds || []);
   const newlyUnlocked: Badge[] = [];
@@ -129,9 +135,17 @@ export async function recordWorkoutCompletion(
 
   // Evaluate Criteria
   checkAndUnlock("first_step_hero", totalWorkouts >= 1);
+  checkAndUnlock("back_to_back_beast", currentStreak >= 2);
   checkAndUnlock("spaghetti_legs", currentStreak >= 3);
+  checkAndUnlock("workweek_warrior", currentStreak >= 5);
   checkAndUnlock("sweat_monster", currentStreak >= 7);
+  checkAndUnlock("fortnight_of_fire", currentStreak >= 14);
+  checkAndUnlock("habit_machine", currentStreak >= 21);
   checkAndUnlock("unstoppable_dynamo", currentStreak >= 30);
+  checkAndUnlock("iron_will", currentStreak >= 60);
+  checkAndUnlock("quarterly_crusher", currentStreak >= 90);
+  checkAndUnlock("half_year_hero", currentStreak >= 180);
+  checkAndUnlock("sun_god_of_sweat", currentStreak >= 365);
   checkAndUnlock("weekend_warrior", workedOutSaturday && workedOutSunday);
   checkAndUnlock("ten_minute_tornado", totalSeconds >= 600);
   checkAndUnlock("hour_of_power", totalSeconds >= 3600);
@@ -140,8 +154,10 @@ export async function recordWorkoutCompletion(
   checkAndUnlock("night_owl", hour >= 20);
   checkAndUnlock("iron_lungs", timer.rounds >= 5);
   checkAndUnlock("custom_creator", !timer.isAiGenerated);
+  checkAndUnlock("imported_gains", importedSharedWorkouts >= 1);
 
   const updatedStats: UserStats = {
+    ...stats,
     currentStreak,
     longestStreak,
     lastWorkoutDate: today,
@@ -151,6 +167,78 @@ export async function recordWorkoutCompletion(
     totalWorkouts,
     totalSeconds,
     totalIntervals,
+    importedSharedWorkouts,
+    unlockedBadgeIds: Array.from(currentUnlocked),
+  };
+
+  await saveUserStats(updatedStats);
+  if (newlyUnlocked.length > 0) {
+    await saveBadgeTimestamps(timestamps);
+  }
+
+  return { newlyUnlocked, stats: updatedStats };
+}
+
+export async function recordShare(
+  activityType?: string | null
+): Promise<{ newlyUnlocked: Badge[]; stats: UserStats }> {
+  const stats = await getUserStats();
+  const timestamps = await getBadgeTimestamps();
+
+  const totalShares = (stats.totalShares || 0) + 1;
+  let sharedViaSms = stats.sharedViaSms;
+  let sharedViaEmailOrLink = stats.sharedViaEmailOrLink;
+
+  const act = (activityType || "").toLowerCase();
+  if (
+    act.includes("message") ||
+    act.includes("sms") ||
+    act.includes("whatsapp") ||
+    act.includes("telegram") ||
+    act.includes("signal")
+  ) {
+    sharedViaSms = true;
+  }
+  if (
+    act.includes("mail") ||
+    act.includes("airdrop") ||
+    act.includes("copy") ||
+    act.includes("pasteboard")
+  ) {
+    sharedViaEmailOrLink = true;
+  }
+
+  // If activityType was not provided (e.g. on Android or direct share button), also count as general share
+  const currentUnlocked = new Set(stats.unlockedBadgeIds || []);
+  const newlyUnlocked: Badge[] = [];
+
+  function checkAndUnlock(badgeId: string, condition: boolean) {
+    if (condition && !currentUnlocked.has(badgeId)) {
+      currentUnlocked.add(badgeId);
+      const badgeDef = BADGE_CATALOG.find((b) => b.id === badgeId);
+      if (badgeDef) {
+        newlyUnlocked.push(badgeDef);
+        timestamps[badgeId] = Date.now();
+      }
+    }
+  }
+
+  // Evaluate viral sharing ladder
+  checkAndUnlock("megaphone_maestro", totalShares >= 1);
+  checkAndUnlock("squad_recruiter", sharedViaSms);
+  checkAndUnlock("chain_letter_of_gains", sharedViaEmailOrLink);
+  checkAndUnlock("hype_machine", totalShares >= 5);
+  checkAndUnlock("sweat_influencer", totalShares >= 10);
+  checkAndUnlock("chief_fitness_officer", totalShares >= 25);
+  checkAndUnlock("viral_phenomenon", totalShares >= 50);
+  checkAndUnlock("cult_leader_of_cardio", totalShares >= 100);
+  checkAndUnlock("galactic_ambassador", totalShares >= 1000);
+
+  const updatedStats: UserStats = {
+    ...stats,
+    totalShares,
+    sharedViaSms,
+    sharedViaEmailOrLink,
     unlockedBadgeIds: Array.from(currentUnlocked),
   };
 

@@ -16,7 +16,7 @@ import * as Haptics from "expo-haptics";
 
 import { RootStackScreenProps } from "../types";
 import { encodeBase64 } from "../utils/base64";
-import { recordWorkoutCompletion } from "../services/badgeService";
+import { recordWorkoutCompletion, recordShare } from "../services/badgeService";
 import { Badge, UserStats } from "../model/Badge";
 import Spacing from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
@@ -106,10 +106,20 @@ export default function CompletionScreen({
 
       const shareMessage = `I just smashed my workout using Interval! ⚡️\n\nTimer: "${timer.name}" (${timer.rounds} rounds, ${formatTime(totalSeconds)} duration)${streakText}${badgeText}\n\n1. Download the app:\nApp Store: ${appStoreLink}\nPlay Store: ${playStoreLink}\n\n2. Open this link to load the timer:\n${deepLink}`;
 
-      await Share.share({
+      const result = await Share.share({
         message: shareMessage,
         title: `Share Workout: ${timer.name}`,
       });
+
+      if (result.action === Share.sharedAction) {
+        const { newlyUnlocked, stats } = await recordShare(result.activityType);
+        setUserStats(stats);
+        if (newlyUnlocked.length > 0) {
+          setNewlyUnlockedBadges((prev) => [...prev, ...newlyUnlocked]);
+          setActiveModalBadge(newlyUnlocked[0]);
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        }
+      }
     } catch (error) {
       console.warn("Error sharing workout:", error);
     }
@@ -123,10 +133,20 @@ export default function CompletionScreen({
       const streakText = userStats && userStats.currentStreak > 0 ? ` (🔥 ${userStats.currentStreak}-Day Streak!)` : "";
       const message = `🏆 I just earned the "${badge.name}" badge${streakText} on Interval!\n\n"${badge.description}"\n\nCrush your fitness goals with custom HIIT interval timers:\nApp Store: ${appStoreLink}\nPlay Store: ${playStoreLink}`;
 
-      await Share.share({
+      const result = await Share.share({
         message,
         title: `Badge Unlocked: ${badge.name}`,
       });
+
+      if (result.action === Share.sharedAction) {
+        const { newlyUnlocked, stats } = await recordShare(result.activityType);
+        setUserStats(stats);
+        if (newlyUnlocked.length > 0) {
+          setNewlyUnlockedBadges((prev) => [...prev, ...newlyUnlocked]);
+          setActiveModalBadge(newlyUnlocked[0]);
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        }
+      }
     } catch (error) {
       console.warn("Error sharing badge:", error);
     }

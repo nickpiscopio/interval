@@ -15,7 +15,7 @@ import * as Haptics from "expo-haptics";
 
 import { RootStackScreenProps } from "../types";
 import { Badge, UserStats } from "../model/Badge";
-import { getAllBadgesWithStatus, getUserStats } from "../services/badgeService";
+import { getAllBadgesWithStatus, getUserStats, recordShare } from "../services/badgeService";
 import Spacing from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
 import Colors from "../constants/Colors";
@@ -51,12 +51,47 @@ export default function AwardsScreen({ navigation }: RootStackScreenProps<"Award
       const streakText = stats && stats.currentStreak > 0 ? ` (🔥 ${stats.currentStreak}-Day Streak!)` : "";
       const message = `🏆 I just earned the "${badge.name}" badge${streakText} on Interval!\n\n"${badge.description}"\n\nCrush your fitness goals with custom HIIT interval timers:\nApp Store: ${appStoreLink}\nPlay Store: ${playStoreLink}`;
 
-      await Share.share({
+      const result = await Share.share({
         message,
         title: `Badge Unlocked: ${badge.name}`,
       });
+
+      if (result.action === Share.sharedAction) {
+        const { newlyUnlocked, stats: updatedStats } = await recordShare(result.activityType);
+        setStats(updatedStats);
+        await loadData();
+        if (newlyUnlocked.length > 0) {
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          setSelectedBadge(newlyUnlocked[0]);
+        }
+      }
     } catch (error) {
       console.warn("Error sharing badge:", error);
+    }
+  }
+
+  async function handleShareApp() {
+    try {
+      const appStoreLink = "https://apps.apple.com/app/hiit-interval-timer/id12345678";
+      const playStoreLink = "https://play.google.com/store/apps/details?id=com.interval.hiittimer";
+      const message = `🔥 Join me on Interval — the cleanest, most powerful HIIT timer for workouts and training!\n\nDownload for free:\nApp Store: ${appStoreLink}\nPlay Store: ${playStoreLink}`;
+
+      const result = await Share.share({
+        message,
+        title: "Join me on Interval",
+      });
+
+      if (result.action === Share.sharedAction) {
+        const { newlyUnlocked, stats: updatedStats } = await recordShare(result.activityType);
+        setStats(updatedStats);
+        await loadData();
+        if (newlyUnlocked.length > 0) {
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          setSelectedBadge(newlyUnlocked[0]);
+        }
+      }
+    } catch (e) {
+      console.warn("Failed to share app:", e);
     }
   }
 
@@ -122,11 +157,34 @@ export default function AwardsScreen({ navigation }: RootStackScreenProps<"Award
               <Text style={styles.statMetricLabel}>Total Time</Text>
             </View>
             <View style={styles.statMetric}>
-              <Text style={styles.statMetricValue}>{stats?.longestStreak || 0}d</Text>
-              <Text style={styles.statMetricLabel}>Best Streak</Text>
+              <Text style={styles.statMetricValue}>{stats?.totalShares || 0}</Text>
+              <Text style={styles.statMetricLabel}>Shares</Text>
             </View>
           </View>
         </LinearGradient>
+
+        {/* Invite Friends & Viral Rewards Banner */}
+        <TouchableOpacity
+          style={styles.inviteBanner}
+          activeOpacity={0.9}
+          onPress={handleShareApp}
+        >
+          <LinearGradient
+            colors={["#3B82F6", "#1D4ED8"]}
+            style={styles.inviteBannerGradient}
+          >
+            <View style={styles.inviteBannerIconWrap}>
+              <Ionicons name="gift" size={22} color="#FFFFFF" />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.inviteBannerTitle}>Invite Friends & Earn Badges 🚀</Text>
+              <Text style={styles.inviteBannerSubtitle}>
+                {stats?.totalShares || 0} shares completed • Share with friends to unlock!
+              </Text>
+            </View>
+            <Ionicons name="share-social" size={18} color="#FFFFFF" />
+          </LinearGradient>
+        </TouchableOpacity>
 
         {/* Badges Collection Grid */}
         <View style={styles.gridSection}>
@@ -337,6 +395,43 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontFamily: "Poppins-Regular",
     color: "#9CA3AF",
+    marginTop: 2,
+  },
+  inviteBanner: {
+    borderRadius: Spacing.radius.lg,
+    overflow: "hidden",
+    marginBottom: Spacing.lg,
+    shadowColor: "#3B82F6",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
+    elevation: 4,
+  },
+  inviteBannerGradient: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.md,
+    gap: Spacing.sm,
+  },
+  inviteBannerIconWrap: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  inviteBannerTitle: {
+    fontSize: FontSize.sm,
+    lineHeight: FontSize.lineHeight.sm,
+    fontFamily: "Poppins-Bold",
+    color: "#FFFFFF",
+  },
+  inviteBannerSubtitle: {
+    fontSize: 11,
+    fontFamily: "Poppins-Regular",
+    color: "rgba(255, 255, 255, 0.85)",
     marginTop: 2,
   },
   gridSection: {
