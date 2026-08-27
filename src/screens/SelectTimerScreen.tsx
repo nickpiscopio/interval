@@ -32,10 +32,13 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { getUserStats, recordShare } from "../services/badgeService";
 import { UserStats } from "../model/Badge";
 import { ExerciseLibraryView } from "../components/ExerciseLibraryView";
+import { LegalDisclaimerModal } from "../components/LegalDisclaimerModal";
 import { t } from "../i18n";
 
 const STORAGE_KEY = "@hiit_timers";
 const INITIALIZED_KEY = "@hiit_initialized";
+const LEGAL_ACCEPTED_KEY = "@legal_disclaimer_accepted";
+const LEGAL_ACCEPTED_DATE_KEY = "@legal_disclaimer_accepted_date";
 
 export default function SelectTimerScreen({
   navigation,
@@ -47,6 +50,9 @@ export default function SelectTimerScreen({
   const [isScrolled, setIsScrolled] = useState(false);
   const [hasMoreBelow, setHasMoreBelow] = useState(false);
   const [headerHeight, setHeaderHeight] = useState(120);
+  const [showLegalGate, setShowLegalGate] = useState(false);
+  const [showLegalReview, setShowLegalReview] = useState(false);
+  const [legalAcceptedDate, setLegalAcceptedDate] = useState<string | null>(null);
   const isFocused = useIsFocused();
   const insets = useSafeAreaInsets();
 
@@ -60,6 +66,16 @@ export default function SelectTimerScreen({
   async function loadTimers() {
     try {
       setLoading(true);
+      const isLegalAccepted = await AsyncStorage.getItem(LEGAL_ACCEPTED_KEY);
+      if (!isLegalAccepted) {
+        setShowLegalGate(true);
+      } else {
+        const savedDate = await AsyncStorage.getItem(LEGAL_ACCEPTED_DATE_KEY);
+        if (savedDate) {
+          setLegalAcceptedDate(savedDate);
+        }
+      }
+
       const isInitialized = await AsyncStorage.getItem(INITIALIZED_KEY);
       if (!isInitialized) {
         await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_AI_TIMERS));
@@ -81,6 +97,23 @@ export default function SelectTimerScreen({
       console.warn("Failed to load timers from AsyncStorage:", e);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleAcceptLegal() {
+    try {
+      const todayFormatted = new Date().toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+      await AsyncStorage.setItem(LEGAL_ACCEPTED_KEY, "true");
+      await AsyncStorage.setItem(LEGAL_ACCEPTED_DATE_KEY, todayFormatted);
+      setLegalAcceptedDate(todayFormatted);
+    } catch (e) {
+      console.warn("Failed to save legal acceptance:", e);
+    } finally {
+      setShowLegalGate(false);
     }
   }
 
@@ -366,22 +399,34 @@ export default function SelectTimerScreen({
                 : t("exercises.librarySubtitle")}
             </Text>
           </View>
-          <TouchableOpacity
-            style={styles.trophyButton}
-            activeOpacity={0.8}
-            onPress={() => navigation.navigate("Awards")}
-          >
-            {userStats && userStats.currentStreak > 0 ? (
-              <View style={styles.streakBadge}>
-                <Text style={styles.streakBadgeEmoji}>🔥</Text>
-                <Text style={styles.streakBadgeCount}>{userStats.currentStreak}</Text>
-              </View>
-            ) : (
-              <View style={styles.trophyIconWrap}>
-                <Ionicons name="trophy" size={22} color="#F59E0B" />
-              </View>
-            )}
-          </TouchableOpacity>
+          <View style={styles.headerActionsRow}>
+            <TouchableOpacity
+              testID="legal-info-header-btn"
+              style={styles.infoButton}
+              activeOpacity={0.8}
+              onPress={() => setShowLegalReview(true)}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Ionicons name="information-circle-outline" size={22} color="#6B7280" />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.trophyButton}
+              activeOpacity={0.8}
+              onPress={() => navigation.navigate("Awards")}
+            >
+              {userStats && userStats.currentStreak > 0 ? (
+                <View style={styles.streakBadge}>
+                  <Text style={styles.streakBadgeEmoji}>🔥</Text>
+                  <Text style={styles.streakBadgeCount}>{userStats.currentStreak}</Text>
+                </View>
+              ) : (
+                <View style={styles.trophyIconWrap}>
+                  <Ionicons name="trophy" size={22} color="#F59E0B" />
+                </View>
+              )}
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
 
@@ -484,6 +529,21 @@ export default function SelectTimerScreen({
           </Text>
         </TouchableOpacity>
       </View>
+
+      {/* First-Launch Blocking Legal Gate Modal */}
+      <LegalDisclaimerModal
+        visible={showLegalGate}
+        mode="gate"
+        onAccept={handleAcceptLegal}
+      />
+
+      {/* Reviewable Legal & Medical Info Modal */}
+      <LegalDisclaimerModal
+        visible={showLegalReview}
+        mode="review"
+        acceptedDate={legalAcceptedDate}
+        onClose={() => setShowLegalReview(false)}
+      />
     </View>
   );
 }
@@ -534,6 +594,21 @@ const styles = StyleSheet.create({
     fontSize: FontSize.sm,
     color: "#6B7280",
     marginTop: 2,
+  },
+  headerActionsRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  infoButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#F3F4F6",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
   },
   trophyButton: {
     padding: Spacing.xs,

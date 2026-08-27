@@ -27,3 +27,7 @@ _Avoid_: Rehab Drill, Clinical Protocol
 **Body Part Focus**:
 Everyday user-friendly anatomical regions (e.g., Ankle & Feet, Knees, Pelvic Floor, Lower Back, Upper Back, Neck, Wrists & Hands, Elbows, Hips & Glutes, Shoulders) used for filtering and discovering exercises.
 _Avoid_: Medical Jargon (e.g., Cervical Spine, Lumbar, Talocrural, Patellofemoral)
+
+**Legal Agreement & Medical Disclaimer**:
+A mandatory first-launch acknowledgement and reviewable legal terms informing the user of voluntary participation, assumption of personal risk, non-medical nature of AI & physical therapy exercise recommendations, and the requirement to consult a physician.
+_Avoid_: EULA, Fine Print

@@ -255,4 +255,52 @@ describe("SelectTimerScreen", () => {
 
     expect(getByText("Let's Workout! ⚡️")).toBeTruthy();
   });
+
+  it("displays legal agreement gate on first launch and saves acceptance with date", async () => {
+    await AsyncStorage.removeItem("@legal_disclaimer_accepted");
+    await AsyncStorage.removeItem("@legal_disclaimer_accepted_date");
+
+    const { getByTestId, getByText, queryByTestId } = render(
+      <SelectTimerScreen navigation={{} as any} route={{} as any} />
+    );
+
+    await waitFor(() => {
+      expect(getByText("IMPORTANT SAFETY & HEALTH NOTICE")).toBeTruthy();
+      expect(getByText("Legal Agreement & Medical Disclaimer")).toBeTruthy();
+    });
+
+    const agreeBtn = getByTestId("legal-agree-button");
+    fireEvent.press(agreeBtn);
+
+    await waitFor(async () => {
+      const accepted = await AsyncStorage.getItem("@legal_disclaimer_accepted");
+      const acceptedDate = await AsyncStorage.getItem("@legal_disclaimer_accepted_date");
+      expect(accepted).toBe("true");
+      expect(acceptedDate).toBeTruthy();
+    });
+  });
+
+  it("opens legal agreement in review mode from header info button with agreed date", async () => {
+    await AsyncStorage.setItem("@legal_disclaimer_accepted", "true");
+    await AsyncStorage.setItem("@legal_disclaimer_accepted_date", "Aug 27, 2026");
+
+    const { getByTestId, getByText } = render(
+      <SelectTimerScreen navigation={{} as any} route={{} as any} />
+    );
+
+    await waitFor(() => {
+      expect(getByTestId("legal-info-header-btn")).toBeTruthy();
+    });
+
+    const infoBtn = getByTestId("legal-info-header-btn");
+    fireEvent.press(infoBtn);
+
+    expect(getByText("Legal Agreement & Medical Disclaimer")).toBeTruthy();
+    expect(getByText("Agreed on Aug 27, 2026")).toBeTruthy();
+    expect(getByTestId("legal-modal-close-btn")).toBeTruthy();
+
+    const closeBtn = getByTestId("legal-modal-close-btn");
+    fireEvent.press(closeBtn);
+  });
 });
+

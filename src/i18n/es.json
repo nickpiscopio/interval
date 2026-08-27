@@ -1446,5 +1446,23 @@
       "tagline": "¡Entrenar juntos es lo mejor!",
       "description": "Importaste y completaste con éxito un entrenamiento compartido por un amigo."
     }
+  },
+  "legal": {
+    "title": "Acuerdo Legal y Descargo Médico",
+    "subtitle": "Por favor lee atentamente antes de usar Interval",
+    "badgeWarning": "AVISO IMPORTANTE DE SALUD Y SEGURIDAD",
+    "assumptionOfRiskTitle": "1. Participación Voluntaria y Asunción de Riesgo",
+    "assumptionOfRiskBody": "Reconoces que estás utilizando Interval de manera totalmente voluntaria y bajo tu propio riesgo. De ninguna manera nadie te está obligando o forzando a realizar ninguna actividad física o entrenamiento.",
+    "recommendationsTitle": "2. Recomendaciones de Ejercicio y Fisioterapia",
+    "recommendationsBody": "Cualquier temporizador, secuencia de ejercicios, rutina o movimiento de fisioterapia/correctivo recomendado o generado por Interval (incluyendo entrenamientos con IA) es únicamente una recomendación informativa. Interval no es un proveedor médico y no prescribe tratamientos médicos.",
+    "physicianConsultationTitle": "3. Consulta Médica Obligatoria",
+    "physicianConsultationBody": "Siempre debes consultar con tu médico, fisioterapeuta o profesional de la salud calificado antes de iniciar cualquier rutina de ejercicios, programa HIIT o protocolo de fisioterapia, especialmente si tienes lesiones previas o condiciones de salud.",
+    "liabilityTitle": "4. Límite de Responsabilidad y Práctica Segura",
+    "liabilityBody": "Escucha siempre a tu cuerpo y detén el ejercicio de inmediato si sientes dolor, mareo, falta de aire o malestar. Al continuar, aceptas que Interval y sus creadores no asumen responsabilidad alguna por lesiones o complicaciones resultantes del uso de la aplicación.",
+    "agreeButton": "Entiendo y Acepto",
+    "reviewCloseButton": "Cerrar",
+    "appVersionLabel": "Interval v%{version}",
+    "termsNotice": "Al presionar 'Entiendo y Acepto', confirmas que has leído y aceptado estos términos.",
+    "agreedOnDate": "Aceptado el %{date}"
   }
 }

@@ -1446,5 +1446,23 @@
       "tagline": "Transpirer ensemble, c'est le meilleur !",
       "description": "Vous avez importé et terminé avec succès une séance partagée par un ami."
     }
+  },
+  "legal": {
+    "title": "Accord Légal et Avertissement Médical",
+    "subtitle": "Veuillez lire attentivement avant d'utiliser Interval",
+    "badgeWarning": "AVIS IMPORTANT DE SANTÉ ET SÉCURITÉ",
+    "assumptionOfRiskTitle": "1. Participation Volontaire et Prise de Risque",
+    "assumptionOfRiskBody": "Vous reconnaissez que vous utilisez Interval de manière strictement volontaire et à vos propres risques. En aucun cas personne ne vous oblige ou ne vous contraint à effectuer une activité physique ou un entraînement.",
+    "recommendationsTitle": "2. Recommandations d'Entraînement et Kinésithérapie",
+    "recommendationsBody": "Tout minuteur, séquence d'exercices, routine ou mouvement de kinésithérapie/correctif fourni ou généré par Interval (y compris les entraînements IA) constitue uniquement une recommandation informative. Interval n'est pas un professionnel de santé et ne prescrit aucun traitement médical.",
+    "physicianConsultationTitle": "3. Consultation Médicale Obligatoire",
+    "physicianConsultationBody": "Vous devez toujours consulter votre médecin, kinésithérapeute ou professionnel de santé qualifié avant de commencer un programme d'entraînement, un entraînement HIIT ou un protocole de rééducation, particulièrement en cas de blessures préalables ou de problèmes de santé.",
+    "liabilityTitle": "4. Limitation de Responsabilité et Pratique Sécurisée",
+    "liabilityBody": "Écoutez toujours votre corps et cessez immédiatement tout exercice en cas de douleur, vertige, essoufflement ou malaise. En continuant, vous acceptez qu'Interval et ses créateurs déclinent toute responsabilité en cas de blessure ou de complication résultant de l'utilisation de l'application.",
+    "agreeButton": "Je Comprends et J'Accepte",
+    "reviewCloseButton": "Fermer",
+    "appVersionLabel": "Interval v%{version}",
+    "termsNotice": "En appuyant sur 'Je Comprends et J'Accepte', vous confirmez avoir lu et accepté ces conditions.",
+    "agreedOnDate": "Accepté le %{date}"
   }
 }
