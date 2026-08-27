@@ -112,6 +112,7 @@ export function generateWorkout(params: GeneratorParams): Timer {
   // 4. Generate motivating localized title
   const goalNames: Record<string, string> = {
     weight_loss: t("timerGenerator.goalWeightLoss", { defaultValue: "Fat Burn" }),
+    toned: t("timerGenerator.goalTone", { defaultValue: "Tone & Sculpt" }),
     tone: t("timerGenerator.goalTone", { defaultValue: "Tone & Sculpt" }),
     bulk: t("timerGenerator.goalBulk", { defaultValue: "Strength Boost" })
   };

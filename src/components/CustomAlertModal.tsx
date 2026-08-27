@@ -152,7 +152,7 @@ export function CustomAlertModal({
       onRequestClose={handleBackdropPress}
     >
       <TouchableWithoutFeedback onPress={handleBackdropPress}>
-        <Animated.View style={[styles.overlay, { opacity: opacityAnim }]}>
+        <Animated.View testID="custom-alert-backdrop" style={[styles.overlay, { opacity: opacityAnim }]}>
           <TouchableWithoutFeedback>
             <Animated.View
               style={[
