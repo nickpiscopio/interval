@@ -453,7 +453,366 @@
         "Rest forehead gently on mat and extend arms long.",
         "Breathe deeply into back and relax shoulders."
       ]
+    },
+    "butt_kicks": {
+      "name": "Butt Kicks",
+      "instructions": [
+        "Stand with feet hip-width apart.",
+        "Jog in place while kicking your heels up toward your glutes.",
+        "Keep your chest upright and shoulders relaxed.",
+        "Maintain a quick, bouncy rhythm."
+      ]
+    },
+    "skater_jumps": {
+      "name": "Skater Jumps",
+      "instructions": [
+        "Stand on right foot and bound laterally to the left.",
+        "Land on left foot, sweeping right leg behind you.",
+        "Immediately bound back to the right.",
+        "Swing your arms naturally to generate power."
+      ]
+    },
+    "tuck_jumps": {
+      "name": "Tuck Jumps",
+      "instructions": [
+        "Stand with feet shoulder-width apart and knees slightly bent.",
+        "Explode vertically off the ground as high as you can.",
+        "Pull knees up tightly toward chest in mid-air.",
+        "Land softly on the balls of your feet and reset immediately."
+      ]
+    },
+    "fast_feet": {
+      "name": "Fast Feet",
+      "instructions": [
+        "Assume an athletic quarter-squat stance with feet wide.",
+        "Patter your feet as rapidly as possible against the floor.",
+        "Keep your weight centered over the balls of your feet.",
+        "Stay low and keep core engaged."
+      ]
+    },
+    "shadow_boxing": {
+      "name": "Shadow Boxing",
+      "instructions": [
+        "Adopt a boxer stance with hands up protecting chin.",
+        "Throw alternating jab, cross, hook, and uppercut punches.",
+        "Rotate through your hips and pivot on the balls of your feet.",
+        "Breathe out sharply with each strike."
+      ]
+    },
+    "star_jumps": {
+      "name": "Star Jumps",
+      "instructions": [
+        "Crouch into a low squat with arms tucked close.",
+        "Explode into the air, spreading arms and legs wide into a star shape.",
+        "Quickly bring limbs back together before landing.",
+        "Absorb the landing softly back into a squat."
+      ]
+    },
+    "incline_pushups": {
+      "name": "Incline Push-Ups",
+      "instructions": [
+        "Place hands elevated on a sturdy bench, chair, or step.",
+        "Lower your chest until it approaches the elevated surface.",
+        "Press back up through chest and triceps.",
+        "Keep body in a straight plank posture."
+      ]
+    },
+    "decline_pushups": {
+      "name": "Decline Push-Ups",
+      "instructions": [
+        "Place feet elevated on a bench or sturdy platform with hands on the floor.",
+        "Lower chest smoothly toward the floor.",
+        "Press through your upper chest and shoulders to return to start.",
+        "Maintain strict core engagement without sagging."
+      ]
+    },
+    "bench_dips": {
+      "name": "Tricep Dips",
+      "instructions": [
+        "Sit on the edge of a chair or bench with hands next to hips.",
+        "Slide hips forward off the edge, supporting weight on hands.",
+        "Bend elbows to 90 degrees, lowering hips toward floor.",
+        "Press through palms to lockout arms at the top."
+      ]
+    },
+    "shoulder_taps": {
+      "name": "Plank Shoulder Taps",
+      "instructions": [
+        "Hold a high push-up plank with feet slightly wider than hips.",
+        "Lift right hand and tap your left shoulder without rotating hips.",
+        "Return right hand and tap right shoulder with left hand.",
+        "Keep your pelvis perfectly still throughout."
+      ]
+    },
+    "inchworms": {
+      "name": "Inchworms",
+      "instructions": [
+        "Stand tall, then bend at waist and touch hands to floor in front of feet.",
+        "Walk hands forward one by one until you reach a high plank.",
+        "Hold for one second, then walk hands back toward feet.",
+        "Stand tall and repeat."
+      ]
+    },
+    "prone_ytw": {
+      "name": "Prone Y-T-W Raises",
+      "instructions": [
+        "Lie face down with forehead resting gently on the floor.",
+        "Raise arms in a 'Y' shape with thumbs up, squeezing upper back.",
+        "Shift arms to a 'T' shape and repeat, then to a 'W' shape.",
+        "Strengthens rear delts, rhomboids, and postural muscles."
+      ]
+    },
+    "sumo_squats": {
+      "name": "Sumo Squats",
+      "instructions": [
+        "Take a wide stance with toes pointed out at a 45-degree angle.",
+        "Lower hips straight down, keeping knees pushed outward.",
+        "Feel engagement in inner thighs and glutes.",
+        "Press through heels to rise back up."
+      ]
+    },
+    "reverse_lunges": {
+      "name": "Reverse Lunges",
+      "instructions": [
+        "Stand upright, then step one foot backward.",
+        "Lower back knee smoothly toward the floor.",
+        "Keep front shin vertical and weight centered in front heel.",
+        "Drive through front heel to step forward."
+      ]
+    },
+    "side_lunges": {
+      "name": "Lateral Side Lunges",
+      "instructions": [
+        "Take a large step out to the right side.",
+        "Sit hips back into right heel while keeping left leg completely straight.",
+        "Keep chest tall and right foot flat.",
+        "Push off right foot to return to center, then alternate."
+      ]
+    },
+    "curtsy_lunges": {
+      "name": "Curtsy Lunges",
+      "instructions": [
+        "Step left leg back and across behind right leg as if curtsying.",
+        "Lower hips until front thigh is nearly parallel to floor.",
+        "Feel targeted activation in outer hip and glute.",
+        "Push through front foot to return and switch sides."
+      ]
+    },
+    "single_leg_bridge": {
+      "name": "Single-Leg Glute Bridge",
+      "instructions": [
+        "Lie on back, lift one leg straight up into the air.",
+        "Drive through the supporting heel to lift hips toward ceiling.",
+        "Keep pelvis level and squeeze glute at the peak.",
+        "Lower down slowly and repeat before switching legs."
+      ]
+    },
+    "donkey_kicks": {
+      "name": "Donkey Kicks",
+      "instructions": [
+        "Start on all fours with hands under shoulders and knees under hips.",
+        "Keeping knee bent at 90 degrees, kick one heel up toward ceiling.",
+        "Squeeze glute at top without arching lower back.",
+        "Lower knee with control and alternate sides."
+      ]
+    },
+    "fire_hydrants": {
+      "name": "Fire Hydrants",
+      "instructions": [
+        "Begin on all fours on a comfortable mat.",
+        "Keeping knee bent, raise one leg out to the side like a dog at a hydrant.",
+        "Target outer gluteus medius and hip abductors.",
+        "Lower slowly and repeat."
+      ]
+    },
+    "single_leg_rdl": {
+      "name": "Single-Leg Romanian Deadlift",
+      "instructions": [
+        "Stand on one leg with supporting knee slightly unlocked.",
+        "Hinge forward at hips, extending opposite leg straight behind you.",
+        "Keep back flat and hips square to floor.",
+        "Drive through standing heel and glute to stand tall."
+      ]
+    },
+    "high_plank": {
+      "name": "High Plank Hold",
+      "instructions": [
+        "Set hands directly beneath shoulders with fingers spread.",
+        "Step feet back into a full push-up position.",
+        "Press floor away actively to engage shoulder stabilizers.",
+        "Keep core locked and spine neutral."
+      ]
+    },
+    "side_plank": {
+      "name": "Side Plank",
+      "instructions": [
+        "Lie on your side with forearm flat and feet stacked.",
+        "Lift hips off floor until body forms a straight diagonal line.",
+        "Engage lower obliques and reach top arm upward.",
+        "Hold without letting hips dip."
+      ]
+    },
+    "leg_raises": {
+      "name": "Lying Leg Raises",
+      "instructions": [
+        "Lie flat on your back with hands placed under lower back for support.",
+        "Keep legs straight and raise them together until perpendicular to floor.",
+        "Lower legs slowly without letting lower back arch off floor.",
+        "Hover feet just above the floor before the next rep."
+      ]
+    },
+    "scissor_kicks": {
+      "name": "Scissor Kicks",
+      "instructions": [
+        "Lie on back with legs extended a few inches above floor.",
+        "Cross right ankle over left, then widen and cross left over right.",
+        "Target lower abdominal wall and hip flexors.",
+        "Maintain steady, calm breathing."
+      ]
+    },
+    "dead_bug": {
+      "name": "Dead Bug",
+      "instructions": [
+        "Lie on back with arms pointing straight up and knees at 90 degrees.",
+        "Simultaneously lower right arm overhead and left leg toward floor.",
+        "Keep lower back glued to the floor.",
+        "Return to start and repeat on opposite diagonal."
+      ]
+    },
+    "bird_dog": {
+      "name": "Bird Dog",
+      "instructions": [
+        "Start on all fours on a padded surface.",
+        "Simultaneously reach right arm forward and left leg straight back.",
+        "Hold for a second, aligning limbs parallel to floor.",
+        "Return with control and switch sides."
+      ]
+    },
+    "hollow_body_hold": {
+      "name": "Hollow Body Hold",
+      "instructions": [
+        "Lie flat on back with arms extended overhead.",
+        "Simultaneously lift shoulders, arms, and straight legs off floor.",
+        "Press lower back completely flat into the mat like a banana curve.",
+        "Hold maximum core tension."
+      ]
+    },
+    "cross_body_climbers": {
+      "name": "Cross-Body Mountain Climbers",
+      "instructions": [
+        "In a high push-up position, drive right knee across toward left elbow.",
+        "Return and immediately drive left knee across to right elbow.",
+        "Engage rotational core strength and obliques.",
+        "Maintain a strong, crisp rhythm."
+      ]
+    },
+    "plank_jacks": {
+      "name": "Plank Jacks",
+      "instructions": [
+        "Hold a solid forearm or high plank position.",
+        "Jump both feet outward wide, then jump them back together.",
+        "Keep hips from bouncing excessively up and down.",
+        "Combines core stability with cardiovascular demand."
+      ]
+    },
+    "bear_crawl": {
+      "name": "Bear Crawl",
+      "instructions": [
+        "Start on hands and knees with knees hovering 2 inches off floor.",
+        "Crawl forward moving opposite hand and foot simultaneously.",
+        "Keep back flat and hips level as you travel.",
+        "Reverse direction or turn when needed."
+      ]
+    },
+    "crab_walk": {
+      "name": "Crab Walk",
+      "instructions": [
+        "Sit on floor with knees bent, feet flat, and hands behind hips.",
+        "Lift hips off ground and crawl backward or forward.",
+        "Engages shoulders, triceps, glutes, and hamstrings.",
+        "Keep hips elevated and core tight."
+      ]
+    },
+    "sprawls": {
+      "name": "Sprawls",
+      "instructions": [
+        "Stand in athletic stance, drop hands to floor and kick feet back wide.",
+        "Snap hips forward quickly and jump back to standing athletic stance.",
+        "Fast-paced wrestling and combat conditioning movement.",
+        "Maintain brisk speed."
+      ]
+    },
+    "climber_pushup": {
+      "name": "Mountain Climber to Push-Up",
+      "instructions": [
+        "Perform 4 fast mountain climber knee drives in plank.",
+        "Immediately execute one crisp, full push-up.",
+        "Repeat the sequence continuously.",
+        "Maximizes chest, shoulder, and cardio endurance."
+      ]
+    },
+    "squat_thrusts": {
+      "name": "Squat Thrusts",
+      "instructions": [
+        "Drop into a deep squat placing hands on floor.",
+        "Kick feet back into a full plank position.",
+        "Quickly jump feet forward back outside hands.",
+        "Stand up tall and repeat."
+      ]
+    },
+    "plank_walkouts": {
+      "name": "Plank Walkouts",
+      "instructions": [
+        "From a high plank, take small steps with hands walking further forward.",
+        "Reach as far forward as possible while keeping core from sagging.",
+        "Walk hands back under shoulders.",
+        "Deeply challenges abdominal wall and lats."
+      ]
+    },
+    "split_squat_jumps": {
+      "name": "Jumping Split Lunges",
+      "instructions": [
+        "Start in a lunge with left leg forward.",
+        "Explode vertically off the ground and switch legs in mid-air.",
+        "Land softly in a lunge with right leg forward.",
+        "Repeat continuously with explosive power."
+      ]
+    },
+    "skater_to_hop": {
+      "name": "Skater Hop to Vertical",
+      "instructions": [
+        "Perform a wide lateral skater bound.",
+        "Immediately jump straight up on the landing leg.",
+        "Bound to the other side and repeat vertical hop.",
+        "Develops lateral agility and vertical explosiveness."
+      ]
+    },
+    "burpee_tuck_jump": {
+      "name": "Burpee to Tuck Jump",
+      "instructions": [
+        "Complete a full chest-to-floor burpee.",
+        "As you stand up, explode immediately into a high tuck jump.",
+        "Pull knees to chest at peak height.",
+        "Absorb landing and flow straight into the next burpee."
+      ]
+    },
+    "cobra_pose": {
+      "name": "Cobra / Upward Dog",
+      "instructions": [
+        "Lie face down, hands planted under shoulders.",
+        "Gently press through hands to lift chest off floor.",
+        "Keep shoulders down away from ears and open the chest.",
+        "Stretches abdominal wall and strengthens spine."
+      ]
     }
+  },
+  "exercisePicker": {
+    "title": "Exercise Library",
+    "subtitle": "%{count} bodyweight exercises",
+    "searchPlaceholder": "Search exercises...",
+    "chooseExercise": "Library",
+    "all": "All",
+    "noResults": "No exercises found"
   },
   "badges": {
     "first_step_hero": {

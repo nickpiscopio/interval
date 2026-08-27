@@ -453,7 +453,366 @@
         "Posez le front sur le tapis et étirez les bras loin devant.",
         "Respirez profondément en relâchant les épaules."
       ]
+    },
+    "butt_kicks": {
+      "name": "Talons-Fesses",
+      "instructions": [
+        "Debout, pieds écartés de la largeur des hanches.",
+        "Courez sur place en amenant les talons vers les fessiers.",
+        "Gardez le buste droit et les épaules relâchées.",
+        "Maintenez un rythme dynamique et souple."
+      ]
+    },
+    "skater_jumps": {
+      "name": "Sauts de Patineur",
+      "instructions": [
+        "En appui sur le pied droit, sautez latéralement vers la gauche.",
+        "Réceptionnez sur le pied gauche en croisant la jambe droite derrière.",
+        "Sautez immédiatement de retour vers la droite.",
+        "Accompagnez le mouvement avec les bras pour l'équilibre."
+      ]
+    },
+    "tuck_jumps": {
+      "name": "Sauts Groupés",
+      "instructions": [
+        "Debout, pieds largeur des épaules et genoux souples.",
+        "Explosez vers le haut dans un saut vertical maximal.",
+        "Montez vigoureusement les genoux vers la poitrine en l'air.",
+        "Atterrissez souplement sur l'avant du pied et réenchaînez."
+      ]
+    },
+    "fast_feet": {
+      "name": "Pieds Rapides",
+      "instructions": [
+        "Adoptez une posture athlétique en quart de squat, pieds larges.",
+        "Pétillez des pieds le plus vite possible contre le sol.",
+        "Gardez le poids centré sur l'avant des pieds.",
+        "Restez bas avec le gainage bien serré."
+      ]
+    },
+    "shadow_boxing": {
+      "name": "Boxe de l'Ombre",
+      "instructions": [
+        "Adoptez une garde de boxeur, mains protégeant le menton.",
+        "Donnez des coups alternés : directs, crochets et uppercuts.",
+        "Pivotez avec les hanches et sur la pointe des pieds.",
+        "Expirez franchement à chaque frappe."
+      ]
+    },
+    "star_jumps": {
+      "name": "Sauts en Étoile",
+      "instructions": [
+        "Accroupissez-vous en squat bas, bras regroupés.",
+        "Explosez en l'air en écartant bras et jambes en forme d'étoile.",
+        "Regroupez rapidement les membres avant l'atterrissage.",
+        "Amortissez en douceur de retour en squat."
+      ]
+    },
+    "incline_pushups": {
+      "name": "Pompes Inclinées",
+      "instructions": [
+        "Posez les mains sur un banc, une chaise solide ou une marche.",
+        "Descendez la poitrine vers la surface surélevée.",
+        "Poussez fermement avec les pectoraux et triceps pour remonter.",
+        "Gardez le corps parfaitement aligné en planche."
+      ]
+    },
+    "decline_pushups": {
+      "name": "Pompes Déclinées",
+      "instructions": [
+        "Pieds surélevés sur un banc et mains posées au sol.",
+        "Descendez la poitrine avec contrôle vers le sol.",
+        "Poussez sur le haut des pectoraux et épaules pour remonter.",
+        "Maintenez un gainage rigide sans cambrer."
+      ]
+    },
+    "bench_dips": {
+      "name": "Dips pour Triceps",
+      "instructions": [
+        "Assis au bord d'une chaise, mains de chaque côté des hanches.",
+        "Avancez le bassin dans le vide, en appui sur les mains.",
+        "Pliez les coudes à 90 degrés en descendant le bassin.",
+        "Poussez sur la paume des mains pour tendre les bras."
+      ]
+    },
+    "shoulder_taps": {
+      "name": "Touches d'Épaule en Planche",
+      "instructions": [
+        "En planche haute, pieds un peu plus larges que les hanches.",
+        "Décollez la main droite pour toucher l'épaule gauche sans bouger le bassin.",
+        "Reposez et touchez l'épaule droite avec la main gauche.",
+        "Gardez le bassin parfaitement stable."
+      ]
+    },
+    "inchworms": {
+      "name": "Marches de l'Arpenteuse",
+      "instructions": [
+        "Debout, penchez-vous et posez les mains au sol devant les pieds.",
+        "Avancez avec les mains pas à pas jusqu'à une planche haute.",
+        "Tenez une seconde, puis reculez les mains vers les pieds.",
+        "Redressez-vous debout et recommencez."
+      ]
+    },
+    "prone_ytw": {
+      "name": "Élévations Y-T-W au Sol",
+      "instructions": [
+        "Allongé sur le ventre, front posé délicatement au sol.",
+        "Levez les bras en 'Y' pouces vers le haut en serrant le haut du dos.",
+        "Passez les bras en 'T' puis en 'W'.",
+        "Renforce les deltoïdes postérieurs et la posture."
+      ]
+    },
+    "sumo_squats": {
+      "name": "Squats Sumo",
+      "instructions": [
+        "Écartez largement les pieds, pointes à 45 degrés vers l'extérieur.",
+        "Descendez le bassin à la verticale en ouvrant bien les genoux.",
+        "Ressentez l'engagement des adducteurs et fessiers.",
+        "Poussez sur les talons pour remonter."
+      ]
+    },
+    "reverse_lunges": {
+      "name": "Fentes Arrière",
+      "instructions": [
+        "Debout, faites un grand pas vers l'arrière.",
+        "Descendez le genou arrière en douceur vers le sol.",
+        "Gardez le tibia avant vertical et le poids sur le talon avant.",
+        "Poussez sur le talon avant pour vous redresser."
+      ]
+    },
+    "side_lunges": {
+      "name": "Fentes Latérales",
+      "instructions": [
+        "Faites un grand pas vers la droite.",
+        "Asseyez les hanches sur le talon droit en gardant la jambe gauche tendue.",
+        "Gardez le buste droit et le pied droit bien à plat.",
+        "Poussez sur le pied droit pour revenir au centre, puis alternez."
+      ]
+    },
+    "curtsy_lunges": {
+      "name": "Fentes Révérence",
+      "instructions": [
+        "Croisez la jambe gauche derrière la jambe droite en révérence.",
+        "Descendez les hanches jusqu'à ce que la cuisse avant soit parallèle au sol.",
+        "Ressentez l'activation ciblée sur le moyen fessier.",
+        "Poussez sur le pied avant et changez de côté."
+      ]
+    },
+    "single_leg_bridge": {
+      "name": "Pont Fessier à Une Jambe",
+      "instructions": [
+        "Allongé sur le dos, tendez une jambe vers le haut.",
+        "Poussez sur le talon d'appui pour monter le bassin.",
+        "Gardez le bassin de niveau et contractez le fessier en haut.",
+        "Redescendez lentement avant de changer de jambe."
+      ]
+    },
+    "donkey_kicks": {
+      "name": "Ruades du Mulet",
+      "instructions": [
+        "À quatre pattes, mains sous les épaules et genoux sous les hanches.",
+        "Genou plié à 90 degrés, poussez le talon vers le plafond.",
+        "Contractez le fessier en haut sans cambrer le bas du dos.",
+        "Redescendez avec contrôle et alternez."
+      ]
+    },
+    "fire_hydrants": {
+      "name": "Ouvertures Latérales de Hanche",
+      "instructions": [
+        "À quatre pattes sur un tapis confortable.",
+        "Genou plié, ouvrez la jambe sur le côté.",
+        "Ciblez le moyen fessier et les abducteurs.",
+        "Redescendez lentement et répétez."
+      ]
+    },
+    "single_leg_rdl": {
+      "name": "Soulevé de Terre Unilatéral",
+      "instructions": [
+        "Debout sur une jambe avec le genou légèrement déverrouillé.",
+        "Basculez le buste vers l'avant en tendant l'autre jambe derrière.",
+        "Gardez le dos plat et les hanches face au sol.",
+        "Poussez sur le talon d'appui pour revenir debout."
+      ]
+    },
+    "high_plank": {
+      "name": "Planche Haute",
+      "instructions": [
+        "Placez les mains sous les épaules, doigts écartés.",
+        "Tendez les jambes en arrière en position haute de pompe.",
+        "Repoussez activement le sol pour stabiliser les épaules.",
+        "Maintenez le gainage verrouillé et la colonne neutre."
+      ]
+    },
+    "side_plank": {
+      "name": "Gainage Latéral",
+      "instructions": [
+        "Allongé sur le côté, avant-bras au sol et pieds superposés.",
+        "Montez les hanches pour former une ligne droite diagonale.",
+        "Engagez les obliques inférieurs et levez le bras supérieur.",
+        "Maintenez sans laisser tomber le bassin."
+      ]
+    },
+    "leg_raises": {
+      "name": "Relevés de Jambes au Sol",
+      "instructions": [
+        "Allongé sur le dos, mains sous le bas du dos pour le soutien.",
+        "Montez les jambes tendues à la verticale.",
+        "Redescendez les jambes lentement sans cambrer les lombaires.",
+        "Frôlez le sol avant la répétition suivante."
+      ]
+    },
+    "scissor_kicks": {
+      "name": "Battements Croisés Ciseaux",
+      "instructions": [
+        "Allongé sur le dos, jambes décollées à quelques centimètres du sol.",
+        "Croisez la cheville droite sur la gauche, puis inversez.",
+        "Travaillez le bas des abdominaux et les fléchisseurs de hanche.",
+        "Gardez une respiration fluide."
+      ]
+    },
+    "dead_bug": {
+      "name": "Insecte Mort",
+      "instructions": [
+        "Allongé sur le dos, bras tendus vers le haut et genoux à 90 degrés.",
+        "Descendez simultanément le bras droit en arrière et la jambe gauche au sol.",
+        "Plaquez le bas du dos contre le sol.",
+        "Revenez au départ et répétez sur la diagonale opposée."
+      ]
+    },
+    "bird_dog": {
+      "name": "Chien d'Arrêt",
+      "instructions": [
+        "À quatre pattes sur un tapis de sol.",
+        "Tendez simultanément le bras droit devant et la jambe gauche derrière.",
+        "Tenez une seconde en alignant les membres à l'horizontale.",
+        "Revenez avec contrôle et changez de côté."
+      ]
+    },
+    "hollow_body_hold": {
+      "name": "Gainage en Banane",
+      "instructions": [
+        "Allongé sur le dos, bras tendus au-dessus de la tête.",
+        "Décollez simultanément les épaules, les bras et les jambes tendues.",
+        "Plaquez fermement le bas du dos contre le tapis en forme de berceau.",
+        "Maintenez une tension abdominale maximale."
+      ]
+    },
+    "cross_body_climbers": {
+      "name": "Climbers Croisés",
+      "instructions": [
+        "En planche haute, amenez le genou droit vers le coude gauche.",
+        "Revenez et amenez le genou gauche vers le coude droit.",
+        "Renforcez la rotation du tronc et les obliques.",
+        "Gardez un rythme vif et régulier."
+      ]
+    },
+    "plank_jacks": {
+      "name": "Jumping Jacks en Planche",
+      "instructions": [
+        "Tenez une planche solide sur les avant-bras ou les mains.",
+        "Sautez en écartant les pieds, puis sautez en les resserrant.",
+        "Évitez que le bassin ne rebondisse de haut en bas.",
+        "Combine stabilité abdominale et sollicitation cardiovasculaire."
+      ]
+    },
+    "bear_crawl": {
+      "name": "Marche de l'Ours",
+      "instructions": [
+        "À quatre pattes avec les genoux décollés à 5 cm du sol.",
+        "Avancez en déplaçant main et pied opposés en même temps.",
+        "Gardez le dos plat et les hanches stables pendant le déplacement.",
+        "Tournez ou reculez selon l'espace disponible."
+      ]
+    },
+    "crab_walk": {
+      "name": "Marche du Crabe",
+      "instructions": [
+        "Assis au sol, genoux pliés, pieds et mains en appui arrière.",
+        "Décollez le bassin du sol et avancez ou reculez.",
+        "Sollicite les épaules, triceps, fessiers et ischio-jambiers.",
+        "Gardez le bassin surélevé et le tronc gainé."
+      ]
+    },
+    "sprawls": {
+      "name": "Sprawls",
+      "instructions": [
+        "En posture athlétique, posez les mains au sol et jetez les pieds en arrière.",
+        "Ramenez vivement les hanches vers l'avant et redressez-vous.",
+        "Exercice de conditionnement issu des sports de combat.",
+        "Maintenez une vitesse soutenue."
+      ]
+    },
+    "climber_pushup": {
+      "name": "Climber avec Pompe",
+      "instructions": [
+        "Effectuez 4 montées de genoux rapides en planche.",
+        "Enchaînez immédiatement avec une belle pompe complète.",
+        "Répétez la séquence de façon continue.",
+        "Développe l'endurance des pectoraux, épaules et cardio."
+      ]
+    },
+    "squat_thrusts": {
+      "name": "Squat Thrusts",
+      "instructions": [
+        "Descendez en squat profond et posez les mains au sol.",
+        "Envoyez les pieds en arrière en planche complète.",
+        "Ramenez rapidement les pieds près des mains.",
+        "Redressez-vous debout et recommencez."
+      ]
+    },
+    "plank_walkouts": {
+      "name": "Marches en Planche Avancée",
+      "instructions": [
+        "Depuis une planche haute, avancez les mains pas à pas devant vous.",
+        "Allez aussi loin que possible sans laisser le bassin s'affaisser.",
+        "Ramenez les mains sous les épaules.",
+        "Sollicite intensément la sangle abdominale."
+      ]
+    },
+    "split_squat_jumps": {
+      "name": "Fentes Sautées",
+      "instructions": [
+        "Démarrez en fente avec la jambe gauche devant.",
+        "Explosez vers le haut et inversez les jambes en l'air.",
+        "Atterrissez souplement en fente avec la jambe droite devant.",
+        "Enchaînez avec puissance et régularité."
+      ]
+    },
+    "skater_to_hop": {
+      "name": "Patineur avec Saut Vertical",
+      "instructions": [
+        "Effectuez un large saut latéral de patineur.",
+        "Sautez aussitôt à la verticale sur la jambe de réception.",
+        "Sautez de l'autre côté et répétez.",
+        "Développe l'agilité latérale et l'explosivité verticale."
+      ]
+    },
+    "burpee_tuck_jump": {
+      "name": "Burpee avec Saut Groupé",
+      "instructions": [
+        "Réalisez un burpee complet poitrine au sol.",
+        "En vous relevant, explosez directement dans un saut groupé genoux-poitrine.",
+        "Montez les genoux au plus haut.",
+        "Amortissez et enchaînez directement avec le burpee suivant."
+      ]
+    },
+    "cobra_pose": {
+      "name": "Cobra / Chien Tête en Haut",
+      "instructions": [
+        "Allongé sur le ventre, mains sous les épaules.",
+        "Poussez délicatement sur les mains pour redresser le buste.",
+        "Éloignez les épaules des oreilles et ouvrez la poitrine.",
+        "Étire la paroi abdominale et renforce la colonne vertébrale."
+      ]
     }
+  },
+  "exercisePicker": {
+    "title": "Bibliothèque d'Exercices",
+    "subtitle": "%{count} exercices au poids du corps",
+    "searchPlaceholder": "Rechercher un exercice...",
+    "chooseExercise": "Bibliothèque",
+    "all": "Tous",
+    "noResults": "Aucun exercice trouvé"
   },
   "badges": {
     "first_step_hero": {

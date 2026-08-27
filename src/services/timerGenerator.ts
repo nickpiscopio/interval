@@ -1,6 +1,7 @@
 import { EXERCISE_CATALOG, getLocalizedExercise } from "../constants/exerciseCatalog";
 import { Timer } from "../model/Timer";
 import { Interval, generateIntervalId } from "../model/Interval";
+import { Exercise } from "../model/Exercise";
 import { t } from "../i18n";
 
 export interface GeneratorParams {
@@ -9,54 +10,18 @@ export interface GeneratorParams {
   experience: "beginner" | "intermediate" | "advanced";
 }
 
+/**
+ * Intelligent client-side athletic rules engine.
+ * Generates balanced, progressive bodyweight HIIT routines.
+ */
 export function generateWorkout(params: GeneratorParams): Timer {
   const { goal, area, experience } = params;
 
-  // 1. Filter exercises by category (area)
-  let filtered = EXERCISE_CATALOG;
-  if (area !== "surprise") {
-    filtered = EXERCISE_CATALOG.filter((ex) => ex.category === area);
-  }
-
-  // 2. Filter exercises by difficulty (incorporating fallbacks if pool is small)
-  let matchingExercises = filtered.filter((ex) => ex.difficulty === experience);
-
-  // Fallback chain if we don't have enough exercises
-  if (matchingExercises.length < 3) {
-    if (experience === "advanced") {
-      matchingExercises = [
-        ...matchingExercises,
-        ...filtered.filter((ex) => ex.difficulty === "intermediate"),
-        ...filtered.filter((ex) => ex.difficulty === "beginner")
-      ];
-    } else if (experience === "intermediate") {
-      matchingExercises = [
-        ...matchingExercises,
-        ...filtered.filter((ex) => ex.difficulty === "beginner"),
-        ...filtered.filter((ex) => ex.difficulty === "advanced")
-      ];
-    } else {
-      matchingExercises = [
-        ...matchingExercises,
-        ...filtered.filter((ex) => ex.difficulty === "intermediate"),
-        ...filtered.filter((ex) => ex.difficulty === "advanced")
-      ];
-    }
-  }
-
-  // Deduplicate exercises in case of merges
-  matchingExercises = matchingExercises.filter(
-    (ex, index, self) => self.findIndex((t) => t.id === ex.id) === index
-  );
-
-  // Shuffle selected exercises
-  const shuffled = [...matchingExercises].sort(() => 0.5 - Math.random());
-
-  // 3. Determine structure parameters based on experience
+  // 1. Structure configuration by experience level
   let activeDuration = 30; // seconds
-  let restDuration = 15; // seconds
+  let restDuration = 15;   // seconds
   let rounds = 3;
-  let workoutCount = 4; // number of exercises in the cycle
+  let workoutCount = 4;    // exercises per circuit
 
   if (experience === "intermediate") {
     activeDuration = 40;
@@ -65,32 +30,66 @@ export function generateWorkout(params: GeneratorParams): Timer {
     workoutCount = 5;
   } else if (experience === "advanced") {
     activeDuration = 45;
-    restDuration = 10;
-    rounds = 5;
+    restDuration = 15;
+    rounds = 4;
     workoutCount = 6;
   }
 
-  // Pick up to workoutCount exercises
-  const selectedExercises = shuffled.slice(0, Math.min(workoutCount, shuffled.length));
+  // 2. Select balanced exercises with Antagonist Sequencing
+  const selectedExercises: Exercise[] = [];
 
-  // If we still have fewer than expected exercises, duplicate or loop them
-  while (selectedExercises.length < workoutCount && selectedExercises.length > 0) {
-    selectedExercises.push(selectedExercises[Math.floor(Math.random() * selectedExercises.length)]);
+  if (area === "total" || area === "surprise" || goal === "weight_loss") {
+    // Balanced Antagonist Flow: Cardio -> Lower -> Upper -> Abs -> Explosive -> Lower
+    const categoryFlow: Array<Exercise["category"]> = ["cardio", "lower", "upper", "abs", "total", "lower"];
+    const usedIds = new Set<string>();
+
+    for (let i = 0; i < workoutCount; i++) {
+      const targetCat = categoryFlow[i % categoryFlow.length];
+      const pool = EXERCISE_CATALOG.filter(
+        (ex) => ex.category === targetCat && !usedIds.has(ex.id) && (ex.difficulty === experience || ex.difficulty === "beginner" || ex.difficulty === "intermediate")
+      );
+
+      const candidate = pool.length > 0
+        ? pool[Math.floor(Math.random() * pool.length)]
+        : EXERCISE_CATALOG.find((ex) => !usedIds.has(ex.id)) || EXERCISE_CATALOG[0];
+
+      selectedExercises.push(candidate);
+      usedIds.add(candidate.id);
+    }
+  } else {
+    // Targeted focus area with difficulty matching
+    const primaryPool = EXERCISE_CATALOG.filter((ex) => ex.category === area);
+    const matchedDifficulty = primaryPool.filter((ex) => ex.difficulty === experience);
+    const candidatePool = matchedDifficulty.length >= workoutCount ? matchedDifficulty : primaryPool;
+    const shuffled = [...candidatePool].sort(() => 0.5 - Math.random());
+    const picked = shuffled.slice(0, Math.min(workoutCount, shuffled.length));
+
+    selectedExercises.push(...picked);
+
+    // Fallback if needed
+    while (selectedExercises.length < workoutCount) {
+      const fallback = EXERCISE_CATALOG[Math.floor(Math.random() * EXERCISE_CATALOG.length)];
+      if (!selectedExercises.some((ex) => ex.id === fallback.id)) {
+        selectedExercises.push(fallback);
+      } else {
+        selectedExercises.push(selectedExercises[0]);
+        break;
+      }
+    }
   }
 
-  // 4. Construct colors and intervals list
+  // 3. Construct intervals list
   const intervals: Interval[] = [];
   const colorMap: Record<string, string> = {
-    cardio: "#1ACC6C", // Active Green
-    total: "#E63946",  // Vivid Red
-    upper: "#3B82F6",  // Bright Blue
-    lower: "#F59E0B",  // Orange/Amber
-    abs: "#8338EC"     // Electric Purple
+    cardio: "#1ACC6C", // Emerald
+    total: "#E63946",  // Red
+    upper: "#3B82F6",  // Blue
+    lower: "#F59E0B",  // Amber
+    abs: "#8338EC"     // Purple
   };
 
   selectedExercises.forEach((rawEx, idx) => {
     const ex = getLocalizedExercise(rawEx);
-    // Add Active Exercise Interval
     intervals.push({
       id: generateIntervalId(),
       name: ex.name,
@@ -99,18 +98,18 @@ export function generateWorkout(params: GeneratorParams): Timer {
       exerciseId: rawEx.id
     });
 
-    // Add Rest Interval (if it is not the very last interval of the loop)
+    // Add rest interval between exercises
     if (idx < selectedExercises.length - 1) {
       intervals.push({
         id: generateIntervalId(),
         name: t("timerGenerator.rest", { defaultValue: "Rest" }),
         duration: restDuration,
-        color: "#4B5563" // Slate Gray
+        color: "#4B5563"
       });
     }
   });
 
-  // 5. Generate motivating localized name
+  // 4. Generate motivating localized title
   const goalNames: Record<string, string> = {
     weight_loss: t("timerGenerator.goalWeightLoss", { defaultValue: "Fat Burn" }),
     tone: t("timerGenerator.goalTone", { defaultValue: "Tone & Sculpt" }),
@@ -119,11 +118,11 @@ export function generateWorkout(params: GeneratorParams): Timer {
 
   const areaNames: Record<string, string> = {
     total: t("timerGenerator.areaTotal", { defaultValue: "Full Body" }),
-    abs: t("timerGenerator.areaAbs", { defaultValue: "Core Focus" }),
-    lower: t("timerGenerator.areaLower", { defaultValue: "Lower Body" }),
+    abs: t("timerGenerator.areaAbs", { defaultValue: "Core" }),
+    lower: t("timerGenerator.areaLower", { defaultValue: "Legs & Glutes" }),
     upper: t("timerGenerator.areaUpper", { defaultValue: "Upper Body" }),
     cardio: t("timerGenerator.areaCardio", { defaultValue: "HIIT Cardio" }),
-    surprise: t("timerGenerator.areaSurprise", { defaultValue: "Custom Blast" })
+    surprise: t("timerGenerator.areaSurprise", { defaultValue: "Power Circuit" })
   };
 
   const difficultyNames: Record<string, string> = {

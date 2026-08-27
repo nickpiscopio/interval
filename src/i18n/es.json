@@ -453,7 +453,366 @@
         "Apoya la frente en la esterilla y estira los brazos.",
         "Respira hondo relajando hombros y espalda."
       ]
+    },
+    "butt_kicks": {
+      "name": "Talones a los Glúteos",
+      "instructions": [
+        "Párate con los pies al ancho de las caderas.",
+        "Trota en el lugar llevando los talones hacia los glúteos.",
+        "Mantén el pecho erguido y hombros relajados.",
+        "Sigue un ritmo ágil y continuo."
+      ]
+    },
+    "skater_jumps": {
+      "name": "Saltos de Patinador",
+      "instructions": [
+        "Párate sobre el pie derecho y salta lateralmente a la izquierda.",
+        "Aterriza sobre el pie izquierdo cruzando la pierna derecha por detrás.",
+        "Salta inmediatamente de regreso a la derecha.",
+        "Usa los brazos para ganar impulso y estabilidad."
+      ]
+    },
+    "tuck_jumps": {
+      "name": "Saltos Agrupados",
+      "instructions": [
+        "Párate con pies al ancho de hombros y rodillas ligeramente flexionadas.",
+        "Salta verticalmente lo más alto posible.",
+        "Lleva las rodillas al pecho en el aire.",
+        "Aterriza suavemente sobre las puntas y repite."
+      ]
+    },
+    "fast_feet": {
+      "name": "Pies Rápidos",
+      "instructions": [
+        "Ponte en posición atlética de media sentadilla con pies abiertos.",
+        "Mueve los pies lo más rápido posible contra el suelo.",
+        "Mantén el peso sobre las puntas de los pies.",
+        "Permanece agachado con el core firme."
+      ]
+    },
+    "shadow_boxing": {
+      "name": "Boxeo de Sombra",
+      "instructions": [
+        "Adopta postura de guardia con las manos protegiendo el mentón.",
+        "Lanza golpes alternos: jabs, cruces, ganchos y uppercuts.",
+        "Gira con las caderas y pivota sobre las puntas.",
+        "Exhala fuertemente con cada golpe."
+      ]
+    },
+    "star_jumps": {
+      "name": "Saltos de Estrella",
+      "instructions": [
+        "Agáchate en sentadilla baja con los brazos recogidos.",
+        "Explota en el aire abriendo brazos y piernas en forma de estrella.",
+        "Junta las extremidades antes de aterrizar.",
+        "Amortigua la caída suavemente de vuelta en sentadilla."
+      ]
+    },
+    "incline_pushups": {
+      "name": "Flexiones Inclinadas",
+      "instructions": [
+        "Apoya las manos en un banco, silla o escalón resistente.",
+        "Baja el pecho hacia la superficie elevada.",
+        "Empuja con el pecho y tríceps para subir.",
+        "Mantén el cuerpo recto en tabla."
+      ]
+    },
+    "decline_pushups": {
+      "name": "Flexiones Declinadas",
+      "instructions": [
+        "Coloca los pies elevados en un banco con las manos en el suelo.",
+        "Baja el pecho suavemente hacia el suelo.",
+        "Empuja fuerte con la parte superior del pecho y hombros.",
+        "Mantén el abdomen firme sin hundir la cadera."
+      ]
+    },
+    "bench_dips": {
+      "name": "Fondos de Tríceps",
+      "instructions": [
+        "Siéntate en el borde de una silla con las manos junto a las caderas.",
+        "Desliza las caderas al frente apoyándote en las manos.",
+        "Dobla los codos a 90 grados bajando las caderas.",
+        "Empuja con las palmas para extender los brazos."
+      ]
+    },
+    "shoulder_taps": {
+      "name": "Toques de Hombro en Plancha",
+      "instructions": [
+        "Mantén una plancha alta con los pies un poco más abiertos que las caderas.",
+        "Levanta la mano derecha y toca el hombro izquierdo sin rotar caderas.",
+        "Regresa y toca el hombro derecho con la mano izquierda.",
+        "Mantén la pelvis inmóvil."
+      ]
+    },
+    "inchworms": {
+      "name": "Gusanos",
+      "instructions": [
+        "Párate derecho, flexiona la cintura y apoya las manos en el suelo.",
+        "Camina con las manos al frente hasta llegar a una plancha alta.",
+        "Sostén un segundo y camina con las manos de vuelta hacia los pies.",
+        "Ponte de pie y repite."
+      ]
+    },
+    "prone_ytw": {
+      "name": "Elevaciones Y-T-W en Prono",
+      "instructions": [
+        "Acuéstate boca abajo con la frente apoyada en el suelo.",
+        "Eleva los brazos en 'Y' con pulgares arriba apretando la espalda alta.",
+        "Pasa los brazos a 'T' y luego a 'W'.",
+        "Fortalece deltoides posteriores y postura."
+      ]
+    },
+    "sumo_squats": {
+      "name": "Sentadillas Sumo",
+      "instructions": [
+        "Adopta una postura ancha con las puntas a 45 grados hacia afuera.",
+        "Baja las caderas recto manteniendo las rodillas abiertas.",
+        "Siente el trabajo en aductores y glúteos.",
+        "Empuja con los talones para levantarte."
+      ]
+    },
+    "reverse_lunges": {
+      "name": "Zancadas Hacia Atrás",
+      "instructions": [
+        "Párate derecho y da un paso largo hacia atrás con un pie.",
+        "Baja la rodilla trasera suavemente hacia el suelo.",
+        "Mantén la espinilla delantera vertical y el peso en el talón.",
+        "Empuja con el talón delantero para volver arriba."
+      ]
+    },
+    "side_lunges": {
+      "name": "Zancadas Laterales",
+      "instructions": [
+        "Da un paso amplio hacia la derecha.",
+        "Lleva las caderas hacia el talón derecho manteniendo la pierna izquierda recta.",
+        "Mantén el pecho erguido y el pie derecho apoyado.",
+        "Empuja con el pie derecho para volver al centro y alterna."
+      ]
+    },
+    "curtsy_lunges": {
+      "name": "Zancadas de Reverencia",
+      "instructions": [
+        "Cruza la pierna izquierda por detrás de la derecha en reverencia.",
+        "Baja las caderas hasta que el muslo delantero quede paralelo al suelo.",
+        "Siente la activación en cadera y glúteo externo.",
+        "Empuja con el pie delantero y cambia de lado."
+      ]
+    },
+    "single_leg_bridge": {
+      "name": "Puente Glúteo a Una Pierna",
+      "instructions": [
+        "Acuéstate boca arriba y eleva una pierna estirada hacia arriba.",
+        "Empuja con el talón de apoyo para subir las caderas.",
+        "Mantén la pelvis nivelada y aprieta el glúteo arriba.",
+        "Baja despacio y repite antes de cambiar."
+      ]
+    },
+    "donkey_kicks": {
+      "name": "Patadas de Burro",
+      "instructions": [
+        "Ponte en cuatro puntos con manos bajo hombros y rodillas bajo caderas.",
+        "Con la rodilla a 90 grados, patea el talón hacia el techo.",
+        "Aprieta el glúteo arriba sin arquear la espalda baja.",
+        "Baja con control y alterna piernas."
+      ]
+    },
+    "fire_hydrants": {
+      "name": "Bocas de Incendio",
+      "instructions": [
+        "Empieza en cuatro puntos sobre una esterilla cómoda.",
+        "Con la rodilla doblada, eleva la pierna lateralmente.",
+        "Trabaja el glúteo medio y abductores.",
+        "Baja despacio y repite."
+      ]
+    },
+    "single_leg_rdl": {
+      "name": "Peso Muerto Rumano a Una Pierna",
+      "instructions": [
+        "Párate sobre una pierna con la rodilla ligeramente desbloqueada.",
+        "Inclina el torso desde la cadera estirando la otra pierna atrás.",
+        "Mantén la espalda recta y caderas cuadradas.",
+        "Empuja con el talón y glúteo de apoyo para levantarte."
+      ]
+    },
+    "high_plank": {
+      "name": "Plancha Alta",
+      "instructions": [
+        "Coloca las manos bajo los hombros con los dedos separados.",
+        "Estira las piernas atrás en posición completa de flexión.",
+        "Empuja el suelo con fuerza para estabilizar hombros.",
+        "Mantén el core bloqueado y la columna neutra."
+      ]
+    },
+    "side_plank": {
+      "name": "Plancha Lateral",
+      "instructions": [
+        "Acuéstate de lado con el antebrazo apoyado y pies apilados.",
+        "Eleva las caderas hasta formar una línea diagonal recta.",
+        "Activa los oblicuos inferiores y eleva el brazo superior.",
+        "Mantén sin dejar caer la cadera."
+      ]
+    },
+    "leg_raises": {
+      "name": "Elevaciones de Piernas Tumbado",
+      "instructions": [
+        "Acuéstate boca arriba con las manos bajo la espalda baja.",
+        "Eleva las piernas rectas hasta quedar perpendiculares al suelo.",
+        "Baja las piernas despacio sin arquear la zona lumbar.",
+        "Mantén los pies flotando antes de la siguiente repetición."
+      ]
+    },
+    "scissor_kicks": {
+      "name": "Patadas de Tijera",
+      "instructions": [
+        "Acuéstate boca arriba con piernas a pocos centímetros del suelo.",
+        "Cruza el tobillo derecho sobre el izquierdo y luego alterna.",
+        "Trabaja la pared abdominal inferior y flexores de cadera.",
+        "Mantén respiración constante."
+      ]
+    },
+    "dead_bug": {
+      "name": "Bicho Muerto",
+      "instructions": [
+        "Acuéstate boca arriba con brazos arriba y rodillas a 90 grados.",
+        "Baja simultáneamente el brazo derecho y la pierna izquierda.",
+        "Mantén la espalda baja pegada al suelo.",
+        "Vuelve al inicio y repite en la diagonal opuesta."
+      ]
+    },
+    "bird_dog": {
+      "name": "Perro de Caza",
+      "instructions": [
+        "Ponte en cuatro puntos sobre una superficie acolchada.",
+        "Estira simultáneamente el brazo derecho al frente y la pierna izquierda atrás.",
+        "Sostén un segundo alineando las extremidades.",
+        "Regresa con control y cambia de lado."
+      ]
+    },
+    "hollow_body_hold": {
+      "name": "Postura Hueca",
+      "instructions": [
+        "Acuéstate boca arriba con brazos estirados por encima de la cabeza.",
+        "Eleva simultáneamente hombros, brazos y piernas rectas.",
+        "Pega la espalda baja contra el suelo en forma de barca.",
+        "Mantén máxima tensión en el core."
+      ]
+    },
+    "cross_body_climbers": {
+      "name": "Escaladores Cruzados",
+      "instructions": [
+        "En plancha alta, lleva la rodilla derecha hacia el codo izquierdo.",
+        "Regresa y lleva la rodilla izquierda hacia el codo derecho.",
+        "Trabaja la fuerza rotacional del core y oblicuos.",
+        "Mantén un ritmo activo y constante."
+      ]
+    },
+    "plank_jacks": {
+      "name": "Saltos de Plancha",
+      "instructions": [
+        "Mantén una plancha sólida sobre antebrazos o manos.",
+        "Salta abriendo los pies y luego salta juntándolos.",
+        "Evita que las caderas reboten arriba y abajo.",
+        "Combina estabilidad abdominal con exigencia cardiovascular."
+      ]
+    },
+    "bear_crawl": {
+      "name": "Paso del Oso",
+      "instructions": [
+        "Empieza en cuatro puntos con las rodillas a 5 cm del suelo.",
+        "Avanza moviendo mano y pie opuestos a la vez.",
+        "Mantén la espalda plana y caderas niveladas.",
+        "Gira o retrocede según el espacio."
+      ]
+    },
+    "crab_walk": {
+      "name": "Paso del Cangrejo",
+      "instructions": [
+        "Siéntate en el suelo con rodillas dobladas, pies y manos apoyados.",
+        "Eleva las caderas del suelo y camina adelante o atrás.",
+        "Activa hombros, tríceps, glúteos e isquiotibiales.",
+        "Mantén las caderas arriba y abdomen firme."
+      ]
+    },
+    "sprawls": {
+      "name": "Sprawls",
+      "instructions": [
+        "Desde postura atlética, apoya manos al suelo y lanza pies atrás abiertos.",
+        "Recupera las caderas rápidamente y vuelve a posición atlética.",
+        "Ejercicio de acondicionamiento de lucha y combate.",
+        "Mantén velocidad rápida."
+      ]
+    },
+    "climber_pushup": {
+      "name": "Escalador con Flexión",
+      "instructions": [
+        "Realiza 4 escaladores rápidos en plancha alta.",
+        "Ejecuta de inmediato una flexión completa y controlada.",
+        "Repite la secuencia de forma continua.",
+        "Maximiza resistencia en pecho, hombros y cardio."
+      ]
+    },
+    "squat_thrusts": {
+      "name": "Sentadillas con Salto Atrás",
+      "instructions": [
+        "Baja en sentadilla profunda apoyando manos en el suelo.",
+        "Lanza los pies atrás a plancha completa.",
+        "Salta con los pies adelante junto a las manos.",
+        "Ponte de pie y repite."
+      ]
+    },
+    "plank_walkouts": {
+      "name": "Caminatas en Plancha",
+      "instructions": [
+        "Desde plancha alta, camina con las manos hacia adelante paso a paso.",
+        "Llega lo más lejos posible sin que se hunda la cadera.",
+        "Camina con las manos de vuelta bajo los hombros.",
+        "Desafía profundamente la pared abdominal."
+      ]
+    },
+    "split_squat_jumps": {
+      "name": "Zancadas con Salto",
+      "instructions": [
+        "Empieza en zancada con la pierna izquierda al frente.",
+        "Salta verticalmente y cambia de pierna en el aire.",
+        "Aterriza suavemente en zancada con la pierna derecha al frente.",
+        "Repite de manera continua con potencia."
+      ]
+    },
+    "skater_to_hop": {
+      "name": "Patinador con Salto Vertical",
+      "instructions": [
+        "Realiza un salto lateral amplio de patinador.",
+        "Salta inmediatamente en vertical sobre la pierna de apoyo.",
+        "Salta al otro lado y repite.",
+        "Desarrolla agilidad lateral y potencia vertical."
+      ]
+    },
+    "burpee_tuck_jump": {
+      "name": "Burpee con Salto Agrupado",
+      "instructions": [
+        "Completa un burpee bajando el pecho al suelo.",
+        "Al levantarte, explota en un salto agrupado llevando rodillas al pecho.",
+        "Lleva rodillas al pecho en lo más alto.",
+        "Amortigua la caída y continúa con el siguiente burpee."
+      ]
+    },
+    "cobra_pose": {
+      "name": "Cobra / Perro Boca Arriba",
+      "instructions": [
+        "Acuéstate boca abajo con manos bajo los hombros.",
+        "Empuja suavemente con las manos levantando el pecho.",
+        "Mantén hombros lejos de las orejas y abre el pecho.",
+        "Estira la pared abdominal y fortalece la columna."
+      ]
     }
+  },
+  "exercisePicker": {
+    "title": "Biblioteca de Ejercicios",
+    "subtitle": "%{count} ejercicios con peso corporal",
+    "searchPlaceholder": "Buscar ejercicios...",
+    "chooseExercise": "Biblioteca",
+    "all": "Todos",
+    "noResults": "No se encontraron ejercicios"
   },
   "badges": {
     "first_step_hero": {

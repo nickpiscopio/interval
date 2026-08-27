@@ -26,6 +26,8 @@ import DraggableFlatList, {
 import { RootStackScreenProps } from "../types";
 import { Timer } from "../model/Timer";
 import { Interval, generateIntervalId, normalizeInterval } from "../model/Interval";
+import { Exercise } from "../model/Exercise";
+import { ExercisePickerModal } from "../components/ExercisePickerModal";
 import { t } from "../i18n";
 import { useAlert } from "../context/AlertContext";
 import Spacing from "../constants/Spacing";
@@ -57,6 +59,7 @@ export default function CreateTimerScreen({
   const [card2Height, setCard2Height] = useState<number>(240);
   const [navBarHeight, setNavBarHeight] = useState<number>(44);
   const [activeCardIndex, setActiveCardIndex] = useState<number>(0);
+  const [showExercisePicker, setShowExercisePicker] = useState<boolean>(false);
 
   const editTimer = route.params?.timer;
   const isImportMode = Boolean(editTimer && editTimer.id.startsWith("ai_") && !editTimer.createdAt);
@@ -155,6 +158,22 @@ export default function CreateTimerScreen({
     setIntervals((prev) =>
       prev.map((int) => (int.id === selectedInterval.id ? { ...int, ...fields } : int))
     );
+  }
+
+  // Action: Pick Exercise from Library
+  function handlePickExercise(exercise: Exercise) {
+    const categoryColors: Record<string, string> = {
+      cardio: "#1ACC6C",
+      upper: "#3B82F6",
+      lower: "#F59E0B",
+      abs: "#8338EC",
+      total: "#E63946",
+    };
+    updateSelectedInterval({
+      name: exercise.name,
+      exerciseId: exercise.id,
+      color: categoryColors[exercise.category] || selectedInterval?.color || "#1ACC6C",
+    });
   }
 
   // Action: Duplicate Interval
@@ -291,9 +310,9 @@ export default function CreateTimerScreen({
             try {
               const data = await AsyncStorage.getItem(STORAGE_KEY);
               if (data) {
-                const parsed = JSON.parse(data) as Timer[];
-                const filtered = parsed.filter((t) => t.id !== editTimer.id);
-                await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+                const savedTimers: Timer[] = JSON.parse(data);
+                const updated = savedTimers.filter((t) => t.id !== editTimer.id);
+                await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
               }
               navigation.popToTop();
             } catch (e) {
@@ -314,37 +333,39 @@ export default function CreateTimerScreen({
     }
   }
 
-  // Format seconds to display string (e.g. 5s, 1m 30s)
-  function formatSeconds(sec: number): string {
-    const h = Math.floor(sec / 3600);
-    const m = Math.floor((sec % 3600) / 60);
-    const s = sec % 60;
-    if (h > 0) return `${h}h ${m}m ${s}s`;
-    if (m > 0) return `${m}m ${s}s`;
-    return `${s}s`;
+  // Format Duration string helpers
+  function formatSeconds(seconds: number): string {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    if (mins > 0) {
+      return `${mins}m ${secs > 0 ? `${secs}s` : ""}`;
+    }
+    return `${secs}s`;
   }
 
-  // Format seconds into HH:MM:SS string
-  function formatHHMMSS(sec: number): string {
-    const h = Math.floor(sec / 3600);
-    const m = Math.floor((sec % 3600) / 60);
-    const s = sec % 60;
-    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+  function formatHHMMSS(totalSecs: number): string {
+    const hours = Math.floor(totalSecs / 3600);
+    const minutes = Math.floor((totalSecs % 3600) / 60);
+    const seconds = totalSecs % 60;
+    const h = String(hours).padStart(2, "0");
+    const m = String(minutes).padStart(2, "0");
+    const s = String(seconds).padStart(2, "0");
+    return `${h}:${m}:${s}`;
   }
 
-  // Handle Right-to-Left HH:MM:SS typing
-  function handleDurationChange(rawText: string) {
-    const cleanDigits = rawText.replace(/\D/g, "");
-    const trimmed = cleanDigits.slice(-6);
-    const padded = trimmed.padStart(6, "0");
-    const h = parseInt(padded.slice(0, 2), 10) || 0;
-    const m = parseInt(padded.slice(2, 4), 10) || 0;
-    const s = parseInt(padded.slice(4, 6), 10) || 0;
-    const totalSeconds = h * 3600 + m * 60 + s;
+  function handleDurationChange(text: string) {
+    const digitsOnly = text.replace(/[^0-9]/g, "");
+    if (digitsOnly.length > 6) return;
+
+    const padded = digitsOnly.padStart(6, "0");
+    const hours = parseInt(padded.slice(0, 2), 10);
+    const minutes = parseInt(padded.slice(2, 4), 10);
+    const seconds = parseInt(padded.slice(4, 6), 10);
+
+    const totalSeconds = hours * 3600 + minutes * 60 + seconds;
     updateSelectedInterval({ duration: totalSeconds });
   }
 
-  // Clamp duration to minimum 1s on blur
   function handleDurationBlur() {
     if (selectedInterval && selectedInterval.duration < 1) {
       updateSelectedInterval({ duration: 1 });
@@ -357,6 +378,7 @@ export default function CreateTimerScreen({
     isActive,
   }: RenderItemParams<Interval>) => {
     const isSelected = item.id === selectedInterval?.id;
+
     return (
       <ScaleDecorator>
         <TouchableOpacity
@@ -448,9 +470,8 @@ export default function CreateTimerScreen({
             )}
             scrollEventThrottle={16}
             style={styles.carouselScrollView}
-            contentContainerStyle={styles.carouselContentContainer}
           >
-            {/* Card 1: Timer Details */}
+            {/* Card 1: Edit Timer Details */}
             <View style={[styles.cardPage, { width }]}>
               <View
                 style={styles.card}
@@ -461,32 +482,35 @@ export default function CreateTimerScreen({
                   }
                 }}
               >
-                <Text style={styles.cardTitle}>{t("createTimer.titleCreate")}</Text>
+                <Text style={styles.cardTitle}>{t("createTimer.titleDetails")}</Text>
 
-                <View style={styles.inputRow}>
+                <View style={styles.editorInputRow}>
                   <View style={styles.inputGroup}>
-                    <Text style={styles.inputLabel}>{t("common.appName")} Name</Text>
+                    <Text style={styles.inputLabel}>{t("createTimer.timerNamePlaceholder")}</Text>
                     <TextInput
-                      style={styles.textInput}
+                      style={styles.editorTextInput}
                       value={timerName}
                       onChangeText={setTimerName}
-                      placeholder={t("createTimer.namePlaceholder")}
+                      placeholder={t("createTimer.timerNamePlaceholder")}
                       placeholderTextColor="#9CA3AF"
                     />
                   </View>
-                  <View style={[styles.inputGroup, { flex: 0.38 }]}>
+
+                  <View style={[styles.inputGroup, { flex: 0.55 }]}>
                     <Text style={styles.inputLabel}>{t("createTimer.rounds")}</Text>
                     <View style={styles.roundsControl}>
                       <TouchableOpacity
                         onPress={() => setRounds(Math.max(1, rounds - 1))}
-                        style={styles.roundAdjustButton}
+                        style={styles.roundButton}
+                        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                       >
                         <Ionicons name="remove" size={16} color="#4B5563" />
                       </TouchableOpacity>
                       <Text style={styles.roundsValue}>{rounds}</Text>
                       <TouchableOpacity
                         onPress={() => setRounds(rounds + 1)}
-                        style={styles.roundAdjustButton}
+                        style={styles.roundButton}
+                        hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                       >
                         <Ionicons name="add" size={16} color="#4B5563" />
                       </TouchableOpacity>
@@ -532,7 +556,19 @@ export default function CreateTimerScreen({
                   <>
                     <View style={styles.editorInputRow}>
                       <View style={styles.inputGroup}>
-                        <Text style={styles.inputLabel}>{t("createTimer.intervalNamePlaceholder")}</Text>
+                        <View style={styles.inputLabelRow}>
+                          <Text style={styles.inputLabel}>{t("createTimer.intervalNamePlaceholder")}</Text>
+                          <TouchableOpacity
+                            style={styles.libraryPickerBtn}
+                            onPress={() => setShowExercisePicker(true)}
+                            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                          >
+                            <Ionicons name="barbell-outline" size={13} color={Colors.primary} />
+                            <Text style={styles.libraryPickerBtnText}>
+                              {t("exercisePicker.chooseExercise", { defaultValue: "Library" })}
+                            </Text>
+                          </TouchableOpacity>
+                        </View>
                         <TextInput
                           style={styles.editorTextInput}
                           value={selectedInterval.name}
@@ -646,6 +682,13 @@ export default function CreateTimerScreen({
           </View>
         </View>
       </View>
+
+      {/* Exercise Library Picker Modal */}
+      <ExercisePickerModal
+        visible={showExercisePicker}
+        onClose={() => setShowExercisePicker(false)}
+        onSelect={handlePickExercise}
+      />
     </KeyboardAvoidingView>
   );
 }
@@ -808,6 +851,26 @@ const styles = StyleSheet.create({
   inputGroup: {
     flex: 1,
   },
+  inputLabelRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: Spacing.xs,
+  },
+  libraryPickerBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+    backgroundColor: "#EFF6FF",
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: Spacing.radius.full,
+  },
+  libraryPickerBtnText: {
+    fontSize: 11,
+    fontFamily: "Poppins-SemiBold",
+    color: Colors.primary,
+  },
   inputLabel: {
     fontSize: FontSize.xs,
     lineHeight: FontSize.lineHeight.xs,
@@ -837,6 +900,12 @@ const styles = StyleSheet.create({
     minHeight: Spacing.touchTarget.min,
     backgroundColor: "#F9FAFB",
     overflow: "hidden",
+  },
+  roundButton: {
+    flex: 1,
+    minHeight: Spacing.touchTarget.min,
+    justifyContent: "center",
+    alignItems: "center",
   },
   roundAdjustButton: {
     flex: 1,
