@@ -64,6 +64,7 @@ export default function CreateTimerScreen({
   // Form State
   const [timerName, setTimerName] = useState("");
   const [rounds, setRounds] = useState(3);
+  const [isAiGenerated, setIsAiGenerated] = useState<boolean>(false);
   const [intervals, setIntervals] = useState<Interval[]>([
     { id: "init_1", name: "High Interval", duration: 30, color: "#1ACC6C" },
     { id: "init_2", name: "Low Interval", duration: 15, color: "#3B82F6" }
@@ -75,6 +76,7 @@ export default function CreateTimerScreen({
     if (editTimer) {
       setTimerName(editTimer.name);
       setRounds(editTimer.rounds);
+      setIsAiGenerated(Boolean(editTimer.isAiGenerated || editTimer.id?.startsWith("ai_")));
       const normalized = editTimer.intervals.map((int, idx) => normalizeInterval(int, idx));
       setIntervals(normalized);
       if (normalized.length > 0) {
@@ -83,6 +85,7 @@ export default function CreateTimerScreen({
     } else {
       setTimerName("");
       setRounds(3);
+      setIsAiGenerated(false);
       const initial: Interval[] = [
         { id: generateIntervalId(), name: "High Interval", duration: 30, color: "#1ACC6C" },
         { id: generateIntervalId(), name: "Low Interval", duration: 15, color: "#3B82F6" }
@@ -218,7 +221,8 @@ export default function CreateTimerScreen({
         name: timerName.trim(),
         rounds,
         intervals,
-        createdAt: editTimer?.createdAt || Date.now()
+        createdAt: editTimer?.createdAt || Date.now(),
+        isAiGenerated: isAiGenerated ? true : undefined,
       };
 
       if (editTimer) {
@@ -265,6 +269,7 @@ export default function CreateTimerScreen({
         rounds: rounds,
         intervals: mappedIntervals,
         createdAt: Date.now(),
+        isAiGenerated: isAiGenerated ? true : undefined,
       },
     });
   }

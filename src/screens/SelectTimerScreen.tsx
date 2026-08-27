@@ -104,6 +104,7 @@ export default function SelectTimerScreen({
       const sharePayload = {
         name: timer.name,
         rounds: timer.rounds,
+        isAiGenerated: timer.isAiGenerated,
         intervals: timer.intervals.map((int) => ({
           name: int.name,
           duration: int.duration,
