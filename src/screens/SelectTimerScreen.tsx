@@ -113,7 +113,7 @@ export default function SelectTimerScreen({
 
       const base64Data = encodeBase64(JSON.stringify(sharePayload));
       const deepLink = `interval://import?data=${base64Data}`;
-      
+
       const appStoreLink = "https://apps.apple.com/app/interval-hiit-timer/id12345678";
       const playStoreLink = "https://play.google.com/store/apps/details?id=com.plyonest.interval";
 
@@ -210,47 +210,6 @@ export default function SelectTimerScreen({
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      
-      {/* Dynamic Sticky Header */}
-      <View
-        onLayout={(e) => setHeaderHeight(e.nativeEvent.layout.height)}
-        style={[
-          styles.header,
-          isScrolled ? styles.headerScrolled : styles.headerUnscrolled,
-          { paddingTop: Math.max(insets.top, 20) + Spacing.sm },
-        ]}
-      >
-        <View style={styles.headerTopRow}>
-          <View style={styles.headerTitles}>
-            <Text style={styles.greeting}>Let's Workout! ⚡️</Text>
-            <Text style={styles.subGreeting}>Choose or generate a HIIT timer to start</Text>
-          </View>
-          <TouchableOpacity
-            style={styles.trophyButton}
-            activeOpacity={0.8}
-            onPress={() => navigation.navigate("Awards")}
-          >
-            {userStats && userStats.currentStreak > 0 ? (
-              <View style={styles.streakBadge}>
-                <Text style={styles.streakBadgeEmoji}>🔥</Text>
-                <Text style={styles.streakBadgeCount}>{userStats.currentStreak}</Text>
-              </View>
-            ) : (
-              <View style={styles.trophyIconWrap}>
-                <Ionicons name="trophy" size={22} color="#F59E0B" />
-              </View>
-            )}
-          </TouchableOpacity>
-        </View>
-
-        {isScrolled && (
-          <LinearGradient
-            colors={["rgba(0, 0, 0, 0.06)", "transparent"]}
-            style={styles.headerShadowGradient}
-            pointerEvents="none"
-          />
-        )}
-      </View>
 
       {loading ? (
         <View style={styles.centered}>
@@ -282,10 +241,13 @@ export default function SelectTimerScreen({
             styles.listContent,
             { paddingTop: headerHeight + Spacing.sm },
           ]}
+          onScrollOffsetChange={(offsetY) => {
+            setIsScrolled(offsetY > 1);
+          }}
           onScroll={(e) => {
             const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
             const offsetY = contentOffset.y;
-            setIsScrolled(offsetY > 2);
+            setIsScrolled(offsetY > 0);
             const remaining = contentSize.height - (offsetY + layoutMeasurement.height);
             setHasMoreBelow(remaining > 10);
           }}
@@ -293,6 +255,51 @@ export default function SelectTimerScreen({
             setHasMoreBelow(contentHeight > 550);
           }}
           scrollEventThrottle={16}
+        />
+      )}
+
+      {/* Dynamic Sticky Header - Rendered after list so it always floats on top */}
+      <View
+        onLayout={(e) => setHeaderHeight(e.nativeEvent.layout.height)}
+        style={[
+          styles.header,
+          isScrolled ? styles.headerScrolled : styles.headerUnscrolled,
+          { paddingTop: Math.max(insets.top, 20) + Spacing.sm },
+        ]}
+      >
+        <View style={styles.headerTopRow}>
+          <View style={styles.headerTitles}>
+            <Text style={styles.greeting}>Let's Workout! ⚡️</Text>
+            <Text style={styles.subGreeting}>Choose or generate a HIIT timer to start</Text>
+          </View>
+          <TouchableOpacity
+            style={styles.trophyButton}
+            activeOpacity={0.8}
+            onPress={() => navigation.navigate("Awards")}
+          >
+            {userStats && userStats.currentStreak > 0 ? (
+              <View style={styles.streakBadge}>
+                <Text style={styles.streakBadgeEmoji}>🔥</Text>
+                <Text style={styles.streakBadgeCount}>{userStats.currentStreak}</Text>
+              </View>
+            ) : (
+              <View style={styles.trophyIconWrap}>
+                <Ionicons name="trophy" size={22} color="#F59E0B" />
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Floating Drop Shadow Gradient right below the header */}
+      {isScrolled && (
+        <LinearGradient
+          colors={["rgba(0, 0, 0, 0.15)", "rgba(0, 0, 0, 0.05)", "transparent"]}
+          style={[
+            styles.headerShadowGradient,
+            { top: headerHeight },
+          ]}
+          pointerEvents="none"
         />
       )}
 
@@ -347,7 +354,7 @@ const styles = StyleSheet.create({
     right: 0,
     paddingHorizontal: Spacing.md,
     paddingBottom: Spacing.md,
-    zIndex: 10,
+    zIndex: 99,
   },
   headerUnscrolled: {
     backgroundColor: "#F9FAFB",
@@ -357,10 +364,10 @@ const styles = StyleSheet.create({
   },
   headerShadowGradient: {
     position: "absolute",
-    bottom: -5,
     left: 0,
     right: 0,
-    height: 5,
+    height: 6,
+    zIndex: 98,
   },
   headerTopRow: {
     flexDirection: "row",
@@ -431,21 +438,21 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "#FFFFFF",
     borderRadius: Spacing.radius.md,
+    paddingLeft: Spacing.sm,
     padding: Spacing.md,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 1, height: 1 },
     shadowOpacity: 0.05,
     shadowRadius: 10,
     elevation: 2,
-    borderWidth: 1,
+    borderWidth: 0,
     borderColor: "#E5E7EB",
   },
   cardDragging: {
     borderColor: Colors.primary,
-    shadowColor: Colors.primary,
     shadowOpacity: 0.25,
-    shadowRadius: 14,
-    elevation: 8,
+    shadowRadius: 10,
+    elevation: 6,
   },
   cardHeader: {
     flexDirection: "row",
@@ -465,7 +472,7 @@ const styles = StyleSheet.create({
     lineHeight: FontSize.lineHeight.lg,
     fontFamily: "Poppins-Bold",
     color: "#1F2937",
-    marginBottom: Spacing.xs,
+    marginBottom: Spacing.sm,
   },
   badgeRow: {
     flexDirection: "row",
