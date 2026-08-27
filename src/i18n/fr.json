@@ -157,7 +157,7 @@
       ]
     },
     "squats": {
-      "name": "Squats au Poids du Corps",
+      "name": "Squats",
       "instructions": [
         "Pieds écartés à la largeur des épaules, pointes légèrement vers l'extérieur.",
         "Descendez les hanches vers l'arrière comme pour vous asseoir sur une chaise.",
@@ -166,7 +166,7 @@
       ]
     },
     "plank": {
-      "name": "Gainage sur Avant-Bras",
+      "name": "Gainage",
       "instructions": [
         "Placez vos avant-bras au sol, coudes sous les épaules.",
         "Maintenez votre corps droit de la tête aux talons.",
@@ -203,7 +203,7 @@
       ]
     },
     "lunges": {
-      "name": "Fentes Alternées",
+      "name": "Fentes",
       "instructions": [
         "Tenez-vous droit, pieds écartés de la largeur des hanches.",
         "Faites un pas en avant avec une jambe et descendez les hanches.",
@@ -227,6 +227,231 @@
         "Décollez vos pieds du sol en équilibre sur le coccyx.",
         "Croisez vos mains et faites pivoter le torse de gauche à droite.",
         "Touchez le sol à côté de vos hanches à chaque rotation."
+      ]
+    },
+    "jog_in_place": {
+      "name": "Course sur Place",
+      "instructions": [
+        "Pieds écartés à la largeur du bassin.",
+        "Levez un pied en montant légèrement le genou et balancez le bras opposé.",
+        "Alternez les pieds en rythme continu.",
+        "Restez souple sur la pointe des pieds."
+      ]
+    },
+    "high_knees": {
+      "name": "Montées de Genoux",
+      "instructions": [
+        "Tenez-vous bien droit, pieds à la largeur des hanches.",
+        "Montez un genou vers la poitrine le plus haut possible.",
+        "Alternez rapidement les jambes à un rythme de sprint.",
+        "Accompagnez le mouvement avec les bras."
+      ]
+    },
+    "bicycle_crunches": {
+      "name": "Crunches Bicyclette",
+      "instructions": [
+        "Allongé sur le dos, mains derrière la tête et genoux levés.",
+        "Amenez le coude droit vers le genou gauche en tendant la jambe droite.",
+        "Alternez de façon fluide en pédalant.",
+        "Engagez les obliques à chaque rotation."
+      ]
+    },
+    "mason_twists": {
+      "name": "Twists du Maçon",
+      "instructions": [
+        "Assis au sol, genoux pliés et pieds légèrement décollés.",
+        "Joignez les mains et pivotez le buste d'un côté à l'autre.",
+        "Touchez le sol à côté des hanches.",
+        "Maintenez le buste incliné à 45 degrés en arrière."
+      ]
+    },
+    "arm_circles": {
+      "name": "Cercles de Bras",
+      "instructions": [
+        "Debout, pieds écartés et bras tendus à l'horizontale.",
+        "Effectuez des rotations circulaires contrôlées avec les deux bras.",
+        "Gardez les épaules basses et le tronc gainé.",
+        "Inversez le sens de rotation à mi-parcours."
+      ]
+    },
+    "wide_grip_pushups": {
+      "name": "Pompes Prise Large",
+      "instructions": [
+        "Placez les mains bien plus larges que les épaules.",
+        "Maintenez le corps droit en gainage solide.",
+        "Descendez la poitrine vers le sol avec contrôle.",
+        "Poussez fermement pour remonter."
+      ]
+    },
+    "close_grip_pushups": {
+      "name": "Pompes Prise Serrée",
+      "instructions": [
+        "Placez les mains sous la poitrine, pouces et index rapprochés.",
+        "Gardez les coudes serrés contre les côtes lors de la descente.",
+        "Ciblez le travail sur les triceps et l'intérieur des pectoraux.",
+        "Remontez en position de départ."
+      ]
+    },
+    "superman": {
+      "name": "Superman",
+      "instructions": [
+        "Allongé à plat ventre, bras et jambes tendus.",
+        "Décollez simultanément les bras, la poitrine et les jambes.",
+        "Contractez les fessiers et les lombaires au sommet.",
+        "Maintenez brièvement et redescendez avec contrôle."
+      ]
+    },
+    "squat_jumps": {
+      "name": "Squats Sautés",
+      "instructions": [
+        "Descendez en squat classique.",
+        "Explosez vers le haut dans un saut vertical en levant les bras.",
+        "Atterrissez en douceur sur l'avant du pied et absorbez en squat.",
+        "Enchaînez les sauts de manière continue."
+      ]
+    },
+    "glute_bridges": {
+      "name": "Pont Fessier",
+      "instructions": [
+        "Allongé sur le dos, genoux pliés et pieds à plat.",
+        "Poussez sur les talons pour lever le bassin jusqu'à aligner cuisses et buste.",
+        "Contractez fort les fessiers en haut.",
+        "Redescendez avec contrôle."
+      ]
+    },
+    "calf_raises": {
+      "name": "Élévations des Mollets",
+      "instructions": [
+        "Debout, pieds écartés à la largeur du bassin.",
+        "Montez sur la pointe des pieds en contractant les mollets.",
+        "Tenez la contraction une seconde.",
+        "Redescendez lentement les talons."
+      ]
+    },
+    "wall_sit": {
+      "name": "Chaise Contre le Mur",
+      "instructions": [
+        "Dos bien plaqué au mur, descendez cuisses parallèles au sol.",
+        "Genoux alignés à 90 degrés au-dessus des chevilles.",
+        "Maintenez la posture en respirant calmement.",
+        "Ne posez pas les mains sur les cuisses."
+      ]
+    },
+    "left_leg_swings": {
+      "name": "Balancements Jambe Gauche",
+      "instructions": [
+        "Debout en appui contre un mur pour l'équilibre.",
+        "Balancez la jambe gauche d'avant en arrière avec fluidité.",
+        "Gardez le buste droit sans trop cambrer.",
+        "Augmentez l'amplitude au fil de l'échauffement."
+      ]
+    },
+    "right_leg_swings": {
+      "name": "Balancements Jambe Droite",
+      "instructions": [
+        "Debout en appui contre un mur pour l'équilibre.",
+        "Balancez la jambe droite d'avant en arrière avec fluidité.",
+        "Gardez le buste droit sans trop cambrer.",
+        "Augmentez l'amplitude au fil de l'échauffement."
+      ]
+    },
+    "left_side_leg_lifts": {
+      "name": "Élévations Latérales Jambe Gauche",
+      "instructions": [
+        "Allongé sur le côté droit, jambes tendues et superposées.",
+        "Montez la jambe gauche vers le haut sans pivoter le bassin.",
+        "Contractez le côté de la hanche et le fessier.",
+        "Redescendez lentement."
+      ]
+    },
+    "right_side_leg_lifts": {
+      "name": "Élévations Latérales Jambe Droite",
+      "instructions": [
+        "Allongé sur le côté gauche, jambes tendues et superposées.",
+        "Montez la jambe droite vers le haut sans pivoter le bassin.",
+        "Contractez le côté de la hanche et le fessier.",
+        "Redescendez lentement."
+      ]
+    },
+    "left_arm_shoulder_stretch": {
+      "name": "Étirement Épaule Gauche",
+      "instructions": [
+        "Passez le bras gauche devant la poitrine à l'horizontale.",
+        "Utilisez l'avant-bras droit pour rapprocher doucement le bras du torse.",
+        "Gardez l'épaule gauche basse et relâchée.",
+        "Maintenez en respirant profondément."
+      ]
+    },
+    "right_arm_shoulder_stretch": {
+      "name": "Étirement Épaule Droite",
+      "instructions": [
+        "Passez le bras droit devant la poitrine à l'horizontale.",
+        "Utilisez l'avant-bras gauche pour rapprocher doucement le bras du torse.",
+        "Gardez l'épaule droite basse et relâchée.",
+        "Maintenez en respirant profondément."
+      ]
+    },
+    "left_arm_tricep_stretch": {
+      "name": "Étirement Triceps Gauche",
+      "instructions": [
+        "Montez le coude gauche et pliez le bras vers le haut du dos.",
+        "Appuyez délicatement sur le coude gauche avec la main droite.",
+        "Gardez le dos droit et la poitrine ouverte.",
+        "Maintenez une respiration calme."
+      ]
+    },
+    "right_arm_tricep_stretch": {
+      "name": "Étirement Triceps Droit",
+      "instructions": [
+        "Montez le coude droit et pliez le bras vers le haut du dos.",
+        "Appuyez délicatement sur le coude droit avec la main gauche.",
+        "Gardez le dos droit et la poitrine ouverte.",
+        "Maintenez une respiration calme."
+      ]
+    },
+    "seated_toe_touch": {
+      "name": "Toucher d'Orteils Assis",
+      "instructions": [
+        "Assis au sol, jambes tendues devant vous.",
+        "Penchez-vous en avant depuis les hanches vers vos orteils.",
+        "Allongez la colonne vertébrale sans forcer.",
+        "Maintenez sans à-coups."
+      ]
+    },
+    "cat_cow": {
+      "name": "Chat et Vache",
+      "instructions": [
+        "À quatre pattes, poignets sous les épaules et genoux sous les hanches.",
+        "Inspirez en creusant le dos et en levant le regard (Vache).",
+        "Expirez en arrondissant le dos, menton vers la poitrine (Chat).",
+        "Enchaînez avec fluidité au rythme du souffle."
+      ]
+    },
+    "left_side_quad_stretch": {
+      "name": "Étirement Quadriceps Gauche",
+      "instructions": [
+        "Debout sur la jambe droite (en appui si besoin).",
+        "Pliez le genou gauche et attrapez la cheville derrière vous.",
+        "Ramenez le talon vers le fessier, genoux serrés.",
+        "Ressentez l'étirement à l'avant de la cuisse."
+      ]
+    },
+    "right_side_quad_stretch": {
+      "name": "Étirement Quadriceps Droit",
+      "instructions": [
+        "Debout sur la jambe gauche (en appui si besoin).",
+        "Pliez le genou droit et attrapez la cheville derrière vous.",
+        "Ramenez le talon vers le fessier, genoux serrés.",
+        "Ressentez l'étirement à l'avant de la cuisse."
+      ]
+    },
+    "childs_pose": {
+      "name": "Posture de l'Enfant",
+      "instructions": [
+        "À genoux, gros orteils en contact et genoux écartés.",
+        "Asseyez les fesses sur les talons et avancez les mains au sol.",
+        "Posez le front sur le tapis et étirez les bras loin devant.",
+        "Respirez profondément en relâchant les épaules."
       ]
     }
   },

@@ -157,7 +157,7 @@
       ]
     },
     "squats": {
-      "name": "Sentadillas al Aire",
+      "name": "Sentadillas",
       "instructions": [
         "Párate con los pies separados al ancho de los hombros, con las puntas apuntando ligeramente hacia afuera.",
         "Baja las caderas hacia atrás y hacia abajo como si te sentaras en una silla.",
@@ -166,7 +166,7 @@
       ]
     },
     "plank": {
-      "name": "Plancha de Antebrazos",
+      "name": "Plancha",
       "instructions": [
         "Apoya los antebrazos en el suelo con los codos alineados bajo los hombros.",
         "Extiende el cuerpo en línea recta desde la cabeza hasta los talones.",
@@ -203,7 +203,7 @@
       ]
     },
     "lunges": {
-      "name": "Zancadas Alternas",
+      "name": "Zancadas",
       "instructions": [
         "Párate erguido con los pies al ancho de las caderas.",
         "Da un paso adelante con una pierna y baja las caderas.",
@@ -227,6 +227,231 @@
         "Levanta los pies del suelo y mantén el equilibrio sobre el coxis.",
         "Entrelaza las manos y gira el torso de un lado a otro.",
         "Toca el suelo junto a tu cadera en cada giro."
+      ]
+    },
+    "jog_in_place": {
+      "name": "Trote en el Lugar",
+      "instructions": [
+        "Párate con los pies al ancho de las caderas.",
+        "Levanta un pie subiendo ligeramente la rodilla y bracea de forma opuesta.",
+        "Alterna los pies a un ritmo de trote continuo.",
+        "Mantén ligereza en la punta de los pies."
+      ]
+    },
+    "high_knees": {
+      "name": "Rodillas al Pecho",
+      "instructions": [
+        "Párate derecho con los pies al ancho de las caderas.",
+        "Lleva una rodilla hacia arriba lo más alto posible.",
+        "Alterna rápidamente las piernas a paso de carrera.",
+        "Bracea con ritmo acompañando las rodillas."
+      ]
+    },
+    "bicycle_crunches": {
+      "name": "Abdominales en Bicicleta",
+      "instructions": [
+        "Acuéstate boca arriba con las manos en la cabeza y rodillas elevadas.",
+        "Lleva el codo derecho hacia la rodilla izquierda extendiendo la pierna derecha.",
+        "Alterna lados suavemente en movimiento de pedaleo.",
+        "Activa los oblicuos en cada torsión."
+      ]
+    },
+    "mason_twists": {
+      "name": "Giros de Albañil",
+      "instructions": [
+        "Siéntate en el suelo con rodillas flexionadas y pies ligeramente elevados.",
+        "Junta las manos y gira el torso de lado a lado.",
+        "Toca el suelo junto a las caderas.",
+        "Mantén el torso inclinado hacia atrás 45 grados."
+      ]
+    },
+    "arm_circles": {
+      "name": "Círculos con Brazos",
+      "instructions": [
+        "Párate con los pies al ancho de los hombros y extiende los brazos en cruz.",
+        "Realiza movimientos circulares controlados con ambos brazos.",
+        "Mantén hombros relajados y abdomen suavemente contraído.",
+        "Invierte la dirección a mitad de tiempo."
+      ]
+    },
+    "wide_grip_pushups": {
+      "name": "Flexiones con Agarre Ancho",
+      "instructions": [
+        "Coloca las manos bastante más abiertas que el ancho de hombros.",
+        "Mantén el cuerpo alineado de pies a cabeza.",
+        "Baja el pecho suavemente hacia el suelo.",
+        "Empuja fuerte con el pecho para subir."
+      ]
+    },
+    "close_grip_pushups": {
+      "name": "Flexiones con Agarre Cerrado",
+      "instructions": [
+        "Coloca las manos bajo el pecho con pulgares e índices cercanos.",
+        "Mantén los codos pegados a las costillas al bajar.",
+        "Enfoca el esfuerzo en tríceps y centro del pecho.",
+        "Sube a la posición inicial."
+      ]
+    },
+    "superman": {
+      "name": "Superman",
+      "instructions": [
+        "Acuéstate boca abajo con brazos y piernas estirados.",
+        "Eleva simultáneamente brazos, pecho y piernas del suelo.",
+        "Aprieta glúteos y espalda baja en el punto más alto.",
+        "Sostén brevemente y baja con control."
+      ]
+    },
+    "squat_jumps": {
+      "name": "Sentadillas con Salto",
+      "instructions": [
+        "Baja a una sentadilla clásica.",
+        "Explota hacia arriba en un salto vertical alzando los brazos.",
+        "Aterriza suavemente sobre las puntas y amortigua en sentadilla.",
+        "Repite con ritmo continuo y explosivo."
+      ]
+    },
+    "glute_bridges": {
+      "name": "Puentes de Glúteos",
+      "instructions": [
+        "Acuéstate boca arriba con rodillas dobladas y pies apoyados.",
+        "Empuja con los talones elevando las caderas hasta alinear muslos y torso.",
+        "Aprieta fuerte los glúteos arriba.",
+        "Baja con control."
+      ]
+    },
+    "calf_raises": {
+      "name": "Elevaciones de Gemelos",
+      "instructions": [
+        "Párate derecho con pies al ancho de caderas.",
+        "Eleva los talones apoyándote en las puntas de los pies.",
+        "Mantén la contracción máxima un segundo.",
+        "Baja despacio al suelo."
+      ]
+    },
+    "wall_sit": {
+      "name": "Silla en Pared",
+      "instructions": [
+        "Apoya la espalda plana contra una pared y baja hasta muslos paralelos al suelo.",
+        "Asegúrate de que las rodillas queden a 90 grados sobre los tobillos.",
+        "Mantén la posición respirando con calma.",
+        "No apoyes las manos sobre los muslos."
+      ]
+    },
+    "left_leg_swings": {
+      "name": "Balanceos de Pierna Izquierda",
+      "instructions": [
+        "Párate erguido sujetando una pared para equilibrarte.",
+        "Balancea la pierna izquierda adelante y atrás en un arco continuo.",
+        "Mantén el tronco erguido sin arquear en exceso la espalda.",
+        "Aumenta la amplitud conforme calientas."
+      ]
+    },
+    "right_leg_swings": {
+      "name": "Balanceos de Pierna Derecha",
+      "instructions": [
+        "Párate erguido sujetando una pared para equilibrarte.",
+        "Balancea la pierna derecha adelante y atrás en un arco continuo.",
+        "Mantén el tronco erguido sin arquear en exceso la espalda.",
+        "Aumenta la amplitud conforme calientas."
+      ]
+    },
+    "left_side_leg_lifts": {
+      "name": "Elevaciones Laterales Pierna Izquierda",
+      "instructions": [
+        "Acuéstate sobre el costado derecho con piernas rectas y juntas.",
+        "Eleva la pierna izquierda hacia el techo sin rotar la cadera.",
+        "Aprieta la cadera externa y glúteo arriba.",
+        "Baja despacio."
+      ]
+    },
+    "right_side_leg_lifts": {
+      "name": "Elevaciones Laterales Pierna Derecha",
+      "instructions": [
+        "Acuéstate sobre el costado izquierdo con piernas rectas y juntas.",
+        "Eleva la pierna derecha hacia el techo sin rotar la cadera.",
+        "Aprieta la cadera externa y glúteo arriba.",
+        "Baja despacio."
+      ]
+    },
+    "left_arm_shoulder_stretch": {
+      "name": "Estiramiento Hombro Izquierdo",
+      "instructions": [
+        "Cruza el brazo izquierdo horizontalmente sobre el pecho.",
+        "Usa el antebrazo derecho para abrazar suavemente el brazo hacia ti.",
+        "Mantén el hombro izquierdo relajado hacia abajo.",
+        "Sostén respirando profundamente."
+      ]
+    },
+    "right_arm_shoulder_stretch": {
+      "name": "Estiramiento Hombro Derecho",
+      "instructions": [
+        "Cruza el brazo derecho horizontalmente sobre el pecho.",
+        "Usa el antebrazo izquierdo para abrazar suavemente el brazo hacia ti.",
+        "Mantén el hombro derecho relajado hacia abajo.",
+        "Sostén respirando profundamente."
+      ]
+    },
+    "left_arm_tricep_stretch": {
+      "name": "Estiramiento Tríceps Izquierdo",
+      "instructions": [
+        "Eleva el codo izquierdo doblándolo hacia la espalda alta.",
+        "Presiona suavemente el codo izquierdo con la mano derecha.",
+        "Mantén la espalda erguida y el pecho abierto.",
+        "Sostén con respiración constante."
+      ]
+    },
+    "right_arm_tricep_stretch": {
+      "name": "Estiramiento Tríceps Derecho",
+      "instructions": [
+        "Eleva el codo derecho doblándolo hacia la espalda alta.",
+        "Presiona suavemente el codo derecho con la mano izquierda.",
+        "Mantén la espalda erguida y el pecho abierto.",
+        "Sostén con respiración constante."
+      ]
+    },
+    "seated_toe_touch": {
+      "name": "Toque de Punteras Sentado",
+      "instructions": [
+        "Siéntate en el suelo con las piernas estiradas al frente.",
+        "Inclina el torso desde las caderas alcanzando los pies.",
+        "Alarga la columna y mantén rodillas relajadas.",
+        "Sostén sin dar rebotes."
+      ]
+    },
+    "cat_cow": {
+      "name": "Gato y Vaca",
+      "instructions": [
+        "Ponte en cuatro puntos con muñecas bajo hombros y rodillas bajo caderas.",
+        "Inhala arqueando la espalda y mirando al frente (Vaca).",
+        "Exhala redondeando la espalda y llevando la barbilla al pecho (Gato).",
+        "Fluye suavemente al ritmo de tu respiración."
+      ]
+    },
+    "left_side_quad_stretch": {
+      "name": "Estiramiento Cuádriceps Izquierdo",
+      "instructions": [
+        "Párate sobre la pierna derecha (o apóyate en la pared).",
+        "Dobla la rodilla izquierda y toma el tobillo por detrás.",
+        "Acerca el talón al glúteo manteniendo rodillas juntas.",
+        "Siente la liberación de tensión en el muslo."
+      ]
+    },
+    "right_side_quad_stretch": {
+      "name": "Estiramiento Cuádriceps Derecho",
+      "instructions": [
+        "Párate sobre la pierna izquierda (o apóyate en la pared).",
+        "Dobla la rodilla derecha y toma el tobillo por detrás.",
+        "Acerca el talón al glúteo manteniendo rodillas juntas.",
+        "Siente la liberación de tensión en el muslo."
+      ]
+    },
+    "childs_pose": {
+      "name": "Postura del Niño",
+      "instructions": [
+        "Arrodíllate con dedos de los pies juntos y rodillas separadas.",
+        "Lleva las caderas hacia los talones y camina con las manos al frente.",
+        "Apoya la frente en la esterilla y estira los brazos.",
+        "Respira hondo relajando hombros y espalda."
       ]
     }
   },
