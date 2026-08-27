@@ -199,11 +199,15 @@ describe("CreateTimerScreen", () => {
     const libraryBtn = getByText("Library");
     fireEvent.press(libraryBtn);
 
-    expect(getByText("Jumping Jacks")).toBeTruthy();
-    const item = getByText("Jumping Jacks");
+    expect(getByText("Tibialis Raises")).toBeTruthy();
+    const item = getByText("Tibialis Raises");
     fireEvent.press(item);
 
-    expect(getByText("Jumping Jacks")).toBeTruthy();
+    expect(getByText("Add to Timer")).toBeTruthy();
+    const addBtn = getByText("Add to Timer");
+    fireEvent.press(addBtn);
+
+    expect(getByText("Tibialis Raises")).toBeTruthy();
 
     // Change interval name manually
     const intervalNameInput = getByPlaceholderText("Interval name");

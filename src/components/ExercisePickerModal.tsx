@@ -6,15 +6,25 @@ import {
   TextInput,
   TouchableOpacity,
   FlatList,
+  ScrollView,
   StyleSheet,
   SafeAreaView,
   Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { EXERCISE_CATALOG, getLocalizedExercise, getLocalizedCategoryName } from "../constants/exerciseCatalog";
-import { Exercise } from "../model/Exercise";
-import Spacing from "../constants/Spacing";
+import * as Haptics from "expo-haptics";
+import {
+  EXERCISE_CATALOG,
+  BODY_PART_CATALOG,
+  getLocalizedExercise,
+  getLocalizedCategoryName,
+  getLocalizedBodyPartName,
+} from "../constants/exerciseCatalog";
+import { Exercise, BodyPart } from "../model/Exercise";
+import { ExerciseDetailModal } from "./ExerciseDetailModal";
+import Spacing, { RADIUS } from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
+import Colors from "../constants/Colors";
 import { t } from "../i18n";
 
 interface ExercisePickerModalProps {
@@ -23,39 +33,63 @@ interface ExercisePickerModalProps {
   onSelect: (exercise: Exercise) => void;
 }
 
-const CATEGORIES = ["all", "cardio", "upper", "lower", "abs", "total"];
+const CATEGORIES = ["all", "corrective", "cardio", "upper", "lower", "abs", "total"];
 
 export function ExercisePickerModal({ visible, onClose, onSelect }: ExercisePickerModalProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedBodyPart, setSelectedBodyPart] = useState<string>("all");
+  const [inspectingExercise, setInspectingExercise] = useState<Exercise | null>(null);
 
   const localizedList = useMemo(() => {
     return EXERCISE_CATALOG.map(getLocalizedExercise);
   }, [visible]);
 
   const filteredExercises = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+
     return localizedList.filter((item) => {
-      const matchesCat = selectedCategory === "all" || item.category === selectedCategory;
-      const query = searchQuery.trim().toLowerCase();
-      const matchesSearch =
-        query.length === 0 ||
-        item.name.toLowerCase().includes(query) ||
-        item.category.toLowerCase().includes(query);
-      return matchesCat && matchesSearch;
+      // Category filter
+      if (selectedCategory !== "all" && item.category !== selectedCategory) {
+        return false;
+      }
+
+      // Body Part filter
+      if (selectedBodyPart !== "all") {
+        if (!item.bodyParts || !item.bodyParts.includes(selectedBodyPart as BodyPart)) {
+          return false;
+        }
+      }
+
+      // Search matching
+      if (!query) return true;
+
+      const nameMatch = item.name.toLowerCase().includes(query);
+      const descMatch = (item.description || "").toLowerCase().includes(query);
+      const muscleMatch = (item.targetMuscles || []).some((m) => m.toLowerCase().includes(query));
+      const bodyPartMatch = (item.bodyParts || []).some((bp) => {
+        const bpName = getLocalizedBodyPartName(bp).toLowerCase();
+        return bp.toLowerCase().includes(query) || bpName.includes(query);
+      });
+      const instructionMatch = item.instructions.some((inst) => inst.toLowerCase().includes(query));
+
+      return nameMatch || descMatch || muscleMatch || bodyPartMatch || instructionMatch;
     });
-  }, [localizedList, selectedCategory, searchQuery]);
+  }, [localizedList, selectedCategory, selectedBodyPart, searchQuery]);
 
   function handleSelect(item: Exercise) {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     onSelect(item);
     onClose();
   }
 
   const categoryColors: Record<string, string> = {
-    cardio: "#10B981",
-    upper: "#3B82F6",
-    lower: "#F59E0B",
-    abs: "#8B5CF6",
-    total: "#EF4444",
+    corrective: "#059669",
+    cardio: "#D97706",
+    upper: "#2563EB",
+    lower: "#7C3AED",
+    abs: "#DC2626",
+    total: "#0891B2",
   };
 
   return (
@@ -64,9 +98,9 @@ export function ExercisePickerModal({ visible, onClose, onSelect }: ExercisePick
         {/* Modal Header */}
         <View style={styles.header}>
           <View style={styles.headerTitleWrap}>
-            <Text style={styles.headerTitle}>{t("exercisePicker.title", { defaultValue: "Exercise Library" })}</Text>
+            <Text style={styles.headerTitle}>{t("exercisePicker.title")}</Text>
             <Text style={styles.headerSubtitle}>
-              {t("exercisePicker.subtitle", { count: filteredExercises.length, defaultValue: `${filteredExercises.length} bodyweight exercises` })}
+              {t("exercisePicker.subtitle", { count: filteredExercises.length })}
             </Text>
           </View>
           <TouchableOpacity style={styles.closeButton} onPress={onClose} hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}>
@@ -79,7 +113,7 @@ export function ExercisePickerModal({ visible, onClose, onSelect }: ExercisePick
           <Ionicons name="search" size={18} color="#9CA3AF" style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
-            placeholder={t("exercisePicker.searchPlaceholder", { defaultValue: "Search exercises..." })}
+            placeholder={t("exercisePicker.searchPlaceholder")}
             placeholderTextColor="#9CA3AF"
             value={searchQuery}
             onChangeText={setSearchQuery}
@@ -95,27 +129,78 @@ export function ExercisePickerModal({ visible, onClose, onSelect }: ExercisePick
 
         {/* Category Filter Chips */}
         <View style={styles.categoriesContainer}>
-          <FlatList
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            data={CATEGORIES}
-            keyExtractor={(cat) => cat}
-            contentContainerStyle={styles.categoriesList}
-            renderItem={({ item: cat }) => {
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoriesList}>
+            {CATEGORIES.map((cat) => {
               const isSelected = selectedCategory === cat;
+              const isCorrective = cat === "corrective";
               return (
                 <TouchableOpacity
-                  style={[styles.categoryChip, isSelected && styles.categoryChipActive]}
+                  key={cat}
+                  style={[
+                    styles.categoryChip,
+                    isSelected && styles.categoryChipActive,
+                    isCorrective && !isSelected && styles.correctiveChip,
+                  ]}
                   onPress={() => setSelectedCategory(cat)}
                   activeOpacity={0.7}
                 >
-                  <Text style={[styles.categoryChipText, isSelected && styles.categoryChipTextActive]}>
-                    {cat === "all" ? t("exercisePicker.all", { defaultValue: "All" }) : getLocalizedCategoryName(cat)}
+                  {isCorrective && (
+                    <Ionicons
+                      name="medical"
+                      size={12}
+                      color={isSelected ? "#FFFFFF" : "#059669"}
+                      style={{ marginRight: 4 }}
+                    />
+                  )}
+                  <Text
+                    style={[
+                      styles.categoryChipText,
+                      isSelected && styles.categoryChipTextActive,
+                      isCorrective && !isSelected && { color: "#059669", fontWeight: "700" },
+                    ]}
+                  >
+                    {cat === "all" ? t("exercisePicker.all") : getLocalizedCategoryName(cat)}
                   </Text>
                 </TouchableOpacity>
               );
-            }}
-          />
+            })}
+          </ScrollView>
+        </View>
+
+        {/* Body Part Filter Chips */}
+        <View style={styles.bodyPartsContainer}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.bodyPartsList}>
+            <TouchableOpacity
+              style={[styles.bodyPartChip, selectedBodyPart === "all" && styles.bodyPartChipActive]}
+              onPress={() => setSelectedBodyPart("all")}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.bodyPartChipText, selectedBodyPart === "all" && styles.bodyPartChipTextActive]}>
+                {t("exercises.allBodyParts")}
+              </Text>
+            </TouchableOpacity>
+            {BODY_PART_CATALOG.map((bp) => {
+              const isSelected = selectedBodyPart === bp.id;
+              return (
+                <TouchableOpacity
+                  key={bp.id}
+                  style={[styles.bodyPartChip, isSelected && styles.bodyPartChipActive]}
+                  onPress={() => setSelectedBodyPart(bp.id)}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons
+                    name={bp.iconName as any}
+                    size={12}
+                    color={isSelected ? "#FFFFFF" : "#4B5563"}
+                    style={{ marginRight: 4 }}
+                  />
+                  <Text style={[styles.bodyPartChipText, isSelected && styles.bodyPartChipTextActive]}>
+                    {getLocalizedBodyPartName(bp.id)}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
         </View>
 
         {/* Exercise List */}
@@ -127,7 +212,11 @@ export function ExercisePickerModal({ visible, onClose, onSelect }: ExercisePick
           renderItem={({ item }) => {
             const badgeColor = categoryColors[item.category] || "#10B981";
             return (
-              <TouchableOpacity style={styles.exerciseCard} onPress={() => handleSelect(item)} activeOpacity={0.65}>
+              <TouchableOpacity
+                style={styles.exerciseCard}
+                onPress={() => setInspectingExercise(item)}
+                activeOpacity={0.65}
+              >
                 <View style={styles.exerciseCardLeft}>
                   <View style={[styles.categoryDot, { backgroundColor: badgeColor }]} />
                   <View style={styles.exerciseDetails}>
@@ -139,23 +228,36 @@ export function ExercisePickerModal({ visible, onClose, onSelect }: ExercisePick
                         </Text>
                       </View>
                       <View style={styles.difficultyBadge}>
-                        <Text style={styles.difficultyBadgeText}>
-                          {item.difficulty.toUpperCase()}
-                        </Text>
+                        <Text style={styles.difficultyBadgeText}>{item.difficulty.toUpperCase()}</Text>
                       </View>
                     </View>
+                    {item.description ? (
+                      <Text style={styles.exerciseDescSnippet} numberOfLines={2}>
+                        {item.description}
+                      </Text>
+                    ) : null}
                   </View>
                 </View>
-                <Ionicons name="add-circle" size={24} color="#1ACC6C" />
+                <Ionicons name="information-circle-outline" size={22} color={Colors.primary} />
               </TouchableOpacity>
             );
           }}
           ListEmptyComponent={
-            <View style={styles.emptyState}>
-              <Ionicons name="fitness-outline" size={48} color="#D1D5DB" />
-              <Text style={styles.emptyText}>{t("exercisePicker.noResults", { defaultValue: "No exercises found" })}</Text>
+            <View style={styles.emptyContainer}>
+              <Ionicons name="search" size={48} color="#D1D5DB" />
+              <Text style={styles.emptyTitle}>{t("exercisePicker.emptyTitle")}</Text>
+              <Text style={styles.emptySubtitle}>{t("exercisePicker.emptySubtitle")}</Text>
             </View>
           }
+        />
+
+        {/* Inspection Detail Modal */}
+        <ExerciseDetailModal
+          visible={inspectingExercise !== null}
+          exercise={inspectingExercise}
+          mode="picker"
+          onClose={() => setInspectingExercise(null)}
+          onSelectExercise={handleSelect}
         />
       </SafeAreaView>
     </Modal>
@@ -172,39 +274,40 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: Spacing.md,
-    paddingTop: Spacing.md,
-    paddingBottom: Spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: "#E5E7EB",
+    paddingTop: Spacing.sm,
+    paddingBottom: Spacing.xs,
   },
   headerTitleWrap: {
     flex: 1,
   },
   headerTitle: {
-    fontSize: FontSize.lg,
-    lineHeight: FontSize.lineHeight.lg,
-    fontFamily: "Poppins-Bold",
+    fontSize: FontSize["2xl"],
+    fontWeight: "800",
     color: "#111827",
   },
   headerSubtitle: {
-    fontSize: FontSize.xs,
-    fontFamily: "Poppins-Regular",
+    fontSize: FontSize.sm,
     color: "#6B7280",
-    marginTop: 1,
+    marginTop: 2,
   },
   closeButton: {
-    padding: Spacing.xs,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: "#F3F4F6",
+    alignItems: "center",
+    justifyContent: "center",
   },
   searchBar: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#FFFFFF",
     marginHorizontal: Spacing.md,
-    marginTop: Spacing.sm,
+    marginTop: Spacing.xs,
     marginBottom: Spacing.xs,
     paddingHorizontal: Spacing.sm,
-    paddingVertical: Platform.OS === "ios" ? 10 : 6,
-    borderRadius: Spacing.radius.md,
+    height: 42,
+    borderRadius: RADIUS.lg,
     borderWidth: 1,
     borderColor: "#E5E7EB",
   },
@@ -214,40 +317,75 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: FontSize.sm,
-    fontFamily: "Poppins-Regular",
-    color: "#111827",
+    color: "#1F2937",
+    paddingVertical: 6,
   },
   categoriesContainer: {
-    paddingVertical: Spacing.xs,
+    marginBottom: 6,
   },
   categoriesList: {
     paddingHorizontal: Spacing.md,
-    gap: Spacing.xs,
+    gap: 6,
   },
   categoryChip: {
-    paddingHorizontal: 14,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: Spacing.radius.full,
-    backgroundColor: "#F3F4F6",
+    borderRadius: RADIUS.full,
+    backgroundColor: "#FFFFFF",
     borderWidth: 1,
     borderColor: "#E5E7EB",
   },
   categoryChipActive: {
-    backgroundColor: "#111827",
-    borderColor: "#111827",
+    backgroundColor: Colors.primary,
+    borderColor: Colors.primary,
+  },
+  correctiveChip: {
+    backgroundColor: "#ECFDF5",
+    borderColor: "#A7F3D0",
   },
   categoryChipText: {
     fontSize: FontSize.xs,
-    fontFamily: "Poppins-Medium",
+    fontWeight: "600",
     color: "#4B5563",
   },
   categoryChipTextActive: {
     color: "#FFFFFF",
-    fontFamily: "Poppins-SemiBold",
+    fontWeight: "700",
+  },
+  bodyPartsContainer: {
+    marginBottom: Spacing.xs,
+  },
+  bodyPartsList: {
+    paddingHorizontal: Spacing.md,
+    gap: 6,
+  },
+  bodyPartChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: RADIUS.md,
+    backgroundColor: "#F3F4F6",
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+  },
+  bodyPartChipActive: {
+    backgroundColor: "#374151",
+    borderColor: "#1F2937",
+  },
+  bodyPartChipText: {
+    fontSize: FontSize.xs,
+    fontWeight: "600",
+    color: "#4B5563",
+  },
+  bodyPartChipTextActive: {
+    color: "#FFFFFF",
   },
   listContent: {
     paddingHorizontal: Spacing.md,
-    paddingBottom: Spacing["4xl"],
+    paddingBottom: Spacing.xl,
   },
   separator: {
     height: 8,
@@ -257,70 +395,78 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     backgroundColor: "#FFFFFF",
-    padding: Spacing.sm + 4,
-    borderRadius: Spacing.radius.md,
+    padding: Spacing.md,
+    borderRadius: RADIUS.md,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.03,
-    shadowRadius: 3,
+    borderColor: "#F3F4F6",
   },
   exerciseCardLeft: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     flex: 1,
     marginRight: Spacing.sm,
   },
   categoryDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    marginRight: Spacing.sm,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginTop: 6,
+    marginRight: Spacing.xs,
   },
   exerciseDetails: {
     flex: 1,
   },
   exerciseName: {
-    fontSize: FontSize.sm,
-    fontFamily: "Poppins-SemiBold",
+    fontSize: FontSize.base,
+    fontWeight: "700",
     color: "#111827",
+  },
+  exerciseDescSnippet: {
+    fontSize: FontSize.xs,
+    color: "#6B7280",
+    lineHeight: 16,
+    marginTop: 4,
   },
   badgeRow: {
     flexDirection: "row",
     alignItems: "center",
+    marginTop: 4,
     gap: 6,
-    marginTop: 3,
   },
   categoryBadge: {
     paddingHorizontal: 6,
     paddingVertical: 2,
-    borderRadius: 4,
+    borderRadius: RADIUS.xs,
   },
   categoryBadgeText: {
     fontSize: 10,
-    fontFamily: "Poppins-Medium",
+    fontWeight: "700",
   },
   difficultyBadge: {
     paddingHorizontal: 6,
     paddingVertical: 2,
-    borderRadius: 4,
+    borderRadius: RADIUS.xs,
     backgroundColor: "#F3F4F6",
   },
   difficultyBadgeText: {
     fontSize: 10,
-    fontFamily: "Poppins-Regular",
+    fontWeight: "600",
     color: "#6B7280",
   },
-  emptyState: {
+  emptyContainer: {
     alignItems: "center",
     justifyContent: "center",
-    paddingTop: 60,
+    paddingVertical: 60,
   },
-  emptyText: {
-    fontSize: FontSize.sm,
-    fontFamily: "Poppins-Regular",
-    color: "#9CA3AF",
+  emptyTitle: {
+    fontSize: FontSize.lg,
+    fontWeight: "700",
+    color: "#374151",
     marginTop: Spacing.sm,
+  },
+  emptySubtitle: {
+    fontSize: FontSize.sm,
+    color: "#9CA3AF",
+    marginTop: 4,
   },
 });

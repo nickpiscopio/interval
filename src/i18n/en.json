@@ -28,7 +28,11 @@
     "createCustom": "Create Custom",
     "generateAi": "Generate with AI",
     "shareTimerTitle": "Share Timer: %{name}",
-    "shareMessage": "🔥 Try my custom HIIT workout \"%{name}\" on Interval!\n\nWorkout details: %{rounds} rounds, %{duration} total time.\n\n1. Download Interval:\nApp Store: %{appStoreLink}\nPlay Store: %{playStoreLink}\n\n2. Open this link to load the timer:\n%{deepLink}"
+    "shareMessage": "🔥 Try my custom HIIT workout \"%{name}\" on Interval!\n\nWorkout details: %{rounds} rounds, %{duration} total time.\n\n1. Download Interval:\nApp Store: %{appStoreLink}\nPlay Store: %{playStoreLink}\n\n2. Open this link to load the timer:\n%{deepLink}",
+    "workoutsTab": "Workouts",
+    "libraryTab": "Exercise Library",
+    "emptyTitle": "No Timers Yet",
+    "emptySubtitle": "Create your first timer or browse the exercise library to start."
   },
   "createTimer": {
     "titleCreate": "Create Timer",
@@ -103,7 +107,9 @@
     "exitTitle": "Leave Workout?",
     "exitMessage": "Your progress for this workout will be lost.",
     "exitConfirm": "Leave",
-    "exitCancel": "Keep Going"
+    "exitCancel": "Keep Going",
+    "prep": "Get Ready",
+    "rest": "Rest"
   },
   "completion": {
     "title": "Workout Complete! ⚡️",
@@ -151,7 +157,8 @@
       "upper": "Upper Body",
       "lower": "Lower Body",
       "abs": "Abs & Core",
-      "total": "Full Body"
+      "total": "Full Body",
+      "corrective": "Physical Therapy"
     },
     "jumping_jacks": {
       "name": "Jumping Jacks",
@@ -434,12 +441,13 @@
       ]
     },
     "cat_cow": {
-      "name": "Cat Cow",
+      "name": "Cat-Cow Spinal Flow",
+      "description": "Gentle spinal flexion and extension that hydrates spinal discs and relieves lower back stiffness.",
       "instructions": [
-        "Start on all fours with wrists under shoulders and knees under hips.",
-        "Inhale, arch back, dropping belly and lifting gaze (Cow).",
-        "Exhale, round spine upward, tucking chin to chest (Cat).",
-        "Flow smoothly between poses with your breath."
+        "Start on all fours with hands under shoulders and knees under hips.",
+        "Inhale, arch back downward, lift chest and tailbone (Cow Pose).",
+        "Exhale, tuck chin, round spine upward toward ceiling (Cat Pose).",
+        "Move smoothly with deep breathing."
       ]
     },
     "left_side_quad_stretch": {
@@ -633,11 +641,12 @@
     },
     "fire_hydrants": {
       "name": "Fire Hydrants",
+      "description": "Strengthens lateral hip abductors to improve pelvis stability during walking and running.",
       "instructions": [
-        "Begin on all fours on a comfortable mat.",
-        "Keeping knee bent, raise one leg out to the side like a dog at a hydrant.",
-        "Target outer gluteus medius and hip abductors.",
-        "Lower slowly and repeat."
+        "Start on all fours with hands under shoulders, knees under hips.",
+        "Keeping knee bent at 90 degrees, raise one leg out to the side like a dog at a fire hydrant.",
+        "Pause for 1 second at top without twisting lower back.",
+        "Lower with control and complete reps before switching sides."
       ]
     },
     "single_leg_rdl": {
@@ -828,6 +837,452 @@
         "Keep shoulders down away from ears and open the chest.",
         "Stretches abdominal wall and strengthens spine."
       ]
+    },
+    "libraryTitle": "Exercise Library 📚",
+    "librarySubtitle": "Discover exercises & physical therapy movements",
+    "bodyPartFocus": "Body Part Focus",
+    "targetMuscles": "Target Muscles",
+    "aboutAndBenefits": "About & Benefits",
+    "instructionsHeading": "Instructions & Form",
+    "startQuickRoutine": "Start Quick Routine",
+    "createCustomWorkout": "Create Custom Workout",
+    "addToTimer": "Add to Timer",
+    "searchPlaceholder": "Search exercises, body parts, or instructions...",
+    "allCategories": "All",
+    "allBodyParts": "All Body Parts",
+    "resultsCount": "%{count} exercises",
+    "noExercisesFound": "No Exercises Found",
+    "noExercisesSubtitle": "Try searching a different joint, body part, or keyword.",
+    "bodyParts": {
+      "ankle_feet": "Ankle & Feet",
+      "knees": "Knees",
+      "pelvic_floor": "Pelvic Floor",
+      "lower_back": "Lower Back",
+      "upper_back_shoulders": "Upper Back & Shoulders",
+      "neck": "Neck",
+      "wrists_hands": "Wrists & Hands",
+      "elbows_forearms": "Elbows & Forearms",
+      "hips_glutes": "Hips & Glutes",
+      "abs_core": "Abs & Core",
+      "chest": "Chest",
+      "arms": "Arms"
+    },
+    "tibialis_raises": {
+      "name": "Tibialis Raises",
+      "description": "Strengthens the shin muscles to absorb ground impact, relieve shin splints, and support knee joint stability.",
+      "instructions": [
+        "Stand with back flat against a wall, feet about 1-2 feet out.",
+        "Keeping knees straight, pull toes and balls of feet up toward shins.",
+        "Hold the contraction at the top for 1 second.",
+        "Lower feet smoothly back to the floor and repeat."
+      ]
+    },
+    "ankle_alphabet": {
+      "name": "Ankle Alphabet",
+      "description": "Improves multi-directional range of motion, proprioception, and rehabilitation after ankle sprains.",
+      "instructions": [
+        "Sit comfortably with foot elevated off the ground.",
+        "Point your big toe and trace uppercase letters A through Z in the air.",
+        "Move only from the ankle joint, keeping knee still.",
+        "Perform full range of motion for each letter."
+      ]
+    },
+    "calf_eccentric_drops": {
+      "name": "Calf Stretch & Heel Drops",
+      "description": "Controlled eccentric lowering to strengthen the Achilles tendon and relieve calf tightness.",
+      "instructions": [
+        "Stand with balls of feet on a step or ledge, heels hanging off.",
+        "Rise up onto toes with both feet.",
+        "Slowly lower heels below step level over 3-4 seconds.",
+        "Feel a gentle stretch in calves, then rise back up."
+      ]
+    },
+    "toe_heel_walks": {
+      "name": "Toe & Heel Walks",
+      "description": "Strengthens foot arch intrinsics, enhances balance, and restores walking gait mechanics.",
+      "instructions": [
+        "Walk forward on the balls of your toes for 10-15 paces.",
+        "Switch to walking exclusively on your heels with toes lifted.",
+        "Maintain upright posture with engaged core throughout."
+      ]
+    },
+    "terminal_knee_extensions": {
+      "name": "Terminal Knee Extensions",
+      "description": "Isolates the inner quad to improve patellofemoral tracking and reduce anterior knee pain.",
+      "instructions": [
+        "Stand with slight bend in working knee (or loop light resistance band behind knee).",
+        "Squeeze your thigh to straighten knee fully without hyperextending.",
+        "Hold the peak quad squeeze for 2 seconds.",
+        "Control the return back to a soft knee bend."
+      ]
+    },
+    "straight_leg_raises": {
+      "name": "Straight Leg Raises",
+      "description": "Gentle non-weight-bearing knee extensor and hip flexor strengthening to protect healing knee joints.",
+      "instructions": [
+        "Lie flat on back with one knee bent and one leg straight.",
+        "Flex toes of straight leg toward shin and tighten quad.",
+        "Lift straight leg up to the height of the opposite knee.",
+        "Pause for 1 second, then slowly lower without touching floor."
+      ]
+    },
+    "wall_sit_isometric": {
+      "name": "Wall Sit Knee Isometric Hold",
+      "description": "Isometric quad loading that stimulates collagen synthesis and relieves patellar tendon discomfort.",
+      "instructions": [
+        "Lean back against a smooth wall and slide down until knees are at 45 to 90 degrees.",
+        "Keep knees directly aligned above ankles, not past toes.",
+        "Press flat back firmly into wall and breathe evenly.",
+        "Hold steady without bouncing."
+      ]
+    },
+    "step_downs": {
+      "name": "Controlled Step-Downs",
+      "description": "Develops single-leg stability, eccentric quad deceleration, and prevents knee collapse during stairs and runs.",
+      "instructions": [
+        "Stand on a low step or box with one foot hovering off the side.",
+        "Hinge slightly at hips and bend standing knee to tap heel to floor.",
+        "Keep standing knee tracking inline with second toe.",
+        "Drive through heel to return to top."
+      ]
+    },
+    "kegel_holds": {
+      "name": "Kegel Holds & Pulses",
+      "description": "Foundational pelvic floor activation to restore deep core stability, continence, and posture.",
+      "instructions": [
+        "Lie on back with knees bent and feet flat on floor.",
+        "Exhale gently and contract the pelvic floor as if stopping urine flow.",
+        "Draw muscles upward and inward without squeezing glutes.",
+        "Hold for 5 seconds, relax fully for 5 seconds, and repeat."
+      ]
+    },
+    "glute_bridge_pelvic_tilt": {
+      "name": "Glute Bridge with Pelvic Tilt",
+      "description": "Aligns pelvis, strengthens glutes, and takes compressive pressure off the lumbar spine.",
+      "instructions": [
+        "Lie on back with knees bent, feet hip-width apart.",
+        "Flatten lower back into the mat with a gentle posterior pelvic tilt.",
+        "Drive through heels to lift hips until thighs and torso form a straight line.",
+        "Squeeze glutes at top for 2 seconds, then lower with control."
+      ]
+    },
+    "dead_bugs": {
+      "name": "Dead Bugs",
+      "description": "Diagonal core stabilization that trains abdominal bracing while maintaining a neutral spine.",
+      "instructions": [
+        "Lie on back with arms pointing to ceiling and knees bent at 90 degrees.",
+        "Press lower back firmly into floor.",
+        "Slowly extend right arm overhead and left leg forward near floor.",
+        "Return to center and alternate with opposite limbs."
+      ]
+    },
+    "clamshells_banded": {
+      "name": "Clamshells",
+      "description": "Activates lateral hip stabilizers to prevent inward knee valgus and support pelvic alignment.",
+      "instructions": [
+        "Lie on your side with hips stacked, knees bent at 90 degrees, and feet together.",
+        "Keep feet touching and raise top knee as high as possible without rolling hips back.",
+        "Hold peak contraction for 1 second.",
+        "Slowly lower knee and repeat before switching sides."
+      ]
+    },
+    "bird_dogs": {
+      "name": "Bird Dogs",
+      "description": "A foundational rehab exercise to build spinal endurance and cross-body stabilization.",
+      "instructions": [
+        "Begin on all fours with neutral spine.",
+        "Reach right arm forward and left leg straight back simultaneously.",
+        "Keep hips and shoulders level with the floor without arching back.",
+        "Hold for 2 seconds, return smoothly, and alternate sides."
+      ]
+    },
+    "prone_press_ups": {
+      "name": "Prone Press-Ups (McKenzie Extension)",
+      "description": "McKenzie extension protocol to relieve disc pressure, centralize sciatica, and restore lumbar lordosis.",
+      "instructions": [
+        "Lie face down on mat with hands flat beneath shoulders.",
+        "Relax your glutes and lower back completely.",
+        "Press through hands to lift upper torso while keeping hips pinned to floor.",
+        "Hold at the comfortable top stretch for 2 seconds, then lower down."
+      ]
+    },
+    "childs_pose_side_reach": {
+      "name": "Child's Pose with Side Reach",
+      "description": "Gently decompresses the lumbar spine, opens lateral ribcage, and relieves lower back muscle spasms.",
+      "instructions": [
+        "Kneel on mat with big toes touching and knees wide.",
+        "Sit hips back onto heels and extend arms forward on the floor.",
+        "Walk both hands over to the right side to stretch left lower back.",
+        "Hold for deep breaths, then walk hands over to the left side."
+      ]
+    },
+    "wall_angels": {
+      "name": "Wall Angels",
+      "description": "Corrects forward-head and rounded-shoulder posture by activating mid-back scapular retractors.",
+      "instructions": [
+        "Stand with heels, glutes, upper back, and head resting against a wall.",
+        "Bring elbows and back of hands flat against the wall at 90 degrees (goalpost arms).",
+        "Slowly slide arms upward overhead while maintaining contact with the wall.",
+        "Slide back down, squeezing shoulder blades together."
+      ]
+    },
+    "thoracic_book_openers": {
+      "name": "Side-Lying Thoracic Book Openers",
+      "description": "Unlocks mid-back rotational mobility to relieve neck stiffness and shoulder impingement.",
+      "instructions": [
+        "Lie on side with knees bent at 90 degrees and arms extended straight out in front.",
+        "Inhale and lift top arm up and over across body toward opposite floor.",
+        "Follow your hand with your eyes, keeping knees glued together.",
+        "Pause for a deep breath at maximum rotation, then close arms together."
+      ]
+    },
+    "ytw_raises": {
+      "name": "Y-T-W Scapular Raises",
+      "description": "Comprehensive scapular strengthening protocol to stabilize shoulder blades and prevent rotator cuff injuries.",
+      "instructions": [
+        "Hinge forward at hips with flat back (or lie face down on mat).",
+        "Form a 'Y' with arms thumbs pointing up, squeezing shoulder blades down and back.",
+        "Move arms straight out to sides forming a 'T' with thumbs up.",
+        "Bend elbows into a 'W' shape and pinch shoulder blades together tightly."
+      ]
+    },
+    "band_pull_aparts": {
+      "name": "Scapular Retraction Pull-Aparts",
+      "description": "Strengthens upper back posture to counteract desk slump and computer slouch.",
+      "instructions": [
+        "Stand tall holding imaginary or light resistance band at shoulder width.",
+        "Keep arms straight and pull hands outward to sides until chest opens wide.",
+        "Focus on pinching shoulder blades together.",
+        "Control the return back to starting position."
+      ]
+    },
+    "chin_tucks": {
+      "name": "Chin Tucks",
+      "description": "Primary exercise for correcting 'tech neck' and relieving tension headaches and cervical strain.",
+      "instructions": [
+        "Sit or stand tall with relaxed shoulders.",
+        "Look straight ahead and gently draw chin straight backward (making a 'double chin').",
+        "Feel a gentle elongation at the base of your skull without tilting head down.",
+        "Hold for 3-5 seconds, relax, and repeat."
+      ]
+    },
+    "lateral_neck_stretch": {
+      "name": "Gentle Lateral Neck Stretch",
+      "description": "Safely releases chronic muscle tension and tightness along the sides of the neck.",
+      "instructions": [
+        "Sit upright and anchor right hand under your chair.",
+        "Gently tilt left ear toward left shoulder without forcing.",
+        "Use left hand for light guidance if comfortable.",
+        "Breathe deeply for 20-30 seconds, then switch sides."
+      ]
+    },
+    "isometric_neck_press": {
+      "name": "Isometric Neck Resistance Holds",
+      "description": "Builds multi-directional neck stability and resilience without painful joint movement.",
+      "instructions": [
+        "Place palm of hand against forehead.",
+        "Gently press forehead into palm while resisting with hand so head does not move.",
+        "Hold isometric pressure for 5 seconds.",
+        "Repeat on sides of head and back of head."
+      ]
+    },
+    "tabletop_wrist_rocking": {
+      "name": "Tabletop Wrist Rocking",
+      "description": "Restores wrist extension and weight-bearing tolerance for pushups, yoga, and everyday lifting.",
+      "instructions": [
+        "Start on hands and knees with fingers spread wide pointing forward.",
+        "Gently rock body forward over wrists to feel a stretch in forearms.",
+        "Rotate hands so fingers point sideways and rock side to side.",
+        "Rotate hands so fingers point toward knees and gently sit hips back."
+      ]
+    },
+    "prayer_wrist_stretch": {
+      "name": "Prayer & Reverse Prayer Stretch",
+      "description": "Alleviates typing strain, carpal tunnel tightness, and forearm fatigue.",
+      "instructions": [
+        "Place palms together in front of chest with fingers pointing up (prayer position).",
+        "Slowly lower hands downward while keeping palms pressed together.",
+        "Hold for 15 seconds, then flip hands so backs of hands touch pointing down.",
+        "Feel the gentle stretch across tops of wrists."
+      ]
+    },
+    "wrist_circles_rotations": {
+      "name": "Wrist Circles & Tendon Glides",
+      "description": "Promotes lubricating synovial fluid flow and releases finger and wrist tendon stiffness.",
+      "instructions": [
+        "Interlace fingers together in front of chest.",
+        "Roll wrists in smooth continuous figure-8 patterns.",
+        "Open hands wide spreading all fingers, then curl into tight fists.",
+        "Perform smoothly in both directions."
+      ]
+    },
+    "forearm_pronation_supination": {
+      "name": "Forearm Pronation & Supination",
+      "description": "Rehabilitates tennis elbow and golfer's elbow by strengthening rotational forearm tendons.",
+      "instructions": [
+        "Sit with forearm resting flat on a table, elbow bent at 90 degrees.",
+        "Hold a lightweight object or hammer by the base.",
+        "Slowly rotate forearm outward so palm faces up (supination).",
+        "Control the return, rotating forearm inward so palm faces down (pronation)."
+      ]
+    },
+    "eccentric_wrist_curls": {
+      "name": "Eccentric Wrist Curls",
+      "description": "Evidence-based eccentric loading for tendon recovery and pain relief in epicondylitis.",
+      "instructions": [
+        "Rest forearm on thigh or table with hand hanging over edge palm down.",
+        "Lift wrist up using opposite hand assistance.",
+        "Slowly lower hand back down under self-control over 3-4 seconds.",
+        "Repeat for 10-12 repetitions before switching to palm-up."
+      ]
+    },
+    "isometric_towel_squeeze": {
+      "name": "Isometric Towel Squeeze",
+      "description": "Develops pain-free isometric grip endurance to stabilize the elbow joint.",
+      "instructions": [
+        "Roll a hand towel into a firm cylinder.",
+        "Grip towel firmly with both hands.",
+        "Squeeze as tightly as comfortably possible without pain for 5-10 seconds.",
+        "Release slowly, rest 5 seconds, and repeat."
+      ]
+    },
+    "hip_90_90_flow": {
+      "name": "90/90 Hip Mobility Flow",
+      "description": "Increases hip capsule internal and external rotation to protect the lower back and knees.",
+      "instructions": [
+        "Sit on floor with lead leg bent at 90 degrees in front and trail leg bent at 90 degrees to side.",
+        "Sit tall with proud chest and hinge gently over front shin.",
+        "Hold for 10-15 seconds, then transition smoothly to opposite side without using hands if possible."
+      ]
+    },
+    "pigeon_stretch": {
+      "name": "Elevated Pigeon Stretch",
+      "description": "Deep glute and piriformis stretch that eases sciatic nerve tension and improves hip mobility.",
+      "instructions": [
+        "Place front shin across an elevated surface or yoga mat with knee at comfortable angle.",
+        "Extend back leg straight behind you.",
+        "Keep hips square and hinge forward from the hips with a flat back.",
+        "Hold for 30-45 seconds while taking deep diaphragmatic breaths."
+      ]
+    },
+    "lateral_shuffles": {
+      "name": "Lateral Shuffles",
+      "description": "",
+      "instructions": [
+        "Perform with controlled form."
+      ]
+    },
+    "jump_rope_sim": {
+      "name": "Invisible Jump Rope",
+      "description": "",
+      "instructions": [
+        "Perform with controlled form."
+      ]
+    },
+    "push_ups": {
+      "name": "Push-Ups",
+      "description": "",
+      "instructions": [
+        "Perform with controlled form."
+      ]
+    },
+    "diamond_push_ups": {
+      "name": "Diamond Push-Ups",
+      "description": "",
+      "instructions": [
+        "Perform with controlled form."
+      ]
+    },
+    "decline_push_ups": {
+      "name": "Decline Push-Ups",
+      "description": "",
+      "instructions": [
+        "Perform with controlled form."
+      ]
+    },
+    "pike_push_ups": {
+      "name": "Pike Push-Ups",
+      "description": "",
+      "instructions": [
+        "Perform with controlled form."
+      ]
+    },
+    "dips_chair": {
+      "name": "Chair / Bench Dips",
+      "description": "",
+      "instructions": [
+        "Perform with controlled form."
+      ]
+    },
+    "doorframe_rows": {
+      "name": "Doorframe Rows",
+      "description": "",
+      "instructions": [
+        "Perform with controlled form."
+      ]
+    },
+    "superman_pulls": {
+      "name": "Superman Lat Pulls",
+      "description": "",
+      "instructions": [
+        "Perform with controlled form."
+      ]
+    },
+    "plank_shoulder_taps": {
+      "name": "Plank Shoulder Taps",
+      "description": "",
+      "instructions": [
+        "Perform with controlled form."
+      ]
+    },
+    "inchworm": {
+      "name": "Inchworm Walkouts",
+      "description": "",
+      "instructions": [
+        "Perform with controlled form."
+      ]
+    },
+    "bodyweight_squats": {
+      "name": "Bodyweight Squats",
+      "description": "",
+      "instructions": [
+        "Perform with controlled form."
+      ]
+    },
+    "jump_squats": {
+      "name": "Jump Squats",
+      "description": "",
+      "instructions": [
+        "Perform with controlled form."
+      ]
+    },
+    "walking_lunges": {
+      "name": "Walking Lunges",
+      "description": "",
+      "instructions": [
+        "Perform with controlled form."
+      ]
+    },
+    "single_leg_bridges": {
+      "name": "Single-Leg Glute Bridges",
+      "description": "",
+      "instructions": [
+        "Perform with controlled form."
+      ]
+    },
+    "bear_crawl_hold": {
+      "name": "Bear Crawl Hold",
+      "description": "",
+      "instructions": [
+        "Perform with controlled form."
+      ]
+    },
+    "windshield_wipers": {
+      "name": "Windshield Wipers",
+      "description": "",
+      "instructions": [
+        "Perform with controlled form."
+      ]
     }
   },
   "exercisePicker": {
@@ -836,7 +1291,9 @@
     "searchPlaceholder": "Search exercises...",
     "chooseExercise": "Library",
     "all": "All",
-    "noResults": "No exercises found"
+    "noResults": "No exercises found",
+    "emptyTitle": "No exercises found",
+    "emptySubtitle": "Try searching a different joint, body part, or keyword."
   },
   "badges": {
     "first_step_hero": {

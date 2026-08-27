@@ -21,15 +21,17 @@ import DraggableFlatList, {
 import { RootStackScreenProps } from "../types";
 import { Timer } from "../model/Timer";
 import { normalizeInterval } from "../model/Interval";
+import { Exercise } from "../model/Exercise";
 import { DEFAULT_AI_TIMERS } from "../constants/defaultTimers";
 import { encodeBase64 } from "../utils/base64";
-import Spacing from "../constants/Spacing";
+import Spacing, { RADIUS } from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
 import Colors from "../constants/Colors";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { getUserStats, recordShare } from "../services/badgeService";
 import { UserStats } from "../model/Badge";
+import { ExerciseLibraryView } from "../components/ExerciseLibraryView";
 import { t } from "../i18n";
 
 const STORAGE_KEY = "@hiit_timers";
@@ -38,6 +40,7 @@ const INITIALIZED_KEY = "@hiit_initialized";
 export default function SelectTimerScreen({
   navigation,
 }: RootStackScreenProps<"Root">) {
+  const [activeTab, setActiveTab] = useState<"workouts" | "library">("workouts");
   const [timers, setTimers] = useState<Timer[]>([]);
   const [userStats, setUserStats] = useState<UserStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -59,10 +62,9 @@ export default function SelectTimerScreen({
       setLoading(true);
       const isInitialized = await AsyncStorage.getItem(INITIALIZED_KEY);
       if (!isInitialized) {
-        // Initial app launch: seed default AI timers
         await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_AI_TIMERS));
         await AsyncStorage.setItem(INITIALIZED_KEY, "true");
-        setTimers([...DEFAULT_AI_TIMERS].sort((a, b) => b.createdAt - a.createdAt));
+        setTimers(DEFAULT_AI_TIMERS);
         return;
       }
 
@@ -104,43 +106,92 @@ export default function SelectTimerScreen({
       const sharePayload = {
         name: timer.name,
         rounds: timer.rounds,
-        isAiGenerated: timer.isAiGenerated,
-        intervals: timer.intervals.map((int) => ({
-          name: int.name,
-          duration: int.duration,
-          color: int.color,
-          exerciseId: int.exerciseId,
+        intervals: timer.intervals.map((i) => ({
+          id: i.id,
+          name: i.name,
+          duration: i.duration,
+          color: i.color,
         })),
+        isAiGenerated: timer.isAiGenerated,
       };
 
-      const base64Data = encodeBase64(JSON.stringify(sharePayload));
-      const deepLink = `interval://import?data=${base64Data}`;
-
-      const appStoreLink = "https://apps.apple.com/app/interval-hiit-timer/id12345678";
-      const playStoreLink = "https://play.google.com/store/apps/details?id=com.plyonest.interval";
-
-      const totalSec = calculateTotalDuration(timer);
-      const shareMessage = t("selectTimer.shareMessage", {
+      const base64Str = encodeBase64(JSON.stringify(sharePayload));
+      const shareUrl = `interval://import?t=${base64Str}`;
+      const message = t("selectTimer.shareMessage", {
         name: timer.name,
-        rounds: timer.rounds,
-        duration: formatTime(totalSec),
-        appStoreLink,
-        playStoreLink,
-        deepLink,
+        url: shareUrl,
+        defaultValue: `Check out my HIIT workout "${timer.name}" on Interval Timer! \n\n${shareUrl}`,
       });
 
       const result = await Share.share({
-        message: shareMessage,
-        title: t("selectTimer.shareTimerTitle", { name: timer.name }),
+        title: timer.name,
+        message,
+        url: shareUrl,
       });
 
       if (result.action === Share.sharedAction) {
-        const { stats } = await recordShare(result.activityType);
-        setUserStats(stats);
+        await recordShare(result.activityType);
       }
     } catch (e) {
       console.warn("Failed to share timer:", e);
     }
+  }
+
+  function handleStartQuickRoutine(exercise: Exercise) {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    const quickTimer: Timer = {
+      id: `quick_${Date.now()}`,
+      name: exercise.name,
+      rounds: 3,
+      intervals: [
+        {
+          id: "prep",
+          name: t("timer.prep", { defaultValue: "Get Ready" }),
+          duration: 10,
+          color: "#6B7280",
+        },
+        {
+          id: "work",
+          name: exercise.name,
+          duration: 40,
+          color: exercise.category === "corrective" ? "#059669" : "#3B82F6",
+          exerciseId: exercise.id,
+        },
+        {
+          id: "rest",
+          name: t("timer.rest", { defaultValue: "Rest" }),
+          duration: 15,
+          color: "#4B5563",
+        },
+      ],
+      createdAt: Date.now(),
+    };
+    navigation.navigate("Timer", { timer: quickTimer });
+  }
+
+  function handleCreateCustomTimer(exercise: Exercise) {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    const customTimer: Timer = {
+      id: `custom_${Date.now()}`,
+      name: `${exercise.name} Routine`,
+      rounds: 3,
+      intervals: [
+        {
+          id: "work_1",
+          name: exercise.name,
+          duration: 30,
+          color: exercise.category === "corrective" ? "#059669" : "#3B82F6",
+          exerciseId: exercise.id,
+        },
+        {
+          id: "rest_1",
+          name: t("timer.rest", { defaultValue: "Rest" }),
+          duration: 15,
+          color: "#4B5563",
+        },
+      ],
+    };
+    navigation.navigate("CreateTimer", { timer: customTimer });
   }
 
   const renderTimerCard = ({ item, drag, isActive }: RenderItemParams<Timer>) => (
@@ -199,85 +250,121 @@ export default function SelectTimerScreen({
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               onPress={() => handleShareTimer(item)}
             >
-              <Ionicons name="share-outline" size={20} color="#6B7280" />
+              <Ionicons name="share-outline" size={18} color="#6B7280" />
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.playButton}
+              style={styles.cardPlayButton}
               activeOpacity={0.7}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               onPress={() => navigation.navigate("Timer", { timer: item })}
             >
-              <Ionicons name="play" size={24} color="#FFFFFF" />
+              <Ionicons name="play" size={18} color="#FFFFFF" />
             </TouchableOpacity>
           </View>
+        </View>
+
+        <View style={styles.intervalsPreview}>
+          {item.intervals.map((int) => (
+            <View
+              key={int.id}
+              style={[
+                styles.intervalPill,
+                {
+                  backgroundColor: int.color,
+                  flex: Math.max(1, int.duration),
+                },
+              ]}
+            />
+          ))}
         </View>
       </TouchableOpacity>
     </ScaleDecorator>
   );
 
+  const bottomDockOffset = Math.max(insets.bottom, 12) + 64;
+
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
 
-      {loading ? (
-        <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#3B82F6" />
-        </View>
-      ) : timers.length === 0 ? (
-        <View style={[styles.emptyContainer, { paddingTop: headerHeight + Spacing.md }]}>
-          <View style={styles.emptyIconContainer}>
-            <Ionicons name="stopwatch-outline" size={72} color="#9CA3AF" />
+      {activeTab === "workouts" ? (
+        loading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={Colors.primary} />
           </View>
-          <Text style={styles.emptyTitle}>{t("selectTimer.noTimersTitle")}</Text>
-          <Text style={styles.emptyText}>
-            {t("selectTimer.noTimersText")}
-          </Text>
-        </View>
+        ) : timers.length === 0 ? (
+          <View style={[styles.emptyContainer, { paddingTop: headerHeight + Spacing.lg }]}>
+            <Ionicons name="timer-outline" size={64} color={Colors.textScale.muted} />
+            <Text style={styles.emptyTitle}>{t("selectTimer.emptyTitle")}</Text>
+            <Text style={styles.emptySubtitle}>{t("selectTimer.emptySubtitle")}</Text>
+          </View>
+        ) : (
+          <DraggableFlatList
+            data={timers}
+            keyExtractor={(item) => item.id}
+            onDragBegin={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            }}
+            onDragEnd={({ data }) => {
+              setTimers(data);
+              AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            }}
+            renderItem={renderTimerCard}
+            contentContainerStyle={[
+              styles.listContent,
+              {
+                paddingTop: headerHeight + Spacing.sm,
+                paddingBottom: bottomDockOffset + 80,
+              },
+            ]}
+            onScrollOffsetChange={(offsetY) => {
+              setIsScrolled(offsetY > 1);
+            }}
+            onScroll={(e) => {
+              const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
+              const offsetY = contentOffset.y;
+              setIsScrolled(offsetY > 0);
+              const remaining = contentSize.height - (offsetY + layoutMeasurement.height);
+              setHasMoreBelow(remaining > 10);
+            }}
+            onContentSizeChange={(_, contentHeight) => {
+              setHasMoreBelow(contentHeight > 550);
+            }}
+            scrollEventThrottle={16}
+          />
+        )
       ) : (
-        <DraggableFlatList
-          data={timers}
-          keyExtractor={(item) => item.id}
-          onDragBegin={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          }}
-          onDragEnd={({ data }) => {
-            setTimers(data);
-            AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-          }}
-          renderItem={renderTimerCard}
-          contentContainerStyle={[
-            styles.listContent,
-            { paddingTop: headerHeight + Spacing.sm },
-          ]}
-          onScrollOffsetChange={(offsetY) => {
-            setIsScrolled(offsetY > 1);
-          }}
-          onScroll={(e) => {
-            const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
-            const offsetY = contentOffset.y;
-            setIsScrolled(offsetY > 0);
-            const remaining = contentSize.height - (offsetY + layoutMeasurement.height);
-            setHasMoreBelow(remaining > 10);
-          }}
-          onContentSizeChange={(_, contentHeight) => {
-            setHasMoreBelow(contentHeight > 550);
-          }}
-          scrollEventThrottle={16}
-        />
+        <View style={{ flex: 1, paddingTop: headerHeight + Spacing.xs }}>
+          <ExerciseLibraryView
+            onStartQuickRoutine={handleStartQuickRoutine}
+            onCreateCustomTimer={handleCreateCustomTimer}
+            bottomPadding={bottomDockOffset + 20}
+          />
+        </View>
       )}
 
+      {/* Header with Greeting & Trophy Room */}
       <View
         onLayout={(e) => setHeaderHeight(e.nativeEvent.layout.height)}
         style={[
           styles.header,
-          isScrolled ? styles.headerScrolled : styles.headerUnscrolled,
+          isScrolled && activeTab === "workouts" ? styles.headerScrolled : styles.headerUnscrolled,
           { paddingTop: Math.max(insets.top, 20) + Spacing.sm },
         ]}
       >
         <View style={styles.headerTopRow}>
           <View style={styles.headerTitles}>
-            <Text style={styles.greeting}>{t("selectTimer.greeting")}</Text>
-            <Text style={styles.subGreeting}>{t("selectTimer.subGreeting")}</Text>
+            <Text style={styles.greeting}>
+              {activeTab === "workouts"
+                ? t("selectTimer.greeting")
+                : t("exercises.libraryTitle")}
+            </Text>
+            <Text style={styles.subGreeting}>
+              {activeTab === "workouts"
+                ? t("selectTimer.subGreeting")
+                : t("exercises.librarySubtitle")}
+            </Text>
           </View>
           <TouchableOpacity
             style={styles.trophyButton}
@@ -298,7 +385,7 @@ export default function SelectTimerScreen({
         </View>
       </View>
 
-      {isScrolled && (
+      {isScrolled && activeTab === "workouts" && (
         <LinearGradient
           colors={["rgba(0, 0, 0, 0.15)", "rgba(0, 0, 0, 0.05)", "transparent"]}
           style={[
@@ -309,38 +396,92 @@ export default function SelectTimerScreen({
         />
       )}
 
+      {/* Workouts Action Buttons (When on Workouts tab) */}
+      {activeTab === "workouts" && (
+        <View
+          style={[
+            styles.buttonPanel,
+            {
+              bottom: Math.max(insets.bottom, 12) + 54,
+              borderTopColor: hasMoreBelow ? "#E5E7EB" : "transparent",
+            },
+          ]}
+        >
+          <TouchableOpacity
+            style={styles.createButton}
+            activeOpacity={0.9}
+            onPress={() => navigation.navigate("CreateTimer")}
+          >
+            <Ionicons name="add" size={20} color="#3B82F6" style={styles.buttonIcon} />
+            <Text style={styles.createButtonText}>{t("selectTimer.createCustom")}</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.generateButton}
+            activeOpacity={0.9}
+            onPress={() => navigation.navigate("GenerateTimer")}
+          >
+            <Ionicons name="sparkles" size={18} color="#FFFFFF" style={styles.buttonIcon} />
+            <Text style={styles.generateButtonText}>{t("selectTimer.generateAi")}</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {/* Bottom Dock Tab Bar */}
       <View
         style={[
-          styles.buttonPanel,
+          styles.bottomDock,
           {
-            borderTopColor: hasMoreBelow ? "#E5E7EB" : "transparent",
-            paddingBottom: Math.max(insets.bottom, 12) + Spacing.sm,
+            paddingBottom: Math.max(insets.bottom, 10),
           },
         ]}
       >
         <TouchableOpacity
-          style={styles.createButton}
-          activeOpacity={0.9}
-          onPress={() => navigation.navigate("CreateTimer")}
+          testID="tab-workouts"
+          style={[styles.dockTab, activeTab === "workouts" && styles.dockTabActive]}
+          activeOpacity={0.8}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            setActiveTab("workouts");
+          }}
         >
-          <Ionicons name="add" size={20} color="#3B82F6" style={styles.buttonIcon} />
-          <Text style={styles.createButtonText}>{t("selectTimer.createCustom")}</Text>
+          <Ionicons
+            name={activeTab === "workouts" ? "timer" : "timer-outline"}
+            size={22}
+            color={activeTab === "workouts" ? Colors.primary : "#6B7280"}
+          />
+          <Text
+            style={[
+              styles.dockTabText,
+              activeTab === "workouts" && styles.dockTabTextActive,
+            ]}
+          >
+            {t("selectTimer.workoutsTab")}
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={styles.generateButton}
-          activeOpacity={0.9}
-          onPress={() => navigation.navigate("GenerateTimer")}
+          testID="tab-library"
+          style={[styles.dockTab, activeTab === "library" && styles.dockTabActive]}
+          activeOpacity={0.8}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            setActiveTab("library");
+          }}
         >
-          <LinearGradient
-            colors={Colors.aiGradient}
-            start={Colors.aiGradientCoordinates.start}
-            end={Colors.aiGradientCoordinates.end}
-            style={styles.gradientButton}
+          <Ionicons
+            name={activeTab === "library" ? "barbell" : "barbell-outline"}
+            size={22}
+            color={activeTab === "library" ? Colors.primary : "#6B7280"}
+          />
+          <Text
+            style={[
+              styles.dockTabText,
+              activeTab === "library" && styles.dockTabTextActive,
+            ]}
           >
-            <Ionicons name="sparkles" size={18} color="#FFFFFF" style={styles.buttonIcon} />
-            <Text style={styles.generateButtonText}>{t("selectTimer.generateAi")}</Text>
-          </LinearGradient>
+            {t("selectTimer.libraryTab")}
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -357,22 +498,22 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    paddingHorizontal: Spacing.md,
+    zIndex: 10,
+    paddingHorizontal: Spacing.screen,
     paddingBottom: Spacing.md,
-    zIndex: 99,
   },
   headerUnscrolled: {
     backgroundColor: "#F9FAFB",
   },
   headerScrolled: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "rgba(255, 255, 255, 0.95)",
   },
   headerShadowGradient: {
     position: "absolute",
     left: 0,
     right: 0,
-    height: 6,
-    zIndex: 98,
+    height: 12,
+    zIndex: 9,
   },
   headerTopRow: {
     flexDirection: "row",
@@ -381,32 +522,42 @@ const styles = StyleSheet.create({
   },
   headerTitles: {
     flex: 1,
-    paddingRight: Spacing.sm,
+    marginRight: Spacing.sm,
+  },
+  greeting: {
+    fontSize: FontSize["3xl"],
+    fontWeight: "800",
+    color: "#111827",
+    letterSpacing: -0.5,
+  },
+  subGreeting: {
+    fontSize: FontSize.sm,
+    color: "#6B7280",
+    marginTop: 2,
   },
   trophyButton: {
-    minHeight: Spacing.touchTarget.min,
-    justifyContent: "center",
-    alignItems: "center",
+    padding: Spacing.xs,
+    borderRadius: RADIUS.full,
   },
   trophyIconWrap: {
     width: 44,
     height: 44,
     borderRadius: 22,
     backgroundColor: "#FEF3C7",
-    justifyContent: "center",
     alignItems: "center",
+    justifyContent: "center",
     borderWidth: 1,
     borderColor: "#FDE68A",
   },
   streakBadge: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FEF3C7",
-    borderRadius: Spacing.radius.md,
+    backgroundColor: "#FFFBEB",
+    borderWidth: 1.5,
+    borderColor: "#F59E0B",
+    borderRadius: RADIUS.full,
+    paddingHorizontal: 10,
     paddingVertical: 6,
-    paddingHorizontal: Spacing.sm,
-    borderWidth: 1,
-    borderColor: "#FDE68A",
     gap: 4,
   },
   streakBadgeEmoji: {
@@ -414,218 +565,230 @@ const styles = StyleSheet.create({
   },
   streakBadgeCount: {
     fontSize: FontSize.sm,
-    lineHeight: FontSize.lineHeight.sm,
-    fontFamily: "Poppins-Bold",
-    color: "#D97706",
-  },
-  greeting: {
-    fontSize: FontSize["2xl"],
-    lineHeight: FontSize.lineHeight["2xl"],
-    fontFamily: "Poppins-Bold",
-    color: "#111827",
-  },
-  subGreeting: {
-    fontSize: FontSize.sm,
-    lineHeight: FontSize.lineHeight.sm,
-    fontFamily: "Poppins-Regular",
-    color: "#6B7280",
-    marginTop: Spacing.xs,
-  },
-  centered: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    fontWeight: "800",
+    color: "#B45309",
   },
   listContent: {
-    padding: Spacing.md,
-    paddingBottom: Spacing["4xl"] * 2, // Make room for floating bottom panel
+    paddingHorizontal: Spacing.screen,
   },
   card: {
     backgroundColor: "#FFFFFF",
-    borderRadius: Spacing.radius.md,
-    paddingLeft: Spacing.sm,
+    borderRadius: RADIUS.lg,
     padding: Spacing.md,
-    shadowColor: "#000",
-    shadowOffset: { width: 1, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
     elevation: 2,
-    borderWidth: 0,
-    borderColor: "#E5E7EB",
+    borderWidth: 1,
+    borderColor: "#F3F4F6",
   },
   cardDragging: {
-    borderColor: Colors.primary,
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-    elevation: 6,
+    backgroundColor: "#F9FAFB",
+    shadowColor: Colors.primary,
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
+    elevation: 8,
+    transform: [{ scale: 1.02 }],
   },
   cardHeader: {
     flexDirection: "row",
     alignItems: "center",
-    gap: Spacing.sm,
+    justifyContent: "space-between",
   },
   dragHandle: {
-    paddingRight: Spacing.xs,
+    paddingRight: Spacing.sm,
+    paddingVertical: Spacing.xs,
     justifyContent: "center",
-    alignItems: "center",
   },
   cardMetaContainer: {
     flex: 1,
+    paddingRight: Spacing.xs,
   },
   cardTitle: {
-    fontSize: FontSize.lg,
-    lineHeight: FontSize.lineHeight.lg,
-    fontFamily: "Poppins-Bold",
-    color: "#1F2937",
-    marginBottom: Spacing.sm,
+    fontSize: FontSize.base,
+    fontWeight: "700",
+    color: "#111827",
+    marginBottom: 4,
   },
   badgeRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: Spacing.sm,
-    flexWrap: "wrap",
+    gap: 6,
   },
   badge: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#F3F4F6",
-    paddingHorizontal: Spacing.sm,
-    paddingVertical: Spacing.xs,
-    borderRadius: Spacing.radius.sm,
-    gap: Spacing.xs,
-  },
-  badgeText: {
-    fontSize: FontSize.xs,
-    lineHeight: FontSize.lineHeight.xs,
-    fontFamily: "Poppins-Medium",
-    color: "#4B5563",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: RADIUS.sm,
+    gap: 4,
   },
   aiBadge: {
     backgroundColor: "#ECFDF5",
+    borderWidth: 1,
+    borderColor: "#A7F3D0",
+  },
+  badgeText: {
+    fontSize: 11,
+    fontWeight: "600",
+    color: "#4B5563",
   },
   aiBadgeText: {
     color: "#059669",
-    fontFamily: "Poppins-Bold",
+    fontWeight: "700",
   },
   durationBadge: {
     backgroundColor: "#EFF6FF",
   },
   durationBadgeText: {
     color: "#1D4ED8",
-    fontFamily: "Poppins-Bold",
+    fontWeight: "600",
   },
   cardActionsRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: Spacing.xs,
+    gap: 8,
   },
   cardShareButton: {
     width: 36,
     height: 36,
     borderRadius: 18,
     backgroundColor: "#F3F4F6",
-    justifyContent: "center",
     alignItems: "center",
+    justifyContent: "center",
   },
-  playButton: {
-    width: Spacing.touchTarget.min,
-    height: Spacing.touchTarget.min,
-    borderRadius: Spacing.touchTarget.min / 2,
-    backgroundColor: "#1D4ED8",
-    justifyContent: "center",
+  cardPlayButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: Colors.primary,
     alignItems: "center",
-    shadowColor: "#1D4ED8",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 3,
+    justifyContent: "center",
+  },
+  intervalsPreview: {
+    flexDirection: "row",
+    height: 6,
+    borderRadius: 3,
+    overflow: "hidden",
+    marginTop: Spacing.sm,
+    backgroundColor: "#E5E7EB",
+  },
+  intervalPill: {
+    height: "100%",
   },
   buttonPanel: {
     position: "absolute",
-    bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: "#FFFFFF",
     flexDirection: "row",
-    padding: Spacing.md,
-    gap: Spacing.md,
+    paddingHorizontal: Spacing.screen,
+    paddingTop: Spacing.xs,
+    paddingBottom: Spacing.xs,
+    backgroundColor: "rgba(249, 250, 251, 0.95)",
+    gap: Spacing.sm,
     borderTopWidth: 1,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: -4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 5,
+    zIndex: 10,
   },
   createButton: {
     flex: 1,
     flexDirection: "row",
-    minHeight: Spacing.button.minHeight,
-    borderRadius: Spacing.radius.sm,
-    borderWidth: 1,
-    borderColor: "#D1D5DB",
-    backgroundColor: "#FFFFFF",
-    justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.xs,
+    justifyContent: "center",
+    backgroundColor: "#FFFFFF",
+    borderWidth: 1.5,
+    borderColor: "#3B82F6",
+    height: Spacing.button.minHeight,
+    borderRadius: RADIUS.lg,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
   createButtonText: {
+    color: "#3B82F6",
     fontSize: FontSize.sm,
-    lineHeight: FontSize.lineHeight.sm,
-    fontFamily: "Poppins-Bold",
-    color: "#374151",
+    fontWeight: "700",
   },
   generateButton: {
-    flex: 1.2,
-    minHeight: Spacing.button.minHeight,
-    borderRadius: Spacing.radius.sm,
-    overflow: "hidden",
-  },
-  gradientButton: {
     flex: 1,
     flexDirection: "row",
-    justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: Spacing.md,
-    paddingVertical: Spacing.xs,
+    justifyContent: "center",
+    backgroundColor: "#059669",
+    height: Spacing.button.minHeight,
+    borderRadius: RADIUS.lg,
+    shadowColor: "#059669",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 2,
   },
   generateButtonText: {
-    fontSize: FontSize.sm,
-    lineHeight: FontSize.lineHeight.sm,
-    fontFamily: "Poppins-Bold",
     color: "#FFFFFF",
+    fontSize: FontSize.sm,
+    fontWeight: "700",
   },
   buttonIcon: {
-    marginRight: Spacing.xs,
+    marginRight: 6,
+  },
+  bottomDock: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    flexDirection: "row",
+    backgroundColor: "#FFFFFF",
+    borderTopWidth: 1,
+    borderTopColor: "#E5E7EB",
+    paddingTop: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 8,
+    zIndex: 15,
+  },
+  dockTab: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 4,
+  },
+  dockTabActive: {},
+  dockTabText: {
+    fontSize: 11,
+    fontWeight: "600",
+    color: "#6B7280",
+    marginTop: 2,
+  },
+  dockTabTextActive: {
+    color: Colors.primary,
+    fontWeight: "700",
+  },
+  loadingContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
   },
   emptyContainer: {
     flex: 1,
-    justifyContent: "center",
     alignItems: "center",
-    padding: Spacing["2xl"],
-  },
-  emptyIconContainer: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: "#F3F4F6",
     justifyContent: "center",
-    alignItems: "center",
-    marginBottom: Spacing.md,
+    paddingHorizontal: Spacing.xl,
   },
   emptyTitle: {
     fontSize: FontSize.xl,
-    lineHeight: FontSize.lineHeight.xl,
-    fontFamily: "Poppins-Bold",
-    color: "#1F2937",
-    marginBottom: Spacing.xs,
+    fontWeight: "700",
+    color: "#374151",
+    marginTop: Spacing.md,
+    marginBottom: 4,
   },
-  emptyText: {
+  emptySubtitle: {
     fontSize: FontSize.sm,
-    lineHeight: FontSize.lineHeight.sm,
-    fontFamily: "Poppins-Regular",
-    color: "#6B7280",
+    color: "#9CA3AF",
     textAlign: "center",
-    maxWidth: 280,
   },
 });

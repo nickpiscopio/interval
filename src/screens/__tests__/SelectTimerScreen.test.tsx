@@ -196,4 +196,63 @@ describe("SelectTimerScreen", () => {
     const shareIcons = getAllByTestId("icon-share-outline");
     fireEvent.press(shareIcons[0]);
   });
+
+  it("switches to Exercise Library tab and starts quick routine or custom timer", async () => {
+    const mockNavigation: any = {
+      navigate: jest.fn(),
+    };
+
+    const { getByTestId, getByText, getAllByText } = render(
+      <SelectTimerScreen navigation={mockNavigation} route={{} as any} />
+    );
+
+    // Switch to Exercise Library tab
+    const libraryTab = getByTestId("tab-library");
+    fireEvent.press(libraryTab);
+
+    await waitFor(() => {
+      expect(getByText("Exercise Library 📚")).toBeTruthy();
+      expect(getByText("Tibialis Raises")).toBeTruthy();
+    });
+
+    // Press an exercise card to open details
+    const tibialisCard = getByText("Tibialis Raises");
+    fireEvent.press(tibialisCard);
+
+    // Start Quick Routine
+    expect(getByText("Start Quick Routine")).toBeTruthy();
+    const quickRoutineBtn = getByText("Start Quick Routine");
+    fireEvent.press(quickRoutineBtn);
+
+    expect(mockNavigation.navigate).toHaveBeenCalledWith(
+      "Timer",
+      expect.objectContaining({
+        timer: expect.objectContaining({
+          name: "Tibialis Raises",
+          rounds: 3,
+        }),
+      })
+    );
+
+    // Open another exercise and Create Custom Timer
+    fireEvent.press(tibialisCard);
+    const createCustomBtn = getByText("Create Custom Workout");
+    fireEvent.press(createCustomBtn);
+
+    expect(mockNavigation.navigate).toHaveBeenCalledWith(
+      "CreateTimer",
+      expect.objectContaining({
+        timer: expect.objectContaining({
+          name: "Tibialis Raises Routine",
+          rounds: 3,
+        }),
+      })
+    );
+
+    // Switch back to Workouts tab
+    const workoutsTab = getByTestId("tab-workouts");
+    fireEvent.press(workoutsTab);
+
+    expect(getByText("Let's Workout! ⚡️")).toBeTruthy();
+  });
 });

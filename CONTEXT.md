@@ -19,3 +19,11 @@ _Avoid_: Workout, Activity
 **Round**:
 A full repetition of the sequence of intervals defined in a Timer.
 _Avoid_: Set, Cycle
+
+**Physical Therapy / Corrective Exercise**:
+A targeted mobility, stability, or rehabilitation movement designed to strengthen specific joints, relieve tension, or aid recovery.
+_Avoid_: Rehab Drill, Clinical Protocol
+
+**Body Part Focus**:
+Everyday user-friendly anatomical regions (e.g., Ankle & Feet, Knees, Pelvic Floor, Lower Back, Upper Back, Neck, Wrists & Hands, Elbows, Hips & Glutes, Shoulders) used for filtering and discovering exercises.
+_Avoid_: Medical Jargon (e.g., Cervical Spine, Lumbar, Talocrural, Patellofemoral)

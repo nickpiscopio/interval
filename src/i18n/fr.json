@@ -28,7 +28,11 @@
     "createCustom": "Créer Personnalisé",
     "generateAi": "Générer avec l'IA",
     "shareTimerTitle": "Partager le minuteur : %{name}",
-    "shareMessage": "🔥 Teste mon entraînement HIIT personnalisé \"%{name}\" sur Interval !\n\nDétails : %{rounds} tours, %{duration} au total.\n\n1. Télécharge Interval :\nApp Store : %{appStoreLink}\nPlay Store : %{playStoreLink}\n\n2. Ouvre ce lien pour charger le minuteur :\n%{deepLink}"
+    "shareMessage": "🔥 Teste mon entraînement HIIT personnalisé \"%{name}\" sur Interval !\n\nDétails : %{rounds} tours, %{duration} au total.\n\n1. Télécharge Interval :\nApp Store : %{appStoreLink}\nPlay Store : %{playStoreLink}\n\n2. Ouvre ce lien pour charger le minuteur :\n%{deepLink}",
+    "workoutsTab": "Entraînements",
+    "libraryTab": "Bibliothèque",
+    "emptyTitle": "Pas encore de minuteurs",
+    "emptySubtitle": "Créez votre premier minuteur ou explorez la bibliothèque."
   },
   "createTimer": {
     "titleCreate": "Créer un Minuteur",
@@ -103,7 +107,9 @@
     "exitTitle": "Quitter l'Entraînement ?",
     "exitMessage": "Votre progression pour cette séance sera perdue.",
     "exitConfirm": "Quitter",
-    "exitCancel": "Continuer"
+    "exitCancel": "Continuer",
+    "prep": "Préparez-vous",
+    "rest": "Repos"
   },
   "completion": {
     "title": "Entraînement Terminé ! ⚡️",
@@ -151,7 +157,8 @@
       "upper": "Haut du Corps",
       "lower": "Bas du Corps",
       "abs": "Abdos & Gainage",
-      "total": "Corps Complet"
+      "total": "Corps Complet",
+      "corrective": "Kinésithérapie"
     },
     "jumping_jacks": {
       "name": "Jumping Jacks",
@@ -434,11 +441,12 @@
       ]
     },
     "cat_cow": {
-      "name": "Chat et Vache",
+      "name": "Chat-Vache (Mobilité Rachidienne)",
+      "description": "Flexion et extension douces de la colonne hydratant les disques et soulageant les raideurs lombaires.",
       "instructions": [
-        "À quatre pattes, poignets sous les épaules et genoux sous les hanches.",
-        "Inspirez en creusant le dos et en levant le regard (Vache).",
-        "Expirez en arrondissant le dos, menton vers la poitrine (Chat).",
+        "Positionnez-vous à quatre pattes, mains sous les épaules et genoux sous les hanches.",
+        "Inspirez, creusez le dos en ouvrant la poitrine et levant le coccyx (Vache).",
+        "Expirez, rentrez le menton et arrondissez la colonne vers le haut (Chat).",
         "Enchaînez avec fluidité au rythme du souffle."
       ]
     },
@@ -632,12 +640,13 @@
       ]
     },
     "fire_hydrants": {
-      "name": "Ouvertures Latérales de Hanche",
+      "name": "Bouche d'Incendie (Fire Hydrant)",
+      "description": "Renforce les abducteurs de hanche pour stabiliser le bassin pendant la marche et la course.",
       "instructions": [
-        "À quatre pattes sur un tapis confortable.",
-        "Genou plié, ouvrez la jambe sur le côté.",
-        "Ciblez le moyen fessier et les abducteurs.",
-        "Redescendez lentement et répétez."
+        "À quatre pattes, mains sous les épaules et genoux sous les hanches.",
+        "Genou plié à 90 degrés, levez la jambe sur le côté.",
+        "Marquez 1 seconde en haut sans tordre le bas du dos.",
+        "Redescendez avec contrôle et terminez les répétitions avant d'inverser."
       ]
     },
     "single_leg_rdl": {
@@ -828,6 +837,452 @@
         "Éloignez les épaules des oreilles et ouvrez la poitrine.",
         "Étire la paroi abdominale et renforce la colonne vertébrale."
       ]
+    },
+    "libraryTitle": "Bibliothèque d'Exercices 📚",
+    "librarySubtitle": "Découvrez des exercices et mouvements de kinésithérapie",
+    "bodyPartFocus": "Zone Ciblée",
+    "targetMuscles": "Muscles Ciblés",
+    "aboutAndBenefits": "Description et Bienfaits",
+    "instructionsHeading": "Instructions et Posture",
+    "startQuickRoutine": "Démarrer Routine Rapide",
+    "createCustomWorkout": "Créer Entraînement Personnalisé",
+    "addToTimer": "Ajouter au Minuteur",
+    "searchPlaceholder": "Rechercher des exercices, zones ou instructions...",
+    "allCategories": "Tous",
+    "allBodyParts": "Toutes les Zones",
+    "resultsCount": "%{count} exercices",
+    "noExercisesFound": "Aucun Exercice Trouvé",
+    "noExercisesSubtitle": "Essayez de rechercher une autre articulation, zone ou mot-clé.",
+    "bodyParts": {
+      "ankle_feet": "Cheville et Pieds",
+      "knees": "Genoux",
+      "pelvic_floor": "Plancher Pelvien",
+      "lower_back": "Bas du Dos",
+      "upper_back_shoulders": "Haut du Dos et Épaules",
+      "neck": "Cou",
+      "wrists_hands": "Poignets et Mains",
+      "elbows_forearms": "Coudes et Avant-bras",
+      "hips_glutes": "Hanches et Fessiers",
+      "abs_core": "Abdos et Gainage",
+      "chest": "Pectoraux",
+      "arms": "Bras"
+    },
+    "tibialis_raises": {
+      "name": "Élévations Tibiales",
+      "description": "Renforce les muscles du tibia pour absorber les impacts au sol, soulager les périostites et stabiliser le genou.",
+      "instructions": [
+        "Tenez-vous debout le dos contre un mur, pieds avancés de 30 à 50 cm.",
+        "En gardant les genoux tendus, levez les orteils et l'avant du pied vers les tibias.",
+        "Maintenez la contraction en haut pendant 1 seconde.",
+        "Redescendez doucement les pieds au sol et répétez."
+      ]
+    },
+    "ankle_alphabet": {
+      "name": "Alphabet de la Cheville",
+      "description": "Améliore la mobilité multidirectionnelle, la proprioception et la rééducation après une entorse.",
+      "instructions": [
+        "Asseyez-vous confortablement avec le pied surélevé du sol.",
+        "Pointez le gros orteil et tracez les lettres majuscules de A à Z dans les airs.",
+        "Bougez uniquement depuis la cheville en gardant le genou immobile.",
+        "Effectuez une amplitude complète pour chaque lettre."
+      ]
+    },
+    "calf_eccentric_drops": {
+      "name": "Étirement du Mollet et Descente de Talon",
+      "description": "Descente excentrique contrôlée pour renforcer le tendon d'Achille et soulager la raideur des mollets.",
+      "instructions": [
+        "Placez l'avant des pieds sur une marche, talons dans le vide.",
+        "Montez sur la pointe des pieds.",
+        "Descendez lentement les talons sous le niveau de la marche en 3 à 4 secondes.",
+        "Ressentez un étirement dans les mollets puis remontez."
+      ]
+    },
+    "toe_heel_walks": {
+      "name": "Marche sur Pointes et Talons",
+      "description": "Renforce la voûte plantaire, améliore l'équilibre et optimise la démarche.",
+      "instructions": [
+        "Marchez vers l'avant sur la pointe des pieds pendant 10 à 15 pas.",
+        "Passez à la marche sur les talons avec les orteils relevés.",
+        "Conservez une posture droite et un gainage actif."
+      ]
+    },
+    "terminal_knee_extensions": {
+      "name": "Extensions Terminales du Genou",
+      "description": "Isole le vaste interne pour améliorer l'alignement de la rotule et réduire les douleurs antérieures.",
+      "instructions": [
+        "Tenez-vous debout avec une légère flexion du genou sollicité.",
+        "Contractez la cuisse pour tendre complètement le genou sans hyperextension.",
+        "Maintenez la contraction maximale pendant 2 secondes.",
+        "Contrôlez le retour à une légère flexion."
+      ]
+    },
+    "straight_leg_raises": {
+      "name": "Élévations de Jambe Tendue",
+      "description": "Renforcement doux sans mise en charge des extenseurs du genou et fléchisseurs de hanche.",
+      "instructions": [
+        "Allongez-vous sur le dos, un genou plié et une jambe tendue.",
+        "Fléchissez les orteils vers le tibia et contractez le quadriceps.",
+        "Levez la jambe tendue à hauteur du genou opposé.",
+        "Marquez une pause d'une seconde puis redescendez lentement."
+      ]
+    },
+    "wall_sit_isometric": {
+      "name": "Chaise Murale Isométrique pour Genou",
+      "description": "Travail isométrique des quadriceps stimulant la réparation tendineuse et apaisant le tendon rotulien.",
+      "instructions": [
+        "Adossez-vous au mur et descendez jusqu'à ce que les genoux soient fléchis entre 45 et 90 degrés.",
+        "Gardez les genoux alignés au-dessus des chevilles.",
+        "Plaquez le dos contre le mur et respirez régulièrement.",
+        "Maintenez la position sans à-coups."
+      ]
+    },
+    "step_downs": {
+      "name": "Descentes Contrôlées de Marche",
+      "description": "Développe la stabilité sur une jambe, le contrôle excentrique et prévient le valgus du genou.",
+      "instructions": [
+        "Tenez-vous sur une marche basse avec un pied dans le vide sur le côté.",
+        "Fléchissez légèrement la hanche et pliez le genou d'appui pour effleurer le sol du talon.",
+        "Gardez le genou aligné avec le deuxième orteil.",
+        "Poussez sur le talon pour remonter."
+      ]
+    },
+    "kegel_holds": {
+      "name": "Contractions de Kegel",
+      "description": "Activation du plancher pelvien pour restaurer le gainage profond, la continence et la posture.",
+      "instructions": [
+        "Allongez-vous sur le dos, genoux pliés et pieds à plat.",
+        "Expirez doucement et contractez le plancher pelvien comme pour retenir un flux.",
+        "Aspirez les muscles vers le haut et l'intérieur sans serrer les fessiers.",
+        "Maintenez 5 secondes, relâchez 5 secondes et répétez."
+      ]
+    },
+    "glute_bridge_pelvic_tilt": {
+      "name": "Pont Fessier avec Rétroversion du Bassin",
+      "description": "Aligne le bassin, renforce les fessiers et décharge la colonne lombaire.",
+      "instructions": [
+        "Allongez-vous sur le dos, genoux pliés, pieds écartés de la largeur des hanches.",
+        "Plaquez le bas du dos au sol par une rétroversion du bassin.",
+        "Poussez sur les talons pour monter le bassin en ligne droite avec le tronc.",
+        "Serrez les fessiers 2 secondes en haut puis redescendez avec contrôle."
+      ]
+    },
+    "dead_bugs": {
+      "name": "Insecte Mort (Dead Bug)",
+      "description": "Gainage dynamique croisé renforçant le transverse tout en protégeant les lombaires.",
+      "instructions": [
+        "Allongez-vous sur le dos, bras tendus vers le plafond et genoux à 90 degrés.",
+        "Plaquez fermement le bas du dos contre le sol.",
+        "Tendez lentement le bras droit vers l'arrière et la jambe gauche vers l'avant.",
+        "Revenez au centre et alternez."
+      ]
+    },
+    "clamshells_banded": {
+      "name": "Coquillage (Clamshell)",
+      "description": "Active le moyen fessier pour stabiliser le bassin et éviter l'affaissement des genoux.",
+      "instructions": [
+        "Allongez-vous sur le côté, genoux fléchis à 90 degrés et pieds joints.",
+        "En gardant les pieds collés, levez le genou supérieur sans basculer le bassin.",
+        "Maintenez la contraction 1 seconde.",
+        "Redescendez lentement et répétez de l'autre côté."
+      ]
+    },
+    "bird_dogs": {
+      "name": "Chien-Oiseau (Bird Dog)",
+      "description": "Exercice clé de rééducation développant l'endurance des muscles paravertébraux.",
+      "instructions": [
+        "Commencez à quatre pattes avec la colonne en position neutre.",
+        "Tendez le bras droit devant vous et la jambe gauche derrière vous simultanément.",
+        "Gardez les hanches et épaules parallèles au sol sans cambrer.",
+        "Maintenez 2 secondes, revenez doucement et alternez."
+      ]
+    },
+    "prone_press_ups": {
+      "name": "Extensions McKenzie au Sol",
+      "description": "Protocole d'extension McKenzie pour soulager la pression discale et restaurer la lordose lombaire.",
+      "instructions": [
+        "Allongez-vous à plat ventre, mains sous les épaules.",
+        "Relâchez totalement les fessiers et le bas du dos.",
+        "Poussez sur les mains pour relever le buste en gardant le bassin au sol.",
+        "Maintenez 2 secondes en haut puis redescendez."
+      ]
+    },
+    "childs_pose_side_reach": {
+      "name": "Posture de l'Enfant avec Étirement Latéral",
+      "description": "Décompresse les lombaires, ouvre la cage thoracique et détend les tensions dorsales.",
+      "instructions": [
+        "À genoux, orteils joints et genoux écartés.",
+        "Asseyez-vous sur les talons et tendez les bras vers l'avant au sol.",
+        "Déplacez les deux mains vers la droite pour étirer le côté gauche du dos.",
+        "Respirez profondément puis déplacez les mains vers la gauche."
+      ]
+    },
+    "wall_angels": {
+      "name": "Anges au Mur",
+      "description": "Corrige les épaules enroulées et la tête en avant en activant les fixateurs d'omoplates.",
+      "instructions": [
+        "Debout, talons, fessiers, haut du dos et tête plaqués au mur.",
+        "Placez les coudes et le dos des mains contre le mur à 90 degrés.",
+        "Faites glisser lentement les bras vers le haut sans décoller du mur.",
+        "Redescendez en resserrant les omoplates."
+      ]
+    },
+    "thoracic_book_openers": {
+      "name": "Ouvertures Thoraciques sur le Côté",
+      "description": "Libère la rotation de la colonne dorsale pour soulager les tensions aux cervicales et aux épaules.",
+      "instructions": [
+        "Allongez-vous sur le côté, genoux à 90 degrés et bras tendus devant vous.",
+        "Inspirez et ouvrez le bras supérieur vers le sol du côté opposé.",
+        "Suivez la main du regard en gardant les genoux collés.",
+        "Prenez une grande respiration en ouverture maximale puis refermez."
+      ]
+    },
+    "ytw_raises": {
+      "name": "Élévations Scapulaires Y-T-W",
+      "description": "Protocole de renforcement postural pour stabiliser les omoplates et protéger la coiffe des rotateurs.",
+      "instructions": [
+        "Penchez le buste en avant avec le dos droit.",
+        "Formez un 'Y' avec les bras, pouces vers le haut, en resserrant les omoplates vers le bas.",
+        "Ouvrez les bras sur les côtés en formant un 'T', pouces vers le haut.",
+        "Fléchissez les coudes en 'W' et serrez fort les omoplates."
+      ]
+    },
+    "band_pull_aparts": {
+      "name": "Écartés pour Rétraction Scapulaire",
+      "description": "Renforce le haut du dos pour contrer l'attitude voûtée liée au travail sur écran.",
+      "instructions": [
+        "Tenez-vous debout avec une bande élastique légère à largeur d'épaules.",
+        "Bras tendus, écartez les mains sur les côtés en ouvrant la poitrine.",
+        "Concentrez-vous sur le resserrement des omoplates.",
+        "Contrôlez le retour à la position initiale."
+      ]
+    },
+    "chin_tucks": {
+      "name": "Rentré de Menton (Chin Tucks)",
+      "description": "Exercice clé pour corriger la posture tête en avant et soulager les céphalées de tension.",
+      "instructions": [
+        "Tenez-vous droit avec les épaules relâchées.",
+        "Regardez droit devant vous et reculez doucement le menton vers l'arrière.",
+        "Ressentez un étirement à la base du crâne sans pencher la tête en avant.",
+        "Maintenez 3 à 5 secondes, relâchez et répétez."
+      ]
+    },
+    "lateral_neck_stretch": {
+      "name": "Étirement Latéral Doux du Cou",
+      "description": "Soulage en toute sécurité les tensions musculaires chroniques sur les côtés du cou.",
+      "instructions": [
+        "Asseyez-vous droit et bloquez la main droite sous l'assise.",
+        "Inclinez doucement l'oreille gauche vers l'épaule gauche sans forcer.",
+        "Posez la main gauche pour un guidage léger si confortable.",
+        "Respirez profondément 20 à 30 secondes puis changez de côté."
+      ]
+    },
+    "isometric_neck_press": {
+      "name": "Pressions Isométriques du Cou",
+      "description": "Renforce la stabilité cervicale dans toutes les directions sans mouvement douloureux.",
+      "instructions": [
+        "Placez la paume de la main sur votre front.",
+        "Poussez doucement le front contre la main en résistant pour que la tête reste immobile.",
+        "Maintenez la pression 5 secondes.",
+        "Répétez sur les côtés et à l'arrière de la tête."
+      ]
+    },
+    "tabletop_wrist_rocking": {
+      "name": "Basculements de Poignets à Quatre Pattes",
+      "description": "Restaure l'extension du poignet et la tolérance aux appuis pour les pompes et le yoga.",
+      "instructions": [
+        "À quatre pattes, doigts bien écartés vers l'avant.",
+        "Basculez doucement le buste vers l'avant pour étirer les avant-bras.",
+        "Tournez les mains doigts vers l'extérieur et balancez de gauche à droite.",
+        "Tournez les mains doigts vers les genoux et reculez doucement le bassin."
+      ]
+    },
+    "prayer_wrist_stretch": {
+      "name": "Étirement de Prière et Prière Inversée",
+      "description": "Soulage les tensions liées au clavier, le canal carpien et la fatigue des avant-bras.",
+      "instructions": [
+        "Joignez les paumes devant la poitrine, doigts vers le haut (position de prière).",
+        "Descendez doucement les mains en maintenant les paumes en contact.",
+        "Maintenez 15 secondes puis inversez avec le dos des mains collé, doigts vers le bas.",
+        "Ressentez l'étirement sur le dessus des poignets."
+      ]
+    },
+    "wrist_circles_rotations": {
+      "name": "Rotations de Poignets et Glissements Tendineux",
+      "description": "Favorise la lubrification articulaire et libère la raideur des doigts et poignets.",
+      "instructions": [
+        "Croisez les doigts devant la poitrine.",
+        "Faites rouler les poignets en formant des 8 réguliers.",
+        "Écartez largement les doigts puis fermez les poings fermement.",
+        "Effectuez dans les deux sens."
+      ]
+    },
+    "forearm_pronation_supination": {
+      "name": "Pronation et Supination de l'Avant-Bras",
+      "description": "Rééduque le tennis elbow et le golf elbow en renforçant les tendons rotateurs de l'avant-bras.",
+      "instructions": [
+        "Asseyez-vous avec l'avant-bras sur une table, coude fléchi à 90 degrés.",
+        "Tenez un objet léger par sa base.",
+        "Tournez lentement l'avant-bras vers l'extérieur, paume vers le haut (supination).",
+        "Contrôlez le retour en tournant vers l'intérieur, paume vers le bas (pronation)."
+      ]
+    },
+    "eccentric_wrist_curls": {
+      "name": "Flexions Excentriques du Poignet",
+      "description": "Travail excentrique ciblé pour la régénération tendineuse dans les épicondylites.",
+      "instructions": [
+        "Posez l'avant-bras sur la cuisse ou une table, main dans le vide paume vers le bas.",
+        "Montez le poignet en vous aidant de l'autre main.",
+        "Descendez la main très lentement en 3 à 4 secondes.",
+        "Répétez 10 à 12 fois puis passez en paume vers le haut."
+      ]
+    },
+    "isometric_towel_squeeze": {
+      "name": "Serrage Isométrique de Serviette",
+      "description": "Développe l'endurance de préhension indolore pour stabiliser l'articulation du coude.",
+      "instructions": [
+        "Roulez une serviette en un cylindre compact.",
+        "Saisissez fermement la serviette à deux mains.",
+        "Serrez le plus fort possible sans douleur pendant 5 à 10 secondes.",
+        "Relâchez doucement, reposez 5 secondes et répétez."
+      ]
+    },
+    "hip_90_90_flow": {
+      "name": "Mobilité de Hanche 90/90",
+      "description": "Améliore la rotation interne et externe de hanche pour protéger les lombaires et les genoux.",
+      "instructions": [
+        "Asseyez-vous au sol avec la jambe avant à 90 degrés et la jambe arrière à 90 degrés.",
+        "Buste droit, penchez-vous doucement sur le tibia avant.",
+        "Maintenez 10 à 15 secondes puis basculez de l'autre côté avec fluidité."
+      ]
+    },
+    "pigeon_stretch": {
+      "name": "Étirement du Pigeon Surélevé",
+      "description": "Étirement profond du fessier et du pyramidal soulageant les tensions du nerf sciatique.",
+      "instructions": [
+        "Placez le tibia avant en travers d'une surface surélevée ou au sol avec un angle confortable.",
+        "Tendez la jambe arrière derrière vous.",
+        "Gardez le bassin droit et penchez-vous vers l'avant dos plat.",
+        "Maintenez 30 à 45 secondes en respirant profondément."
+      ]
+    },
+    "lateral_shuffles": {
+      "name": "Lateral Shuffles",
+      "description": "",
+      "instructions": [
+        "Exécutez avec un mouvement contrôlé."
+      ]
+    },
+    "jump_rope_sim": {
+      "name": "Invisible Jump Rope",
+      "description": "",
+      "instructions": [
+        "Exécutez avec un mouvement contrôlé."
+      ]
+    },
+    "push_ups": {
+      "name": "Push-Ups",
+      "description": "",
+      "instructions": [
+        "Exécutez avec un mouvement contrôlé."
+      ]
+    },
+    "diamond_push_ups": {
+      "name": "Diamond Push-Ups",
+      "description": "",
+      "instructions": [
+        "Exécutez avec un mouvement contrôlé."
+      ]
+    },
+    "decline_push_ups": {
+      "name": "Decline Push-Ups",
+      "description": "",
+      "instructions": [
+        "Exécutez avec un mouvement contrôlé."
+      ]
+    },
+    "pike_push_ups": {
+      "name": "Pike Push-Ups",
+      "description": "",
+      "instructions": [
+        "Exécutez avec un mouvement contrôlé."
+      ]
+    },
+    "dips_chair": {
+      "name": "Chair / Bench Dips",
+      "description": "",
+      "instructions": [
+        "Exécutez avec un mouvement contrôlé."
+      ]
+    },
+    "doorframe_rows": {
+      "name": "Doorframe Rows",
+      "description": "",
+      "instructions": [
+        "Exécutez avec un mouvement contrôlé."
+      ]
+    },
+    "superman_pulls": {
+      "name": "Superman Lat Pulls",
+      "description": "",
+      "instructions": [
+        "Exécutez avec un mouvement contrôlé."
+      ]
+    },
+    "plank_shoulder_taps": {
+      "name": "Plank Shoulder Taps",
+      "description": "",
+      "instructions": [
+        "Exécutez avec un mouvement contrôlé."
+      ]
+    },
+    "inchworm": {
+      "name": "Inchworm Walkouts",
+      "description": "",
+      "instructions": [
+        "Exécutez avec un mouvement contrôlé."
+      ]
+    },
+    "bodyweight_squats": {
+      "name": "Bodyweight Squats",
+      "description": "",
+      "instructions": [
+        "Exécutez avec un mouvement contrôlé."
+      ]
+    },
+    "jump_squats": {
+      "name": "Jump Squats",
+      "description": "",
+      "instructions": [
+        "Exécutez avec un mouvement contrôlé."
+      ]
+    },
+    "walking_lunges": {
+      "name": "Walking Lunges",
+      "description": "",
+      "instructions": [
+        "Exécutez avec un mouvement contrôlé."
+      ]
+    },
+    "single_leg_bridges": {
+      "name": "Single-Leg Glute Bridges",
+      "description": "",
+      "instructions": [
+        "Exécutez avec un mouvement contrôlé."
+      ]
+    },
+    "bear_crawl_hold": {
+      "name": "Bear Crawl Hold",
+      "description": "",
+      "instructions": [
+        "Exécutez avec un mouvement contrôlé."
+      ]
+    },
+    "windshield_wipers": {
+      "name": "Windshield Wipers",
+      "description": "",
+      "instructions": [
+        "Exécutez avec un mouvement contrôlé."
+      ]
     }
   },
   "exercisePicker": {
@@ -836,7 +1291,9 @@
     "searchPlaceholder": "Rechercher un exercice...",
     "chooseExercise": "Bibliothèque",
     "all": "Tous",
-    "noResults": "Aucun exercice trouvé"
+    "noResults": "Aucun exercice trouvé",
+    "emptyTitle": "Aucun exercice trouvé",
+    "emptySubtitle": "Essayez de rechercher une autre articulation, zone ou mot-clé."
   },
   "badges": {
     "first_step_hero": {

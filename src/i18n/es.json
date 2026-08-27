@@ -28,7 +28,11 @@
     "createCustom": "Crear Personalizado",
     "generateAi": "Generar con IA",
     "shareTimerTitle": "Compartir Temporizador: %{name}",
-    "shareMessage": "🔥 ¡Prueba mi rutina personalizada de HIIT \"%{name}\" en Interval!\n\nDetalles del entrenamiento: %{rounds} rondas, %{duration} tiempo total.\n\n1. Descarga Interval:\nApp Store: %{appStoreLink}\nPlay Store: %{playStoreLink}\n\n2. Abre este enlace para cargar el temporizador:\n%{deepLink}"
+    "shareMessage": "🔥 ¡Prueba mi rutina personalizada de HIIT \"%{name}\" en Interval!\n\nDetalles del entrenamiento: %{rounds} rondas, %{duration} tiempo total.\n\n1. Descarga Interval:\nApp Store: %{appStoreLink}\nPlay Store: %{playStoreLink}\n\n2. Abre este enlace para cargar el temporizador:\n%{deepLink}",
+    "workoutsTab": "Entrenamientos",
+    "libraryTab": "Biblioteca",
+    "emptyTitle": "Aún no hay temporizadores",
+    "emptySubtitle": "Crea tu primer temporizador o explora la biblioteca de ejercicios."
   },
   "createTimer": {
     "titleCreate": "Crear Temporizador",
@@ -103,7 +107,9 @@
     "exitTitle": "¿Salir del Entrenamiento?",
     "exitMessage": "Se perderá el progreso de esta sesión.",
     "exitConfirm": "Salir",
-    "exitCancel": "Continuar"
+    "exitCancel": "Continuar",
+    "prep": "Prepárate",
+    "rest": "Descanso"
   },
   "completion": {
     "title": "¡Entrenamiento Completado! ⚡️",
@@ -151,7 +157,8 @@
       "upper": "Tren Superior",
       "lower": "Tren Inferior",
       "abs": "Abdominales & Core",
-      "total": "Cuerpo Completo"
+      "total": "Cuerpo Completo",
+      "corrective": "Fisioterapia"
     },
     "jumping_jacks": {
       "name": "Saltos de Tijera",
@@ -434,12 +441,13 @@
       ]
     },
     "cat_cow": {
-      "name": "Gato y Vaca",
+      "name": "Gato-Vaca para Columna",
+      "description": "Flexión y extensión suave de la columna que hidrata los discos y alivia la rigidez lumbar.",
       "instructions": [
-        "Ponte en cuatro puntos con muñecas bajo hombros y rodillas bajo caderas.",
-        "Inhala arqueando la espalda y mirando al frente (Vaca).",
-        "Exhala redondeando la espalda y llevando la barbilla al pecho (Gato).",
-        "Fluye suavemente al ritmo de tu respiración."
+        "Colócate en cuatro puntos con manos bajo los hombros y rodillas bajo caderas.",
+        "Inhala, arquea la espalda hacia abajo, levanta el pecho y coxis (Vaca).",
+        "Exhala, mete la barbilla y redondea la columna hacia el techo (Gato).",
+        "Muévete con fluidez y respiración profunda."
       ]
     },
     "left_side_quad_stretch": {
@@ -632,12 +640,13 @@
       ]
     },
     "fire_hydrants": {
-      "name": "Bocas de Incendio",
+      "name": "Hidrantes de Cadera (Fire Hydrants)",
+      "description": "Fortalece los abductores laterales de cadera para estabilizar la pelvis al caminar y correr.",
       "instructions": [
-        "Empieza en cuatro puntos sobre una esterilla cómoda.",
-        "Con la rodilla doblada, eleva la pierna lateralmente.",
-        "Trabaja el glúteo medio y abductores.",
-        "Baja despacio y repite."
+        "Comienza en cuatro puntos con manos bajo hombros y rodillas bajo caderas.",
+        "Con la rodilla a 90 grados, levanta la pierna hacia el lado como un perro en una boca de incendios.",
+        "Pausa 1 segundo arriba sin rotar la zona lumbar.",
+        "Baja con control y completa repeticiones antes de cambiar de pierna."
       ]
     },
     "single_leg_rdl": {
@@ -828,6 +837,452 @@
         "Mantén hombros lejos de las orejas y abre el pecho.",
         "Estira la pared abdominal y fortalece la columna."
       ]
+    },
+    "libraryTitle": "Biblioteca de Ejercicios 📚",
+    "librarySubtitle": "Descubre ejercicios y movimientos de fisioterapia",
+    "bodyPartFocus": "Enfoque Corporal",
+    "targetMuscles": "Músculos Objetivo",
+    "aboutAndBenefits": "Acerca de y Beneficios",
+    "instructionsHeading": "Instrucciones y Técnica",
+    "startQuickRoutine": "Iniciar Rutina Rápida",
+    "createCustomWorkout": "Crear Entrenamiento Personalizado",
+    "addToTimer": "Añadir al Temporizador",
+    "searchPlaceholder": "Buscar ejercicios, partes del cuerpo o instrucciones...",
+    "allCategories": "Todos",
+    "allBodyParts": "Todas las Partes",
+    "resultsCount": "%{count} ejercicios",
+    "noExercisesFound": "No se Encontraron Ejercicios",
+    "noExercisesSubtitle": "Intenta buscar otra articulación, parte del cuerpo o palabra clave.",
+    "bodyParts": {
+      "ankle_feet": "Tobillo y Pies",
+      "knees": "Rodillas",
+      "pelvic_floor": "Suelo Pélvico",
+      "lower_back": "Espalda Baja",
+      "upper_back_shoulders": "Espalda Alta y Hombros",
+      "neck": "Cuello",
+      "wrists_hands": "Muñecas y Manos",
+      "elbows_forearms": "Codos y Antebrazos",
+      "hips_glutes": "Caderas y Glúteos",
+      "abs_core": "Abdomen y Core",
+      "chest": "Pecho",
+      "arms": "Brazos"
+    },
+    "tibialis_raises": {
+      "name": "Elevaciones de Tibiales",
+      "description": "Fortalece los músculos de la espinilla para absorber el impacto, aliviar el dolor de espinillas y estabilizar la rodilla.",
+      "instructions": [
+        "Párate con la espalda apoyada contra una pared, pies a unos 30-50 cm.",
+        "Manteniendo las rodillas rectas, levanta los dedos y empeines hacia las espinillas.",
+        "Mantén la contracción arriba durante 1 segundo.",
+        "Baja los pies suavemente al suelo y repite."
+      ]
+    },
+    "ankle_alphabet": {
+      "name": "Alfabeto de Tobillo",
+      "description": "Mejora el rango de movimiento multidireccional, la propiocepción y la rehabilitación tras esguinces de tobillo.",
+      "instructions": [
+        "Siéntate cómodamente con el pie elevado del suelo.",
+        "Apunta con el dedo gordo y traza letras mayúsculas de la A a la Z en el aire.",
+        "Mueve solo la articulación del tobillo, manteniendo la rodilla quieta.",
+        "Realiza un rango completo de movimiento para cada letra."
+      ]
+    },
+    "calf_eccentric_drops": {
+      "name": "Estiramiento de Pantorrilla y Bajadas de Talón",
+      "description": "Descenso excéntrico controlado para fortalecer el tendón de Aquiles y aliviar la tensión en la pantorrilla.",
+      "instructions": [
+        "Párate con la parte delantera de los pies en un escalón, con los talones colgando.",
+        "Sube sobre las puntas de los pies con ambos pies.",
+        "Baja lentamente los talones por debajo del escalón en 3-4 segundos.",
+        "Siente un estiramiento suave en las pantorrillas y vuelve a subir."
+      ]
+    },
+    "toe_heel_walks": {
+      "name": "Caminata de Puntas y Talones",
+      "description": "Fortalece el arco plantar, mejora el equilibrio y restaura la biomecánica de la marcha.",
+      "instructions": [
+        "Camina hacia adelante sobre la punta de los dedos durante 10-15 pasos.",
+        "Cambia a caminar exclusivamente sobre los talones con los dedos levantados.",
+        "Mantén una postura erguida con el abdomen activo en todo momento."
+      ]
+    },
+    "terminal_knee_extensions": {
+      "name": "Extensiones Terminales de Rodilla",
+      "description": "Aísla el vasto medial del cuádriceps para mejorar el alineamiento rotuliano y reducir el dolor de rodilla.",
+      "instructions": [
+        "Párate con una ligera flexión en la rodilla trabajada.",
+        "Aprieta el muslo para extender la rodilla por completo sin hiperextender.",
+        "Mantén la contracción máxima del cuádriceps durante 2 segundos.",
+        "Controla el regreso a una ligera flexión."
+      ]
+    },
+    "straight_leg_raises": {
+      "name": "Elevaciones de Pierna Recta",
+      "description": "Fortalecimiento suave sin carga de los extensores de rodilla y flexores de cadera para proteger la rodilla.",
+      "instructions": [
+        "Acuéstate boca arriba con una rodilla doblada y una pierna recta.",
+        "Flexiona los dedos de la pierna recta hacia la espinilla y tensa el cuádriceps.",
+        "Levanta la pierna recta hasta la altura de la rodilla opuesta.",
+        "Pausa 1 segundo y baja lentamente sin tocar el suelo."
+      ]
+    },
+    "wall_sit_isometric": {
+      "name": "Silla en Pared Isométrica de Rodilla",
+      "description": "Carga isométrica de cuádriceps que estimula el colágeno y alivia la molestia en el tendón rotuliano.",
+      "instructions": [
+        "Apoya la espalda en la pared y deslízate hasta tener las rodillas a 45-90 grados.",
+        "Mantén las rodillas alineadas sobre los tobillos, sin sobrepasar las puntas.",
+        "Presiona la espalda contra la pared y respira con calma.",
+        "Mantén la posición sin rebotar."
+      ]
+    },
+    "step_downs": {
+      "name": "Bajadas Controladas de Escalón",
+      "description": "Desarrolla estabilidad unilateral, desaceleración excéntrica y evita que la rodilla colapse hacia adentro.",
+      "instructions": [
+        "Párate en un escalón bajo con un pie suspendido a un lado.",
+        "Flexiona ligeramente la cadera y dobla la rodilla de apoyo para tocar el suelo con el talón.",
+        "Asegúrate de que la rodilla de apoyo apunte hacia el segundo dedo del pie.",
+        "Empuja con el talón para regresar a la posición inicial."
+      ]
+    },
+    "kegel_holds": {
+      "name": "Contracciones de Kegel",
+      "description": "Activación del suelo pélvico para restaurar la estabilidad del core profundo, continencia y postura.",
+      "instructions": [
+        "Acuéstate boca arriba con las rodillas dobladas y los pies planos.",
+        "Exhala suavemente y contrae el suelo pélvico como si detuvieras el flujo de orina.",
+        "Eleva los músculos hacia adentro y arriba sin apretar los glúteos.",
+        "Mantén durante 5 segundos, relaja 5 segundos y repite."
+      ]
+    },
+    "glute_bridge_pelvic_tilt": {
+      "name": "Puente de Glúteos con Báscula Pélvica",
+      "description": "Alinea la pelvis, fortalece los glúteos y reduce la presión compresiva en la columna lumbar.",
+      "instructions": [
+        "Acuéstate boca arriba con las rodillas flexionadas y los pies al ancho de caderas.",
+        "Aplana la zona lumbar contra la colchoneta con una suave báscula pélvica.",
+        "Empuja con los talones para elevar las caderas hasta formar una línea recta.",
+        "Aprieta los glúteos arriba durante 2 segundos y baja con control."
+      ]
+    },
+    "dead_bugs": {
+      "name": "Bicho Muerto (Dead Bug)",
+      "description": "Estabilización diagonal del core que entrena el refuerzo abdominal manteniendo la columna neutra.",
+      "instructions": [
+        "Acuéstate boca arriba con los brazos hacia el techo y las rodillas a 90 grados.",
+        "Presiona la zona lumbar firmemente contra el suelo.",
+        "Extiende lentamente el brazo derecho hacia atrás y la pierna izquierda hacia adelante.",
+        "Regresa al centro y alterna con las extremidades opuestas."
+      ]
+    },
+    "clamshells_banded": {
+      "name": "Almejas (Clamshells)",
+      "description": "Activa los estabilizadores laterales de cadera para evitar el colapso de rodillas y alinear la pelvis.",
+      "instructions": [
+        "Acuéstate de lado con caderas alineadas, rodillas dobladas a 90 grados y pies juntos.",
+        "Manteniendo los pies en contacto, eleva la rodilla superior sin rotar la cadera hacia atrás.",
+        "Mantén la contracción máxima durante 1 segundo.",
+        "Baja la rodilla lentamente y repite antes de cambiar de lado."
+      ]
+    },
+    "bird_dogs": {
+      "name": "Pájaro-Perro (Bird Dog)",
+      "description": "Ejercicio fundamental de rehabilitación para la resistencia espinal y estabilización cruzada.",
+      "instructions": [
+        "Comienza en cuatro puntos con la columna en posición neutra.",
+        "Extiende el brazo derecho hacia adelante y la pierna izquierda hacia atrás al mismo tiempo.",
+        "Mantén las caderas y hombros paralelos al suelo sin arquear la espalda.",
+        "Mantén durante 2 segundos, regresa suavemente y alterna lados."
+      ]
+    },
+    "prone_press_ups": {
+      "name": "Extensiones McKenzie en Prono",
+      "description": "Protocolo de extensión de McKenzie para aliviar la presión discal y restaurar la lordosis lumbar.",
+      "instructions": [
+        "Acuéstate boca abajo con las manos apoyadas bajo los hombros.",
+        "Relaja los glúteos y la zona lumbar por completo.",
+        "Empuja con las manos para elevar el torso manteniendo la pelvis pegada al suelo.",
+        "Mantén el estiramiento cómodo 2 segundos y baja."
+      ]
+    },
+    "childs_pose_side_reach": {
+      "name": "Postura del Niño con Alcance Lateral",
+      "description": "Descomprime suavemente la columna lumbar, abre la caja torácica y calma espasmos musculares.",
+      "instructions": [
+        "Arrodíllate con los dedos gordos juntos y rodillas separadas.",
+        "Lleva las caderas hacia los talones y extiende los brazos hacia adelante.",
+        "Lleva ambas manos hacia el lado derecho para estirar el lado izquierdo de la espalda.",
+        "Respira hondo unos segundos y cambia hacia el lado izquierdo."
+      ]
+    },
+    "wall_angels": {
+      "name": "Ángeles en Pared",
+      "description": "Corrige la postura de hombros caídos y cabeza adelantada activando los retractores escapulares.",
+      "instructions": [
+        "Párate con talones, glúteos, espalda alta y cabeza apoyados en la pared.",
+        "Coloca codos y dorso de manos contra la pared a 90 grados.",
+        "Desliza lentamente los brazos hacia arriba manteniendo el contacto con la pared.",
+        "Baja deslizando y junta los omóplatos."
+      ]
+    },
+    "thoracic_book_openers": {
+      "name": "Aperturas Torácicas de Lado",
+      "description": "Libera la movilidad rotacional de la espalda media para aliviar la rigidez en cuello y hombros.",
+      "instructions": [
+        "Acuéstate de lado con rodillas dobladas a 90 grados y brazos estirados al frente.",
+        "Inhala y levanta el brazo superior abriéndolo hacia el suelo del lado opuesto.",
+        "Sigue la mano con la mirada, manteniendo las rodillas juntas.",
+        "Pausa respirando profundo en la rotación máxima y cierra los brazos."
+      ]
+    },
+    "ytw_raises": {
+      "name": "Elevaciones Escapulares Y-T-W",
+      "description": "Protocolo de fortalecimiento escapular para estabilizar omóplatos y prevenir lesiones de manguito rotador.",
+      "instructions": [
+        "Inclina el torso hacia adelante con la espalda recta.",
+        "Forma una 'Y' con los brazos y pulgares hacia arriba, apretando omóplatos hacia abajo.",
+        "Abre los brazos a los lados formando una 'T' con pulgares arriba.",
+        "Dobla los codos en forma de 'W' y junta firmemente los omóplatos."
+      ]
+    },
+    "band_pull_aparts": {
+      "name": "Aperturas de Retracción Escapular",
+      "description": "Fortalece la postura de la espalda alta para contrarrestar la postura sedentaria de oficina.",
+      "instructions": [
+        "Párate derecho sosteniendo una banda ligera al ancho de los hombros.",
+        "Mantén los brazos rectos y separa las manos hacia los lados abriendo el pecho.",
+        "Enfócate en juntar los omóplatos.",
+        "Controla el regreso a la posición inicial."
+      ]
+    },
+    "chin_tucks": {
+      "name": "Retracciones de Barbilla (Chin Tucks)",
+      "description": "Ejercicio principal para corregir el cuello adelantado por pantallas y aliviar dolores tensionales de cabeza.",
+      "instructions": [
+        "Siéntate o párate erguido con los hombros relajados.",
+        "Mira al frente y retrae suavemente la barbilla hacia atrás (creando papada).",
+        "Siente una ligera elongación en la base del cráneo sin inclinar la cabeza.",
+        "Mantén 3-5 segundos, relaja y repite."
+      ]
+    },
+    "lateral_neck_stretch": {
+      "name": "Estiramiento Lateral de Cuello",
+      "description": "Alivia de forma segura la tensión muscular crónica a los lados del cuello.",
+      "instructions": [
+        "Siéntate erguido y ancla la mano derecha debajo de la silla.",
+        "Inclina suavemente la oreja izquierda hacia el hombro izquierdo sin forzar.",
+        "Usa la mano izquierda como guía ligera si es cómodo.",
+        "Respira profundo durante 20-30 segundos y cambia de lado."
+      ]
+    },
+    "isometric_neck_press": {
+      "name": "Resistencia Isométrica de Cuello",
+      "description": "Construye estabilidad cervical multidireccional sin movimientos articulares dolorosos.",
+      "instructions": [
+        "Coloca la palma de la mano en la frente.",
+        "Empuja suavemente la frente contra la palma resistiendo para que la cabeza no se mueva.",
+        "Mantén la presión isométrica durante 5 segundos.",
+        "Repite a los lados y detrás de la cabeza."
+      ]
+    },
+    "tabletop_wrist_rocking": {
+      "name": "Balanceos de Muñeca en Cuatro Puntos",
+      "description": "Restaura la extensión de muñeca y la tolerancia a la carga para flexiones y levantamientos.",
+      "instructions": [
+        "Comienza en cuatro puntos con dedos separados apuntando al frente.",
+        "Balancéate suavemente hacia adelante sobre las muñecas para estirar antebrazos.",
+        "Gira las manos con dedos hacia los lados y balancéate de lado a lado.",
+        "Gira las manos apuntando a las rodillas y lleva las caderas ligeramente hacia atrás."
+      ]
+    },
+    "prayer_wrist_stretch": {
+      "name": "Estiramiento de Oración y Oración Invertida",
+      "description": "Alivia la fatiga por teclado, tensión del túnel carpiano y rigidez en antebrazos.",
+      "instructions": [
+        "Une las palmas frente al pecho con dedos hacia arriba (posición de oración).",
+        "Baja lentamente las manos manteniendo las palmas juntas.",
+        "Mantén 15 segundos y junta el dorso de las manos con dedos apuntando hacia abajo.",
+        "Siente el estiramiento suave sobre el dorso de las muñecas."
+      ]
+    },
+    "wrist_circles_rotations": {
+      "name": "Círculos de Muñeca y Deslizamiento Tendinoso",
+      "description": "Promueve la lubricación articular y libera la rigidez en tendones de dedos y muñecas.",
+      "instructions": [
+        "Entrelaza los dedos frente al pecho.",
+        "Gira las muñecas dibujando suaves ochos continuos.",
+        "Abre bien las manos separando dedos y luego cierra en puños firmes.",
+        "Realiza el movimiento en ambas direcciones."
+      ]
+    },
+    "forearm_pronation_supination": {
+      "name": "Pronación y Supinación de Antebrazo",
+      "description": "Rehabilita el codo de tenista y golfista fortaleciendo los tendones rotadores del antebrazo.",
+      "instructions": [
+        "Siéntate con el antebrazo apoyado en una mesa y codo a 90 grados.",
+        "Sujeta un objeto ligero por la base.",
+        "Gira lentamente el antebrazo hacia afuera con la palma hacia arriba (supinación).",
+        "Controla el regreso girando hacia adentro con la palma hacia abajo (pronación)."
+      ]
+    },
+    "eccentric_wrist_curls": {
+      "name": "Flexiones Excéntricas de Muñeca",
+      "description": "Carga excéntrica basada en evidencia para la recuperación tendinosa en epicondilitis.",
+      "instructions": [
+        "Apoya el antebrazo en el muslo o mesa con la mano colgando palma abajo.",
+        "Eleva la muñeca ayudándote con la otra mano.",
+        "Baja la mano lentamente bajo control durante 3-4 segundos.",
+        "Repite 10-12 veces antes de cambiar con la palma hacia arriba."
+      ]
+    },
+    "isometric_towel_squeeze": {
+      "name": "Compresión Isométrica de Toalla",
+      "description": "Desarrolla fuerza de agarre isométrica sin dolor para estabilizar el codo.",
+      "instructions": [
+        "Enrolla una toalla de mano en un cilindro firme.",
+        "Sujeta la toalla con ambas manos.",
+        "Aprieta con firmeza sin dolor durante 5-10 segundos.",
+        "Suelta lentamente, descansa 5 segundos y repite."
+      ]
+    },
+    "hip_90_90_flow": {
+      "name": "Movilidad de Cadera 90/90",
+      "description": "Aumenta la rotación interna y externa de la cadera para proteger la zona lumbar y rodillas.",
+      "instructions": [
+        "Siéntate en el suelo con la pierna delantera a 90 grados al frente y la trasera a 90 grados al lado.",
+        "Mantén el pecho erguido e inclínate suavemente sobre la espinilla delantera.",
+        "Mantén 10-15 segundos y cambia de lado con fluidez sin apoyar manos si es posible."
+      ]
+    },
+    "pigeon_stretch": {
+      "name": "Estiramiento de Paloma Elevado",
+      "description": "Estiramiento profundo de glúteos y piramidal que alivia la tensión del nervio ciático.",
+      "instructions": [
+        "Coloca la espinilla delantera sobre una superficie elevada o colchoneta con la rodilla cómoda.",
+        "Extiende la pierna trasera recta hacia atrás.",
+        "Mantén las caderas alineadas e inclínate desde la cadera con la espalda recta.",
+        "Mantén 30-45 segundos respirando profundamente."
+      ]
+    },
+    "lateral_shuffles": {
+      "name": "Lateral Shuffles",
+      "description": "",
+      "instructions": [
+        "Realizar con forma controlada."
+      ]
+    },
+    "jump_rope_sim": {
+      "name": "Invisible Jump Rope",
+      "description": "",
+      "instructions": [
+        "Realizar con forma controlada."
+      ]
+    },
+    "push_ups": {
+      "name": "Push-Ups",
+      "description": "",
+      "instructions": [
+        "Realizar con forma controlada."
+      ]
+    },
+    "diamond_push_ups": {
+      "name": "Diamond Push-Ups",
+      "description": "",
+      "instructions": [
+        "Realizar con forma controlada."
+      ]
+    },
+    "decline_push_ups": {
+      "name": "Decline Push-Ups",
+      "description": "",
+      "instructions": [
+        "Realizar con forma controlada."
+      ]
+    },
+    "pike_push_ups": {
+      "name": "Pike Push-Ups",
+      "description": "",
+      "instructions": [
+        "Realizar con forma controlada."
+      ]
+    },
+    "dips_chair": {
+      "name": "Chair / Bench Dips",
+      "description": "",
+      "instructions": [
+        "Realizar con forma controlada."
+      ]
+    },
+    "doorframe_rows": {
+      "name": "Doorframe Rows",
+      "description": "",
+      "instructions": [
+        "Realizar con forma controlada."
+      ]
+    },
+    "superman_pulls": {
+      "name": "Superman Lat Pulls",
+      "description": "",
+      "instructions": [
+        "Realizar con forma controlada."
+      ]
+    },
+    "plank_shoulder_taps": {
+      "name": "Plank Shoulder Taps",
+      "description": "",
+      "instructions": [
+        "Realizar con forma controlada."
+      ]
+    },
+    "inchworm": {
+      "name": "Inchworm Walkouts",
+      "description": "",
+      "instructions": [
+        "Realizar con forma controlada."
+      ]
+    },
+    "bodyweight_squats": {
+      "name": "Bodyweight Squats",
+      "description": "",
+      "instructions": [
+        "Realizar con forma controlada."
+      ]
+    },
+    "jump_squats": {
+      "name": "Jump Squats",
+      "description": "",
+      "instructions": [
+        "Realizar con forma controlada."
+      ]
+    },
+    "walking_lunges": {
+      "name": "Walking Lunges",
+      "description": "",
+      "instructions": [
+        "Realizar con forma controlada."
+      ]
+    },
+    "single_leg_bridges": {
+      "name": "Single-Leg Glute Bridges",
+      "description": "",
+      "instructions": [
+        "Realizar con forma controlada."
+      ]
+    },
+    "bear_crawl_hold": {
+      "name": "Bear Crawl Hold",
+      "description": "",
+      "instructions": [
+        "Realizar con forma controlada."
+      ]
+    },
+    "windshield_wipers": {
+      "name": "Windshield Wipers",
+      "description": "",
+      "instructions": [
+        "Realizar con forma controlada."
+      ]
     }
   },
   "exercisePicker": {
@@ -836,7 +1291,9 @@
     "searchPlaceholder": "Buscar ejercicios...",
     "chooseExercise": "Biblioteca",
     "all": "Todos",
-    "noResults": "No se encontraron ejercicios"
+    "noResults": "No se encontraron ejercicios",
+    "emptyTitle": "No se encontraron ejercicios",
+    "emptySubtitle": "Intenta buscar otra articulación, parte del cuerpo o palabra clave."
   },
   "badges": {
     "first_step_hero": {

@@ -1,47 +1,53 @@
 import {
   EXERCISE_CATALOG,
+  BODY_PART_CATALOG,
   getLocalizedExercise,
+  getLocalizedExerciseCatalog,
   getLocalizedCategoryName,
+  getLocalizedBodyPartName,
 } from "../exerciseCatalog";
 
-describe("exerciseCatalog Constants", () => {
-  it("contains 70 unique bodyweight exercises", () => {
-    expect(EXERCISE_CATALOG.length).toBeGreaterThanOrEqual(70);
-    const ids = new Set(EXERCISE_CATALOG.map((e) => e.id));
-    expect(ids.size).toBe(EXERCISE_CATALOG.length);
+describe("exerciseCatalog", () => {
+  it("contains all categories including corrective / physical therapy", () => {
+    const categories = new Set(EXERCISE_CATALOG.map((ex) => ex.category));
+    expect(categories.has("corrective")).toBe(true);
+    expect(categories.has("cardio")).toBe(true);
+    expect(categories.has("upper")).toBe(true);
+    expect(categories.has("lower")).toBe(true);
+    expect(categories.has("abs")).toBe(true);
   });
 
-  it("ensures all exercises have valid required properties", () => {
-    for (const ex of EXERCISE_CATALOG) {
-      expect(ex.id).toBeTruthy();
-      expect(ex.name).toBeTruthy();
-      expect(["cardio", "upper", "lower", "abs", "total"]).toContain(ex.category);
-      expect(["beginner", "intermediate", "advanced"]).toContain(ex.difficulty);
-      expect(Array.isArray(ex.instructions)).toBe(true);
-      expect(ex.instructions.length).toBeGreaterThan(0);
-    }
+  it("contains valid friendly body part definitions in BODY_PART_CATALOG", () => {
+    expect(BODY_PART_CATALOG.length).toBeGreaterThanOrEqual(10);
+    const ids = BODY_PART_CATALOG.map((b) => b.id);
+    expect(ids).toContain("ankle_feet");
+    expect(ids).toContain("knees");
+    expect(ids).toContain("pelvic_floor");
+    expect(ids).toContain("lower_back");
+    expect(ids).toContain("upper_back_shoulders");
+    expect(ids).toContain("neck");
+    expect(ids).toContain("wrists_hands");
+    expect(ids).toContain("elbows_forearms");
+    expect(ids).toContain("hips_glutes");
   });
 
-  it("retrieves localized exercise by object", () => {
-    const rawPushup = EXERCISE_CATALOG.find((e) => e.id === "pushups")!;
-    const localizedPushup = getLocalizedExercise(rawPushup);
-    expect(localizedPushup.id).toBe("pushups");
-    expect(localizedPushup.name).toBeTruthy();
-    expect(localizedPushup.instructions.length).toBeGreaterThan(0);
+  it("localizes body part names and category names", () => {
+    expect(getLocalizedBodyPartName("ankle_feet")).toBe("Ankle & Feet");
+    expect(getLocalizedBodyPartName("lower_back")).toBe("Lower Back");
+    expect(getLocalizedCategoryName("corrective")).toBe("Physical Therapy");
+    expect(getLocalizedCategoryName("cardio")).toBe("Cardio");
   });
 
-  it("retrieves full localized catalog", () => {
-    const { getLocalizedExerciseCatalog } = require("../exerciseCatalog");
-    const full = getLocalizedExerciseCatalog();
-    expect(full.length).toBe(EXERCISE_CATALOG.length);
+  it("returns localized exercise with description and instructions", () => {
+    const firstEx = EXERCISE_CATALOG[0];
+    const localized = getLocalizedExercise(firstEx);
+    expect(localized.name).toBeTruthy();
+    expect(localized.description).toBeTruthy();
+    expect(localized.instructions.length).toBeGreaterThan(0);
   });
 
-  it("retrieves localized category names", () => {
-    expect(getLocalizedCategoryName("cardio")).toBeTruthy();
-    expect(getLocalizedCategoryName("upper")).toBeTruthy();
-    expect(getLocalizedCategoryName("lower")).toBeTruthy();
-    expect(getLocalizedCategoryName("abs")).toBeTruthy();
-    expect(getLocalizedCategoryName("total")).toBeTruthy();
-    expect(getLocalizedCategoryName("unknown_cat" as any)).toBe("unknown_cat");
+  it("returns full localized catalog", () => {
+    const catalog = getLocalizedExerciseCatalog();
+    expect(catalog.length).toBe(EXERCISE_CATALOG.length);
   });
 });

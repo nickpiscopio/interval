@@ -11,7 +11,7 @@ describe("ExercisePickerModal Component", () => {
     expect(getByPlaceholderText("Search exercises...")).toBeTruthy();
     expect(getByText("All")).toBeTruthy();
     expect(getAllByText("Cardio").length).toBeGreaterThan(0);
-    expect(getByText("Jumping Jacks")).toBeTruthy();
+    expect(getByText("Tibialis Raises")).toBeTruthy();
   });
 
   it("filters exercises by search query", () => {
@@ -23,21 +23,31 @@ describe("ExercisePickerModal Component", () => {
     fireEvent.changeText(searchInput, "burpee");
 
     expect(getByText("Burpees")).toBeTruthy();
-    expect(queryByText("Jumping Jacks")).toBeNull();
+    expect(queryByText("Tibialis Raises")).toBeNull();
   });
 
-  it("filters exercises by category chip", () => {
+  it("filters exercises by category and body part chip", () => {
     const { getByText, getAllByText } = render(
       <ExercisePickerModal visible={true} onClose={jest.fn()} onSelect={jest.fn()} />
     );
 
     const upperCategory = getByText("Upper Body");
     fireEvent.press(upperCategory);
-
     expect(getByText("Push-Ups")).toBeTruthy();
+
+    const ptCategory = getByText("Physical Therapy");
+    fireEvent.press(ptCategory);
+    expect(getByText("Tibialis Raises")).toBeTruthy();
+
+    const allBodyParts = getByText("All Body Parts");
+    fireEvent.press(allBodyParts);
+
+    const ankleChip = getAllByText("Ankle & Feet")[0];
+    fireEvent.press(ankleChip);
+    expect(getByText("Tibialis Raises")).toBeTruthy();
   });
 
-  it("calls onSelect and onClose when exercise is tapped", () => {
+  it("opens detail modal and calls onSelect and onClose when Add to Timer is pressed", () => {
     const onSelect = jest.fn();
     const onClose = jest.fn();
 
@@ -45,8 +55,12 @@ describe("ExercisePickerModal Component", () => {
       <ExercisePickerModal visible={true} onClose={onClose} onSelect={onSelect} />
     );
 
-    const exerciseItem = getByText("Jumping Jacks");
+    const exerciseItem = getByText("Tibialis Raises");
     fireEvent.press(exerciseItem);
+
+    expect(getByText("Add to Timer")).toBeTruthy();
+    const addBtn = getByText("Add to Timer");
+    fireEvent.press(addBtn);
 
     expect(onSelect).toHaveBeenCalled();
     expect(onClose).toHaveBeenCalled();
