@@ -1,0 +1,385 @@
+{
+  "common": {
+    "appName": "Interval",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "done": "Done",
+    "close": "Close",
+    "share": "Share",
+    "rounds": "Rounds",
+    "round": "Round",
+    "totalTime": "Total Time",
+    "duration": "Duration",
+    "sec": "sec",
+    "min": "min",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK"
+  },
+  "selectTimer": {
+    "greeting": "Let's Workout! ⚡️",
+    "subGreeting": "Choose or generate a HIIT timer to start",
+    "noTimersTitle": "No Timers Yet",
+    "noTimersText": "Build your custom intervals or let the AI coach design a workout for you.",
+    "createCustom": "Create Custom",
+    "generateAi": "Generate with AI",
+    "shareTimerTitle": "Share Timer: %{name}",
+    "shareMessage": "🔥 Try my custom HIIT workout \"%{name}\" on Interval!\n\nWorkout details: %{rounds} rounds, %{duration} total time.\n\n1. Download Interval:\nApp Store: %{appStoreLink}\nPlay Store: %{playStoreLink}\n\n2. Open this link to load the timer:\n%{deepLink}"
+  },
+  "createTimer": {
+    "titleCreate": "Create Timer",
+    "titleEdit": "Edit Timer",
+    "namePlaceholder": "Workout Name (e.g. Morning Blast)",
+    "rounds": "Rounds",
+    "intervals": "Intervals",
+    "addInterval": "Add Interval",
+    "intervalNamePlaceholder": "Interval name",
+    "seconds": "seconds",
+    "saveWorkout": "Save Workout",
+    "deleteWorkout": "Delete Workout",
+    "deleteConfirmTitle": "Delete Timer",
+    "deleteConfirmMessage": "Are you sure you want to delete \"%{name}\"?",
+    "chooseExercise": "Choose Exercise",
+    "searchExercisePlaceholder": "Search exercises...",
+    "exerciseCatalog": "Exercise Catalog",
+    "noExercisesFound": "No exercises found matching your search.",
+    "validationNameRequired": "Please enter a name for your timer.",
+    "validationIntervalRequired": "Please add at least one interval.",
+    "validationDurationRequired": "All intervals must have a duration greater than 0."
+  },
+  "generateTimer": {
+    "title": "AI Workout Generator",
+    "description": "Tell us a little about what you are looking for to allow Interval's AI to create a custom bodyweight exercise timer for you!",
+    "goalQuestion": "What is your fitness goal?",
+    "goalWeightLoss": "Lose weight",
+    "goalTone": "Get toned",
+    "goalBulk": "Bulk up",
+    "areaQuestion": "What would you like to exercise?",
+    "areaTotal": "Total body",
+    "areaAbs": "Abs",
+    "areaLower": "Lower body",
+    "areaCardio": "Cardio",
+    "areaUpper": "Upper body",
+    "areaSurprise": "Surprise me!",
+    "experienceQuestion": "What is your fitness experience?",
+    "experienceBeginner": "Beginner",
+    "experienceIntermediate": "Intermediate",
+    "experienceAdvanced": "Advanced",
+    "generateButton": "Generate Timer",
+    "loadingTitle": "Coaching Engine Active...",
+    "loadingSubtitle": "Designing a custom bodyweight HIIT routine tailored to your goals."
+  },
+  "timerGenerator": {
+    "rest": "Rest",
+    "goalWeightLoss": "Fat Burn",
+    "goalTone": "Tone & Sculpt",
+    "goalBulk": "Strength Boost",
+    "areaTotal": "Full Body",
+    "areaAbs": "Core Focus",
+    "areaLower": "Lower Body",
+    "areaUpper": "Upper Body",
+    "areaCardio": "HIIT Cardio",
+    "areaSurprise": "Custom Blast",
+    "diffBeginner": "Beginner",
+    "diffIntermediate": "Int.",
+    "diffAdvanced": "Pro",
+    "timerName": "%{difficulty} %{area} %{goal}"
+  },
+  "timer": {
+    "roundOf": "Round %{current} of %{total}",
+    "nextUp": "NEXT UP",
+    "workoutComplete": "Workout Complete!",
+    "exitTitle": "Leave Workout?",
+    "exitMessage": "Your progress for this workout will be lost.",
+    "exitConfirm": "Leave",
+    "exitCancel": "Keep Going"
+  },
+  "completion": {
+    "title": "Workout Complete! ⚡️",
+    "subtitle": "You crushed \"%<name>s\"!",
+    "totalTime": "Total Time",
+    "intervalsCompleted": "Intervals Completed",
+    "roundsFinished": "Rounds Finished",
+    "newBadgeUnlocked": "New Award Unlocked!",
+    "doneButton": "Back to Timers",
+    "shareWorkout": "Share Workout",
+    "shareBadge": "Share Badge",
+    "shareWorkoutTitle": "Share Workout: %{name}",
+    "shareMessage": "I just smashed my workout using Interval! ⚡️\n\nTimer: \"%{name}\" (%{rounds} rounds, %{duration} duration)%{streakText}%{badgeText}\n\n1. Download the app:\nApp Store: %{appStoreLink}\nPlay Store: %{playStoreLink}\n\n2. Open this link to load the timer:\n%{deepLink}",
+    "shareStreakText": "\nStreak: 🔥 %{streak}-Day Streak",
+    "shareBadgeText": "\nUnlocked: 🏆 %{badges}",
+    "shareBadgeMessage": "🏆 I just earned the \"%{name}\" badge%{streakText} on Interval!\n\n\"%{description}\"\n\nCrush your fitness goals with custom HIIT interval timers:\nApp Store: %{appStoreLink}\nPlay Store: %{playStoreLink}"
+  },
+  "awards": {
+    "title": "Trophy Room",
+    "statsTitle": "Workout Stats",
+    "currentStreak": "Current Streak",
+    "longestStreak": "Longest Streak",
+    "totalWorkouts": "Workouts",
+    "totalTime": "Sweat Time",
+    "inviteBannerTitle": "Workout With Friends",
+    "inviteBannerSubtitle": "Share custom timers or invite your workout buddy to unlock exclusive viral sharing badges!",
+    "inviteButton": "Invite Friends",
+    "unlockedCount": "%{unlocked} of %{total} Unlocked",
+    "locked": "Locked",
+    "unlockedOn": "Unlocked on %{date}",
+    "howToUnlock": "How to Unlock",
+    "shareBadge": "Share Achievement",
+    "shareAppTitle": "Join me on Interval",
+    "shareAppMessage": "🔥 Join me on Interval — the cleanest, most powerful HIIT timer for workouts and training!\n\nDownload for free:\nApp Store: %{appStoreLink}\nPlay Store: %{playStoreLink}"
+  },
+  "exercises": {
+    "categories": {
+      "cardio": "Cardio",
+      "upper": "Upper Body",
+      "lower": "Lower Body",
+      "abs": "Abs & Core",
+      "total": "Full Body"
+    },
+    "jumping_jacks": {
+      "name": "Jumping Jacks",
+      "instructions": [
+        "Stand upright with your feet together and arms at your sides.",
+        "Jump up, spreading your feet wider than shoulder-width while raising your arms above your head.",
+        "Jump again to return to the starting position.",
+        "Repeat rhythmically at a steady pace."
+      ]
+    },
+    "pushups": {
+      "name": "Pushups",
+      "instructions": [
+        "Place your hands on the floor slightly wider than shoulder-width.",
+        "Extend your legs straight behind you, supporting weight on toes.",
+        "Lower your body until your chest nearly touches the floor.",
+        "Push yourself back up to the starting position."
+      ]
+    },
+    "squats": {
+      "name": "Air Squats",
+      "instructions": [
+        "Stand with feet shoulder-width apart, toes pointing slightly out.",
+        "Lower your hips back and down as if sitting in a chair.",
+        "Keep your chest upright and knees behind your toes.",
+        "Drive through your heels to return to standing."
+      ]
+    },
+    "plank": {
+      "name": "Forearm Plank",
+      "instructions": [
+        "Place your forearms on the floor, elbows aligned under shoulders.",
+        "Extend your body in a straight line from head to heels.",
+        "Engage your core, glutes, and thighs.",
+        "Hold this position without letting your hips sag."
+      ]
+    },
+    "burpees": {
+      "name": "Burpees",
+      "instructions": [
+        "Start in a standing position.",
+        "Drop into a squat with hands on the ground.",
+        "Kick your feet back into a pushup position.",
+        "Immediately return your feet to the squat position.",
+        "Jump up explosively, reaching hands overhead."
+      ]
+    },
+    "mountain_climbers": {
+      "name": "Mountain Climbers",
+      "instructions": [
+        "Begin in a high plank position.",
+        "Drive one knee toward your chest, then return it.",
+        "Immediately switch to drive the other knee forward.",
+        "Keep your back flat and run your knees as fast as possible."
+      ]
+    },
+    "crunches": {
+      "name": "Abdominal Crunches",
+      "instructions": [
+        "Lie on your back with knees bent and feet flat on the floor.",
+        "Place your hands lightly behind your head.",
+        "Engage your abs and lift your shoulders off the floor.",
+        "Lower back down slowly, keeping tension in your core."
+      ]
+    },
+    "lunges": {
+      "name": "Alternating Lunges",
+      "instructions": [
+        "Stand tall with feet hip-width apart.",
+        "Step forward with one leg and lower your hips.",
+        "Both knees should bend at 90-degree angles.",
+        "Push off your front foot to return to standing, then switch legs."
+      ]
+    },
+    "pike_pushups": {
+      "name": "Pike Pushups",
+      "instructions": [
+        "Start in a downward dog position with hips high.",
+        "Bend your elbows to lower the top of your head toward the floor.",
+        "Push through your shoulders to return to the starting position.",
+        "Keep your core tight and neck neutral."
+      ]
+    },
+    "russian_twists": {
+      "name": "Russian Twists",
+      "instructions": [
+        "Sit on the floor, bend your knees, and lean back slightly.",
+        "Lift your feet off the floor and balance on your tailbone.",
+        "Interlock your hands and twist your torso from side to side.",
+        "Touch the ground beside your hip on each twist."
+      ]
+    }
+  },
+  "badges": {
+    "first_step_hero": {
+      "name": "First Step Hero",
+      "tagline": "The adventure begins!",
+      "description": "Completed your very first workout. The hardest part is starting!"
+    },
+    "back_to_back_beast": {
+      "name": "Back-to-Back Beast",
+      "tagline": "No fluke here!",
+      "description": "Completed a 2-day workout streak. Day 1 was no accident—double trouble!"
+    },
+    "spaghetti_legs": {
+      "name": "Spaghetti Legs",
+      "tagline": "Wobbly but victorious!",
+      "description": "Crushed a 3-day workout streak. Your legs may be pasta, but your spirit is iron!"
+    },
+    "workweek_warrior": {
+      "name": "Workweek Warrior",
+      "tagline": "Monday to Friday crushed!",
+      "description": "Achieved a 5-day workout streak. You conquered the entire working week with sweat!"
+    },
+    "sweat_monster": {
+      "name": "Sweat Monster",
+      "tagline": "7 days of pure heat!",
+      "description": "Achieved a full 7-day workout streak. You are officially unstoppable."
+    },
+    "fortnight_of_fire": {
+      "name": "Fortnight of Fire",
+      "tagline": "Two weeks blazing!",
+      "description": "Maintained a 14-day workout streak. Two uninterrupted weeks of pure momentum!"
+    },
+    "habit_machine": {
+      "name": "Habit Machine",
+      "tagline": "Hardwired for gains!",
+      "description": "Reached a 21-day workout streak. Science says 21 days builds a habit—you are automatic!"
+    },
+    "unstoppable_dynamo": {
+      "name": "Unstoppable Dynamo",
+      "tagline": "30-day legendary status!",
+      "description": "Maintained a 30-day workout streak. You've forged a superpower habit!"
+    },
+    "iron_will": {
+      "name": "Iron Will",
+      "tagline": "Unbreakable discipline!",
+      "description": "Maintained a 60-day workout streak. Two solid months of relentless determination!"
+    },
+    "quarterly_crusher": {
+      "name": "Quarterly Crusher",
+      "tagline": "Quarter of greatness!",
+      "description": "Reached a 90-day workout streak. 3 solid months of cardio supremacy!"
+    },
+    "half_year_hero": {
+      "name": "Half-Year Hero",
+      "tagline": "Halfway to immortality!",
+      "description": "Achieved a 180-day workout streak. 6 continuous months of crushing it daily!"
+    },
+    "sun_god_of_sweat": {
+      "name": "Sun God of Sweat",
+      "tagline": "A full orbit of gains!",
+      "description": "A legendary 365-day workout streak. A full year without missing a beat—fitness deity status!"
+    },
+    "weekend_warrior": {
+      "name": "Weekend Warrior",
+      "tagline": "No days off for greatness!",
+      "description": "Completed workouts on both Saturday and Sunday in the same weekend."
+    },
+    "ten_minute_tornado": {
+      "name": "Ten-Minute Tornado",
+      "tagline": "Double-digit endurance!",
+      "description": "Clocked 10 total minutes of high-intensity sweat time."
+    },
+    "hour_of_power": {
+      "name": "Hour of Power",
+      "tagline": "60 minutes of greatness!",
+      "description": "Completed 60 total minutes of cumulative interval training."
+    },
+    "century_club": {
+      "name": "Century Club",
+      "tagline": "100 intervals conquered!",
+      "description": "Powered through 100 total individual workout intervals."
+    },
+    "early_bird": {
+      "name": "Early Bird Gets the Sweat",
+      "tagline": "Rise and shine champion!",
+      "description": "Completed a workout before 8:00 AM. Winning before the day even starts!"
+    },
+    "night_owl": {
+      "name": "Night Owl Burn",
+      "tagline": "Midnight grind mode!",
+      "description": "Completed a workout after 8:00 PM. Lighting up the night with sweat!"
+    },
+    "iron_lungs": {
+      "name": "Iron Lungs",
+      "tagline": "Endurance beast!",
+      "description": "Completed a grueling workout session with 5 or more rounds."
+    },
+    "custom_creator": {
+      "name": "Custom Creator",
+      "tagline": "Master architect!",
+      "description": "Built and finished your own custom crafted interval timer."
+    },
+    "megaphone_maestro": {
+      "name": "Megaphone Maestro",
+      "tagline": "Spread the good word!",
+      "description": "Shared your very first workout, timer, or badge with the world."
+    },
+    "squad_recruiter": {
+      "name": "Squad Recruiter",
+      "tagline": "Misery loves company!",
+      "description": "Shared a workout or custom timer directly to a friend via Messages/SMS."
+    },
+    "chain_letter_of_gains": {
+      "name": "Chain Letter of Gains",
+      "tagline": "Forward or skip leg day!",
+      "description": "Shared an interval timer via Email or direct invite link."
+    },
+    "hype_machine": {
+      "name": "Hype Machine",
+      "tagline": "Contagious energy!",
+      "description": "Shared 5 workouts, badges, or timers with friends."
+    },
+    "sweat_influencer": {
+      "name": "Sweat Influencer",
+      "tagline": "Basically famous!",
+      "description": "Shared 10 times across your fitness network. Influencer status unlocked!"
+    },
+    "chief_fitness_officer": {
+      "name": "Chief Fitness Officer",
+      "tagline": "Promoted to management!",
+      "description": "Shared 25 times! Leading the charge to get everyone moving."
+    },
+    "viral_phenomenon": {
+      "name": "Viral Phenomenon",
+      "tagline": "Trending everywhere!",
+      "description": "50 total shares! You are officially breaking the fitness internet."
+    },
+    "cult_leader_of_cardio": {
+      "name": "Cult Leader of Cardio",
+      "tagline": "Drink the electrolyte Kool-Aid!",
+      "description": "100 total shares! You've amassed a loyal following of cardio disciples."
+    },
+    "galactic_ambassador": {
+      "name": "Galactic Ambassador of Gains",
+      "tagline": "Spreading HIIT to the stars!",
+      "description": "1,000 shares! Interstellar legend status achieved."
+    },
+    "imported_gains": {
+      "name": "Workout Pen Pal",
+      "tagline": "Shared sweat is best sweat!",
+      "description": "Successfully imported and completed a workout shared by a friend."
+    }
+  }
+}

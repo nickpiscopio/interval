@@ -1,7 +1,7 @@
-import { EXERCISE_CATALOG } from "../constants/exerciseCatalog";
+import { EXERCISE_CATALOG, getLocalizedExercise } from "../constants/exerciseCatalog";
 import { Timer } from "../model/Timer";
 import { Interval, generateIntervalId } from "../model/Interval";
-import { Exercise } from "../model/Exercise";
+import { t } from "../i18n";
 
 export interface GeneratorParams {
   goal: "weight_loss" | "tone" | "bulk";
@@ -88,50 +88,56 @@ export function generateWorkout(params: GeneratorParams): Timer {
     abs: "#8338EC"     // Electric Purple
   };
 
-  selectedExercises.forEach((ex, idx) => {
+  selectedExercises.forEach((rawEx, idx) => {
+    const ex = getLocalizedExercise(rawEx);
     // Add Active Exercise Interval
     intervals.push({
       id: generateIntervalId(),
       name: ex.name,
       duration: activeDuration,
-      color: colorMap[ex.category] || "#1ACC6C",
-      exerciseId: ex.id
+      color: colorMap[rawEx.category] || "#1ACC6C",
+      exerciseId: rawEx.id
     });
 
     // Add Rest Interval (if it is not the very last interval of the loop)
     if (idx < selectedExercises.length - 1) {
       intervals.push({
         id: generateIntervalId(),
-        name: "Rest",
+        name: t("timerGenerator.rest", { defaultValue: "Rest" }),
         duration: restDuration,
         color: "#4B5563" // Slate Gray
       });
     }
   });
 
-  // 5. Generate motivating name
+  // 5. Generate motivating localized name
   const goalNames: Record<string, string> = {
-    weight_loss: "Fat Burn",
-    tone: "Tone & Sculpt",
-    bulk: "Strength Boost"
+    weight_loss: t("timerGenerator.goalWeightLoss", { defaultValue: "Fat Burn" }),
+    tone: t("timerGenerator.goalTone", { defaultValue: "Tone & Sculpt" }),
+    bulk: t("timerGenerator.goalBulk", { defaultValue: "Strength Boost" })
   };
 
   const areaNames: Record<string, string> = {
-    total: "Full Body",
-    abs: "Core Focus",
-    lower: "Lower Body",
-    upper: "Upper Body",
-    cardio: "HIIT Cardio",
-    surprise: "Custom Blast"
+    total: t("timerGenerator.areaTotal", { defaultValue: "Full Body" }),
+    abs: t("timerGenerator.areaAbs", { defaultValue: "Core Focus" }),
+    lower: t("timerGenerator.areaLower", { defaultValue: "Lower Body" }),
+    upper: t("timerGenerator.areaUpper", { defaultValue: "Upper Body" }),
+    cardio: t("timerGenerator.areaCardio", { defaultValue: "HIIT Cardio" }),
+    surprise: t("timerGenerator.areaSurprise", { defaultValue: "Custom Blast" })
   };
 
   const difficultyNames: Record<string, string> = {
-    beginner: "Beginner",
-    intermediate: "Int.",
-    advanced: "Pro"
+    beginner: t("timerGenerator.diffBeginner", { defaultValue: "Beginner" }),
+    intermediate: t("timerGenerator.diffIntermediate", { defaultValue: "Int." }),
+    advanced: t("timerGenerator.diffAdvanced", { defaultValue: "Pro" })
   };
 
-  const timerName = `${difficultyNames[experience]} ${areaNames[area]} ${goalNames[goal]}`;
+  const timerName = t("timerGenerator.timerName", {
+    difficulty: difficultyNames[experience],
+    area: areaNames[area],
+    goal: goalNames[goal],
+    defaultValue: `${difficultyNames[experience]} ${areaNames[area]} ${goalNames[goal]}`
+  });
 
   return {
     id: `ai_${Date.now()}_${Math.floor(Math.random() * 1000)}`,

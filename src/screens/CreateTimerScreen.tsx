@@ -26,6 +26,7 @@ import DraggableFlatList, {
 import { RootStackScreenProps } from "../types";
 import { Timer } from "../model/Timer";
 import { Interval, generateIntervalId, normalizeInterval } from "../model/Interval";
+import { t } from "../i18n";
 import Spacing from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
 import Colors from "../constants/Colors";
@@ -92,7 +93,7 @@ export default function CreateTimerScreen({
   // Dynamic Navigation Header Title
   useEffect(() => {
     const isSaved = Boolean(editTimer && editTimer.createdAt && !isImportMode);
-    const fallbackTitle = isSaved ? "Edit Timer" : "Create Timer";
+    const fallbackTitle = isSaved ? t("createTimer.titleEdit") : t("createTimer.titleCreate");
     const trimmed = timerName.trim();
     navigation.setOptions({
       title: trimmed.length > 0 ? timerName : fallbackTitle,
@@ -130,7 +131,7 @@ export default function CreateTimerScreen({
   function addInterval() {
     const newInterval: Interval = {
       id: generateIntervalId(),
-      name: "Work Interval",
+      name: t("createTimer.addInterval"),
       duration: 30,
       color: COLOR_PALETTE[intervals.length % COLOR_PALETTE.length]
     };
@@ -179,7 +180,7 @@ export default function CreateTimerScreen({
   // Action: Delete Selected Interval
   function deleteSelectedInterval() {
     if (intervals.length <= 1) {
-      Alert.alert("Error", "You must have at least one interval in your timer.");
+      Alert.alert(t("common.appName"), t("createTimer.validationIntervalRequired"));
       return;
     }
     const index = intervals.findIndex((int) => int.id === selectedInterval?.id);
@@ -192,7 +193,7 @@ export default function CreateTimerScreen({
   // Save Timer to local database
   async function saveTimer() {
     if (!timerName.trim()) {
-      Alert.alert("Error", "Please enter a timer name.");
+      Alert.alert(t("common.appName"), t("createTimer.validationNameRequired"));
       return;
     }
 
@@ -221,19 +222,16 @@ export default function CreateTimerScreen({
       }
 
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(savedTimers));
-      Alert.alert("Success", "Timer saved successfully!", [
-        { text: "OK", onPress: () => navigation.popToTop() }
-      ]);
+      navigation.popToTop();
     } catch (e) {
       console.warn("Failed to save timer:", e);
-      Alert.alert("Error", "Failed to save timer. Please try again.");
     }
   }
 
   // Start Timer directly from Timer Details
   function startTimer() {
     if (!timerName.trim()) {
-      Alert.alert("Error", "Please enter a timer name.");
+      Alert.alert(t("common.appName"), t("createTimer.validationNameRequired"));
       return;
     }
 
@@ -259,12 +257,12 @@ export default function CreateTimerScreen({
     if (!editTimer) return;
     
     Alert.alert(
-      "Delete Timer?",
-      "Are you sure you want to delete this entire timer?",
+      t("createTimer.deleteConfirmTitle"),
+      t("createTimer.deleteConfirmMessage", { name: timerName }),
       [
-        { text: "Cancel", style: "cancel" },
+        { text: t("common.cancel"), style: "cancel" },
         {
-          text: "Delete",
+          text: t("common.delete"),
           style: "destructive",
           onPress: async () => {
             try {
@@ -403,10 +401,10 @@ export default function CreateTimerScreen({
           contentContainerStyle={styles.scrollContent}
           ListHeaderComponent={
             <View style={styles.intervalListHeader}>
-              <Text style={styles.sectionTitle}>Intervals</Text>
+              <Text style={styles.sectionTitle}>{t("createTimer.intervals")}</Text>
               <TouchableOpacity style={styles.addIntervalLink} onPress={addInterval}>
                 <Ionicons name="add-circle" size={18} color={Colors.primary} />
-                <Text style={styles.addIntervalLinkText}>Add Interval</Text>
+                <Text style={styles.addIntervalLinkText}>{t("createTimer.addInterval")}</Text>
               </TouchableOpacity>
             </View>
           }
@@ -440,21 +438,21 @@ export default function CreateTimerScreen({
                   }
                 }}
               >
-                <Text style={styles.cardTitle}>Timer Details</Text>
+                <Text style={styles.cardTitle}>{t("createTimer.titleCreate")}</Text>
 
                 <View style={styles.inputRow}>
                   <View style={styles.inputGroup}>
-                    <Text style={styles.inputLabel}>Timer Name</Text>
+                    <Text style={styles.inputLabel}>{t("common.appName")} Name</Text>
                     <TextInput
                       style={styles.textInput}
                       value={timerName}
                       onChangeText={setTimerName}
-                      placeholder="Timer Name"
+                      placeholder={t("createTimer.namePlaceholder")}
                       placeholderTextColor="#9CA3AF"
                     />
                   </View>
                   <View style={[styles.inputGroup, { flex: 0.38 }]}>
-                    <Text style={styles.inputLabel}>Rounds</Text>
+                    <Text style={styles.inputLabel}>{t("createTimer.rounds")}</Text>
                     <View style={styles.roundsControl}>
                       <TouchableOpacity
                         onPress={() => setRounds(Math.max(1, rounds - 1))}
@@ -505,24 +503,24 @@ export default function CreateTimerScreen({
                   }
                 }}
               >
-                <Text style={styles.cardTitle}>Edit Selected Interval</Text>
+                <Text style={styles.cardTitle}>{t("createTimer.titleEdit")}</Text>
 
                 {selectedInterval ? (
                   <>
                     <View style={styles.editorInputRow}>
                       <View style={styles.inputGroup}>
-                        <Text style={styles.inputLabel}>Interval Name</Text>
+                        <Text style={styles.inputLabel}>{t("createTimer.intervalNamePlaceholder")}</Text>
                         <TextInput
                           style={styles.editorTextInput}
                           value={selectedInterval.name}
                           onChangeText={(name) => updateSelectedInterval({ name })}
-                          placeholder="Interval Name"
+                          placeholder={t("createTimer.intervalNamePlaceholder")}
                           placeholderTextColor="#9CA3AF"
                         />
                       </View>
 
                       <View style={[styles.inputGroup, { flex: 0.55 }]}>
-                        <Text style={styles.inputLabel}>Duration</Text>
+                        <Text style={styles.inputLabel}>{t("common.duration")}</Text>
                         <TextInput
                           style={styles.timeInput}
                           value={formatHHMMSS(selectedInterval.duration)}
@@ -534,7 +532,7 @@ export default function CreateTimerScreen({
                       </View>
                     </View>
 
-                    <Text style={styles.label}>Interval Color</Text>
+                    <Text style={styles.label}>{t("createTimer.intervals")} Color</Text>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.colorPalette}>
                       {COLOR_PALETTE.map((color) => {
                         const isSelected = selectedInterval.color === color;
@@ -565,7 +563,7 @@ export default function CreateTimerScreen({
                     </View>
                   </>
                 ) : (
-                  <Text style={styles.noIntervalText}>Select an interval above to edit details.</Text>
+                  <Text style={styles.noIntervalText}>{t("createTimer.validationIntervalRequired")}</Text>
                 )}
               </View>
             </View>
@@ -591,7 +589,7 @@ export default function CreateTimerScreen({
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               >
                 <Ionicons name="chevron-back" size={16} color="#6B7280" />
-                <Text style={styles.navButtonText}>Timer Details</Text>
+                <Text style={styles.navButtonText}>{t("createTimer.titleCreate")}</Text>
               </TouchableOpacity>
             ) : null}
           </View>
@@ -618,7 +616,7 @@ export default function CreateTimerScreen({
                 style={styles.navButtonRight}
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               >
-                <Text style={styles.navButtonText}>Edit Selected Interval</Text>
+                <Text style={styles.navButtonText}>{t("createTimer.titleEdit")}</Text>
                 <Ionicons name="chevron-forward" size={16} color="#6B7280" />
               </TouchableOpacity>
             ) : null}

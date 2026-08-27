@@ -1,0 +1,385 @@
+{
+  "common": {
+    "appName": "Interval",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "done": "Listo",
+    "close": "Cerrar",
+    "share": "Compartir",
+    "rounds": "Rondas",
+    "round": "Ronda",
+    "totalTime": "Tiempo Total",
+    "duration": "Duración",
+    "sec": "seg",
+    "min": "min",
+    "yes": "Sí",
+    "no": "No",
+    "ok": "Aceptar"
+  },
+  "selectTimer": {
+    "greeting": "¡A Entrenar! ⚡️",
+    "subGreeting": "Elige o genera un temporizador HIIT para comenzar",
+    "noTimersTitle": "Aún no hay temporizadores",
+    "noTimersText": "Crea tus intervalos personalizados o deja que el entrenador de IA diseñe una rutina para ti.",
+    "createCustom": "Crear Personalizado",
+    "generateAi": "Generar con IA",
+    "shareTimerTitle": "Compartir Temporizador: %{name}",
+    "shareMessage": "🔥 ¡Prueba mi rutina personalizada de HIIT \"%{name}\" en Interval!\n\nDetalles del entrenamiento: %{rounds} rondas, %{duration} tiempo total.\n\n1. Descarga Interval:\nApp Store: %{appStoreLink}\nPlay Store: %{playStoreLink}\n\n2. Abre este enlace para cargar el temporizador:\n%{deepLink}"
+  },
+  "createTimer": {
+    "titleCreate": "Crear Temporizador",
+    "titleEdit": "Editar Temporizador",
+    "namePlaceholder": "Nombre de la rutina (ej. Energía Matutina)",
+    "rounds": "Rondas",
+    "intervals": "Intervalos",
+    "addInterval": "Añadir Intervalo",
+    "intervalNamePlaceholder": "Nombre del intervalo",
+    "seconds": "segundos",
+    "saveWorkout": "Guardar Rutina",
+    "deleteWorkout": "Eliminar Rutina",
+    "deleteConfirmTitle": "Eliminar Temporizador",
+    "deleteConfirmMessage": "¿Estás seguro de que deseas eliminar \"%{name}\"?",
+    "chooseExercise": "Elegir Ejercicio",
+    "searchExercisePlaceholder": "Buscar ejercicios...",
+    "exerciseCatalog": "Catálogo de Ejercicios",
+    "noExercisesFound": "No se encontraron ejercicios con esa búsqueda.",
+    "validationNameRequired": "Por favor ingresa un nombre para tu temporizador.",
+    "validationIntervalRequired": "Por favor añade al menos un intervalo.",
+    "validationDurationRequired": "Todos los intervalos deben tener una duración mayor a 0."
+  },
+  "generateTimer": {
+    "title": "Generador de Rutinas IA",
+    "description": "¡Cuéntanos qué estás buscando y la IA de Interval creará un temporizador de peso corporal a tu medida!",
+    "goalQuestion": "¿Cuál es tu objetivo fitness?",
+    "goalWeightLoss": "Perder peso",
+    "goalTone": "Tonificar",
+    "goalBulk": "Aumentar masa muscular",
+    "areaQuestion": "¿Qué te gustaría ejercitar?",
+    "areaTotal": "Cuerpo completo",
+    "areaAbs": "Abdominales",
+    "areaLower": "Tren inferior",
+    "areaCardio": "Cardio",
+    "areaUpper": "Tren superior",
+    "areaSurprise": "¡Sorpréndeme!",
+    "experienceQuestion": "¿Cuál es tu nivel de experiencia?",
+    "experienceBeginner": "Principiante",
+    "experienceIntermediate": "Intermedio",
+    "experienceAdvanced": "Avanzado",
+    "generateButton": "Generar Temporizador",
+    "loadingTitle": "Motor de Entrenamiento Activo...",
+    "loadingSubtitle": "Diseñando una rutina HIIT de peso corporal adaptada a tus objetivos."
+  },
+  "timerGenerator": {
+    "rest": "Descanso",
+    "goalWeightLoss": "Quema Grasa",
+    "goalTone": "Tonificación & Esculpir",
+    "goalBulk": "Fuerza Potente",
+    "areaTotal": "Cuerpo Completo",
+    "areaAbs": "Enfoque Core",
+    "areaLower": "Tren Inferior",
+    "areaUpper": "Tren Superior",
+    "areaCardio": "Cardio HIIT",
+    "areaSurprise": "Explosión Sorpresa",
+    "diffBeginner": "Principiante",
+    "diffIntermediate": "Inter.",
+    "diffAdvanced": "Pro",
+    "timerName": "%{difficulty} %{area} %{goal}"
+  },
+  "timer": {
+    "roundOf": "Ronda %{current} de %{total}",
+    "nextUp": "SIGUIENTE",
+    "workoutComplete": "¡Entrenamiento Completado!",
+    "exitTitle": "¿Salir del Entrenamiento?",
+    "exitMessage": "Se perderá el progreso de esta sesión.",
+    "exitConfirm": "Salir",
+    "exitCancel": "Continuar"
+  },
+  "completion": {
+    "title": "¡Entrenamiento Completado! ⚡️",
+    "subtitle": "¡Destruiste \"%<name>s\"!",
+    "totalTime": "Tiempo Total",
+    "intervalsCompleted": "Intervalos Completados",
+    "roundsFinished": "Rondas Finalizadas",
+    "newBadgeUnlocked": "¡Nueva Insignia Desbloqueada!",
+    "doneButton": "Volver a Temporizadores",
+    "shareWorkout": "Compartir Entrenamiento",
+    "shareBadge": "Compartir Insignia",
+    "shareWorkoutTitle": "Compartir Entrenamiento: %{name}",
+    "shareMessage": "¡Acabo de completar mi entrenamiento en Interval! ⚡️\n\nTemporizador: \"%{name}\" (%{rounds} rondas, %{duration} de duración)%{streakText}%{badgeText}\n\n1. Descarga la app:\nApp Store: %{appStoreLink}\nPlay Store: %{playStoreLink}\n\n2. Abre este enlace para cargar la rutina:\n%{deepLink}",
+    "shareStreakText": "\nRacha: 🔥 Racha de %{streak} Días",
+    "shareBadgeText": "\nDesbloqueado: 🏆 %{badges}",
+    "shareBadgeMessage": "🏆 ¡Acabo de ganar la insignia \"%{name}\"%{streakText} en Interval!\n\n\"%{description}\"\n\nAlcanza tus metas con temporizadores HIIT personalizados:\nApp Store: %{appStoreLink}\nPlay Store: %{playStoreLink}"
+  },
+  "awards": {
+    "title": "Sala de Trofeos",
+    "statsTitle": "Estadísticas de Entrenamiento",
+    "currentStreak": "Racha Actual",
+    "longestStreak": "Mejor Racha",
+    "totalWorkouts": "Entrenamientos",
+    "totalTime": "Tiempo de Sudor",
+    "inviteBannerTitle": "Entrena con Amigos",
+    "inviteBannerSubtitle": "¡Comparte temporizadores o invita a tus compañeros de entrenamiento para desbloquear insignias virales exclusivas!",
+    "inviteButton": "Invitar Amigos",
+    "unlockedCount": "%{unlocked} de %{total} Desbloqueadas",
+    "locked": "Bloqueada",
+    "unlockedOn": "Desbloqueada el %{date}",
+    "howToUnlock": "Cómo Desbloquear",
+    "shareBadge": "Compartir Logro",
+    "shareAppTitle": "Únete a mí en Interval",
+    "shareAppMessage": "🔥 ¡Únete a mí en Interval, el temporizador HIIT más limpio y potente para tus entrenamientos!\n\nDescárgalo gratis:\nApp Store: %{appStoreLink}\nPlay Store: %{playStoreLink}"
+  },
+  "exercises": {
+    "categories": {
+      "cardio": "Cardio",
+      "upper": "Tren Superior",
+      "lower": "Tren Inferior",
+      "abs": "Abdominales & Core",
+      "total": "Cuerpo Completo"
+    },
+    "jumping_jacks": {
+      "name": "Saltos de Tijera",
+      "instructions": [
+        "Párate derecho con los pies juntos y los brazos a los costados.",
+        "Salta separando los pies más allá del ancho de los hombros y levantando los brazos por encima de la cabeza.",
+        "Vuelve a saltar para regresar a la posición inicial.",
+        "Repite con ritmo a un paso constante."
+      ]
+    },
+    "pushups": {
+      "name": "Flexiones de Pecho",
+      "instructions": [
+        "Coloca las manos en el suelo un poco más abiertas que el ancho de los hombros.",
+        "Extiende las piernas rectas detrás de ti, apoyando el peso sobre los dedos de los pies.",
+        "Baja el cuerpo hasta que el pecho casi toque el suelo.",
+        "Empuja hacia arriba para volver a la posición inicial."
+      ]
+    },
+    "squats": {
+      "name": "Sentadillas al Aire",
+      "instructions": [
+        "Párate con los pies separados al ancho de los hombros, con las puntas apuntando ligeramente hacia afuera.",
+        "Baja las caderas hacia atrás y hacia abajo como si te sentaras en una silla.",
+        "Mantén el pecho erguido y las rodillas detrás de las puntas de los pies.",
+        "Empuja con los talones para volver a ponerte de pie."
+      ]
+    },
+    "plank": {
+      "name": "Plancha de Antebrazos",
+      "instructions": [
+        "Apoya los antebrazos en el suelo con los codos alineados bajo los hombros.",
+        "Extiende el cuerpo en línea recta desde la cabeza hasta los talones.",
+        "Activa el abdomen, glúteos y muslos.",
+        "Mantén la posición sin dejar caer la cadera."
+      ]
+    },
+    "burpees": {
+      "name": "Burpees",
+      "instructions": [
+        "Comienza de pie.",
+        "Baja en una sentadilla y coloca las manos en el suelo.",
+        "Lanza los pies hacia atrás a la posición de flexión.",
+        "Regresa los pies de inmediato a la sentadilla.",
+        "Salta explosivamente hacia arriba con los brazos en alto."
+      ]
+    },
+    "mountain_climbers": {
+      "name": "Escaladores de Montaña",
+      "instructions": [
+        "Empieza en posición de plancha alta.",
+        "Lleva una rodilla hacia el pecho y luego regrésala.",
+        "Cambia rápidamente para llevar la otra rodilla hacia adelante.",
+        "Mantén la espalda recta y corre con las rodillas lo más rápido posible."
+      ]
+    },
+    "crunches": {
+      "name": "Abdominales Clásicos",
+      "instructions": [
+        "Acuéstate boca arriba con las rodillas flexionadas y los pies planos.",
+        "Coloca las manos ligeramente detrás de la cabeza.",
+        "Activa el abdomen y levanta los hombros del suelo.",
+        "Baja lentamente manteniendo la tensión en el core."
+      ]
+    },
+    "lunges": {
+      "name": "Zancadas Alternas",
+      "instructions": [
+        "Párate erguido con los pies al ancho de las caderas.",
+        "Da un paso adelante con una pierna y baja las caderas.",
+        "Ambas rodillas deben doblarse en ángulos de 90 grados.",
+        "Empuja con el pie delantero para levantarte y cambia de pierna."
+      ]
+    },
+    "pike_pushups": {
+      "name": "Flexiones en Pica",
+      "instructions": [
+        "Comienza en posición de perro boca abajo con las caderas elevadas.",
+        "Flexiona los codos para bajar la parte superior de la cabeza hacia el suelo.",
+        "Empuja con los hombros para volver a la posición inicial.",
+        "Mantén el core firme y el cuello neutro."
+      ]
+    },
+    "russian_twists": {
+      "name": "Giros Rusos",
+      "instructions": [
+        "Siéntate en el suelo, flexiona las rodillas e inclínate ligeramente hacia atrás.",
+        "Levanta los pies del suelo y mantén el equilibrio sobre el coxis.",
+        "Entrelaza las manos y gira el torso de un lado a otro.",
+        "Toca el suelo junto a tu cadera en cada giro."
+      ]
+    }
+  },
+  "badges": {
+    "first_step_hero": {
+      "name": "Héroe del Primer Paso",
+      "tagline": "¡La aventura comienza!",
+      "description": "Completaste tu primer entrenamiento. ¡Lo más difícil es empezar!"
+    },
+    "back_to_back_beast": {
+      "name": "Bestia Consecutiva",
+      "tagline": "¡No fue casualidad!",
+      "description": "Completaste una racha de 2 días de entrenamiento. ¡Doble amenaza!"
+    },
+    "spaghetti_legs": {
+      "name": "Piernas de Espagueti",
+      "tagline": "¡Temblando pero victorioso!",
+      "description": "Completaste una racha de 3 días. Tus piernas serán pasta, ¡pero tu espíritu es de hierro!"
+    },
+    "workweek_warrior": {
+      "name": "Guerrero Semanal",
+      "tagline": "¡De lunes a viernes superado!",
+      "description": "Alcanzaste una racha de 5 días. ¡Conquistaste toda la semana laboral con sudor!"
+    },
+    "sweat_monster": {
+      "name": "Monstruo del Sudor",
+      "tagline": "¡7 días de puro fuego!",
+      "description": "Lograste una racha de 7 días completos. Eres oficialmente imparable."
+    },
+    "fortnight_of_fire": {
+      "name": "Quincena de Fuego",
+      "tagline": "¡Dos semanas ardiendo!",
+      "description": "Mantuviste una racha de 14 días. ¡Dos semanas continuas de pura disciplina!"
+    },
+    "habit_machine": {
+      "name": "Máquina de Hábitos",
+      "tagline": "¡Programado para ganar!",
+      "description": "Alcanzaste una racha de 21 días. La ciencia dice que 21 días forjan un hábito: ¡ya eres automático!"
+    },
+    "unstoppable_dynamo": {
+      "name": "Dínamo Imparable",
+      "tagline": "¡Estatus legendario de 30 días!",
+      "description": "Mantuviste una racha de 30 días. ¡Has creado un superpoder!"
+    },
+    "iron_will": {
+      "name": "Voluntad de Hierro",
+      "tagline": "¡Disciplina inquebrantable!",
+      "description": "Mantuviste una racha de 60 días. ¡Dos meses completos de pura determinación!"
+    },
+    "quarterly_crusher": {
+      "name": "Destructor Trimestral",
+      "tagline": "¡Un trimestre de grandeza!",
+      "description": "Alcanzaste una racha de 90 días. ¡3 meses seguidos de supremacía cardiovascular!"
+    },
+    "half_year_hero": {
+      "name": "Héroe Semestral",
+      "tagline": "¡A mitad de camino a la inmortalidad!",
+      "description": "Lograste una racha de 180 días. ¡6 meses continuos rompiéndola a diario!"
+    },
+    "sun_god_of_sweat": {
+      "name": "Dios Solar del Sudor",
+      "tagline": "¡Una órbita completa de poder!",
+      "description": "Una legendaria racha de 365 días. Un año entero sin saltarte ni un día: ¡estatus divino alcanzado!"
+    },
+    "weekend_warrior": {
+      "name": "Guerrero de Fin de Semana",
+      "tagline": "¡Sin días libres para la grandeza!",
+      "description": "Completaste entrenamientos tanto el sábado como el domingo en el mismo fin de semana."
+    },
+    "ten_minute_tornado": {
+      "name": "Tornado de Diez Minutos",
+      "tagline": "¡Resistencia de dos dígitos!",
+      "description": "Acumulaste 10 minutos de entrenamiento de alta intensidad."
+    },
+    "hour_of_power": {
+      "name": "Hora de Poder",
+      "tagline": "¡60 minutos de gloria!",
+      "description": "Completaste 60 minutos acumulados de entrenamiento a intervalos."
+    },
+    "century_club": {
+      "name": "Club del Siglo",
+      "tagline": "¡100 intervalos conquistados!",
+      "description": "Superaste 100 intervalos individuales de entrenamiento."
+    },
+    "early_bird": {
+      "name": "Madrugador Imparable",
+      "tagline": "¡Arriba ese campeón!",
+      "description": "Completaste un entrenamiento antes de las 8:00 AM. ¡Ganando antes de que empiece el día!"
+    },
+    "night_owl": {
+      "name": "Búho Nocturno",
+      "tagline": "¡Entrenamiento de medianoche!",
+      "description": "Completaste un entrenamiento después de las 8:00 PM. ¡Iluminando la noche con sudor!"
+    },
+    "iron_lungs": {
+      "name": "Pulmones de Acero",
+      "tagline": "¡Bestia de resistencia!",
+      "description": "Completaste una intensa sesión de 5 rondas o más."
+    },
+    "custom_creator": {
+      "name": "Creador Personalizado",
+      "tagline": "¡Maestro arquitecto!",
+      "description": "Diseñaste y completaste tu propio temporizador de intervalos."
+    },
+    "megaphone_maestro": {
+      "name": "Maestro del Megáfono",
+      "tagline": "¡Difunde la buena energía!",
+      "description": "Compartiste tu primer entrenamiento, temporizador o insignia con el mundo."
+    },
+    "squad_recruiter": {
+      "name": "Reclutador del Escuadrón",
+      "tagline": "¡El esfuerzo compartido es mejor!",
+      "description": "Compartiste un temporizador directamente con un amigo por Mensajes/SMS."
+    },
+    "chain_letter_of_gains": {
+      "name": "Cadena de Ganancias",
+      "tagline": "¡Reenvía o no te saltes pierna!",
+      "description": "Compartiste un temporizador por correo electrónico o enlace directo."
+    },
+    "hype_machine": {
+      "name": "Máquina de Motivación",
+      "tagline": "¡Energía contagiosa!",
+      "description": "Compartiste 5 entrenamientos, insignias o temporizadores con amigos."
+    },
+    "sweat_influencer": {
+      "name": "Influencer Fitness",
+      "tagline": "¡Básicamente famoso!",
+      "description": "Compartiste 10 veces en tu red de contactos. ¡Estatus de influencer desbloqueado!"
+    },
+    "chief_fitness_officer": {
+      "name": "Director General de Fitness",
+      "tagline": "¡Promovido a la dirección!",
+      "description": "¡25 compartidos! Liderando el camino para que todos se muevan."
+    },
+    "viral_phenomenon": {
+      "name": "Fenómeno Viral",
+      "tagline": "¡Tendencia en todas partes!",
+      "description": "¡50 compartidos en total! Rompiendo oficialmente el internet fitness."
+    },
+    "cult_leader_of_cardio": {
+      "name": "Líder del Culto de Cardio",
+      "tagline": "¡Todos a seguir la disciplina!",
+      "description": "¡100 compartidos! Tienes una legión de seguidores del cardio."
+    },
+    "galactic_ambassador": {
+      "name": "Embajador Galáctico",
+      "tagline": "¡Llevando el HIIT a las estrellas!",
+      "description": "¡1.000 compartidos! Alcanzaste el estatus de leyenda interestelar."
+    },
+    "imported_gains": {
+      "name": "Amigo de Entrenamiento",
+      "tagline": "¡Entrenar juntos es lo mejor!",
+      "description": "Importaste y completaste con éxito un entrenamiento compartido por un amigo."
+    }
+  }
+}

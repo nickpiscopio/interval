@@ -1,0 +1,385 @@
+{
+  "common": {
+    "appName": "Interval",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "done": "Terminé",
+    "close": "Fermer",
+    "share": "Partager",
+    "rounds": "Tours",
+    "round": "Tour",
+    "totalTime": "Temps Total",
+    "duration": "Durée",
+    "sec": "sec",
+    "min": "min",
+    "yes": "Oui",
+    "no": "Non",
+    "ok": "OK"
+  },
+  "selectTimer": {
+    "greeting": "C'est l'heure du sport ! ⚡️",
+    "subGreeting": "Choisissez ou générez un minuteur HIIT pour commencer",
+    "noTimersTitle": "Aucun minuteur",
+    "noTimersText": "Créez vos intervalles personnalisés ou laissez le coach IA concevoir un entraînement pour vous.",
+    "createCustom": "Créer Personnalisé",
+    "generateAi": "Générer avec l'IA",
+    "shareTimerTitle": "Partager le minuteur : %{name}",
+    "shareMessage": "🔥 Teste mon entraînement HIIT personnalisé \"%{name}\" sur Interval !\n\nDétails : %{rounds} tours, %{duration} au total.\n\n1. Télécharge Interval :\nApp Store : %{appStoreLink}\nPlay Store : %{playStoreLink}\n\n2. Ouvre ce lien pour charger le minuteur :\n%{deepLink}"
+  },
+  "createTimer": {
+    "titleCreate": "Créer un Minuteur",
+    "titleEdit": "Modifier le Minuteur",
+    "namePlaceholder": "Nom de l'entraînement (ex. Énergie Matinale)",
+    "rounds": "Tours",
+    "intervals": "Intervalles",
+    "addInterval": "Ajouter un Intervalle",
+    "intervalNamePlaceholder": "Nom de l'intervalle",
+    "seconds": "secondes",
+    "saveWorkout": "Enregistrer l'Entraînement",
+    "deleteWorkout": "Supprimer l'Entraînement",
+    "deleteConfirmTitle": "Supprimer le Minuteur",
+    "deleteConfirmMessage": "Êtes-vous sûr de vouloir supprimer \"%{name}\" ?",
+    "chooseExercise": "Choisir un Exercice",
+    "searchExercisePlaceholder": "Rechercher un exercice...",
+    "exerciseCatalog": "Catalogue d'Exercices",
+    "noExercisesFound": "Aucun exercice correspondant à votre recherche.",
+    "validationNameRequired": "Veuillez saisir un nom pour votre minuteur.",
+    "validationIntervalRequired": "Veuillez ajouter au moins un intervalle.",
+    "validationDurationRequired": "Tous les intervalles doivent avoir une durée supérieure à 0."
+  },
+  "generateTimer": {
+    "title": "Générateur d'Entraînement IA",
+    "description": "Indiquez-nous ce que vous recherchez pour permettre à l'IA d'Interval de créer un minuteur d'exercices au poids du corps sur mesure !",
+    "goalQuestion": "Quel est votre objectif sportif ?",
+    "goalWeightLoss": "Perdre du poids",
+    "goalTone": "Se tonifier",
+    "goalBulk": "Prendre du muscle",
+    "areaQuestion": "Quelle zone souhaitez-vous travailler ?",
+    "areaTotal": "Corps complet",
+    "areaAbs": "Abdos",
+    "areaLower": "Bas du corps",
+    "areaCardio": "Cardio",
+    "areaUpper": "Haut du corps",
+    "areaSurprise": "Surprenez-moi !",
+    "experienceQuestion": "Quel est votre niveau d'expérience ?",
+    "experienceBeginner": "Débutant",
+    "experienceIntermediate": "Intermédiaire",
+    "experienceAdvanced": "Avancé",
+    "generateButton": "Générer le Minuteur",
+    "loadingTitle": "Moteur de Coaching Actif...",
+    "loadingSubtitle": "Conception d'une routine HIIT au poids du corps adaptée à vos objectifs."
+  },
+  "timerGenerator": {
+    "rest": "Repos",
+    "goalWeightLoss": "Brûle-Graisses",
+    "goalTone": "Tonification & Sculpture",
+    "goalBulk": "Gain de Force",
+    "areaTotal": "Corps Complet",
+    "areaAbs": "Focus Abdos",
+    "areaLower": "Bas du Corps",
+    "areaUpper": "Haut du Corps",
+    "areaCardio": "Cardio HIIT",
+    "areaSurprise": "Session Surprise",
+    "diffBeginner": "Débutant",
+    "diffIntermediate": "Inter.",
+    "diffAdvanced": "Pro",
+    "timerName": "%{difficulty} %{area} %{goal}"
+  },
+  "timer": {
+    "roundOf": "Tour %{current} sur %{total}",
+    "nextUp": "À SUIVRE",
+    "workoutComplete": "Entraînement Terminé !",
+    "exitTitle": "Quitter l'Entraînement ?",
+    "exitMessage": "Votre progression pour cette séance sera perdue.",
+    "exitConfirm": "Quitter",
+    "exitCancel": "Continuer"
+  },
+  "completion": {
+    "title": "Entraînement Terminé ! ⚡️",
+    "subtitle": "Vous avez écrasé \"%<name>s\" !",
+    "totalTime": "Temps Total",
+    "intervalsCompleted": "Intervalles Complétés",
+    "roundsFinished": "Tours Terminés",
+    "newBadgeUnlocked": "Nouveau Trophée Débloqué !",
+    "doneButton": "Retour aux Minuteurs",
+    "shareWorkout": "Partager l'Entraînement",
+    "shareBadge": "Partager le Trophée",
+    "shareWorkoutTitle": "Partager l'Entraînement : %{name}",
+    "shareMessage": "Je viens de terminer mon entraînement sur Interval ! ⚡️\n\nMinuteur : \"%{name}\" (%{rounds} tours, %{duration} de durée)%{streakText}%{badgeText}\n\n1. Télécharge l'application :\nApp Store : %{appStoreLink}\nPlay Store : %{playStoreLink}\n\n2. Ouvre ce lien pour charger la séance :\n%{deepLink}",
+    "shareStreakText": "\nSérie : 🔥 Série de %{streak} Jours",
+    "shareBadgeText": "\nDébloqué : 🏆 %{badges}",
+    "shareBadgeMessage": "🏆 Je viens de remporter le badge \"%{name}\"%{streakText} sur Interval !\n\n\"%{description}\"\n\nAtteins tes objectifs sportifs avec des minuteurs HIIT personnalisés :\nApp Store : %{appStoreLink}\nPlay Store : %{playStoreLink}"
+  },
+  "awards": {
+    "title": "Salle des Trophées",
+    "statsTitle": "Statistiques d'Entraînement",
+    "currentStreak": "Série Actuelle",
+    "longestStreak": "Meilleure Série",
+    "totalWorkouts": "Entraînements",
+    "totalTime": "Temps d'Effort",
+    "inviteBannerTitle": "Entraînez-vous entre Amis",
+    "inviteBannerSubtitle": "Partagez vos minuteurs ou invitez votre partenaire d'entraînement pour débloquer des badges exclusifs !",
+    "inviteButton": "Inviter des Amis",
+    "unlockedCount": "%{unlocked} sur %{total} Débloqués",
+    "locked": "Verrouillé",
+    "unlockedOn": "Débloqué le %{date}",
+    "howToUnlock": "Comment Débloquer",
+    "shareBadge": "Partager le Succès",
+    "shareAppTitle": "Rejoins-moi sur Interval",
+    "shareAppMessage": "🔥 Rejoins-moi sur Interval — le minuteur HIIT le plus épuré et puissant pour vos séances !\n\nTéléchargement gratuit :\nApp Store : %{appStoreLink}\nPlay Store : %{playStoreLink}"
+  },
+  "exercises": {
+    "categories": {
+      "cardio": "Cardio",
+      "upper": "Haut du Corps",
+      "lower": "Bas du Corps",
+      "abs": "Abdos & Gainage",
+      "total": "Corps Complet"
+    },
+    "jumping_jacks": {
+      "name": "Jumping Jacks",
+      "instructions": [
+        "Tenez-vous droit, pieds joints et bras le long du corps.",
+        "Sautez en écartant les pieds plus larges que les épaules tout en levant les bras au-dessus de la tête.",
+        "Sautez à nouveau pour revenir à la position initiale.",
+        "Répétez de façon rythmée à une cadence soutenue."
+      ]
+    },
+    "pushups": {
+      "name": "Pompes",
+      "instructions": [
+        "Placez vos mains au sol un peu plus larges que vos épaules.",
+        "Tendez vos jambes droites derrière vous, en appui sur les orteils.",
+        "Descendez le corps jusqu'à ce que votre torse frôle le sol.",
+        "Poussez pour revenir en position haute."
+      ]
+    },
+    "squats": {
+      "name": "Squats au Poids du Corps",
+      "instructions": [
+        "Pieds écartés à la largeur des épaules, pointes légèrement vers l'extérieur.",
+        "Descendez les hanches vers l'arrière comme pour vous asseoir sur une chaise.",
+        "Gardez le buste droit et les genoux derrière les pointes de pieds.",
+        "Poussez sur vos talons pour vous redresser."
+      ]
+    },
+    "plank": {
+      "name": "Gainage sur Avant-Bras",
+      "instructions": [
+        "Placez vos avant-bras au sol, coudes sous les épaules.",
+        "Maintenez votre corps droit de la tête aux talons.",
+        "Contractez les abdominaux, fessiers et cuisses.",
+        "Tenez la position sans cambrer ni affaisser le bassin."
+      ]
+    },
+    "burpees": {
+      "name": "Burpees",
+      "instructions": [
+        "Commencez debout.",
+        "Descendez en squat et posez vos mains au sol.",
+        "Envoyez vos pieds en arrière en position de pompe.",
+        "Ramenez immédiatement les pieds en squat.",
+        "Sautez de manière explosive vers le haut, bras levés."
+      ]
+    },
+    "mountain_climbers": {
+      "name": "Mountain Climbers",
+      "instructions": [
+        "Commencez en position de planche haute.",
+        "Amenez un genou vers votre poitrine puis tendez-le à nouveau.",
+        "Alternez rapidement avec l'autre genou.",
+        "Gardez le dos plat et courez avec vos genoux le plus vite possible."
+      ]
+    },
+    "crunches": {
+      "name": "Crunches Abdominaux",
+      "instructions": [
+        "Allongé sur le dos, genoux pliés et pieds à plat.",
+        "Placez délicatement vos mains derrière la tête.",
+        "Contractez les abdos et décollez vos épaules du sol.",
+        "Redescendez lentement en gardant la tension dans le tronc."
+      ]
+    },
+    "lunges": {
+      "name": "Fentes Alternées",
+      "instructions": [
+        "Tenez-vous droit, pieds écartés de la largeur des hanches.",
+        "Faites un pas en avant avec une jambe et descendez les hanches.",
+        "Les deux genoux doivent former des angles droits.",
+        "Poussez sur le pied avant pour revenir debout, puis changez de jambe."
+      ]
+    },
+    "pike_pushups": {
+      "name": "Pompes en Pique",
+      "instructions": [
+        "Commencez en position de chien tête en bas, hanches relevées.",
+        "Pliez les coudes pour abaisser le sommet de la tête vers le sol.",
+        "Poussez sur les épaules pour revenir à la position initiale.",
+        "Gardez le gainage serré et le cou neutre."
+      ]
+    },
+    "russian_twists": {
+      "name": "Twists Russes",
+      "instructions": [
+        "Asseyez-vous, pliez les genoux et penchez-vous légèrement en arrière.",
+        "Décollez vos pieds du sol en équilibre sur le coccyx.",
+        "Croisez vos mains et faites pivoter le torse de gauche à droite.",
+        "Touchez le sol à côté de vos hanches à chaque rotation."
+      ]
+    }
+  },
+  "badges": {
+    "first_step_hero": {
+      "name": "Héros du Premier Pas",
+      "tagline": "L'aventure commence !",
+      "description": "Vous avez terminé votre tout premier entraînement. Le plus dur, c'est de commencer !"
+    },
+    "back_to_back_beast": {
+      "name": "Bête Enchaînée",
+      "tagline": "Ce n'est pas un hasard !",
+      "description": "Vous avez enchaîné 2 jours d'entraînement consécutifs. Double dose d'énergie !"
+    },
+    "spaghetti_legs": {
+      "name": "Jambes de Spaghetti",
+      "tagline": "Tremblant mais victorieux !",
+      "description": "3 jours d'entraînement d'affilée. Vos jambes sont en compote, mais votre mental est d'acier !"
+    },
+    "workweek_warrior": {
+      "name": "Guerrier de la Semaine",
+      "tagline": "Du lundi au vendredi validé !",
+      "description": "5 jours d'entraînement consécutifs. Toute la semaine de travail conquise par l'effort !"
+    },
+    "sweat_monster": {
+      "name": "Monstre de la Transpiration",
+      "tagline": "7 jours de feu pur !",
+      "description": "Une série complète de 7 jours consécutifs. Vous êtes officiellement inarrêtable."
+    },
+    "fortnight_of_fire": {
+      "name": "Quinzaine de Feu",
+      "tagline": "Deux semaines enflammées !",
+      "description": "14 jours d'entraînement d'affilée. Deux semaines ininterrompues de pure discipline !"
+    },
+    "habit_machine": {
+      "name": "Machine à Habitudes",
+      "tagline": "Programmé pour réussir !",
+      "description": "21 jours consécutifs. La science dit que 21 jours créent une habitude : vous êtes automatique !"
+    },
+    "unstoppable_dynamo": {
+      "name": "Dynamo Inarrêtable",
+      "tagline": "Statut légendaire de 30 jours !",
+      "description": "30 jours d'entraînement consécutifs. Vous avez forgé un véritable super-pouvoir !"
+    },
+    "iron_will": {
+      "name": "Volonté de Fer",
+      "tagline": "Discipline inébranlable !",
+      "description": "60 jours consécutifs. Deux mois entiers de détermination sans faille !"
+    },
+    "quarterly_crusher": {
+      "name": "Conquérant Trimestriel",
+      "tagline": "Un trimestre d'excellence !",
+      "description": "90 jours consécutifs. 3 mois d'hégémonie cardio !"
+    },
+    "half_year_hero": {
+      "name": "Héros du Semestre",
+      "tagline": "À mi-chemin de l'immortalité !",
+      "description": "180 jours consécutifs. 6 mois quotidiens à repousser vos limites !"
+    },
+    "sun_god_of_sweat": {
+      "name": "Dieu Solaire de l'Effort",
+      "tagline": "Une orbite complète de puissance !",
+      "description": "Une série légendaire de 365 jours. Une année entière sans manquer un seul jour : statut divin atteint !"
+    },
+    "weekend_warrior": {
+      "name": "Guerrier du Week-end",
+      "tagline": "Pas de repos pour les braves !",
+      "description": "Entraînement complété le samedi ET le dimanche au cours du même week-end."
+    },
+    "ten_minute_tornado": {
+      "name": "Tornade de Dix Minutes",
+      "tagline": "Endurance à deux chiffres !",
+      "description": "10 minutes cumulées d'entraînement à haute intensité."
+    },
+    "hour_of_power": {
+      "name": "Heure de Puissance",
+      "tagline": "60 minutes de grandeur !",
+      "description": "60 minutes cumulées d'entraînement fractionné."
+    },
+    "century_club": {
+      "name": "Club des 100",
+      "tagline": "100 intervalles conquis !",
+      "description": "100 intervalles individuels d'entraînement validés."
+    },
+    "early_bird": {
+      "name": "Lève-Tôt Énergique",
+      "tagline": "Debout champion !",
+      "description": "Entraînement terminé avant 8h00 du matin. Vainqueur avant même que la journée commence !"
+    },
+    "night_owl": {
+      "name": "Oiseau de Nuit",
+      "tagline": "Entraînement nocturne !",
+      "description": "Entraînement terminé après 20h00. Vous illuminez la nuit par votre énergie !"
+    },
+    "iron_lungs": {
+      "name": "Poumons d'Acier",
+      "tagline": "Bête d'endurance !",
+      "description": "Séance exigeante terminée avec 5 tours ou plus."
+    },
+    "custom_creator": {
+      "name": "Créateur d'Élite",
+      "tagline": "Maître architecte !",
+      "description": "Vous avez créé et complété votre propre minuteur sur mesure."
+    },
+    "megaphone_maestro": {
+      "name": "Maestro du Mégaphone",
+      "tagline": "Passez le mot !",
+      "description": "Vous avez partagé votre tout premier entraînement, minuteur ou trophée."
+    },
+    "squad_recruiter": {
+      "name": "Recruteur d'Équipe",
+      "tagline": "L'effort est plus doux partagé !",
+      "description": "Vous avez partagé un minuteur par SMS/Messages avec un ami."
+    },
+    "chain_letter_of_gains": {
+      "name": "Chaîne de l'Énergie",
+      "tagline": "Transférez ou ne sautez pas la séance jambes !",
+      "description": "Vous avez partagé un minuteur par e-mail ou lien direct."
+    },
+    "hype_machine": {
+      "name": "Machine à Motivation",
+      "tagline": "Énergie contagieuse !",
+      "description": "5 entraînements, trophées ou minuteurs partagés avec vos proches."
+    },
+    "sweat_influencer": {
+      "name": "Influenceur Fitness",
+      "tagline": "Bientôt une star !",
+      "description": "10 partages sur vos réseaux de sport. Statut influenceur débloqué !"
+    },
+    "chief_fitness_officer": {
+      "name": "Directeur Général Fitness",
+      "tagline": "Promu à la direction !",
+      "description": "25 partages ! Vous montrez la voie pour faire bouger tout le monde."
+    },
+    "viral_phenomenon": {
+      "name": "Phénomène Viral",
+      "tagline": "Tendance partout !",
+      "description": "50 partages au total ! Vous cassez internet avec vos séances."
+    },
+    "cult_leader_of_cardio": {
+      "name": "Leader du Culte Cardio",
+      "tagline": "Suivez la cadence !",
+      "description": "100 partages ! Vous avez une véritable communauté d'adeptes du cardio."
+    },
+    "galactic_ambassador": {
+      "name": "Ambassadeur Galactique",
+      "tagline": "Le HIIT jusqu'aux étoiles !",
+      "description": "1 000 partages ! Vous avez atteint le statut de légende interstellaire."
+    },
+    "imported_gains": {
+      "name": "Partenaire d'Entraînement",
+      "tagline": "Transpirer ensemble, c'est le meilleur !",
+      "description": "Vous avez importé et terminé avec succès une séance partagée par un ami."
+    }
+  }
+}

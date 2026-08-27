@@ -1,4 +1,5 @@
 import { Exercise } from "../model/Exercise";
+import { t } from "../i18n";
 
 export const EXERCISE_CATALOG: Exercise[] = [
   {
@@ -123,3 +124,30 @@ export const EXERCISE_CATALOG: Exercise[] = [
     ]
   }
 ];
+
+/**
+ * Returns a localized copy of an exercise.
+ */
+export function getLocalizedExercise(exercise: Exercise): Exercise {
+  const instructions = t(`exercises.${exercise.id}.instructions`, { defaultValue: exercise.instructions });
+  return {
+    ...exercise,
+    name: t(`exercises.${exercise.id}.name`, { defaultValue: exercise.name }),
+    instructions: Array.isArray(instructions) ? instructions : exercise.instructions,
+  };
+}
+
+/**
+ * Returns the full exercise catalog localized into the active locale.
+ */
+export function getLocalizedExerciseCatalog(): Exercise[] {
+  return EXERCISE_CATALOG.map(getLocalizedExercise);
+}
+
+/**
+ * Returns the localized category display name.
+ */
+export function getLocalizedCategoryName(category: string): string {
+  return t(`exercises.categories.${category}`, { defaultValue: category.toUpperCase() });
+}
+

@@ -16,6 +16,8 @@ import * as Haptics from "expo-haptics";
 import { RootStackScreenProps } from "../types";
 import { Badge, UserStats } from "../model/Badge";
 import { getAllBadgesWithStatus, getUserStats, recordShare } from "../services/badgeService";
+import { getLocalizedBadge } from "../constants/badges";
+import { t } from "../i18n";
 import Spacing from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
 import Colors from "../constants/Colors";
@@ -34,7 +36,7 @@ export default function AwardsScreen({ navigation }: RootStackScreenProps<"Award
       getAllBadgesWithStatus(),
       getUserStats(),
     ]);
-    setBadges(allBadges);
+    setBadges(allBadges.map(getLocalizedBadge));
     setStats(userStats);
   }
 
@@ -49,11 +51,17 @@ export default function AwardsScreen({ navigation }: RootStackScreenProps<"Award
       const playStoreLink = "https://play.google.com/store/apps/details?id=com.plyonest.interval";
       
       const streakText = stats && stats.currentStreak > 0 ? ` (🔥 ${stats.currentStreak}-Day Streak!)` : "";
-      const message = `🏆 I just earned the "${badge.name}" badge${streakText} on Interval!\n\n"${badge.description}"\n\nCrush your fitness goals with custom HIIT interval timers:\nApp Store: ${appStoreLink}\nPlay Store: ${playStoreLink}`;
+      const message = t("completion.shareBadgeMessage", {
+        name: badge.name,
+        streakText,
+        description: badge.description,
+        appStoreLink,
+        playStoreLink,
+      });
 
       const result = await Share.share({
         message,
-        title: `Badge Unlocked: ${badge.name}`,
+        title: badge.name,
       });
 
       if (result.action === Share.sharedAction) {
@@ -62,7 +70,7 @@ export default function AwardsScreen({ navigation }: RootStackScreenProps<"Award
         await loadData();
         if (newlyUnlocked.length > 0) {
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-          setSelectedBadge(newlyUnlocked[0]);
+          setSelectedBadge(getLocalizedBadge(newlyUnlocked[0]));
         }
       }
     } catch (error) {
@@ -74,11 +82,14 @@ export default function AwardsScreen({ navigation }: RootStackScreenProps<"Award
     try {
       const appStoreLink = "https://apps.apple.com/app/interval-hiit-timer/id12345678";
       const playStoreLink = "https://play.google.com/store/apps/details?id=com.plyonest.interval";
-      const message = `🔥 Join me on Interval — the cleanest, most powerful HIIT timer for workouts and training!\n\nDownload for free:\nApp Store: ${appStoreLink}\nPlay Store: ${playStoreLink}`;
+      const message = t("awards.shareAppMessage", {
+        appStoreLink,
+        playStoreLink,
+      });
 
       const result = await Share.share({
         message,
-        title: "Join me on Interval",
+        title: t("awards.shareAppTitle"),
       });
 
       if (result.action === Share.sharedAction) {
@@ -87,7 +98,7 @@ export default function AwardsScreen({ navigation }: RootStackScreenProps<"Award
         await loadData();
         if (newlyUnlocked.length > 0) {
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-          setSelectedBadge(newlyUnlocked[0]);
+          setSelectedBadge(getLocalizedBadge(newlyUnlocked[0]));
         }
       }
     } catch (e) {
@@ -119,7 +130,7 @@ export default function AwardsScreen({ navigation }: RootStackScreenProps<"Award
         >
           <Ionicons name="arrow-back" size={24} color="#1F2937" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Trophy Room</Text>
+        <Text style={styles.headerTitle}>{t("awards.title")}</Text>
         <View style={styles.headerRightPlaceholder} />
       </View>
 
@@ -135,9 +146,9 @@ export default function AwardsScreen({ navigation }: RootStackScreenProps<"Award
             </View>
             <View>
               <Text style={styles.streakCount}>
-                {stats?.currentStreak || 0} Day{stats?.currentStreak === 1 ? "" : "s"}
+                {stats?.currentStreak || 0} {t("common.done") === "Listo" ? "Días" : t("common.done") === "Terminé" ? "Jours" : "Days"}
               </Text>
-              <Text style={styles.streakLabel}>Current Daily Streak</Text>
+              <Text style={styles.streakLabel}>{t("awards.currentStreak")}</Text>
             </View>
           </View>
 
@@ -146,19 +157,19 @@ export default function AwardsScreen({ navigation }: RootStackScreenProps<"Award
           <View style={styles.statMetricsRow}>
             <View style={styles.statMetric}>
               <Text style={styles.statMetricValue}>{unlockedCount}/{badges.length}</Text>
-              <Text style={styles.statMetricLabel}>Badges</Text>
+              <Text style={styles.statMetricLabel}>{t("awards.unlockedCount", { unlocked: unlockedCount, total: badges.length }).split(" ")[2] || "Badges"}</Text>
             </View>
             <View style={styles.statMetric}>
               <Text style={styles.statMetricValue}>{stats?.totalWorkouts || 0}</Text>
-              <Text style={styles.statMetricLabel}>Workouts</Text>
+              <Text style={styles.statMetricLabel}>{t("awards.totalWorkouts")}</Text>
             </View>
             <View style={styles.statMetric}>
               <Text style={styles.statMetricValue}>{formatDuration(stats?.totalSeconds || 0)}</Text>
-              <Text style={styles.statMetricLabel}>Total Time</Text>
+              <Text style={styles.statMetricLabel}>{t("awards.totalTime")}</Text>
             </View>
             <View style={styles.statMetric}>
               <Text style={styles.statMetricValue}>{stats?.totalShares || 0}</Text>
-              <Text style={styles.statMetricLabel}>Shares</Text>
+              <Text style={styles.statMetricLabel}>{t("common.share")}</Text>
             </View>
           </View>
         </LinearGradient>
@@ -177,9 +188,9 @@ export default function AwardsScreen({ navigation }: RootStackScreenProps<"Award
               <Ionicons name="gift" size={22} color="#FFFFFF" />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={styles.inviteBannerTitle}>Invite Friends & Earn Badges 🚀</Text>
+              <Text style={styles.inviteBannerTitle}>{t("awards.inviteBannerTitle")} 🚀</Text>
               <Text style={styles.inviteBannerSubtitle}>
-                {stats?.totalShares || 0} shares completed • Share with friends to unlock!
+                {t("awards.inviteBannerSubtitle")}
               </Text>
             </View>
             <Ionicons name="share-social" size={18} color="#FFFFFF" />
@@ -188,8 +199,8 @@ export default function AwardsScreen({ navigation }: RootStackScreenProps<"Award
 
         {/* Badges Collection Grid */}
         <View style={styles.gridSection}>
-          <Text style={styles.sectionTitle}>All Achievements</Text>
-          <Text style={styles.sectionSubtitle}>Tap any badge to inspect and share</Text>
+          <Text style={styles.sectionTitle}>{t("awards.title")}</Text>
+          <Text style={styles.sectionSubtitle}>{t("awards.unlockedCount", { unlocked: unlockedCount, total: badges.length })}</Text>
 
           <View style={styles.badgeGrid}>
             {badges.map((badge) => {
@@ -221,11 +232,11 @@ export default function AwardsScreen({ navigation }: RootStackScreenProps<"Award
                   {isUnlocked ? (
                     <View style={styles.unlockedTag}>
                       <Ionicons name="checkmark-circle" size={14} color="#10B981" />
-                      <Text style={styles.unlockedTagText}>Earned</Text>
+                      <Text style={styles.unlockedTagText}>{t("common.done")}</Text>
                     </View>
                   ) : (
                     <Text style={styles.lockedHintText} numberOfLines={1}>
-                      Locked
+                      {t("awards.locked")}
                     </Text>
                   )}
                 </TouchableOpacity>
@@ -280,13 +291,13 @@ export default function AwardsScreen({ navigation }: RootStackScreenProps<"Award
                     style={styles.modalShareGradient}
                   >
                     <Ionicons name="share-social" size={20} color="#FFFFFF" style={{ marginRight: 6 }} />
-                    <Text style={styles.modalShareText}>Share Badge with Friends</Text>
+                    <Text style={styles.modalShareText}>{t("awards.shareBadge")}</Text>
                   </LinearGradient>
                 </TouchableOpacity>
               ) : (
                 <View style={styles.modalLockedPill}>
                   <Ionicons name="lock-closed" size={16} color="#6B7280" />
-                  <Text style={styles.modalLockedPillText}>Keep training to unlock!</Text>
+                  <Text style={styles.modalLockedPillText}>{t("awards.howToUnlock")}</Text>
                 </View>
               )}
             </View>

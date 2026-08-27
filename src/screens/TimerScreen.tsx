@@ -6,6 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 import { RootStackScreenProps } from "../types";
 import { Interval } from "../model/Interval";
+import { t } from "../i18n";
 import Spacing from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
 
@@ -179,11 +180,11 @@ export default function TimerScreen({
     progressAnim.stopAnimation();
 
     Alert.alert(
-      "Exit Workout?",
-      "Are you sure you want to stop this workout and return to the dashboard?",
+      t("timer.exitTitle"),
+      t("timer.exitMessage"),
       [
         {
-          text: "Stay Here",
+          text: t("timer.exitCancel"),
           style: "cancel",
           onPress: () => {
             setIsPaused(wasPaused);
@@ -195,7 +196,7 @@ export default function TimerScreen({
           }
         },
         {
-          text: "Exit",
+          text: t("timer.exitConfirm"),
           style: "destructive",
           onPress: () => {
             clearInterval(timerIdRef.current);
@@ -247,7 +248,7 @@ export default function TimerScreen({
         <Text style={styles.countdown}>{durationLeft}s</Text>
         
         <View style={styles.metaRow}>
-          <Text style={styles.metaText}>Round {currentRound} of {timer.rounds}</Text>
+          <Text style={styles.metaText}>{t("timer.roundOf", { current: currentRound, total: timer.rounds })}</Text>
           <Text style={styles.metaDivider}>•</Text>
           <Text style={styles.metaText}>
             Interval {currentIntervalIndex + 1}/{flatIntervals.length}
@@ -256,7 +257,7 @@ export default function TimerScreen({
 
         {nextInterval && (
           <View style={styles.nextUpCard}>
-            <Text style={styles.nextUpLabel}>NEXT UP</Text>
+            <Text style={styles.nextUpLabel}>{t("timer.nextUp")}</Text>
             <Text style={styles.nextUpValue}>
               {nextInterval.name} ({nextInterval.duration}s)
             </Text>

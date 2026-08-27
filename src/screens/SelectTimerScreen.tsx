@@ -30,6 +30,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { getUserStats, recordShare } from "../services/badgeService";
 import { UserStats } from "../model/Badge";
+import { t } from "../i18n";
 
 const STORAGE_KEY = "@hiit_timers";
 const INITIALIZED_KEY = "@hiit_initialized";
@@ -118,11 +119,18 @@ export default function SelectTimerScreen({
       const playStoreLink = "https://play.google.com/store/apps/details?id=com.plyonest.interval";
 
       const totalSec = calculateTotalDuration(timer);
-      const shareMessage = `🔥 Try my custom HIIT workout "${timer.name}" on Interval!\n\nWorkout details: ${timer.rounds} rounds, ${formatTime(totalSec)} total time.\n\n1. Download Interval:\nApp Store: ${appStoreLink}\nPlay Store: ${playStoreLink}\n\n2. Open this link to load the timer:\n${deepLink}`;
+      const shareMessage = t("selectTimer.shareMessage", {
+        name: timer.name,
+        rounds: timer.rounds,
+        duration: formatTime(totalSec),
+        appStoreLink,
+        playStoreLink,
+        deepLink,
+      });
 
       const result = await Share.share({
         message: shareMessage,
-        title: `Share Timer: ${timer.name}`,
+        title: t("selectTimer.shareTimerTitle", { name: timer.name }),
       });
 
       if (result.action === Share.sharedAction) {
@@ -146,7 +154,6 @@ export default function SelectTimerScreen({
         onPress={() => navigation.navigate("CreateTimer", { timer: item })}
       >
         <View style={styles.cardHeader}>
-          {/* Drag Handle on the Far Left inside the Card */}
           <TouchableOpacity
             onPressIn={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -173,7 +180,7 @@ export default function SelectTimerScreen({
               )}
               <View style={styles.badge}>
                 <Ionicons name="repeat" size={12} color="#4B5563" />
-                <Text style={styles.badgeText}>{item.rounds} Rounds</Text>
+                <Text style={styles.badgeText}>{item.rounds} {t("common.rounds")}</Text>
               </View>
               <View style={[styles.badge, styles.durationBadge]}>
                 <Ionicons name="time-outline" size={12} color="#1D4ED8" />
@@ -220,9 +227,9 @@ export default function SelectTimerScreen({
           <View style={styles.emptyIconContainer}>
             <Ionicons name="stopwatch-outline" size={72} color="#9CA3AF" />
           </View>
-          <Text style={styles.emptyTitle}>No Timers Yet</Text>
+          <Text style={styles.emptyTitle}>{t("selectTimer.noTimersTitle")}</Text>
           <Text style={styles.emptyText}>
-            Build your custom intervals or let the AI coach design a workout for you.
+            {t("selectTimer.noTimersText")}
           </Text>
         </View>
       ) : (
@@ -258,7 +265,6 @@ export default function SelectTimerScreen({
         />
       )}
 
-      {/* Dynamic Sticky Header - Rendered after list so it always floats on top */}
       <View
         onLayout={(e) => setHeaderHeight(e.nativeEvent.layout.height)}
         style={[
@@ -269,8 +275,8 @@ export default function SelectTimerScreen({
       >
         <View style={styles.headerTopRow}>
           <View style={styles.headerTitles}>
-            <Text style={styles.greeting}>Let's Workout! ⚡️</Text>
-            <Text style={styles.subGreeting}>Choose or generate a HIIT timer to start</Text>
+            <Text style={styles.greeting}>{t("selectTimer.greeting")}</Text>
+            <Text style={styles.subGreeting}>{t("selectTimer.subGreeting")}</Text>
           </View>
           <TouchableOpacity
             style={styles.trophyButton}
@@ -291,7 +297,6 @@ export default function SelectTimerScreen({
         </View>
       </View>
 
-      {/* Floating Drop Shadow Gradient right below the header */}
       {isScrolled && (
         <LinearGradient
           colors={["rgba(0, 0, 0, 0.15)", "rgba(0, 0, 0, 0.05)", "transparent"]}
@@ -303,7 +308,6 @@ export default function SelectTimerScreen({
         />
       )}
 
-      {/* Persistent Bottom Action Panel */}
       <View
         style={[
           styles.buttonPanel,
@@ -319,7 +323,7 @@ export default function SelectTimerScreen({
           onPress={() => navigation.navigate("CreateTimer")}
         >
           <Ionicons name="add" size={20} color="#3B82F6" style={styles.buttonIcon} />
-          <Text style={styles.createButtonText}>Create Custom</Text>
+          <Text style={styles.createButtonText}>{t("selectTimer.createCustom")}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -334,7 +338,7 @@ export default function SelectTimerScreen({
             style={styles.gradientButton}
           >
             <Ionicons name="sparkles" size={18} color="#FFFFFF" style={styles.buttonIcon} />
-            <Text style={styles.generateButtonText}>Generate with AI</Text>
+            <Text style={styles.generateButtonText}>{t("selectTimer.generateAi")}</Text>
           </LinearGradient>
         </TouchableOpacity>
       </View>

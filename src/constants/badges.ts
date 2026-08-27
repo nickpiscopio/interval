@@ -1,4 +1,5 @@
 import { Badge } from "../model/Badge";
+import { t } from "../i18n";
 
 export const BADGE_CATALOG: Badge[] = [
   // --- Streaks ---
@@ -309,3 +310,23 @@ export const BADGE_CATALOG: Badge[] = [
     gradientColors: ["#14B8A6", "#0F766E"],
   },
 ];
+
+/**
+ * Returns a localized copy of a badge according to current active locale.
+ */
+export function getLocalizedBadge(badge: Badge): Badge {
+  return {
+    ...badge,
+    name: t(`badges.${badge.id}.name`, { defaultValue: badge.name }),
+    tagline: t(`badges.${badge.id}.tagline`, { defaultValue: badge.tagline }),
+    description: t(`badges.${badge.id}.description`, { defaultValue: badge.description }),
+  };
+}
+
+/**
+ * Returns the full catalog of badges with localized names, taglines, and descriptions.
+ */
+export function getLocalizedBadges(): Badge[] {
+  return BADGE_CATALOG.map(getLocalizedBadge);
+}
+

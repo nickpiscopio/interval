@@ -18,6 +18,8 @@ import { RootStackScreenProps } from "../types";
 import { encodeBase64 } from "../utils/base64";
 import { recordWorkoutCompletion, recordShare } from "../services/badgeService";
 import { Badge, UserStats } from "../model/Badge";
+import { getLocalizedBadge } from "../constants/badges";
+import { t } from "../i18n";
 import Spacing from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
 
@@ -34,52 +36,55 @@ export default function CompletionScreen({
   // Calculate total seconds worked
   const totalSeconds = timer.intervals.reduce((sum, int) => sum + int.duration, 0) * timer.rounds;
 
-  // Play single completion beep and record workout for badge unlocks
+  // Format seconds to mm:ss
+  function formatTime(seconds: number): string {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+  }
+
+  // Play fanfare victory audio on screen load
   useEffect(() => {
-    let sound: Audio.Sound | null = null;
-
-    async function initCompletion() {
+    let soundObj: Audio.Sound | null = null;
+    async function playFanfare() {
       try {
-        const loaded = await Audio.Sound.createAsync(
-          require("../../assets/sounds/beep_3.mp3")
+        const { sound } = await Audio.Sound.createAsync(
+          require("../../assets/sounds/fanfare.mp3")
         );
-        sound = loaded.sound;
-        await sound.replayAsync().catch(() => {});
+        soundObj = sound;
+        await sound.playAsync();
       } catch (e) {
-        console.warn("Failed to play completion beep:", e);
-      }
-
-      // Record workout stats and evaluate badge unlocks
-      try {
-        const { newlyUnlocked, stats } = await recordWorkoutCompletion(timer, totalSeconds);
-        setUserStats(stats);
-        if (newlyUnlocked.length > 0) {
-          setNewlyUnlockedBadges(newlyUnlocked);
-          setActiveModalBadge(newlyUnlocked[0]);
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        }
-      } catch (err) {
-        console.warn("Failed to record completion awards:", err);
+        console.warn("Failed to play fanfare sound:", e);
       }
     }
-
-    initCompletion();
+    playFanfare();
 
     return () => {
-      if (sound) {
-        sound.unloadAsync().catch(() => {});
+      if (soundObj) {
+        soundObj.unloadAsync().catch(() => {});
       }
     };
   }, []);
 
-  function formatTime(totalSec: number): string {
-    const mins = Math.floor(totalSec / 60);
-    const secs = totalSec % 60;
-    if (mins > 0) {
-      return `${mins}m ${secs > 0 ? `${secs}s` : ""}`;
+  // Record workout completion and check for new badges
+  useEffect(() => {
+    async function processCompletion() {
+      try {
+        const { newlyUnlocked, stats } = await recordWorkoutCompletion(timer, totalSeconds);
+        setUserStats(stats);
+
+        if (newlyUnlocked.length > 0) {
+          const localizedList = newlyUnlocked.map(getLocalizedBadge);
+          setNewlyUnlockedBadges(localizedList);
+          setActiveModalBadge(localizedList[0]);
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        }
+      } catch (error) {
+        console.warn("Failed to record workout completion stats:", error);
+      }
     }
-    return `${secs}s`;
-  }
+    processCompletion();
+  }, []);
 
   // Handle native sharing triggers
   async function handleShare() {
@@ -101,22 +106,36 @@ export default function CompletionScreen({
       const appStoreLink = "https://apps.apple.com/app/interval-hiit-timer/id12345678";
       const playStoreLink = "https://play.google.com/store/apps/details?id=com.plyonest.interval";
 
-      const streakText = userStats && userStats.currentStreak > 0 ? `\nStreak: 🔥 ${userStats.currentStreak}-Day Streak` : "";
-      const badgeText = newlyUnlockedBadges.length > 0 ? `\nUnlocked: 🏆 ${newlyUnlockedBadges.map(b => b.name).join(", ")}` : "";
+      const streakText = userStats && userStats.currentStreak > 0
+        ? t("completion.shareStreakText", { streak: userStats.currentStreak })
+        : "";
+      const badgeText = newlyUnlockedBadges.length > 0
+        ? t("completion.shareBadgeText", { badges: newlyUnlockedBadges.map(b => b.name).join(", ") })
+        : "";
 
-      const shareMessage = `I just smashed my workout using Interval! ⚡️\n\nTimer: "${timer.name}" (${timer.rounds} rounds, ${formatTime(totalSeconds)} duration)${streakText}${badgeText}\n\n1. Download the app:\nApp Store: ${appStoreLink}\nPlay Store: ${playStoreLink}\n\n2. Open this link to load the timer:\n${deepLink}`;
+      const shareMessage = t("completion.shareMessage", {
+        name: timer.name,
+        rounds: timer.rounds,
+        duration: formatTime(totalSeconds),
+        streakText,
+        badgeText,
+        appStoreLink,
+        playStoreLink,
+        deepLink,
+      });
 
       const result = await Share.share({
         message: shareMessage,
-        title: `Share Workout: ${timer.name}`,
+        title: t("completion.shareWorkoutTitle", { name: timer.name }),
       });
 
       if (result.action === Share.sharedAction) {
         const { newlyUnlocked, stats } = await recordShare(result.activityType);
         setUserStats(stats);
         if (newlyUnlocked.length > 0) {
-          setNewlyUnlockedBadges((prev) => [...prev, ...newlyUnlocked]);
-          setActiveModalBadge(newlyUnlocked[0]);
+          const localizedList = newlyUnlocked.map(getLocalizedBadge);
+          setNewlyUnlockedBadges((prev) => [...prev, ...localizedList]);
+          setActiveModalBadge(localizedList[0]);
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         }
       }
@@ -131,19 +150,26 @@ export default function CompletionScreen({
       const playStoreLink = "https://play.google.com/store/apps/details?id=com.plyonest.interval";
       
       const streakText = userStats && userStats.currentStreak > 0 ? ` (🔥 ${userStats.currentStreak}-Day Streak!)` : "";
-      const message = `🏆 I just earned the "${badge.name}" badge${streakText} on Interval!\n\n"${badge.description}"\n\nCrush your fitness goals with custom HIIT interval timers:\nApp Store: ${appStoreLink}\nPlay Store: ${playStoreLink}`;
+      const message = t("completion.shareBadgeMessage", {
+        name: badge.name,
+        streakText,
+        description: badge.description,
+        appStoreLink,
+        playStoreLink,
+      });
 
       const result = await Share.share({
         message,
-        title: `Badge Unlocked: ${badge.name}`,
+        title: badge.name,
       });
 
       if (result.action === Share.sharedAction) {
         const { newlyUnlocked, stats } = await recordShare(result.activityType);
         setUserStats(stats);
         if (newlyUnlocked.length > 0) {
-          setNewlyUnlockedBadges((prev) => [...prev, ...newlyUnlocked]);
-          setActiveModalBadge(newlyUnlocked[0]);
+          const localizedList = newlyUnlocked.map(getLocalizedBadge);
+          setNewlyUnlockedBadges((prev) => [...prev, ...localizedList]);
+          setActiveModalBadge(localizedList[0]);
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         }
       }
@@ -163,11 +189,11 @@ export default function CompletionScreen({
         >
           <View style={styles.trophyContainer}>
             <Ionicons name="trophy" size={90} color="#F59E0B" />
-            <Text style={styles.badgeText}>COMPLETED</Text>
+            <Text style={styles.badgeText}>{t("common.done").toUpperCase()}</Text>
           </View>
 
-          <Text style={styles.title}>You Crushed It! 🎉</Text>
-          <Text style={styles.subtitle}>Another successful HIIT session in the books.</Text>
+          <Text style={styles.title}>{t("completion.title")}</Text>
+          <Text style={styles.subtitle}>{t("completion.subtitle", { name: timer.name })}</Text>
         </LinearGradient>
 
         {/* Workout Stats Details */}
@@ -176,19 +202,19 @@ export default function CompletionScreen({
           
           <View style={styles.statsRow}>
             <View style={styles.statBox}>
-              <Text style={styles.statLabel}>Total Time</Text>
+              <Text style={styles.statLabel}>{t("completion.totalTime")}</Text>
               <Text style={styles.statValue}>{formatTime(totalSeconds)}</Text>
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statBox}>
-              <Text style={styles.statLabel}>Rounds</Text>
-              <Text style={styles.statValue}>{timer.rounds} Rounds</Text>
+              <Text style={styles.statLabel}>{t("common.rounds")}</Text>
+              <Text style={styles.statValue}>{timer.rounds} {t("common.rounds")}</Text>
             </View>
             {userStats && userStats.currentStreak > 0 && (
               <>
                 <View style={styles.statDivider} />
                 <View style={styles.statBox}>
-                  <Text style={styles.statLabel}>Streak</Text>
+                  <Text style={styles.statLabel}>{t("awards.currentStreak")}</Text>
                   <Text style={[styles.statValue, { color: "#D97706" }]}>
                     🔥 {userStats.currentStreak}d
                   </Text>
@@ -200,7 +226,7 @@ export default function CompletionScreen({
           <View style={styles.infoRow}>
             <Ionicons name="fitness-outline" size={18} color="#4B5563" />
             <Text style={styles.infoText}>
-              Completed {timer.intervals.filter(i => i.exerciseId).length * timer.rounds} active exercise intervals!
+              {t("completion.intervalsCompleted")}: {timer.intervals.length * timer.rounds}
             </Text>
           </View>
         </View>
@@ -210,7 +236,7 @@ export default function CompletionScreen({
           <View style={styles.unlockedSection}>
             <View style={styles.unlockedSectionHeader}>
               <Ionicons name="sparkles" size={18} color="#F59E0B" />
-              <Text style={styles.unlockedSectionTitle}>New Awards Unlocked!</Text>
+              <Text style={styles.unlockedSectionTitle}>{t("completion.newBadgeUnlocked")}</Text>
             </View>
             <View style={styles.badgeCardsRow}>
               {newlyUnlockedBadges.map((badge) => (
@@ -249,7 +275,7 @@ export default function CompletionScreen({
               style={styles.shareButton}
             >
               <Ionicons name="share-social" size={20} color="#FFFFFF" style={styles.icon} />
-              <Text style={styles.shareButtonText}>Share Workout with Friends</Text>
+              <Text style={styles.shareButtonText}>{t("completion.shareWorkout")}</Text>
             </LinearGradient>
           </TouchableOpacity>
 
@@ -259,7 +285,7 @@ export default function CompletionScreen({
             onPress={() => navigation.navigate("Awards")}
           >
             <Ionicons name="trophy-outline" size={18} color="#D97706" style={styles.icon} />
-            <Text style={styles.trophyRoomButtonText}>View All Awards</Text>
+            <Text style={styles.trophyRoomButtonText}>{t("awards.title")}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -267,7 +293,7 @@ export default function CompletionScreen({
             activeOpacity={0.8}
             onPress={() => navigation.popToTop()}
           >
-            <Text style={styles.doneButtonText}>Back to Dashboard</Text>
+            <Text style={styles.doneButtonText}>{t("completion.doneButton")}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -284,7 +310,7 @@ export default function CompletionScreen({
             <View style={styles.modalContent}>
               <View style={styles.modalBadgeHeaderPill}>
                 <Ionicons name="sparkles" size={14} color="#D97706" />
-                <Text style={styles.modalBadgeHeaderText}>NEW BADGE UNLOCKED!</Text>
+                <Text style={styles.modalBadgeHeaderText}>{t("completion.newBadgeUnlocked").toUpperCase()}</Text>
               </View>
 
               <LinearGradient
@@ -308,7 +334,7 @@ export default function CompletionScreen({
                   style={styles.modalShareGradient}
                 >
                   <Ionicons name="share-social" size={20} color="#FFFFFF" style={{ marginRight: 6 }} />
-                  <Text style={styles.modalShareText}>Share Badge 🚀</Text>
+                  <Text style={styles.modalShareText}>{t("completion.shareBadge")}</Text>
                 </LinearGradient>
               </TouchableOpacity>
 
@@ -317,7 +343,7 @@ export default function CompletionScreen({
                 activeOpacity={0.8}
                 onPress={() => setActiveModalBadge(null)}
               >
-                <Text style={styles.modalContinueText}>Awesome!</Text>
+                <Text style={styles.modalContinueText}>{t("common.ok")}</Text>
               </TouchableOpacity>
             </View>
           </View>

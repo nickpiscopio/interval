@@ -12,6 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 import { RootStackScreenProps } from "../types";
 import { generateWorkout, GeneratorParams } from "../services/timerGenerator";
+import { t } from "../i18n";
 import Spacing from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
 import Colors from "../constants/Colors";
@@ -41,9 +42,9 @@ export default function GenerateTimerScreen({
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#10B981" />
-        <Text style={styles.loadingTitle}>Coaching Engine Active...</Text>
+        <Text style={styles.loadingTitle}>{t("generateTimer.loadingTitle")}</Text>
         <Text style={styles.loadingSubtitle}>
-          Designing a custom bodyweight HIIT routine tailored to your goals.
+          {t("generateTimer.loadingSubtitle")}
         </Text>
       </View>
     );
@@ -52,18 +53,18 @@ export default function GenerateTimerScreen({
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.description}>
-        Tell us a little about what you are looking for to allow Interval's AI to create a custom bodyweight exercise timer for you!
+        {t("generateTimer.description")}
       </Text>
 
       {/* Fitness Goal */}
-      <Text style={styles.sectionHeader}>What is your fitness goal?</Text>
+      <Text style={styles.sectionHeader}>{t("generateTimer.goalQuestion")}</Text>
       <View style={styles.chipRow}>
         <TouchableOpacity
           style={[styles.chip, goal === "weight_loss" && styles.chipActive]}
           onPress={() => setGoal("weight_loss")}
         >
           <Text style={[styles.chipText, goal === "weight_loss" && styles.chipTextActive]}>
-            Lose weight
+            {t("generateTimer.goalWeightLoss")}
           </Text>
         </TouchableOpacity>
 
@@ -72,7 +73,7 @@ export default function GenerateTimerScreen({
           onPress={() => setGoal("tone")}
         >
           <Text style={[styles.chipText, goal === "tone" && styles.chipTextActive]}>
-            Get toned
+            {t("generateTimer.goalTone")}
           </Text>
         </TouchableOpacity>
 
@@ -81,20 +82,20 @@ export default function GenerateTimerScreen({
           onPress={() => setGoal("bulk")}
         >
           <Text style={[styles.chipText, goal === "bulk" && styles.chipTextActive]}>
-            Bulk up
+            {t("generateTimer.goalBulk")}
           </Text>
         </TouchableOpacity>
       </View>
 
       {/* Target Focus Area */}
-      <Text style={styles.sectionHeader}>What would you like to exercise?</Text>
+      <Text style={styles.sectionHeader}>{t("generateTimer.areaQuestion")}</Text>
       <View style={styles.chipRow}>
         <TouchableOpacity
           style={[styles.chip, area === "total" && styles.chipActive]}
           onPress={() => setArea("total")}
         >
           <Text style={[styles.chipText, area === "total" && styles.chipTextActive]}>
-            Total body
+            {t("generateTimer.areaTotal")}
           </Text>
         </TouchableOpacity>
 
@@ -103,7 +104,7 @@ export default function GenerateTimerScreen({
           onPress={() => setArea("abs")}
         >
           <Text style={[styles.chipText, area === "abs" && styles.chipTextActive]}>
-            Abs
+            {t("generateTimer.areaAbs")}
           </Text>
         </TouchableOpacity>
 
@@ -112,7 +113,7 @@ export default function GenerateTimerScreen({
           onPress={() => setArea("lower")}
         >
           <Text style={[styles.chipText, area === "lower" && styles.chipTextActive]}>
-            Lower body
+            {t("generateTimer.areaLower")}
           </Text>
         </TouchableOpacity>
 
@@ -121,7 +122,7 @@ export default function GenerateTimerScreen({
           onPress={() => setArea("cardio")}
         >
           <Text style={[styles.chipText, area === "cardio" && styles.chipTextActive]}>
-            Cardio
+            {t("generateTimer.areaCardio")}
           </Text>
         </TouchableOpacity>
 
@@ -130,7 +131,7 @@ export default function GenerateTimerScreen({
           onPress={() => setArea("upper")}
         >
           <Text style={[styles.chipText, area === "upper" && styles.chipTextActive]}>
-            Upper body
+            {t("generateTimer.areaUpper")}
           </Text>
         </TouchableOpacity>
 
@@ -139,20 +140,20 @@ export default function GenerateTimerScreen({
           onPress={() => setArea("surprise")}
         >
           <Text style={[styles.chipText, area === "surprise" && styles.chipTextActive]}>
-            Surprise me!
+            {t("generateTimer.areaSurprise")}
           </Text>
         </TouchableOpacity>
       </View>
 
       {/* Fitness Experience Level */}
-      <Text style={styles.sectionHeader}>What is your fitness experience?</Text>
+      <Text style={styles.sectionHeader}>{t("generateTimer.experienceQuestion")}</Text>
       <View style={styles.chipRow}>
         <TouchableOpacity
           style={[styles.chip, experience === "beginner" && styles.chipActive]}
           onPress={() => setExperience("beginner")}
         >
           <Text style={[styles.chipText, experience === "beginner" && styles.chipTextActive]}>
-            Beginner
+            {t("generateTimer.experienceBeginner")}
           </Text>
         </TouchableOpacity>
 
@@ -161,7 +162,7 @@ export default function GenerateTimerScreen({
           onPress={() => setExperience("intermediate")}
         >
           <Text style={[styles.chipText, experience === "intermediate" && styles.chipTextActive]}>
-            Intermediate
+            {t("generateTimer.experienceIntermediate")}
           </Text>
         </TouchableOpacity>
 
@@ -170,7 +171,7 @@ export default function GenerateTimerScreen({
           onPress={() => setExperience("advanced")}
         >
           <Text style={[styles.chipText, experience === "advanced" && styles.chipTextActive]}>
-            Advanced
+            {t("generateTimer.experienceAdvanced")}
           </Text>
         </TouchableOpacity>
       </View>
@@ -188,7 +189,7 @@ export default function GenerateTimerScreen({
           style={styles.generateButton}
         >
           <Ionicons name="sparkles" size={18} color="#FFFFFF" style={styles.buttonIcon} />
-          <Text style={styles.generateButtonText}>Generate Timer</Text>
+          <Text style={styles.generateButtonText}>{t("generateTimer.generateButton")}</Text>
         </LinearGradient>
       </TouchableOpacity>
     </ScrollView>
