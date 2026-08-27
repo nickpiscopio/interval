@@ -22,6 +22,7 @@ import {
   getLocalizedBodyPartName,
 } from "../constants/exerciseCatalog";
 import { ExerciseDetailModal } from "./ExerciseDetailModal";
+import { recordExerciseSearch, recordExerciseInspection } from "../services/badgeService";
 import { t } from "../i18n";
 
 export interface ExerciseLibraryViewProps {
@@ -92,7 +93,21 @@ export function ExerciseLibraryView({
 
   function handleCardPress(exercise: Exercise) {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    recordExerciseInspection(exercise.id, exercise.bodyParts);
     setSelectedExercise(exercise);
+  }
+
+  function handleSearchChange(text: string) {
+    setSearchQuery(text);
+    if (text.trim().length >= 2) {
+      recordExerciseSearch(selectedBodyPart);
+    }
+  }
+
+  function handleBodyPartSelect(bpId: string) {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setSelectedBodyPart(bpId);
+    recordExerciseSearch(bpId);
   }
 
   const categoryColorMap: Record<string, string> = {
@@ -114,7 +129,7 @@ export function ExerciseLibraryView({
           placeholder={t("exercises.searchPlaceholder")}
           placeholderTextColor="#9CA3AF"
           value={searchQuery}
-          onChangeText={setSearchQuery}
+          onChangeText={handleSearchChange}
           clearButtonMode="while-editing"
           autoCapitalize="none"
           autoCorrect={false}
@@ -214,10 +229,7 @@ export function ExerciseLibraryView({
                   styles.bodyPartPill,
                   isSelected && styles.bodyPartPillSelected,
                 ]}
-                onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  setSelectedBodyPart(bp.id);
-                }}
+                onPress={() => handleBodyPartSelect(bp.id)}
               >
                 <Ionicons
                   name={bp.iconName as any}

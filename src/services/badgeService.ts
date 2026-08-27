@@ -2,6 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Badge, UserStats } from "../model/Badge";
 import { Timer } from "../model/Timer";
 import { BADGE_CATALOG } from "../constants/badges";
+import { EXERCISE_CATALOG } from "../constants/exerciseCatalog";
 
 const USER_STATS_KEY = "@interval_user_stats";
 const UNLOCKED_TIMESTAMPS_KEY = "@interval_badge_timestamps";
@@ -20,6 +21,11 @@ export const DEFAULT_USER_STATS: UserStats = {
   sharedViaSms: false,
   sharedViaEmailOrLink: false,
   importedSharedWorkouts: 0,
+  totalCorrectiveWorkouts: 0,
+  totalCorrectiveIntervals: 0,
+  totalSearches: 0,
+  exploredBodyParts: [],
+  inspectedExerciseIds: [],
   unlockedBadgeIds: [],
 };
 
@@ -118,6 +124,26 @@ export async function recordWorkoutCompletion(
   const isImportedTimer = Boolean(timer.id.startsWith("ai_") && !timer.createdAt);
   const importedSharedWorkouts = stats.importedSharedWorkouts + (isImportedTimer ? 1 : 0);
 
+  // Corrective calculations
+  const correctiveIntervalCount = timer.intervals.filter((interval) => {
+    if (interval.exerciseId) {
+      const found = EXERCISE_CATALOG.find((e) => e.id === interval.exerciseId);
+      if (found && found.category === "corrective") return true;
+    }
+    const foundByName = EXERCISE_CATALOG.find(
+      (e) => e.name.toLowerCase() === interval.name.toLowerCase()
+    );
+    if (foundByName && foundByName.category === "corrective") return true;
+    return false;
+  }).length * timer.rounds;
+
+  const isCorrectiveWorkout = correctiveIntervalCount > 0;
+  const totalCorrectiveWorkouts = (stats.totalCorrectiveWorkouts || 0) + (isCorrectiveWorkout ? 1 : 0);
+  const totalCorrectiveIntervals = (stats.totalCorrectiveIntervals || 0) + correctiveIntervalCount;
+  const totalSearches = stats.totalSearches || 0;
+  const exploredBodyParts = stats.exploredBodyParts || [];
+  const inspectedExerciseIds = stats.inspectedExerciseIds || [];
+
   const currentUnlocked = new Set(stats.unlockedBadgeIds || []);
   const newlyUnlocked: Badge[] = [];
 
@@ -156,6 +182,17 @@ export async function recordWorkoutCompletion(
   checkAndUnlock("custom_creator", !timer.isAiGenerated);
   checkAndUnlock("imported_gains", importedSharedWorkouts >= 1);
 
+  // Discovery Badges
+  checkAndUnlock("curious_explorer", totalSearches >= 1 || exploredBodyParts.length >= 1);
+  checkAndUnlock("anatomical_master", exploredBodyParts.length >= 5);
+  checkAndUnlock("movement_scholar", inspectedExerciseIds.length >= 10);
+
+  // Corrective Badges
+  checkAndUnlock("rehab_rookie", totalCorrectiveWorkouts >= 1 || totalCorrectiveIntervals >= 1);
+  checkAndUnlock("bulletproof_joints", totalCorrectiveWorkouts >= 5);
+  checkAndUnlock("posture_perfectionist", totalCorrectiveIntervals >= 15);
+  checkAndUnlock("iron_alignment", totalCorrectiveWorkouts >= 10);
+
   const updatedStats: UserStats = {
     ...stats,
     currentStreak,
@@ -168,6 +205,106 @@ export async function recordWorkoutCompletion(
     totalSeconds,
     totalIntervals,
     importedSharedWorkouts,
+    totalCorrectiveWorkouts,
+    totalCorrectiveIntervals,
+    totalSearches,
+    exploredBodyParts,
+    inspectedExerciseIds,
+    unlockedBadgeIds: Array.from(currentUnlocked),
+  };
+
+  await saveUserStats(updatedStats);
+  if (newlyUnlocked.length > 0) {
+    await saveBadgeTimestamps(timestamps);
+  }
+
+  return { newlyUnlocked, stats: updatedStats };
+}
+
+export async function recordExerciseSearch(
+  bodyPart?: string
+): Promise<{ newlyUnlocked: Badge[]; stats: UserStats }> {
+  const stats = await getUserStats();
+  const timestamps = await getBadgeTimestamps();
+
+  const totalSearches = (stats.totalSearches || 0) + 1;
+  const exploredSet = new Set(stats.exploredBodyParts || []);
+  if (bodyPart && bodyPart !== "all") {
+    exploredSet.add(bodyPart);
+  }
+  const exploredBodyParts = Array.from(exploredSet);
+
+  const currentUnlocked = new Set(stats.unlockedBadgeIds || []);
+  const newlyUnlocked: Badge[] = [];
+
+  function checkAndUnlock(badgeId: string, condition: boolean) {
+    if (condition && !currentUnlocked.has(badgeId)) {
+      currentUnlocked.add(badgeId);
+      const badgeDef = BADGE_CATALOG.find((b) => b.id === badgeId);
+      if (badgeDef) {
+        newlyUnlocked.push(badgeDef);
+        timestamps[badgeId] = Date.now();
+      }
+    }
+  }
+
+  checkAndUnlock("curious_explorer", totalSearches >= 1 || exploredBodyParts.length >= 1);
+  checkAndUnlock("anatomical_master", exploredBodyParts.length >= 5);
+
+  const updatedStats: UserStats = {
+    ...stats,
+    totalSearches,
+    exploredBodyParts,
+    unlockedBadgeIds: Array.from(currentUnlocked),
+  };
+
+  await saveUserStats(updatedStats);
+  if (newlyUnlocked.length > 0) {
+    await saveBadgeTimestamps(timestamps);
+  }
+
+  return { newlyUnlocked, stats: updatedStats };
+}
+
+export async function recordExerciseInspection(
+  exerciseId: string,
+  bodyParts?: string[]
+): Promise<{ newlyUnlocked: Badge[]; stats: UserStats }> {
+  const stats = await getUserStats();
+  const timestamps = await getBadgeTimestamps();
+
+  const inspectedSet = new Set(stats.inspectedExerciseIds || []);
+  inspectedSet.add(exerciseId);
+  const inspectedExerciseIds = Array.from(inspectedSet);
+
+  const exploredSet = new Set(stats.exploredBodyParts || []);
+  if (bodyParts) {
+    bodyParts.forEach((bp) => exploredSet.add(bp));
+  }
+  const exploredBodyParts = Array.from(exploredSet);
+
+  const currentUnlocked = new Set(stats.unlockedBadgeIds || []);
+  const newlyUnlocked: Badge[] = [];
+
+  function checkAndUnlock(badgeId: string, condition: boolean) {
+    if (condition && !currentUnlocked.has(badgeId)) {
+      currentUnlocked.add(badgeId);
+      const badgeDef = BADGE_CATALOG.find((b) => b.id === badgeId);
+      if (badgeDef) {
+        newlyUnlocked.push(badgeDef);
+        timestamps[badgeId] = Date.now();
+      }
+    }
+  }
+
+  checkAndUnlock("curious_explorer", exploredBodyParts.length >= 1 || inspectedExerciseIds.length >= 1);
+  checkAndUnlock("anatomical_master", exploredBodyParts.length >= 5);
+  checkAndUnlock("movement_scholar", inspectedExerciseIds.length >= 10);
+
+  const updatedStats: UserStats = {
+    ...stats,
+    exploredBodyParts,
+    inspectedExerciseIds,
     unlockedBadgeIds: Array.from(currentUnlocked),
   };
 
@@ -208,7 +345,6 @@ export async function recordShare(
     sharedViaEmailOrLink = true;
   }
 
-  // If activityType was not provided (e.g. on Android or direct share button), also count as general share
   const currentUnlocked = new Set(stats.unlockedBadgeIds || []);
   const newlyUnlocked: Badge[] = [];
 
@@ -223,7 +359,6 @@ export async function recordShare(
     }
   }
 
-  // Evaluate viral sharing ladder
   checkAndUnlock("megaphone_maestro", totalShares >= 1);
   checkAndUnlock("squad_recruiter", sharedViaSms);
   checkAndUnlock("chain_letter_of_gains", sharedViaEmailOrLink);
@@ -257,6 +392,6 @@ export async function getAllBadgesWithStatus(): Promise<Badge[]> {
 
   return BADGE_CATALOG.map((badge) => ({
     ...badge,
-    unlockedAt: unlockedSet.has(badge.id) ? timestamps[badge.id] || 1 : undefined,
+    unlockedAt: unlockedSet.has(badge.id) ? timestamps[badge.id] || Date.now() : undefined,
   }));
 }

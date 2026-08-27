@@ -1445,6 +1445,41 @@
       "name": "Workout Pen Pal",
       "tagline": "Shared sweat is best sweat!",
       "description": "Successfully imported and completed a workout shared by a friend."
+    },
+    "curious_explorer": {
+      "name": "Curious Explorer",
+      "tagline": "Uncovering new movements!",
+      "description": "Searched the exercise library or filtered by body parts to discover custom exercises."
+    },
+    "anatomical_master": {
+      "name": "Anatomical Master",
+      "tagline": "Total body knowledge!",
+      "description": "Explored exercises across at least 5 different body parts and joint areas."
+    },
+    "movement_scholar": {
+      "name": "Movement Scholar",
+      "tagline": "Perfecting technique & form!",
+      "description": "Inspected detailed form cues and instructions for 10 different exercises."
+    },
+    "rehab_rookie": {
+      "name": "Rehab Rookie",
+      "tagline": "Smart recovery begins!",
+      "description": "Completed your very first corrective or physical therapy exercise routine."
+    },
+    "bulletproof_joints": {
+      "name": "Bulletproof Joints",
+      "tagline": "Resilient & unbreakable!",
+      "description": "Completed 5 corrective, mobility, or physical therapy workout sessions."
+    },
+    "posture_perfectionist": {
+      "name": "Posture Perfectionist",
+      "tagline": "Aligned from head to toe!",
+      "description": "Completed 15 physical therapy & corrective intervals targeting posture and joint stability."
+    },
+    "iron_alignment": {
+      "name": "Iron Alignment",
+      "tagline": "Master of functional health!",
+      "description": "Completed 10 full corrective or physical therapy workout routines."
     }
   },
   "legal": {

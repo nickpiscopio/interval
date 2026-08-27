@@ -1445,6 +1445,41 @@
       "name": "Partenaire d'Entraînement",
       "tagline": "Transpirer ensemble, c'est le meilleur !",
       "description": "Vous avez importé et terminé avec succès une séance partagée par un ami."
+    },
+    "curious_explorer": {
+      "name": "Explorateur Curieux",
+      "tagline": "Découverte de nouveaux mouvements !",
+      "description": "A recherché dans la bibliothèque d'exercices ou filtré par zones corporelles."
+    },
+    "anatomical_master": {
+      "name": "Maître Anatomique",
+      "tagline": "Connaissance corporelle totale !",
+      "description": "A exploré des exercices sur au moins 5 zones corporelles et articulations différentes."
+    },
+    "movement_scholar": {
+      "name": "Érudit du Mouvement",
+      "tagline": "Perfectionnement de la posture et technique !",
+      "description": "A consulté les instructions et conseils de posture pour 10 exercices différents."
+    },
+    "rehab_rookie": {
+      "name": "Initié en Rééducation",
+      "tagline": "La récupération intelligente commence !",
+      "description": "A terminé sa toute première routine d'exercices correctifs ou de kinésithérapie."
+    },
+    "bulletproof_joints": {
+      "name": "Articulations d'Acier",
+      "tagline": "Résistant et incassable !",
+      "description": "A terminé 5 séances d'exercices correctifs, de mobilité ou de kinésithérapie."
+    },
+    "posture_perfectionist": {
+      "name": "Perfectionniste Postural",
+      "tagline": "Aligné de la tête aux pieds !",
+      "description": "A réalisé 15 intervalles de kinésithérapie et de correction posturale."
+    },
+    "iron_alignment": {
+      "name": "Alignement de Fer",
+      "tagline": "Maître de la santé fonctionnelle !",
+      "description": "A terminé 10 routines complètes d'exercices correctifs ou de kinésithérapie."
     }
   },
   "legal": {

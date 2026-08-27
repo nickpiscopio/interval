@@ -5,7 +5,7 @@ export interface Badge {
   iconName: string;
   tagline: string;
   description: string;
-  category: "streak" | "volume" | "feat" | "timing" | "sharing";
+  category: "streak" | "volume" | "feat" | "timing" | "sharing" | "discovery" | "corrective";
   gradientColors: [string, string];
   unlockedAt?: number;
 }
@@ -24,5 +24,10 @@ export interface UserStats {
   sharedViaSms: boolean;
   sharedViaEmailOrLink: boolean;
   importedSharedWorkouts: number;
+  totalCorrectiveWorkouts: number;
+  totalCorrectiveIntervals: number;
+  totalSearches: number;
+  exploredBodyParts: string[];
+  inspectedExerciseIds: string[];
   unlockedBadgeIds: string[];
 }

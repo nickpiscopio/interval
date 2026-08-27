@@ -1445,6 +1445,41 @@
       "name": "Amigo de Entrenamiento",
       "tagline": "¡Entrenar juntos es lo mejor!",
       "description": "Importaste y completaste con éxito un entrenamiento compartido por un amigo."
+    },
+    "curious_explorer": {
+      "name": "Explorador Curioso",
+      "tagline": "¡Descubriendo nuevos movimientos!",
+      "description": "Buscaste en la biblioteca de ejercicios o filtraste por partes del cuerpo para descubrir ejercicios."
+    },
+    "anatomical_master": {
+      "name": "Maestro Anatómico",
+      "tagline": "¡Conocimiento corporal total!",
+      "description": "Exploraste ejercicios en al menos 5 partes del cuerpo y articulaciones diferentes."
+    },
+    "movement_scholar": {
+      "name": "Estudioso del Movimiento",
+      "tagline": "¡Perfeccionando la técnica y postura!",
+      "description": "Inspeccionaste instrucciones y consejos posturales detallados de 10 ejercicios diferentes."
+    },
+    "rehab_rookie": {
+      "name": "Novato de Rehabilitación",
+      "tagline": "¡Comienza la recuperación inteligente!",
+      "description": "Completaste tu primera rutina de ejercicios correctivos o de fisioterapia."
+    },
+    "bulletproof_joints": {
+      "name": "Articulaciones Blindadas",
+      "tagline": "¡Resistente e indestructible!",
+      "description": "Completaste 5 sesiones de ejercicios correctivos, movilidad o fisioterapia."
+    },
+    "posture_perfectionist": {
+      "name": "Perfeccionista de la Postura",
+      "tagline": "¡Alineado de pies a cabeza!",
+      "description": "Completaste 15 intervalos de fisioterapia y correctivos enfocados en postura y estabilidad."
+    },
+    "iron_alignment": {
+      "name": "Alineación de Hierro",
+      "tagline": "¡Maestro de la salud funcional!",
+      "description": "Completaste 10 rutinas completas de ejercicios correctivos o fisioterapia."
     }
   },
   "legal": {
