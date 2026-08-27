@@ -183,7 +183,7 @@ export default function CreateTimerScreen({
     if (index === -1) return;
     const duplicated: Interval = {
       id: generateIntervalId(),
-      name: `${selectedInterval.name} (Copy)`,
+      name: `${selectedInterval.name} ${t("createTimer.copySuffix")}`,
       duration: selectedInterval.duration,
       color: selectedInterval.color,
       exerciseId: selectedInterval.exerciseId
@@ -426,7 +426,7 @@ export default function CreateTimerScreen({
       {isImportMode && (
         <View style={styles.importBanner}>
           <Ionicons name="download-outline" size={16} color="#FFFFFF" />
-          <Text style={styles.importBannerText}>Review & Import Shared Timer</Text>
+          <Text style={styles.importBannerText}>{t("createTimer.importBanner")}</Text>
         </View>
       )}
 
@@ -591,7 +591,7 @@ export default function CreateTimerScreen({
                       </View>
                     </View>
 
-                    <Text style={styles.label}>{t("createTimer.intervals")} Color</Text>
+                    <Text style={styles.label}>{t("createTimer.intervalColor")}</Text>
                     <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.colorPalette}>
                       {COLOR_PALETTE.map((color) => {
                         const isSelected = selectedInterval.color === color;

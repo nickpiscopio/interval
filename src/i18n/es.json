@@ -10,6 +10,8 @@
     "share": "Compartir",
     "rounds": "Rondas",
     "round": "Ronda",
+    "days": "Días",
+    "day": "Día",
     "totalTime": "Tiempo Total",
     "duration": "Duración",
     "sec": "seg",
@@ -30,8 +32,14 @@
   },
   "createTimer": {
     "titleCreate": "Crear Temporizador",
-    "titleEdit": "Editar Temporizador",
+    "titleEdit": "Editar Intervalo",
+    "titleDetails": "Detalles del Minutero",
     "namePlaceholder": "Nombre de la rutina (ej. Energía Matutina)",
+    "timerNamePlaceholder": "Nombre de la rutina (ej. Energía Matutina)",
+    "importBanner": "Revisar e Importar Minutero Compartido",
+    "intervalColor": "Color del Intervalo",
+    "copySuffix": "(Copia)",
+    "delete": "Eliminar",
     "rounds": "Rondas",
     "intervals": "Intervalos",
     "addInterval": "Añadir Intervalo",
@@ -91,6 +99,7 @@
     "roundOf": "Ronda %{current} de %{total}",
     "nextUp": "SIGUIENTE",
     "workoutComplete": "¡Entrenamiento Completado!",
+    "preparing": "Preparando entrenamiento...",
     "exitTitle": "¿Salir del Entrenamiento?",
     "exitMessage": "Se perderá el progreso de esta sesión.",
     "exitConfirm": "Salir",
@@ -119,6 +128,7 @@
     "longestStreak": "Mejor Racha",
     "totalWorkouts": "Entrenamientos",
     "totalTime": "Tiempo de Sudor",
+    "badgesLabel": "Insignias",
     "inviteBannerTitle": "Entrena con Amigos",
     "inviteBannerSubtitle": "¡Comparte temporizadores o invita a tus compañeros de entrenamiento para desbloquear insignias virales exclusivas!",
     "inviteButton": "Invitar Amigos",
@@ -129,6 +139,11 @@
     "shareBadge": "Compartir Logro",
     "shareAppTitle": "Únete a mí en Interval",
     "shareAppMessage": "🔥 ¡Únete a mí en Interval, el temporizador HIIT más limpio y potente para tus entrenamientos!\n\nDescárgalo gratis:\nApp Store: %{appStoreLink}\nPlay Store: %{playStoreLink}"
+  },
+  "notFound": {
+    "title": "¡Ups!",
+    "message": "Esta pantalla no existe.",
+    "link": "¡Ir a la pantalla de inicio!"
   },
   "exercises": {
     "categories": {
@@ -659,6 +674,15 @@
         "Eleva las piernas rectas hasta quedar perpendiculares al suelo.",
         "Baja las piernas despacio sin arquear la zona lumbar.",
         "Mantén los pies flotando antes de la siguiente repetición."
+      ]
+    },
+    "flutter_kicks": {
+      "name": "Aleteo de Piernas",
+      "instructions": [
+        "Acuéstate boca arriba con la zona lumbar pegada a la esterilla.",
+        "Eleva ambas piernas a pocos centímetros del suelo.",
+        "Alterna patadas cortas y rápidas de arriba a abajo.",
+        "Mantén el abdomen firme durante todo el ejercicio."
       ]
     },
     "scissor_kicks": {

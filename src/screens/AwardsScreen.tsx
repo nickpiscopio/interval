@@ -146,7 +146,7 @@ export default function AwardsScreen({ navigation }: RootStackScreenProps<"Award
             </View>
             <View>
               <Text style={styles.streakCount}>
-                {stats?.currentStreak || 0} {t("common.done") === "Listo" ? "Días" : t("common.done") === "Terminé" ? "Jours" : "Days"}
+                {stats?.currentStreak || 0} {t("common.days")}
               </Text>
               <Text style={styles.streakLabel}>{t("awards.currentStreak")}</Text>
             </View>
@@ -157,7 +157,7 @@ export default function AwardsScreen({ navigation }: RootStackScreenProps<"Award
           <View style={styles.statMetricsRow}>
             <View style={styles.statMetric}>
               <Text style={styles.statMetricValue}>{unlockedCount}/{badges.length}</Text>
-              <Text style={styles.statMetricLabel}>{t("awards.unlockedCount", { unlocked: unlockedCount, total: badges.length }).split(" ")[2] || "Badges"}</Text>
+              <Text style={styles.statMetricLabel}>{t("awards.badgesLabel")}</Text>
             </View>
             <View style={styles.statMetric}>
               <Text style={styles.statMetricValue}>{stats?.totalWorkouts || 0}</Text>

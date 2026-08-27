@@ -11,6 +11,7 @@ import {
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as React from "react";
 
+import { t } from "../i18n";
 import SelectTimerScreen from "../screens/SelectTimerScreen";
 import NotFoundScreen from "../screens/NotFoundScreen";
 import { RootStackParamList } from "../types";
@@ -52,7 +53,7 @@ function RootNavigator() {
       <Stack.Screen
         name="CreateTimer"
         component={CreateTimerScreen}
-        options={{ title: "Create Timer" }}
+        options={{ title: t("createTimer.titleCreate") }}
       />
       <Stack.Screen
         name="Timer"
@@ -62,7 +63,7 @@ function RootNavigator() {
       <Stack.Screen
         name="GenerateTimer"
         component={GenerateTimerScreen}
-        options={{ title: "Generate Timer" }}
+        options={{ title: t("generateTimer.title") }}
       />
       <Stack.Screen
         name="Completion"
@@ -77,7 +78,7 @@ function RootNavigator() {
       <Stack.Screen
         name="NotFound"
         component={NotFoundScreen}
-        options={{ title: "Oops!" }}
+        options={{ title: t("notFound.title") }}
       />
     </Stack.Navigator>
   );

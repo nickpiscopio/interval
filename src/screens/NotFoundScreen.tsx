@@ -4,18 +4,19 @@ import { Text, View } from "../components/Themed";
 import { RootStackScreenProps } from "../types";
 import Spacing from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
+import { t } from "../i18n";
 
 export default function NotFoundScreen({
   navigation,
 }: RootStackScreenProps<"NotFound">) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>This screen doesn't exist.</Text>
+      <Text style={styles.title}>{t("notFound.message")}</Text>
       <TouchableOpacity
         onPress={() => navigation.replace("Root")}
         style={styles.link}
       >
-        <Text style={styles.linkText}>Go to home screen!</Text>
+        <Text style={styles.linkText}>{t("notFound.link")}</Text>
       </TouchableOpacity>
     </View>
   );

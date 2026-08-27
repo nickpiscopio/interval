@@ -10,6 +10,8 @@
     "share": "Partager",
     "rounds": "Tours",
     "round": "Tour",
+    "days": "Jours",
+    "day": "Jour",
     "totalTime": "Temps Total",
     "duration": "Durée",
     "sec": "sec",
@@ -30,8 +32,14 @@
   },
   "createTimer": {
     "titleCreate": "Créer un Minuteur",
-    "titleEdit": "Modifier le Minuteur",
+    "titleEdit": "Modifier l'Intervalle",
+    "titleDetails": "Détails du Minuteur",
     "namePlaceholder": "Nom de l'entraînement (ex. Énergie Matinale)",
+    "timerNamePlaceholder": "Nom de l'entraînement (ex. Énergie Matinale)",
+    "importBanner": "Vérifier et Importer le Minuteur Partagé",
+    "intervalColor": "Couleur de l'Intervalle",
+    "copySuffix": "(Copie)",
+    "delete": "Supprimer",
     "rounds": "Tours",
     "intervals": "Intervalles",
     "addInterval": "Ajouter un Intervalle",
@@ -91,6 +99,7 @@
     "roundOf": "Tour %{current} sur %{total}",
     "nextUp": "À SUIVRE",
     "workoutComplete": "Entraînement Terminé !",
+    "preparing": "Préparation de l'entraînement...",
     "exitTitle": "Quitter l'Entraînement ?",
     "exitMessage": "Votre progression pour cette séance sera perdue.",
     "exitConfirm": "Quitter",
@@ -119,6 +128,7 @@
     "longestStreak": "Meilleure Série",
     "totalWorkouts": "Entraînements",
     "totalTime": "Temps d'Effort",
+    "badgesLabel": "Badges",
     "inviteBannerTitle": "Entraînez-vous entre Amis",
     "inviteBannerSubtitle": "Partagez vos minuteurs ou invitez votre partenaire d'entraînement pour débloquer des badges exclusifs !",
     "inviteButton": "Inviter des Amis",
@@ -129,6 +139,11 @@
     "shareBadge": "Partager le Succès",
     "shareAppTitle": "Rejoins-moi sur Interval",
     "shareAppMessage": "🔥 Rejoins-moi sur Interval — le minuteur HIIT le plus épuré et puissant pour vos séances !\n\nTéléchargement gratuit :\nApp Store : %{appStoreLink}\nPlay Store : %{playStoreLink}"
+  },
+  "notFound": {
+    "title": "Oups !",
+    "message": "Cet écran n'existe pas.",
+    "link": "Aller à l'accueil !"
   },
   "exercises": {
     "categories": {
@@ -659,6 +674,15 @@
         "Montez les jambes tendues à la verticale.",
         "Redescendez les jambes lentement sans cambrer les lombaires.",
         "Frôlez le sol avant la répétition suivante."
+      ]
+    },
+    "flutter_kicks": {
+      "name": "Battements de Jambes",
+      "instructions": [
+        "Allongé sur le dos, bas du dos fermement plaqué au sol.",
+        "Décollez les deux jambes à quelques centimètres du sol.",
+        "Alternez de petits battements rapides de haut en bas.",
+        "Gardez la sangle abdominale verrouillée en continu."
       ]
     },
     "scissor_kicks": {

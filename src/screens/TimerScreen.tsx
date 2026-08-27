@@ -215,7 +215,7 @@ export default function TimerScreen({
     return (
       <View style={styles.loadingContainer}>
         <StatusBar style="dark" />
-        <Text>Preparing workout...</Text>
+        <Text>{t("timer.preparing")}</Text>
       </View>
     );
   }

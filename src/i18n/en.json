@@ -10,6 +10,8 @@
     "share": "Share",
     "rounds": "Rounds",
     "round": "Round",
+    "days": "Days",
+    "day": "Day",
     "totalTime": "Total Time",
     "duration": "Duration",
     "sec": "sec",
@@ -30,8 +32,14 @@
   },
   "createTimer": {
     "titleCreate": "Create Timer",
-    "titleEdit": "Edit Timer",
+    "titleEdit": "Edit Interval",
+    "titleDetails": "Timer Details",
     "namePlaceholder": "Workout Name (e.g. Morning Blast)",
+    "timerNamePlaceholder": "Workout Name (e.g. Morning Blast)",
+    "importBanner": "Review & Import Shared Timer",
+    "intervalColor": "Interval Color",
+    "copySuffix": "(Copy)",
+    "delete": "Delete",
     "rounds": "Rounds",
     "intervals": "Intervals",
     "addInterval": "Add Interval",
@@ -91,6 +99,7 @@
     "roundOf": "Round %{current} of %{total}",
     "nextUp": "NEXT UP",
     "workoutComplete": "Workout Complete!",
+    "preparing": "Preparing workout...",
     "exitTitle": "Leave Workout?",
     "exitMessage": "Your progress for this workout will be lost.",
     "exitConfirm": "Leave",
@@ -119,6 +128,7 @@
     "longestStreak": "Longest Streak",
     "totalWorkouts": "Workouts",
     "totalTime": "Sweat Time",
+    "badgesLabel": "Badges",
     "inviteBannerTitle": "Workout With Friends",
     "inviteBannerSubtitle": "Share custom timers or invite your workout buddy to unlock exclusive viral sharing badges!",
     "inviteButton": "Invite Friends",
@@ -129,6 +139,11 @@
     "shareBadge": "Share Achievement",
     "shareAppTitle": "Join me on Interval",
     "shareAppMessage": "🔥 Join me on Interval — the cleanest, most powerful HIIT timer for workouts and training!\n\nDownload for free:\nApp Store: %{appStoreLink}\nPlay Store: %{playStoreLink}"
+  },
+  "notFound": {
+    "title": "Oops!",
+    "message": "This screen doesn't exist.",
+    "link": "Go to home screen!"
   },
   "exercises": {
     "categories": {
@@ -659,6 +674,15 @@
         "Keep legs straight and raise them together until perpendicular to floor.",
         "Lower legs slowly without letting lower back arch off floor.",
         "Hover feet just above the floor before the next rep."
+      ]
+    },
+    "flutter_kicks": {
+      "name": "Flutter Kicks",
+      "instructions": [
+        "Lie on back with lower spine pressed firmly to mat.",
+        "Lift both legs a few inches off the floor.",
+        "Alternate small, rapid kicking motions up and down.",
+        "Keep abs locked tight throughout."
       ]
     },
     "scissor_kicks": {
