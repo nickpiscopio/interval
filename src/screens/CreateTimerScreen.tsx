@@ -27,6 +27,7 @@ import { RootStackScreenProps } from "../types";
 import { Timer } from "../model/Timer";
 import { Interval, generateIntervalId, normalizeInterval } from "../model/Interval";
 import { t } from "../i18n";
+import { useAlert } from "../context/AlertContext";
 import Spacing from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
 import Colors from "../constants/Colors";
@@ -46,6 +47,7 @@ export default function CreateTimerScreen({
   route,
   navigation,
 }: RootStackScreenProps<"CreateTimer">) {
+  const { showAlert } = useAlert();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const carouselRef = useRef<ScrollView>(null);
@@ -180,7 +182,12 @@ export default function CreateTimerScreen({
   // Action: Delete Selected Interval
   function deleteSelectedInterval() {
     if (intervals.length <= 1) {
-      Alert.alert(t("common.appName"), t("createTimer.validationIntervalRequired"));
+      showAlert({
+        title: t("common.appName"),
+        message: t("createTimer.validationIntervalRequired"),
+        icon: "warning",
+        buttons: [{ text: t("common.ok"), style: "default" }],
+      });
       return;
     }
     const index = intervals.findIndex((int) => int.id === selectedInterval?.id);
@@ -193,7 +200,12 @@ export default function CreateTimerScreen({
   // Save Timer to local database
   async function saveTimer() {
     if (!timerName.trim()) {
-      Alert.alert(t("common.appName"), t("createTimer.validationNameRequired"));
+      showAlert({
+        title: t("common.appName"),
+        message: t("createTimer.validationNameRequired"),
+        icon: "error",
+        buttons: [{ text: t("common.ok"), style: "default" }],
+      });
       return;
     }
 
@@ -231,7 +243,12 @@ export default function CreateTimerScreen({
   // Start Timer directly from Timer Details
   function startTimer() {
     if (!timerName.trim()) {
-      Alert.alert(t("common.appName"), t("createTimer.validationNameRequired"));
+      showAlert({
+        title: t("common.appName"),
+        message: t("createTimer.validationNameRequired"),
+        icon: "error",
+        buttons: [{ text: t("common.ok"), style: "default" }],
+      });
       return;
     }
 
@@ -256,10 +273,11 @@ export default function CreateTimerScreen({
   async function deleteTimer() {
     if (!editTimer) return;
     
-    Alert.alert(
-      t("createTimer.deleteConfirmTitle"),
-      t("createTimer.deleteConfirmMessage", { name: timerName }),
-      [
+    showAlert({
+      title: t("createTimer.deleteConfirmTitle"),
+      message: t("createTimer.deleteConfirmMessage", { name: timerName }),
+      icon: "trash",
+      buttons: [
         { text: t("common.cancel"), style: "cancel" },
         {
           text: t("common.delete"),
@@ -276,10 +294,10 @@ export default function CreateTimerScreen({
             } catch (e) {
               console.warn("Failed to delete timer:", e);
             }
-          }
-        }
-      ]
-    );
+          },
+        },
+      ],
+    });
   }
 
   // Handle Carousel Paging

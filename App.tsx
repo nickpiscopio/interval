@@ -4,6 +4,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import useCachedResources from "./src/hooks/useCachedResources";
 import Navigation from "./src/navigation";
+import { AlertProvider } from "./src/context/AlertContext";
 
 export default function App() {
   const isLoadingComplete = useCachedResources();
@@ -14,8 +15,10 @@ export default function App() {
     return (
       <GestureHandlerRootView style={{ flex: 1 }}>
         <SafeAreaProvider>
-          <Navigation />
-          <StatusBar style="dark" />
+          <AlertProvider>
+            <Navigation />
+            <StatusBar style="dark" />
+          </AlertProvider>
         </SafeAreaProvider>
       </GestureHandlerRootView>
     );

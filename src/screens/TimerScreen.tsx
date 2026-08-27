@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { StyleSheet, View, Text, Alert, TouchableOpacity, Animated, Easing } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity, Animated, Easing } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Audio } from "expo-av";
 import { Ionicons } from "@expo/vector-icons";
@@ -7,6 +7,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { RootStackScreenProps } from "../types";
 import { Interval } from "../model/Interval";
 import { t } from "../i18n";
+import { useAlert } from "../context/AlertContext";
 import Spacing from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
 
@@ -14,6 +15,7 @@ export default function TimerScreen({
   route,
   navigation,
 }: RootStackScreenProps<"Timer">) {
+  const { showAlert } = useAlert();
   const { timer } = route.params;
 
   // Sound Ref
@@ -179,10 +181,11 @@ export default function TimerScreen({
     setIsPaused(true);
     progressAnim.stopAnimation();
 
-    Alert.alert(
-      t("timer.exitTitle"),
-      t("timer.exitMessage"),
-      [
+    showAlert({
+      title: t("timer.exitTitle"),
+      message: t("timer.exitMessage"),
+      icon: "warning",
+      buttons: [
         {
           text: t("timer.exitCancel"),
           style: "cancel",
@@ -193,7 +196,7 @@ export default function TimerScreen({
               const fraction = totalDurationRef.current > 0 ? durationLeftRef.current / totalDurationRef.current : 1;
               startProgressAnim(durationLeftRef.current, fraction);
             }
-          }
+          },
         },
         {
           text: t("timer.exitConfirm"),
@@ -202,10 +205,10 @@ export default function TimerScreen({
             clearInterval(timerIdRef.current);
             progressAnim.stopAnimation();
             navigation.popToTop();
-          }
-        }
-      ]
-    );
+          },
+        },
+      ],
+    });
   }
 
   if (!currentInterval) {
