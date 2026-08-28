@@ -37,7 +37,7 @@
   "createTimer": {
     "titleCreate": "Créer un Minuteur",
     "titleEdit": "Modifier l'Intervalle",
-    "titleDetails": "Détails du Minuteur",
+    "titleDetails": "Détails du minuteur",
     "namePlaceholder": "Énergie Matinale",
     "timerNamePlaceholder": "Énergie Matinale",
     "importBanner": "Vérifier et Importer le Minuteur Partagé",

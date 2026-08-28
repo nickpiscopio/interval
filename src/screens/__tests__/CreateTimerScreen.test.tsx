@@ -134,8 +134,9 @@ describe("CreateTimerScreen", () => {
     fireEvent.press(lowIntervalItem);
 
     // Navigate to previous card using footer link
-    const detailsLink = getByText("Create Timer");
-    fireEvent.press(detailsLink);
+    const detailsLinks = getAllByText("Timer Details");
+    const detailsFooterLink = detailsLinks[detailsLinks.length - 1];
+    fireEvent.press(detailsFooterLink);
 
     // Navigate back to Edit Interval using right footer link
     const editIntervalLinks = getAllByText("Edit Interval");
@@ -312,7 +313,7 @@ describe("CreateTimerScreen", () => {
       goBack: jest.fn(),
     };
 
-    const { getByDisplayValue, getByText } = render(
+    const { getByDisplayValue, getByText, getAllByText } = render(
       <AlertProvider>
         <CreateTimerScreen navigation={mockNavigation} route={{} as any} />
       </AlertProvider>
@@ -355,5 +356,8 @@ describe("CreateTimerScreen", () => {
     fireEvent.changeText(lowDurationInput, "055832");
     expect(getByDisplayValue("05:58:32")).toBeTruthy();
     expect(getByText("5h 58m 32s")).toBeTruthy();
+
+    // When on Card 2 (Edit Interval), bottom navigation displays "Timer Details"
+    expect(getAllByText("Timer Details").length).toBeGreaterThanOrEqual(1);
   });
 });

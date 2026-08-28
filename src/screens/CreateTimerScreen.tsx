@@ -694,7 +694,7 @@ export default function CreateTimerScreen({
                 hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               >
                 <Ionicons name="chevron-back" size={16} color="#6B7280" />
-                <Text style={styles.navButtonText}>{t("createTimer.titleCreate")}</Text>
+                <Text style={styles.navButtonText}>{t("createTimer.titleDetails")}</Text>
               </TouchableOpacity>
             ) : null}
           </View>

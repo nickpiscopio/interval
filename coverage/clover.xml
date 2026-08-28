@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1787941997236" clover="3.2.0">
-  <project timestamp="1787941997236" name="All files">
-    <metrics statements="1167" coveredstatements="1103" conditionals="790" coveredconditionals="643" methods="300" coveredmethods="274" elements="2257" coveredelements="2020" complexity="0" loc="1167" ncloc="1167" packages="11" files="38" classes="38"/>
+<coverage generated="1787942240335" clover="3.2.0">
+  <project timestamp="1787942240335" name="All files">
+    <metrics statements="1167" coveredstatements="1105" conditionals="790" coveredconditionals="643" methods="300" coveredmethods="275" elements="2257" coveredelements="2023" complexity="0" loc="1167" ncloc="1167" packages="11" files="38" classes="38"/>
     <package name="components">
       <metrics statements="209" coveredstatements="208" conditionals="227" coveredconditionals="194" methods="81" coveredmethods="79"/>
       <file name="CustomAlertModal.tsx" path="/Users/nickpiscopio/Documents/workarea/nick/interval/src/components/CustomAlertModal.tsx">
@@ -332,9 +332,9 @@
       </file>
     </package>
     <package name="context">
-      <metrics statements="15" coveredstatements="14" conditionals="2" coveredconditionals="2" methods="5" coveredmethods="4"/>
+      <metrics statements="15" coveredstatements="15" conditionals="2" coveredconditionals="2" methods="5" coveredmethods="5"/>
       <file name="AlertContext.tsx" path="/Users/nickpiscopio/Documents/workarea/nick/interval/src/context/AlertContext.tsx">
-        <metrics statements="15" coveredstatements="14" conditionals="2" coveredconditionals="2" methods="5" coveredmethods="4"/>
+        <metrics statements="15" coveredstatements="15" conditionals="2" coveredconditionals="2" methods="5" coveredmethods="5"/>
         <line num="9" count="4" type="stmt"/>
         <line num="12" count="27" type="stmt"/>
         <line num="13" count="27" type="stmt"/>
@@ -344,7 +344,7 @@
         <line num="20" count="27" type="stmt"/>
         <line num="21" count="5" type="stmt"/>
         <line num="22" count="5" type="stmt"/>
-        <line num="23" count="0" type="stmt"/>
+        <line num="23" count="1" type="stmt"/>
         <line num="27" count="27" type="stmt"/>
         <line num="40" count="89" type="stmt"/>
         <line num="41" count="88" type="cond" truecount="2" falsecount="0"/>
@@ -439,7 +439,7 @@
       </file>
     </package>
     <package name="screens">
-      <metrics statements="563" coveredstatements="517" conditionals="358" coveredconditionals="276" methods="161" coveredmethods="139"/>
+      <metrics statements="563" coveredstatements="518" conditionals="358" coveredconditionals="276" methods="161" coveredmethods="139"/>
       <file name="AwardsScreen.tsx" path="/Users/nickpiscopio/Documents/workarea/nick/interval/src/screens/AwardsScreen.tsx">
         <metrics statements="52" coveredstatements="49" conditionals="36" coveredconditionals="31" methods="14" coveredmethods="13"/>
         <line num="26" count="10" type="stmt"/>
@@ -574,7 +574,7 @@
         <line num="357" count="2" type="stmt"/>
       </file>
       <file name="CreateTimerScreen.tsx" path="/Users/nickpiscopio/Documents/workarea/nick/interval/src/screens/CreateTimerScreen.tsx">
-        <metrics statements="195" coveredstatements="171" conditionals="131" coveredconditionals="87" methods="57" coveredmethods="45"/>
+        <metrics statements="195" coveredstatements="172" conditionals="131" coveredconditionals="87" methods="57" coveredmethods="45"/>
         <line num="38" count="2" type="stmt"/>
         <line num="39" count="2" type="stmt"/>
         <line num="53" count="68" type="stmt"/>
@@ -663,7 +663,7 @@
         <line num="222" count="1" type="stmt"/>
         <line num="223" count="1" type="stmt"/>
         <line num="224" count="1" type="stmt"/>
-        <line num="226" count="0" type="stmt"/>
+        <line num="226" count="1" type="stmt"/>
         <line num="233" count="4" type="cond" truecount="2" falsecount="0"/>
         <line num="234" count="1" type="stmt"/>
         <line num="240" count="1" type="stmt"/>
@@ -745,7 +745,7 @@
         <line num="436" count="1" type="stmt"/>
         <line num="437" count="1" type="stmt"/>
         <line num="458" count="68" type="stmt"/>
-        <line num="477" count="125" type="stmt"/>
+        <line num="477" count="126" type="stmt"/>
         <line num="480" count="0" type="stmt"/>
         <line num="483" count="0" type="stmt"/>
         <line num="520" count="0" type="stmt"/>

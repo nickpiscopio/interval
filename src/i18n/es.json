@@ -37,7 +37,7 @@
   "createTimer": {
     "titleCreate": "Crear Temporizador",
     "titleEdit": "Editar Intervalo",
-    "titleDetails": "Detalles del Minutero",
+    "titleDetails": "Detalles del temporizador",
     "namePlaceholder": "Energía Matutina",
     "timerNamePlaceholder": "Energía Matutina",
     "importBanner": "Revisar e Importar Minutero Compartido",
