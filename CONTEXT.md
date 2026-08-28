@@ -39,3 +39,7 @@ _Avoid_: Trophies, Points, Quest Rewards
 **Duration Shift-Register Input**:
 A numeric text entry mechanism for interval duration that queues digits right-to-left up to 6 digits formatted as `00:00:00` (`HH:MM:SS`), calculating total seconds without mid-keystroke conversions.
 _Avoid_: Time Picker Wheel, Single-Digit Parser
+
+**Keyboard-Aware Docked Editor**:
+A bottom-anchored carousel editor panel that persists touch events (`keyboardShouldPersistTaps="handled"`) and dynamically adjusts safe-area insets when the software keyboard opens, preventing downward layout shifts and missed taps.
+_Avoid_: Floating Action Sheet, Modal Drawer

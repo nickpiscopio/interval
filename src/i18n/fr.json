@@ -38,8 +38,8 @@
     "titleCreate": "Créer un Minuteur",
     "titleEdit": "Modifier l'Intervalle",
     "titleDetails": "Détails du Minuteur",
-    "namePlaceholder": "Nom de l'entraînement (ex. Énergie Matinale)",
-    "timerNamePlaceholder": "Nom de l'entraînement (ex. Énergie Matinale)",
+    "namePlaceholder": "Énergie Matinale",
+    "timerNamePlaceholder": "Énergie Matinale",
     "importBanner": "Vérifier et Importer le Minuteur Partagé",
     "intervalColor": "Couleur de l'Intervalle",
     "copySuffix": "(Copie)",
@@ -59,7 +59,8 @@
     "noExercisesFound": "Aucun exercice correspondant à votre recherche.",
     "validationNameRequired": "Veuillez saisir un nom pour votre minuteur.",
     "validationIntervalRequired": "Veuillez ajouter au moins un intervalle.",
-    "validationDurationRequired": "Tous les intervalles doivent avoir une durée supérieure à 0."
+    "validationDurationRequired": "Tous les intervalles doivent avoir une durée supérieure à 0.",
+    "timerNameLabel": "Nom du minuteur"
   },
   "generateTimer": {
     "title": "Générateur d'Entraînement IA",

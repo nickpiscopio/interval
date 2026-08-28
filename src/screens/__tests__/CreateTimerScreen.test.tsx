@@ -24,7 +24,8 @@ describe("CreateTimerScreen", () => {
       </AlertProvider>
     );
 
-    expect(getByPlaceholderText("Workout Name (e.g. Morning Blast)")).toBeTruthy();
+    expect(getByPlaceholderText("Morning Blast")).toBeTruthy();
+    expect(getByText("Timer Name")).toBeTruthy();
     expect(getByText("High Interval")).toBeTruthy();
     expect(getByText("Low Interval")).toBeTruthy();
   });
@@ -65,7 +66,7 @@ describe("CreateTimerScreen", () => {
       </AlertProvider>
     );
 
-    const nameInput = getByPlaceholderText("Workout Name (e.g. Morning Blast)");
+    const nameInput = getByPlaceholderText("Morning Blast");
     fireEvent.changeText(nameInput, "Core Crusher");
 
     // Adjust rounds
@@ -99,7 +100,7 @@ describe("CreateTimerScreen", () => {
       </AlertProvider>
     );
 
-    const nameInput = getByPlaceholderText("Workout Name (e.g. Morning Blast)");
+    const nameInput = getByPlaceholderText("Morning Blast");
     fireEvent.changeText(nameInput, "Instant Workout");
 
     const playBtn = getByTestId("icon-play");

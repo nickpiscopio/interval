@@ -13,6 +13,7 @@ import {
   NativeSyntheticEvent,
   NativeScrollEvent,
   Animated,
+  Keyboard,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -60,6 +61,7 @@ export default function CreateTimerScreen({
   const [navBarHeight, setNavBarHeight] = useState<number>(44);
   const [activeCardIndex, setActiveCardIndex] = useState<number>(0);
   const [showExercisePicker, setShowExercisePicker] = useState<boolean>(false);
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState<boolean>(false);
 
   const editTimer = route.params?.timer;
   const isImportMode = Boolean(editTimer && editTimer.id.startsWith("ai_") && !editTimer.createdAt);
@@ -109,7 +111,23 @@ export default function CreateTimerScreen({
     });
   }, [navigation, timerName, editTimer, isImportMode]);
 
-  const bottomInset = Math.max(insets.bottom, Spacing.sm);
+  // Track keyboard visibility for docked panel insets
+  useEffect(() => {
+    const showSub = Keyboard.addListener(
+      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow",
+      () => setIsKeyboardVisible(true)
+    );
+    const hideSub = Keyboard.addListener(
+      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide",
+      () => setIsKeyboardVisible(false)
+    );
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
+
+  const bottomInset = isKeyboardVisible ? Spacing.xs : Math.max(insets.bottom, Spacing.sm);
   const card1BottomOffset = card1Height + navBarHeight + bottomInset;
   const card2BottomOffset = card2Height + navBarHeight + bottomInset;
 
@@ -457,6 +475,7 @@ export default function CreateTimerScreen({
           ref={listRef}
           data={intervals}
           keyExtractor={(item) => item.id}
+          keyboardShouldPersistTaps="handled"
           onDragBegin={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
           }}
@@ -485,6 +504,7 @@ export default function CreateTimerScreen({
             horizontal
             pagingEnabled
             showsHorizontalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
             onScroll={Animated.event(
               [{ nativeEvent: { contentOffset: { x: scrollX } } }],
               { useNativeDriver: false, listener: handleCarouselScroll }
@@ -507,7 +527,7 @@ export default function CreateTimerScreen({
 
                 <View style={styles.editorInputRow}>
                   <View style={styles.inputGroup}>
-                    <Text style={styles.inputLabel}>{t("createTimer.timerNamePlaceholder")}</Text>
+                    <Text style={styles.inputLabel}>{t("createTimer.timerNameLabel")}</Text>
                     <TextInput
                       style={styles.editorTextInput}
                       value={timerName}
@@ -613,7 +633,12 @@ export default function CreateTimerScreen({
                     </View>
 
                     <Text style={styles.label}>{t("createTimer.intervalColor")}</Text>
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.colorPalette}>
+                    <ScrollView
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      keyboardShouldPersistTaps="handled"
+                      style={styles.colorPalette}
+                    >
                       {COLOR_PALETTE.map((color) => {
                         const isSelected = selectedInterval.color === color;
                         return (

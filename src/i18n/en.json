@@ -38,8 +38,8 @@
     "titleCreate": "Create Timer",
     "titleEdit": "Edit Interval",
     "titleDetails": "Timer Details",
-    "namePlaceholder": "Workout Name (e.g. Morning Blast)",
-    "timerNamePlaceholder": "Workout Name (e.g. Morning Blast)",
+    "namePlaceholder": "Morning Blast",
+    "timerNamePlaceholder": "Morning Blast",
     "importBanner": "Review & Import Shared Timer",
     "intervalColor": "Interval Color",
     "copySuffix": "(Copy)",
@@ -59,7 +59,8 @@
     "noExercisesFound": "No exercises found matching your search.",
     "validationNameRequired": "Please enter a name for your timer.",
     "validationIntervalRequired": "Please add at least one interval.",
-    "validationDurationRequired": "All intervals must have a duration greater than 0."
+    "validationDurationRequired": "All intervals must have a duration greater than 0.",
+    "timerNameLabel": "Timer Name"
   },
   "generateTimer": {
     "title": "AI Workout Generator",

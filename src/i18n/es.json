@@ -38,8 +38,8 @@
     "titleCreate": "Crear Temporizador",
     "titleEdit": "Editar Intervalo",
     "titleDetails": "Detalles del Minutero",
-    "namePlaceholder": "Nombre de la rutina (ej. Energía Matutina)",
-    "timerNamePlaceholder": "Nombre de la rutina (ej. Energía Matutina)",
+    "namePlaceholder": "Energía Matutina",
+    "timerNamePlaceholder": "Energía Matutina",
     "importBanner": "Revisar e Importar Minutero Compartido",
     "intervalColor": "Color del Intervalo",
     "copySuffix": "(Copia)",
@@ -59,7 +59,8 @@
     "noExercisesFound": "No se encontraron ejercicios con esa búsqueda.",
     "validationNameRequired": "Por favor ingresa un nombre para tu temporizador.",
     "validationIntervalRequired": "Por favor añade al menos un intervalo.",
-    "validationDurationRequired": "Todos los intervalos deben tener una duración mayor a 0."
+    "validationDurationRequired": "Todos los intervalos deben tener una duración mayor a 0.",
+    "timerNameLabel": "Nombre del temporizador"
   },
   "generateTimer": {
     "title": "Generador de Rutinas IA",
