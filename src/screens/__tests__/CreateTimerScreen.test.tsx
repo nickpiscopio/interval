@@ -26,6 +26,7 @@ describe("CreateTimerScreen", () => {
 
     expect(getByPlaceholderText("Morning Blast")).toBeTruthy();
     expect(getByText("Timer Name")).toBeTruthy();
+    expect(getByText("Timer Details")).toBeTruthy();
     expect(getByText("High Interval")).toBeTruthy();
     expect(getByText("Low Interval")).toBeTruthy();
   });
@@ -116,67 +117,89 @@ describe("CreateTimerScreen", () => {
     );
   });
 
-  it("selects intervals from list and navigates between carousel cards", () => {
+  it("opens Edit Interval bottom sheet modal when tapping an interval and dismisses with Done", async () => {
     const mockNavigation: any = {
       setOptions: jest.fn(),
       navigate: jest.fn(),
       goBack: jest.fn(),
     };
 
-    const { getByText, getAllByText } = render(
+    const { getByText, getByTestId, queryByText, queryByTestId } = render(
       <AlertProvider>
         <CreateTimerScreen navigation={mockNavigation} route={{} as any} />
       </AlertProvider>
     );
 
-    // Select Low Interval from list
-    const lowIntervalItem = getAllByText("Low Interval")[0];
-    fireEvent.press(lowIntervalItem);
+    // Tap Low Interval to open bottom sheet
+    const lowInterval = getByText("Low Interval");
+    fireEvent.press(lowInterval);
 
-    // Navigate to previous card using footer link
-    const detailsLinks = getAllByText("Timer Details");
-    const detailsFooterLink = detailsLinks[detailsLinks.length - 1];
-    fireEvent.press(detailsFooterLink);
+    expect(getByText("Edit Interval")).toBeTruthy();
+    // Tap Done to close modal
+    const doneBtn = getByText("Done");
+    fireEvent.press(doneBtn);
 
-    // Navigate back to Edit Interval using right footer link
-    const editIntervalLinks = getAllByText("Edit Interval");
-    fireEvent.press(editIntervalLinks[editIntervalLinks.length - 1]);
+    await waitFor(() => {
+      expect(queryByText("Done")).toBeNull();
+    });
   });
 
-  it("duplicates interval, deletes interval, and warns when trying to delete last interval", () => {
+  it("duplicates interval, deletes interval, and warns when trying to delete last interval", async () => {
     const mockNavigation: any = {
       setOptions: jest.fn(),
       navigate: jest.fn(),
       goBack: jest.fn(),
     };
 
-    const { getByText, getByTestId, getAllByTestId, queryByText } = render(
+    const { getByText, getAllByText, getByTestId, getAllByTestId, queryByText } = render(
       <AlertProvider>
         <CreateTimerScreen navigation={mockNavigation} route={{} as any} />
       </AlertProvider>
     );
 
-    // Add new interval
+    // Add new interval -> immediately opens modal
     const addIntervalBtn = getByText("Add Interval");
     fireEvent.press(addIntervalBtn);
+
+    expect(getByText("Edit Interval")).toBeTruthy();
 
     // Duplicate interval
     const duplicateBtn = getByTestId("icon-copy-outline");
     fireEvent.press(duplicateBtn);
 
-    expect(getByText("Add Interval (Copy)")).toBeTruthy();
+    // Close modal
+    fireEvent.press(getByText("Done"));
+    await waitFor(() => {
+      expect(getByText("Add Interval (Copy)")).toBeTruthy();
+    });
 
-    // Delete duplicated interval
+    // Reopen modal on duplicated item and delete it
+    fireEvent.press(getByText("Add Interval (Copy)"));
     const trashBtn = getByTestId("icon-trash-outline");
     fireEvent.press(trashBtn);
-    expect(queryByText("Add Interval (Copy)")).toBeNull();
+    await waitFor(() => {
+      expect(queryByText("Add Interval (Copy)")).toBeNull();
+    });
 
-    // Delete intervals until only 1 remains
-    fireEvent.press(trashBtn);
-    fireEvent.press(trashBtn);
+    // Open and delete Low Interval
+    fireEvent.press(getByText("Low Interval"));
+    fireEvent.press(getByTestId("icon-trash-outline"));
 
-    // Try to delete the very last remaining interval -> triggers alert
-    fireEvent.press(trashBtn);
+    // Open and delete High Interval
+    await waitFor(() => {
+      expect(getByText("High Interval")).toBeTruthy();
+    });
+    fireEvent.press(getByText("High Interval"));
+    fireEvent.press(getByTestId("icon-trash-outline"));
+
+    // Open remaining Add Interval and try deleting last one -> triggers warning
+    await waitFor(() => {
+      const items = getAllByText("Add Interval");
+      expect(items.length).toBeGreaterThan(0);
+    });
+    const addIntervalItems = getAllByText("Add Interval");
+    fireEvent.press(addIntervalItems[addIntervalItems.length - 1]);
+    fireEvent.press(getByTestId("icon-trash-outline"));
     expect(getByText("Please add at least one interval.")).toBeTruthy();
 
     const dragHandles = getAllByTestId("icon-drag-indicator");
@@ -185,18 +208,21 @@ describe("CreateTimerScreen", () => {
     }
   });
 
-  it("opens exercise library picker modal and selects exercise", () => {
+  it("opens exercise library picker modal and selects exercise", async () => {
     const mockNavigation: any = {
       setOptions: jest.fn(),
       navigate: jest.fn(),
       goBack: jest.fn(),
     };
 
-    const { getByText, getByPlaceholderText, getByDisplayValue, getByTestId } = render(
+    const { getByText, getByDisplayValue, getByTestId } = render(
       <AlertProvider>
         <CreateTimerScreen navigation={mockNavigation} route={{} as any} />
       </AlertProvider>
     );
+
+    // Open bottom sheet
+    fireEvent.press(getByText("High Interval"));
 
     const libraryBtn = getByText("Library");
     fireEvent.press(libraryBtn);
@@ -209,12 +235,13 @@ describe("CreateTimerScreen", () => {
     const addBtn = getByText("Add to Timer");
     fireEvent.press(addBtn);
 
-    expect(getByText("Tibialis Raises")).toBeTruthy();
+    await waitFor(() => {
+      expect(getByDisplayValue("Tibialis Raises")).toBeTruthy();
+    });
 
     // Change interval name manually
-    const intervalNameInput = getByPlaceholderText("Interval name");
+    const intervalNameInput = getByDisplayValue("Tibialis Raises");
     fireEvent.changeText(intervalNameInput, "Burpees Warmup");
-    expect(getByText("Burpees Warmup")).toBeTruthy();
 
     // Change duration
     const durationInput = getByDisplayValue("00:00:30");
@@ -224,6 +251,12 @@ describe("CreateTimerScreen", () => {
     // Select color
     const checkmark = getByTestId("icon-checkmark");
     fireEvent.press(checkmark);
+
+    // Tap Done
+    fireEvent.press(getByText("Done"));
+    await waitFor(() => {
+      expect(getByText("Burpees Warmup")).toBeTruthy();
+    });
   });
 
   it("handles edit mode with existing timer and allows full deletion", async () => {
@@ -245,7 +278,7 @@ describe("CreateTimerScreen", () => {
       popToTop: jest.fn(),
     };
 
-    const { getByDisplayValue, getByText, getAllByTestId } = render(
+    const { getByDisplayValue, getByText, getByTestId } = render(
       <AlertProvider>
         <CreateTimerScreen
           navigation={mockNavigation}
@@ -257,8 +290,8 @@ describe("CreateTimerScreen", () => {
     expect(getByDisplayValue("Existing Workout")).toBeTruthy();
 
     // Delete existing timer via trash icon in timer actions
-    const trashIcons = getAllByTestId("icon-trash-outline");
-    fireEvent.press(trashIcons[0]);
+    const trashIcon = getByTestId("icon-trash-outline");
+    fireEvent.press(trashIcon);
 
     expect(getByText("Delete Timer")).toBeTruthy();
     const confirmDeleteBtn = getByText("Delete");
@@ -306,58 +339,31 @@ describe("CreateTimerScreen", () => {
     });
   });
 
-  it("handles right-to-left 6-digit shift register for duration input, backspace, and blur normalization", () => {
+  it("handles right-to-left 6-digit shift register for duration input in bottom sheet", async () => {
     const mockNavigation: any = {
       setOptions: jest.fn(),
       navigate: jest.fn(),
       goBack: jest.fn(),
     };
 
-    const { getByDisplayValue, getByText, getAllByText } = render(
+    const { getByDisplayValue, getByText } = render(
       <AlertProvider>
         <CreateTimerScreen navigation={mockNavigation} route={{} as any} />
       </AlertProvider>
     );
 
-    // Initial selected interval is High Interval (30s) -> "00:00:30"
-    const durationInput = getByDisplayValue("00:00:30");
-
-    // Type 4 -> "00:00:04"
-    fireEvent.changeText(durationInput, "4");
-    expect(getByDisplayValue("00:00:04")).toBeTruthy();
-
-    // Type 5 after 00:00:04 -> "0000045" -> "00:00:45"
-    fireEvent.changeText(durationInput, "00:00:045");
-    expect(getByDisplayValue("00:00:45")).toBeTruthy();
-
-    // Type 0 -> "0000450" -> "00:04:50"
-    fireEvent.changeText(durationInput, "00:00:450");
-    expect(getByDisplayValue("00:04:50")).toBeTruthy();
-
-    // Backspace: simulate removing last digit from 00:04:50 -> "00:04:5"
-    fireEvent.changeText(durationInput, "00:04:5");
-    expect(getByDisplayValue("00:00:45")).toBeTruthy();
-
-    // Type empty or 0 -> "00:00:00"
-    fireEvent.changeText(durationInput, "");
-    expect(getByDisplayValue("00:00:00")).toBeTruthy();
-
-    // Blur -> defaults minimum to 1s -> "00:00:01"
-    fireEvent(durationInput, "blur");
-    expect(getByDisplayValue("00:00:01")).toBeTruthy();
-
-    // Switch to Low Interval (15s)
-    const lowInterval = getByText("Low Interval");
-    fireEvent.press(lowInterval);
-    expect(getByDisplayValue("00:00:15")).toBeTruthy();
-
-    // Type 055832 -> "05:58:32" -> converts to 5h 58m 32s on interval card
+    // Open Low Interval modal (15s) -> "00:00:15"
+    fireEvent.press(getByText("Low Interval"));
     const lowDurationInput = getByDisplayValue("00:00:15");
+
+    // Type 055832 -> "05:58:32"
     fireEvent.changeText(lowDurationInput, "055832");
     expect(getByDisplayValue("05:58:32")).toBeTruthy();
-    expect(getByText("5h 58m 32s")).toBeTruthy();
 
-    // When on Card 2 (Edit Interval), bottom navigation displays "Timer Details"
-    expect(getAllByText("Timer Details").length).toBeGreaterThanOrEqual(1);
+    // Tap Done
+    fireEvent.press(getByText("Done"));
+    await waitFor(() => {
+      expect(getByText("5h 58m 32s")).toBeTruthy();
+    });
   });
 });

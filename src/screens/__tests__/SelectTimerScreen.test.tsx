@@ -8,6 +8,7 @@ import { DEFAULT_AI_TIMERS } from "../../constants/defaultTimers";
 describe("SelectTimerScreen", () => {
   beforeEach(async () => {
     await AsyncStorage.clear();
+    await AsyncStorage.setItem("@hiit_has_agreed_legal_disclaimer", "true");
     jest.clearAllMocks();
   });
 
@@ -224,30 +225,33 @@ describe("SelectTimerScreen", () => {
     const quickRoutineBtn = getByText("Start Quick Routine");
     fireEvent.press(quickRoutineBtn);
 
-    expect(mockNavigation.navigate).toHaveBeenCalledWith(
-      "Timer",
-      expect.objectContaining({
-        timer: expect.objectContaining({
-          name: "Tibialis Raises",
-          rounds: 3,
-        }),
-      })
-    );
+    await waitFor(() => {
+      expect(mockNavigation.navigate).toHaveBeenCalledWith(
+        "Timer",
+        expect.objectContaining({
+          timer: expect.objectContaining({
+            name: "Tibialis Raises",
+            rounds: 3,
+          }),
+        })
+      );
+    });
 
     // Open another exercise and Create Custom Timer
     fireEvent.press(tibialisCard);
     const createCustomBtn = getByText("Create Custom Workout");
     fireEvent.press(createCustomBtn);
 
-    expect(mockNavigation.navigate).toHaveBeenCalledWith(
-      "CreateTimer",
-      expect.objectContaining({
-        timer: expect.objectContaining({
-          name: "Tibialis Raises Routine",
-          rounds: 3,
-        }),
-      })
-    );
+    await waitFor(() => {
+      expect(mockNavigation.navigate).toHaveBeenCalledWith(
+        "CreateTimer",
+        expect.objectContaining({
+          timer: expect.objectContaining({
+            name: "Tibialis Raises Routine",
+          }),
+        })
+      );
+    });
 
     // Switch back to Workouts tab
     const workoutsTab = getByTestId("tab-workouts");

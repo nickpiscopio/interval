@@ -40,6 +40,6 @@ _Avoid_: Trophies, Points, Quest Rewards
 A numeric text entry mechanism for interval duration that queues digits right-to-left up to 6 digits formatted as `00:00:00` (`HH:MM:SS`), calculating total seconds without mid-keystroke conversions.
 _Avoid_: Time Picker Wheel, Single-Digit Parser
 
-**Keyboard-Aware Docked Editor**:
-A bottom-anchored carousel editor panel that persists touch events (`keyboardShouldPersistTaps="handled"`) and dynamically adjusts safe-area insets when the software keyboard opens, preventing downward layout shifts and missed taps.
-_Avoid_: Floating Action Sheet, Modal Drawer
+**Interval Edit Bottom Sheet**:
+A dedicated slide-up bottom sheet modal (`animationType="slide"`) with an animated transparent fade-in backdrop for inspecting and editing an individual interval's name, duration, and color with a top-right "Done" button and self-contained keyboard avoidance.
+_Avoid_: Carousel Slider, Inline Accordion

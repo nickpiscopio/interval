@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Modal,
   StyleSheet,
@@ -7,6 +7,7 @@ import {
   ScrollView,
   View,
   Dimensions,
+  Animated,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
@@ -42,7 +43,49 @@ export function ExerciseDetailModal({
   onStartQuickRoutine,
   onCreateCustomTimer,
 }: ExerciseDetailModalProps) {
-  if (!exercise) return null;
+  const [internalVisible, setInternalVisible] = useState(visible);
+  const opacityAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(400)).current;
+
+  useEffect(() => {
+    if (visible) {
+      setInternalVisible(true);
+      Animated.parallel([
+        Animated.timing(opacityAnim, {
+          toValue: 1,
+          duration: 250,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 250,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else {
+      Animated.parallel([
+        Animated.timing(opacityAnim, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 400,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        setInternalVisible(false);
+      });
+    }
+  }, [visible]);
+
+  const isVisible = visible || internalVisible;
+  if (!isVisible || !exercise) return null;
+
+  function handleClose() {
+    onClose();
+  }
 
   function handleSelect() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -81,15 +124,15 @@ export function ExerciseDetailModal({
 
   return (
     <Modal
-      visible={visible}
+      visible={visible || internalVisible}
       transparent
-      animationType="slide"
-      onRequestClose={onClose}
+      animationType="none"
+      onRequestClose={handleClose}
     >
-      <TouchableWithoutFeedback onPress={onClose}>
-        <View style={styles.overlay}>
+      <TouchableWithoutFeedback onPress={handleClose}>
+        <Animated.View style={[styles.overlay, { opacity: opacityAnim }]}>
           <TouchableWithoutFeedback>
-            <View style={styles.sheetContainer}>
+            <Animated.View style={[styles.sheetContainer, { transform: [{ translateY: slideAnim }] }]}>
               {/* Header Handle */}
               <View style={styles.handleBar} />
 
@@ -97,7 +140,7 @@ export function ExerciseDetailModal({
               <TouchableOpacity
                 testID="exercise-detail-close-btn"
                 style={styles.closeButton}
-                onPress={onClose}
+                onPress={handleClose}
                 hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
               >
                 <Ionicons name="close" size={22} color="#6B7280" />
@@ -239,9 +282,9 @@ export function ExerciseDetailModal({
                   </TouchableOpacity>
                 )}
               </View>
-            </View>
+            </Animated.View>
           </TouchableWithoutFeedback>
-        </View>
+        </Animated.View>
       </TouchableWithoutFeedback>
     </Modal>
   );

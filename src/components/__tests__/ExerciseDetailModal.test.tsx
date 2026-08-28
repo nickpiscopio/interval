@@ -1,5 +1,5 @@
 import React from "react";
-import { render, fireEvent } from "@testing-library/react-native";
+import { render, fireEvent, waitFor } from "@testing-library/react-native";
 import { ExerciseDetailModal } from "../ExerciseDetailModal";
 import { Exercise } from "../../model/Exercise";
 
@@ -30,7 +30,7 @@ describe("ExerciseDetailModal Component", () => {
     expect(queryByText("Tibialis Raises")).toBeNull();
   });
 
-  it("renders exercise details in picker mode and handles select action", () => {
+  it("renders exercise details in picker mode and handles select action", async () => {
     const onSelect = jest.fn();
     const onClose = jest.fn();
 
@@ -54,11 +54,13 @@ describe("ExerciseDetailModal Component", () => {
     const addBtn = getByText("Add to Timer");
     fireEvent.press(addBtn);
 
-    expect(onSelect).toHaveBeenCalledWith(mockExercise);
-    expect(onClose).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(onSelect).toHaveBeenCalledWith(mockExercise);
+      expect(onClose).toHaveBeenCalled();
+    });
   });
 
-  it("renders in library mode and handles Quick Routine and Custom Workout actions", () => {
+  it("renders in library mode and handles Quick Routine and Custom Workout actions", async () => {
     const onQuickRoutine = jest.fn();
     const onCustomTimer = jest.fn();
     const onClose = jest.fn();
@@ -76,15 +78,21 @@ describe("ExerciseDetailModal Component", () => {
 
     const quickBtn = getByText("Start Quick Routine");
     fireEvent.press(quickBtn);
-    expect(onQuickRoutine).toHaveBeenCalledWith(mockExercise);
-    expect(onClose).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(onQuickRoutine).toHaveBeenCalledWith(mockExercise);
+      expect(onClose).toHaveBeenCalled();
+    });
 
     const customBtn = getByText("Create Custom Workout");
     fireEvent.press(customBtn);
-    expect(onCustomTimer).toHaveBeenCalledWith(mockExercise);
+    await waitFor(() => {
+      expect(onCustomTimer).toHaveBeenCalledWith(mockExercise);
+    });
 
     const closeBtn = getByTestId("exercise-detail-close-btn");
     fireEvent.press(closeBtn);
-    expect(onClose).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(onClose).toHaveBeenCalled();
+    });
   });
 });

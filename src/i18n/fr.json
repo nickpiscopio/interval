@@ -60,7 +60,8 @@
     "validationNameRequired": "Veuillez saisir un nom pour votre minuteur.",
     "validationIntervalRequired": "Veuillez ajouter au moins un intervalle.",
     "validationDurationRequired": "Tous les intervalles doivent avoir une durée supérieure à 0.",
-    "timerNameLabel": "Nom du minuteur"
+    "timerNameLabel": "Nom du minuteur",
+    "saveError": "Échec de l'enregistrement du minuteur. Veuillez réessayer."
   },
   "generateTimer": {
     "title": "Générateur d'Entraînement IA",

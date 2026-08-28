@@ -60,7 +60,8 @@
     "validationNameRequired": "Por favor ingresa un nombre para tu temporizador.",
     "validationIntervalRequired": "Por favor añade al menos un intervalo.",
     "validationDurationRequired": "Todos los intervalos deben tener una duración mayor a 0.",
-    "timerNameLabel": "Nombre del temporizador"
+    "timerNameLabel": "Nombre del temporizador",
+    "saveError": "Error al guardar el temporizador. Inténtalo de nuevo."
   },
   "generateTimer": {
     "title": "Generador de Rutinas IA",

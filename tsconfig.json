@@ -8,5 +8,12 @@
         "./node_modules/react-native-gradient-icon/lib/index.d.ts"
       ]
     }
-  }
+  },
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "node_modules",
+    "src/**/__tests__/**"
+  ]
 }

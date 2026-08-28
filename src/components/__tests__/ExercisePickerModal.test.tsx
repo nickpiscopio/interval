@@ -1,5 +1,5 @@
 import React from "react";
-import { render, fireEvent } from "@testing-library/react-native";
+import { render, fireEvent, waitFor } from "@testing-library/react-native";
 import { ExercisePickerModal } from "../ExercisePickerModal";
 
 describe("ExercisePickerModal Component", () => {
@@ -47,7 +47,7 @@ describe("ExercisePickerModal Component", () => {
     expect(getByText("Tibialis Raises")).toBeTruthy();
   });
 
-  it("opens detail modal and calls onSelect and onClose when Add to Timer is pressed", () => {
+  it("opens detail modal and calls onSelect and onClose when Add to Timer is pressed", async () => {
     const onSelect = jest.fn();
     const onClose = jest.fn();
 
@@ -62,8 +62,10 @@ describe("ExercisePickerModal Component", () => {
     const addBtn = getByText("Add to Timer");
     fireEvent.press(addBtn);
 
-    expect(onSelect).toHaveBeenCalled();
-    expect(onClose).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(onSelect).toHaveBeenCalled();
+      expect(onClose).toHaveBeenCalled();
+    });
   });
 
   it("displays empty state when no search matches", () => {

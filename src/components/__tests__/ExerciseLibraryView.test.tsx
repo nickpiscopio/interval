@@ -1,5 +1,5 @@
 import React from "react";
-import { render, fireEvent } from "@testing-library/react-native";
+import { render, fireEvent, waitFor } from "@testing-library/react-native";
 import { ExerciseLibraryView } from "../ExerciseLibraryView";
 
 describe("ExerciseLibraryView Component", () => {
@@ -56,7 +56,7 @@ describe("ExerciseLibraryView Component", () => {
     expect(getByText("No Exercises Found")).toBeTruthy();
   });
 
-  it("opens exercise detail sheet when an exercise card is pressed", () => {
+  it("opens exercise detail sheet when an exercise card is pressed", async () => {
     const onQuickRoutine = jest.fn();
     const onCustomTimer = jest.fn();
 
@@ -73,6 +73,8 @@ describe("ExerciseLibraryView Component", () => {
     expect(getByText("Start Quick Routine")).toBeTruthy();
     const quickRoutineBtn = getByText("Start Quick Routine");
     fireEvent.press(quickRoutineBtn);
-    expect(onQuickRoutine).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(onQuickRoutine).toHaveBeenCalled();
+    });
   });
 });

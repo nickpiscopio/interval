@@ -229,6 +229,7 @@ export default function SelectTimerScreen({
           color: "#4B5563",
         },
       ],
+      createdAt: Date.now(),
     };
     navigation.navigate("CreateTimer", { timer: customTimer });
   }
