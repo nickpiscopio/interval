@@ -303,21 +303,6 @@ export default function SelectTimerScreen({
             </TouchableOpacity>
           </View>
         </View>
-
-        <View style={styles.intervalsPreview}>
-          {item.intervals.map((int) => (
-            <View
-              key={int.id}
-              style={[
-                styles.intervalPill,
-                {
-                  backgroundColor: int.color,
-                  flex: Math.max(1, int.duration),
-                },
-              ]}
-            />
-          ))}
-        </View>
       </TouchableOpacity>
     </ScaleDecorator>
   );
@@ -655,23 +640,23 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: "#FFFFFF",
-    borderRadius: RADIUS.lg,
+    borderRadius: RADIUS.md,
+    paddingLeft: 0,
     padding: Spacing.md,
     shadowColor: "#000000",
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.06,
-    shadowRadius: 8,
+    shadowRadius: 10,
     elevation: 2,
-    borderWidth: 1,
+    borderWidth: 0,
     borderColor: "#F3F4F6",
   },
   cardDragging: {
     backgroundColor: "#F9FAFB",
-    shadowColor: Colors.primary,
     shadowOpacity: 0.2,
     shadowRadius: 12,
     elevation: 8,
-    transform: [{ scale: 1.02 }],
+    transform: [{ scale: 1 }],
   },
   cardHeader: {
     flexDirection: "row",
@@ -679,6 +664,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   dragHandle: {
+    paddingLeft: Spacing.sm,
     paddingRight: Spacing.sm,
     paddingVertical: Spacing.xs,
     justifyContent: "center",
@@ -748,14 +734,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
     alignItems: "center",
     justifyContent: "center",
-  },
-  intervalsPreview: {
-    flexDirection: "row",
-    height: 6,
-    borderRadius: 3,
-    overflow: "hidden",
-    marginTop: Spacing.sm,
-    backgroundColor: "#E5E7EB",
   },
   intervalPill: {
     height: "100%",
