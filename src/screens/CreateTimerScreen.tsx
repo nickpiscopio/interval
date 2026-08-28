@@ -73,6 +73,7 @@ export default function CreateTimerScreen({
     { id: "init_2", name: "Low Interval", duration: 15, color: "#3B82F6" }
   ]);
   const [selectedIntervalId, setSelectedIntervalId] = useState<string>("init_1");
+  const [durationInputText, setDurationInputText] = useState<string>("00:00:30");
 
   // Initialize form if in edit/import mode
   useEffect(() => {
@@ -120,10 +121,18 @@ export default function CreateTimerScreen({
 
   const selectedInterval = intervals.find((int) => int.id === selectedIntervalId) || intervals[0];
 
+  // Sync duration input when selected interval changes
+  useEffect(() => {
+    if (selectedInterval) {
+      setDurationInputText(formatHHMMSS(selectedInterval.duration));
+    }
+  }, [selectedIntervalId]);
+
   // Navigate to Card
   function scrollToCard(index: number) {
     if (selectedInterval && selectedInterval.duration < 1) {
       updateSelectedInterval({ duration: 1 });
+      setDurationInputText(formatHHMMSS(1));
     }
     setActiveCardIndex(index);
     carouselRef.current?.scrollTo({ x: index * width, animated: true });
@@ -335,10 +344,16 @@ export default function CreateTimerScreen({
 
   // Format Duration string helpers
   function formatSeconds(seconds: number): string {
-    const mins = Math.floor(seconds / 60);
+    const hours = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
+    if (hours > 0) {
+      const minsStr = mins > 0 ? `${mins}m` : "";
+      const secsStr = secs > 0 ? `${secs}s` : "";
+      return [`${hours}h`, minsStr, secsStr].filter(Boolean).join(" ");
+    }
     if (mins > 0) {
-      return `${mins}m ${secs > 0 ? `${secs}s` : ""}`;
+      return `${mins}m ${secs > 0 ? `${secs}s` : ""}`.trim();
     }
     return `${secs}s`;
   }
@@ -354,21 +369,27 @@ export default function CreateTimerScreen({
   }
 
   function handleDurationChange(text: string) {
-    const digitsOnly = text.replace(/[^0-9]/g, "");
-    if (digitsOnly.length > 6) return;
+    const rawDigits = text.replace(/\D/g, "");
+    const trimmed = rawDigits.slice(-6);
+    const padded = trimmed.padStart(6, "0");
+    const formatted = `${padded.slice(0, 2)}:${padded.slice(2, 4)}:${padded.slice(4, 6)}`;
+    setDurationInputText(formatted);
 
-    const padded = digitsOnly.padStart(6, "0");
     const hours = parseInt(padded.slice(0, 2), 10);
     const minutes = parseInt(padded.slice(2, 4), 10);
     const seconds = parseInt(padded.slice(4, 6), 10);
-
     const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+
     updateSelectedInterval({ duration: totalSeconds });
   }
 
   function handleDurationBlur() {
-    if (selectedInterval && selectedInterval.duration < 1) {
-      updateSelectedInterval({ duration: 1 });
+    if (selectedInterval) {
+      const finalDuration = Math.max(1, selectedInterval.duration);
+      if (selectedInterval.duration < 1) {
+        updateSelectedInterval({ duration: 1 });
+      }
+      setDurationInputText(formatHHMMSS(finalDuration));
     }
   }
 
@@ -582,7 +603,7 @@ export default function CreateTimerScreen({
                         <Text style={styles.inputLabel}>{t("common.duration")}</Text>
                         <TextInput
                           style={styles.timeInput}
-                          value={formatHHMMSS(selectedInterval.duration)}
+                          value={durationInputText}
                           onChangeText={handleDurationChange}
                           onBlur={handleDurationBlur}
                           keyboardType="number-pad"

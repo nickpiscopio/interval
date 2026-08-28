@@ -35,3 +35,7 @@ _Avoid_: EULA, Fine Print
 **Discovery & Corrective Badges**:
 Gamified achievement awards unlocked when exploring the exercise library and completing physical therapy / mobility routines.
 _Avoid_: Trophies, Points, Quest Rewards
+
+**Duration Shift-Register Input**:
+A numeric text entry mechanism for interval duration that queues digits right-to-left up to 6 digits formatted as `00:00:00` (`HH:MM:SS`), calculating total seconds without mid-keystroke conversions.
+_Avoid_: Time Picker Wheel, Single-Digit Parser

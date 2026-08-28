@@ -303,4 +303,56 @@ describe("CreateTimerScreen", () => {
       expect(mockNavigation.popToTop).toHaveBeenCalled();
     });
   });
+
+  it("handles right-to-left 6-digit shift register for duration input, backspace, and blur normalization", () => {
+    const mockNavigation: any = {
+      setOptions: jest.fn(),
+      navigate: jest.fn(),
+      goBack: jest.fn(),
+    };
+
+    const { getByDisplayValue, getByText } = render(
+      <AlertProvider>
+        <CreateTimerScreen navigation={mockNavigation} route={{} as any} />
+      </AlertProvider>
+    );
+
+    // Initial selected interval is High Interval (30s) -> "00:00:30"
+    const durationInput = getByDisplayValue("00:00:30");
+
+    // Type 4 -> "00:00:04"
+    fireEvent.changeText(durationInput, "4");
+    expect(getByDisplayValue("00:00:04")).toBeTruthy();
+
+    // Type 5 after 00:00:04 -> "0000045" -> "00:00:45"
+    fireEvent.changeText(durationInput, "00:00:045");
+    expect(getByDisplayValue("00:00:45")).toBeTruthy();
+
+    // Type 0 -> "0000450" -> "00:04:50"
+    fireEvent.changeText(durationInput, "00:00:450");
+    expect(getByDisplayValue("00:04:50")).toBeTruthy();
+
+    // Backspace: simulate removing last digit from 00:04:50 -> "00:04:5"
+    fireEvent.changeText(durationInput, "00:04:5");
+    expect(getByDisplayValue("00:00:45")).toBeTruthy();
+
+    // Type empty or 0 -> "00:00:00"
+    fireEvent.changeText(durationInput, "");
+    expect(getByDisplayValue("00:00:00")).toBeTruthy();
+
+    // Blur -> defaults minimum to 1s -> "00:00:01"
+    fireEvent(durationInput, "blur");
+    expect(getByDisplayValue("00:00:01")).toBeTruthy();
+
+    // Switch to Low Interval (15s)
+    const lowInterval = getByText("Low Interval");
+    fireEvent.press(lowInterval);
+    expect(getByDisplayValue("00:00:15")).toBeTruthy();
+
+    // Type 055832 -> "05:58:32" -> converts to 5h 58m 32s on interval card
+    const lowDurationInput = getByDisplayValue("00:00:15");
+    fireEvent.changeText(lowDurationInput, "055832");
+    expect(getByDisplayValue("05:58:32")).toBeTruthy();
+    expect(getByText("5h 58m 32s")).toBeTruthy();
+  });
 });

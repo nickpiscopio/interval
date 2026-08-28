@@ -126,10 +126,16 @@ export default function SelectTimerScreen({
   }
 
   function formatTime(seconds: number): string {
-    const mins = Math.floor(seconds / 60);
+    const hours = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
+    if (hours > 0) {
+      const minsStr = mins > 0 ? `${mins}m` : "";
+      const secsStr = secs > 0 ? `${secs}s` : "";
+      return [`${hours}h`, minsStr, secsStr].filter(Boolean).join(" ");
+    }
     if (mins > 0) {
-      return `${mins}m ${secs > 0 ? `${secs}s` : ""}`;
+      return `${mins}m ${secs > 0 ? `${secs}s` : ""}`.trim();
     }
     return `${secs}s`;
   }
