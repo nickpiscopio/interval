@@ -8,7 +8,10 @@ import {
   DefaultTheme,
   DarkTheme,
 } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import {
+  createStackNavigator,
+  CardStyleInterpolators,
+} from "@react-navigation/stack";
 import * as React from "react";
 
 import { t } from "../i18n";
@@ -34,55 +37,26 @@ export default function Navigation() {
  * A root stack navigator is often used for displaying modals on top of all other content.
  * https://reactnavigation.org/docs/modal
  */
-const Stack = createNativeStackNavigator<RootStackParamList>();
+const Stack = createStackNavigator<RootStackParamList>();
 
 function RootNavigator() {
   return (
     <Stack.Navigator
       screenOptions={{
-        headerTitleAlign: "center",
+        headerShown: false,
         presentation: "card",
-        animation: "ios_from_right",
-        freezeOnBlur: false,
-        contentStyle: { backgroundColor: "#F9FAFB" },
         gestureEnabled: true,
+        cardStyleInterpolator: CardStyleInterpolators.forHorizontalIOS,
+        cardStyle: { backgroundColor: "#F9FAFB" },
       }}
     >
-      <Stack.Screen
-        name="Root"
-        component={SelectTimerScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="CreateTimer"
-        component={CreateTimerScreen}
-        options={{ title: t("createTimer.titleCreate") }}
-      />
-      <Stack.Screen
-        name="Timer"
-        component={TimerScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="GenerateTimer"
-        component={GenerateTimerScreen}
-        options={{ title: t("generateTimer.title") }}
-      />
-      <Stack.Screen
-        name="Completion"
-        component={CompletionScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Awards"
-        component={AwardsScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="NotFound"
-        component={NotFoundScreen}
-        options={{ title: t("notFound.title") }}
-      />
+      <Stack.Screen name="Root" component={SelectTimerScreen} />
+      <Stack.Screen name="CreateTimer" component={CreateTimerScreen} />
+      <Stack.Screen name="Timer" component={TimerScreen} />
+      <Stack.Screen name="GenerateTimer" component={GenerateTimerScreen} />
+      <Stack.Screen name="Completion" component={CompletionScreen} />
+      <Stack.Screen name="Awards" component={AwardsScreen} />
+      <Stack.Screen name="NotFound" component={NotFoundScreen} />
     </Stack.Navigator>
   );
 }

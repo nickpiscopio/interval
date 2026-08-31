@@ -101,24 +101,9 @@ export default function CreateTimerScreen({
     }
   }, [editTimer]);
 
-  function updateHeaderTitle(nameToUse?: string) {
-    const isSaved = Boolean(editTimer && editTimer.createdAt && !isImportMode);
-    const fallbackTitle = isSaved ? t("createTimer.titleEdit") : t("createTimer.titleCreate");
-    const name = typeof nameToUse === "string" ? nameToUse : timerName;
-    const trimmed = name.trim();
-    navigation.setOptions({
-      title: trimmed.length > 0 ? name : fallbackTitle,
-    });
-  }
-
-  // Set initial navigation header title on mount / editTimer change
-  useEffect(() => {
-    if (editTimer) {
-      updateHeaderTitle(editTimer.name);
-    } else {
-      updateHeaderTitle("");
-    }
-  }, [editTimer]);
+  const isSaved = Boolean(editTimer && editTimer.createdAt && !isImportMode);
+  const fallbackTitle = isSaved ? t("createTimer.titleEdit") : t("createTimer.titleCreate");
+  const headerTitle = timerName.trim().length > 0 ? timerName.trim() : fallbackTitle;
 
   // Action: Open Edit Modal for Interval
   function handleSelectInterval(interval: Interval) {
@@ -357,8 +342,28 @@ export default function CreateTimerScreen({
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 88 : 0}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
     >
+      {/* Custom In-Screen Navigation Header */}
+      <View style={[styles.header, { paddingTop: Math.max(insets.top, 16) + Spacing.xs }]}>
+        <TouchableOpacity
+          testID="header-back-button"
+          accessibilityLabel={t("common.back", { defaultValue: "Back" })}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            navigation.goBack();
+          }}
+          style={styles.backButton}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Ionicons name="arrow-back" size={24} color="#1F2937" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle} numberOfLines={1} ellipsizeMode="tail">
+          {headerTitle}
+        </Text>
+        <View style={styles.headerRightPlaceholder} />
+      </View>
+
       {/* Header Banner */}
       {isImportMode && (
         <View style={styles.importBanner}>
@@ -406,7 +411,6 @@ export default function CreateTimerScreen({
                 style={styles.editorTextInput}
                 value={timerName}
                 onChangeText={setTimerName}
-                onBlur={() => updateHeaderTitle()}
                 placeholder={t("createTimer.timerNamePlaceholder")}
                 placeholderTextColor="#9CA3AF"
               />
@@ -483,6 +487,34 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F9FAFB",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: Spacing.screen,
+    paddingVertical: Spacing.sm,
+    backgroundColor: "#FFFFFF",
+    borderBottomWidth: 1,
+    borderBottomColor: "#E5E7EB",
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#F3F4F6",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  headerTitle: {
+    fontSize: FontSize.lg,
+    fontWeight: "700",
+    color: "#111827",
+    maxWidth: "70%",
+    textAlign: "center",
+  },
+  headerRightPlaceholder: {
+    width: 40,
   },
   listContainer: {
     flex: 1,

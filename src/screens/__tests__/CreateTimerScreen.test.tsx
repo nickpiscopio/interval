@@ -366,4 +366,21 @@ describe("CreateTimerScreen", () => {
       expect(getByText("5h 58m 32s")).toBeTruthy();
     });
   });
+
+  it("navigates back when header back button is pressed", () => {
+    const mockNavigation: any = {
+      goBack: jest.fn(),
+    };
+
+    const { getByTestId } = render(
+      <AlertProvider>
+        <CreateTimerScreen navigation={mockNavigation} route={{} as any} />
+      </AlertProvider>
+    );
+
+    const backBtn = getByTestId("header-back-button");
+    fireEvent.press(backBtn);
+
+    expect(mockNavigation.goBack).toHaveBeenCalled();
+  });
 });

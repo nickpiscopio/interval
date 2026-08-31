@@ -1,4 +1,5 @@
 /* eslint-env jest */
+require("react-native-gesture-handler/jestSetup");
 
 // Polyfill window for React 19 test renderer
 if (typeof window === "undefined") {

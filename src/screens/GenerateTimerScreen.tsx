@@ -9,6 +9,8 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import * as Haptics from "expo-haptics";
 
 import { RootStackScreenProps } from "../types";
 import { generateWorkout, GeneratorParams } from "../services/timerGenerator";
@@ -20,6 +22,7 @@ import Colors from "../constants/Colors";
 export default function GenerateTimerScreen({
   navigation,
 }: RootStackScreenProps<"GenerateTimer">) {
+  const insets = useSafeAreaInsets();
   // Survey Selections
   const [goal, setGoal] = useState<GeneratorParams["goal"]>("weight_loss");
   const [area, setArea] = useState<GeneratorParams["area"]>("total");
@@ -51,7 +54,28 @@ export default function GenerateTimerScreen({
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <View style={styles.screen}>
+      {/* Custom In-Screen Navigation Header */}
+      <View style={[styles.header, { paddingTop: Math.max(insets.top, 16) + Spacing.xs }]}>
+        <TouchableOpacity
+          testID="header-back-button"
+          accessibilityLabel={t("common.back", { defaultValue: "Back" })}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            navigation.goBack();
+          }}
+          style={styles.backButton}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Ionicons name="arrow-back" size={24} color="#1F2937" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle} numberOfLines={1} ellipsizeMode="tail">
+          {t("generateTimer.title")}
+        </Text>
+        <View style={styles.headerRightPlaceholder} />
+      </View>
+
+      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.description}>
         {t("generateTimer.description")}
       </Text>
@@ -193,10 +217,43 @@ export default function GenerateTimerScreen({
         </LinearGradient>
       </TouchableOpacity>
     </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: "#F9FAFB",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: Spacing.screen,
+    paddingVertical: Spacing.sm,
+    backgroundColor: "#FFFFFF",
+    borderBottomWidth: 1,
+    borderBottomColor: "#E5E7EB",
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#F3F4F6",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  headerTitle: {
+    fontSize: FontSize.lg,
+    fontWeight: "700",
+    color: "#111827",
+    maxWidth: "70%",
+    textAlign: "center",
+  },
+  headerRightPlaceholder: {
+    width: 40,
+  },
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",

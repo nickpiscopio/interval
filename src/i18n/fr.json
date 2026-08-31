@@ -18,7 +18,8 @@
     "min": "min",
     "yes": "Oui",
     "no": "Non",
-    "ok": "OK"
+    "ok": "OK",
+    "back": "Retour"
   },
   "selectTimer": {
     "greeting": "C'est l'heure du sport ! ⚡️",

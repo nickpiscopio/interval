@@ -85,4 +85,19 @@ describe("GenerateTimerScreen", () => {
       })
     );
   });
+
+  it("navigates back when header back button is pressed", () => {
+    const mockNavigation: any = {
+      goBack: jest.fn(),
+    };
+
+    const { getByTestId } = render(
+      <GenerateTimerScreen navigation={mockNavigation} route={{} as any} />
+    );
+
+    const backBtn = getByTestId("header-back-button");
+    fireEvent.press(backBtn);
+
+    expect(mockNavigation.goBack).toHaveBeenCalled();
+  });
 });
