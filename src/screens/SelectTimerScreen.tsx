@@ -468,25 +468,27 @@ export default function SelectTimerScreen({
             <Ionicons name="add" size={24} color="#FFFFFF" />
           </TouchableOpacity>
 
-          <TouchableOpacity
-            testID="btn-generate-ai"
-            accessibilityLabel={t("selectTimer.generateAi")}
-            style={styles.generateFabWrapper}
-            activeOpacity={0.85}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-              navigation.navigate("GenerateTimer");
-            }}
-          >
-            <LinearGradient
-              colors={["#1A6CCC", "#1ACC6C"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.generateFabGradient}
+          <View style={styles.generateFabShadow}>
+            <TouchableOpacity
+              testID="btn-generate-ai"
+              accessibilityLabel={t("selectTimer.generateAi")}
+              style={styles.generateFabTouchable}
+              activeOpacity={0.85}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                navigation.navigate("GenerateTimer");
+              }}
             >
-              <Ionicons name="sparkles" size={24} color="#FFFFFF" />
-            </LinearGradient>
-          </TouchableOpacity>
+              <LinearGradient
+                colors={["#1A6CCC", "#1ACC6C"]}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.generateFabGradient}
+              >
+                <Ionicons name="sparkles" size={24} color="#FFFFFF" />
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
         </View>
       )}
 
@@ -776,7 +778,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 4,
   },
-  generateFabWrapper: {
+  generateFabShadow: {
     width: 56,
     height: 56,
     borderRadius: 28,
@@ -785,10 +787,17 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 6,
     elevation: 6,
+    backgroundColor: "transparent",
   },
-  generateFabGradient: {
+  generateFabTouchable: {
     width: 56,
     height: 56,
+    borderRadius: 28,
+    overflow: "hidden",
+  },
+  generateFabGradient: {
+    width: "100%",
+    height: "100%",
     borderRadius: 28,
     alignItems: "center",
     justifyContent: "center",

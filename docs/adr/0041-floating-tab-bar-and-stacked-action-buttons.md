@@ -18,7 +18,7 @@ Previously, `SelectTimerScreen` used an anchored, full-width solid bottom dock t
 2. **Stacked Floating Action Buttons (FABs)**:
    - Positioned floating action buttons on the bottom right above the floating tab bar, exclusive to the Workouts tab.
    - **Generate with AI (Bottom-Right Hero FAB)**:
-     - `56x56` circular button (`borderRadius: 28`) styled with the AI linear gradient (`["#1A6CCC", "#1ACC6C"]`), white `sparkles` icon (24px), and emerald drop shadow.
+     - `56x56` circular button (`borderRadius: 28`) constructed with an outer elevation shadow container and an inner full-bleed touchable (`overflow: "hidden"`) containing the AI linear gradient (`["#1A6CCC", "#1ACC6C"]`), white `sparkles` icon (24px), and emerald drop shadow (`#059669`). This guarantees that the press feedback layer expands to the exact 56x56 circular boundary without clipping or size mismatch.
    - **Create Custom (Stacked Above)**:
      - `44x44` circular button (`borderRadius: 22`) styled with solid brand blue (`#1A6CCC`), white `add` (`+`) icon (24px), and elevated shadow.
 
