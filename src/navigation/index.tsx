@@ -42,7 +42,10 @@ function RootNavigator() {
       screenOptions={{
         headerTitleAlign: "center",
         presentation: "card",
-        animation: "slide_from_right",
+        animation: "ios_from_right",
+        freezeOnBlur: false,
+        contentStyle: { backgroundColor: "#F9FAFB" },
+        gestureEnabled: true,
       }}
     >
       <Stack.Screen

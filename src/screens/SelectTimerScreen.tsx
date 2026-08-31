@@ -55,6 +55,7 @@ export default function SelectTimerScreen({
   const [legalAcceptedDate, setLegalAcceptedDate] = useState<string | null>(null);
   const isFocused = useIsFocused();
   const insets = useSafeAreaInsets();
+  const hasLoadedRef = React.useRef(false);
 
   useEffect(() => {
     if (isFocused) {
@@ -64,8 +65,12 @@ export default function SelectTimerScreen({
   }, [isFocused]);
 
   async function loadTimers() {
+    const isInitial = !hasLoadedRef.current;
+    const startTime = Date.now();
     try {
-      setLoading(true);
+      if (isInitial) {
+        setLoading(true);
+      }
       const isLegalAccepted = await AsyncStorage.getItem(LEGAL_ACCEPTED_KEY);
       if (!isLegalAccepted) {
         setShowLegalGate(true);
@@ -81,22 +86,29 @@ export default function SelectTimerScreen({
         await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_AI_TIMERS));
         await AsyncStorage.setItem(INITIALIZED_KEY, "true");
         setTimers(DEFAULT_AI_TIMERS);
-        return;
-      }
-
-      const data = await AsyncStorage.getItem(STORAGE_KEY);
-      if (data) {
-        const parsed = JSON.parse(data) as Timer[];
-        const normalized = parsed.map((t) => ({
-          ...t,
-          intervals: t.intervals.map((int, idx) => normalizeInterval(int, idx)),
-        }));
-        setTimers(normalized);
+      } else {
+        const data = await AsyncStorage.getItem(STORAGE_KEY);
+        if (data) {
+          const parsed = JSON.parse(data) as Timer[];
+          const normalized = parsed.map((t) => ({
+            ...t,
+            intervals: t.intervals.map((int, idx) => normalizeInterval(int, idx)),
+          }));
+          setTimers(normalized);
+        }
       }
     } catch (e) {
       console.warn("Failed to load timers from AsyncStorage:", e);
     } finally {
-      setLoading(false);
+      if (isInitial) {
+        const elapsed = Date.now() - startTime;
+        const remaining = Math.max(0, 1500 - elapsed);
+        if (remaining > 0) {
+          await new Promise((resolve) => setTimeout(resolve, remaining));
+        }
+        setLoading(false);
+        hasLoadedRef.current = true;
+      }
     }
   }
 

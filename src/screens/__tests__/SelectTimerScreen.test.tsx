@@ -24,7 +24,7 @@ describe("SelectTimerScreen", () => {
     await waitFor(() => {
       expect(getByText("Let's Workout! ⚡️")).toBeTruthy();
       expect(getByText(DEFAULT_AI_TIMERS[0].name)).toBeTruthy();
-    });
+    }, { timeout: 3500 });
   });
 
   it("navigates to CreateTimer when 'Create Custom' FAB is pressed", async () => {
@@ -38,7 +38,7 @@ describe("SelectTimerScreen", () => {
 
     await waitFor(() => {
       expect(getByTestId("btn-create-custom")).toBeTruthy();
-    });
+    }, { timeout: 3500 });
 
     const createBtn = getByTestId("btn-create-custom");
     fireEvent.press(createBtn);
@@ -57,7 +57,7 @@ describe("SelectTimerScreen", () => {
 
     await waitFor(() => {
       expect(getByTestId("btn-generate-ai")).toBeTruthy();
-    });
+    }, { timeout: 3500 });
 
     const generateBtn = getByTestId("btn-generate-ai");
     fireEvent.press(generateBtn);
@@ -76,7 +76,7 @@ describe("SelectTimerScreen", () => {
 
     await waitFor(() => {
       expect(getAllByText("play").length).toBeGreaterThan(0);
-    });
+    }, { timeout: 3500 });
 
     const playButtons = getAllByText("play");
     fireEvent.press(playButtons[0]);
@@ -101,14 +101,14 @@ describe("SelectTimerScreen", () => {
 
     await waitFor(() => {
       expect(getAllByText("share-outline").length).toBeGreaterThan(0);
-    });
+    }, { timeout: 3500 });
 
     const shareButtons = getAllByText("share-outline");
     fireEvent.press(shareButtons[0]);
 
     await waitFor(() => {
       expect(Share.share).toHaveBeenCalled();
-    });
+    }, { timeout: 3500 });
   });
 
   it("navigates to Awards screen when trophy icon is pressed", async () => {
@@ -122,7 +122,7 @@ describe("SelectTimerScreen", () => {
 
     await waitFor(() => {
       expect(getByText("trophy")).toBeTruthy();
-    });
+    }, { timeout: 3500 });
 
     const trophyBtn = getByText("trophy");
     fireEvent.press(trophyBtn);
@@ -141,7 +141,7 @@ describe("SelectTimerScreen", () => {
 
     await waitFor(() => {
       expect(getByText(DEFAULT_AI_TIMERS[0].name)).toBeTruthy();
-    });
+    }, { timeout: 3500 });
 
     const card = getByText(DEFAULT_AI_TIMERS[0].name);
     fireEvent.press(card);
@@ -178,7 +178,7 @@ describe("SelectTimerScreen", () => {
     await waitFor(() => {
       expect(getByText("Quick Tabata")).toBeTruthy();
       expect(getByText("20s")).toBeTruthy();
-    });
+    }, { timeout: 3500 });
 
     const dragHandles = getAllByTestId("icon-drag-indicator");
     fireEvent(dragHandles[0], "pressIn");
@@ -214,7 +214,7 @@ describe("SelectTimerScreen", () => {
     await waitFor(() => {
       expect(getByText("Exercise Library 📚")).toBeTruthy();
       expect(getByText("Tibialis Raises")).toBeTruthy();
-    });
+    }, { timeout: 3500 });
 
     // Press an exercise card to open details
     const tibialisCard = getByText("Tibialis Raises");
@@ -235,7 +235,7 @@ describe("SelectTimerScreen", () => {
           }),
         })
       );
-    });
+    }, { timeout: 3500 });
 
     // Open another exercise and Create Custom Timer
     fireEvent.press(tibialisCard);
@@ -251,7 +251,7 @@ describe("SelectTimerScreen", () => {
           }),
         })
       );
-    });
+    }, { timeout: 3500 });
 
     // Switch back to Workouts tab
     const workoutsTab = getByTestId("tab-workouts");
@@ -271,7 +271,7 @@ describe("SelectTimerScreen", () => {
     await waitFor(() => {
       expect(getByText("IMPORTANT SAFETY & HEALTH NOTICE")).toBeTruthy();
       expect(getByText("Legal Agreement & Medical Disclaimer")).toBeTruthy();
-    });
+    }, { timeout: 3500 });
 
     const agreeBtn = getByTestId("legal-agree-button");
     fireEvent.press(agreeBtn);
@@ -281,7 +281,7 @@ describe("SelectTimerScreen", () => {
       const acceptedDate = await AsyncStorage.getItem("@legal_disclaimer_accepted_date");
       expect(accepted).toBe("true");
       expect(acceptedDate).toBeTruthy();
-    });
+    }, { timeout: 3500 });
   });
 
   it("opens legal agreement in review mode from header info button with agreed date", async () => {
@@ -294,7 +294,7 @@ describe("SelectTimerScreen", () => {
 
     await waitFor(() => {
       expect(getByTestId("legal-info-header-btn")).toBeTruthy();
-    });
+    }, { timeout: 3500 });
 
     const infoBtn = getByTestId("legal-info-header-btn");
     fireEvent.press(infoBtn);

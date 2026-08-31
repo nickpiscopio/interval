@@ -22,3 +22,6 @@ We decided to establish a comprehensive, single-source-of-truth design system co
    - **Sheet Transitions**: Bottom sheets must use **slide up** transitions (`animationType="slide"`).
    - **Corners**: Rounded top corners (`borderTopLeftRadius: Spacing.radius.lg`, `borderTopRightRadius: Spacing.radius.lg`).
    - **Dismissal**: Top-right **"Done"** / close button and tapping the backdrop dismisses the sheet.
+5. **Standardized Loading Indicator System**:
+   - **Full Viewport Replacement**: Any loading operation utilizes a standardized centered loading indicator (`ActivityIndicator size="large" color={Colors.primary}`).
+   - **Minimum Display Duration**: All loading states enforce a minimum duration of at least 1500 ms (even if data returns earlier) to eliminate screen micro-flicker and ensure stable visual feedback.
