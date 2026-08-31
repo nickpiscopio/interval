@@ -43,3 +43,7 @@ _Avoid_: Time Picker Wheel, Single-Digit Parser
 **Interval Edit Bottom Sheet**:
 A dedicated slide-up bottom sheet modal (`animationType="slide"`) with an animated transparent fade-in backdrop for inspecting and editing an individual interval's name, duration, and color with a top-right "Done" button and self-contained keyboard avoidance.
 _Avoid_: Carousel Slider, Inline Accordion
+
+**Floating Navigation Bar & Action Buttons**:
+A translucent floating bottom bar for switching between Workouts and Exercise Library with stacked floating action buttons (FABs) on the bottom-right for timer generation and creation.
+_Avoid_: Tab Bar Dock, Bottom Action Sheet

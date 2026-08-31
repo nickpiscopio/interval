@@ -433,49 +433,67 @@ export default function SelectTimerScreen({
         />
       )}
 
-      {/* Workouts Action Buttons (When on Workouts tab) */}
+      {/* Floating Action Buttons (Workouts Tab Only) */}
       {activeTab === "workouts" && (
         <View
           style={[
-            styles.buttonPanel,
+            styles.fabContainer,
             {
-              bottom: Math.max(insets.bottom, 12) + 54,
-              borderTopColor: hasMoreBelow ? "#E5E7EB" : "transparent",
+              bottom: Math.max(insets.bottom, 12) + 60,
             },
           ]}
         >
           <TouchableOpacity
-            style={styles.createButton}
-            activeOpacity={0.9}
-            onPress={() => navigation.navigate("CreateTimer")}
+            testID="btn-create-custom"
+            accessibilityLabel={t("selectTimer.createCustom")}
+            style={styles.createFab}
+            activeOpacity={0.85}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              navigation.navigate("CreateTimer");
+            }}
           >
-            <Ionicons name="add" size={20} color="#3B82F6" style={styles.buttonIcon} />
-            <Text style={styles.createButtonText}>{t("selectTimer.createCustom")}</Text>
+            <Ionicons name="add" size={24} color="#FFFFFF" />
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={styles.generateButton}
-            activeOpacity={0.9}
-            onPress={() => navigation.navigate("GenerateTimer")}
+            testID="btn-generate-ai"
+            accessibilityLabel={t("selectTimer.generateAi")}
+            style={styles.generateFabWrapper}
+            activeOpacity={0.85}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              navigation.navigate("GenerateTimer");
+            }}
           >
-            <Ionicons name="sparkles" size={18} color="#FFFFFF" style={styles.buttonIcon} />
-            <Text style={styles.generateButtonText}>{t("selectTimer.generateAi")}</Text>
+            <LinearGradient
+              colors={["#1A6CCC", "#1ACC6C"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.generateFabGradient}
+            >
+              <Ionicons name="sparkles" size={24} color="#FFFFFF" />
+            </LinearGradient>
           </TouchableOpacity>
         </View>
       )}
 
-      {/* Bottom Dock Tab Bar */}
+      {/* Floating Translucent Tab Bar */}
       <View
         style={[
-          styles.bottomDock,
+          styles.floatingTabBar,
           {
-            paddingBottom: Math.max(insets.bottom, 10),
+            bottom: Math.max(insets.bottom, 12),
           },
         ]}
       >
         <TouchableOpacity
           testID="tab-workouts"
-          style={[styles.dockTab, activeTab === "workouts" && styles.dockTabActive]}
+          accessibilityLabel={t("selectTimer.workoutsTab")}
+          style={[
+            styles.floatingTab,
+            activeTab === "workouts" && styles.floatingTabActive,
+          ]}
           activeOpacity={0.8}
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -484,22 +502,18 @@ export default function SelectTimerScreen({
         >
           <Ionicons
             name={activeTab === "workouts" ? "timer" : "timer-outline"}
-            size={22}
+            size={24}
             color={activeTab === "workouts" ? Colors.primary : "#6B7280"}
           />
-          <Text
-            style={[
-              styles.dockTabText,
-              activeTab === "workouts" && styles.dockTabTextActive,
-            ]}
-          >
-            {t("selectTimer.workoutsTab")}
-          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           testID="tab-library"
-          style={[styles.dockTab, activeTab === "library" && styles.dockTabActive]}
+          accessibilityLabel={t("selectTimer.libraryTab")}
+          style={[
+            styles.floatingTab,
+            activeTab === "library" && styles.floatingTabActive,
+          ]}
           activeOpacity={0.8}
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -508,17 +522,9 @@ export default function SelectTimerScreen({
         >
           <Ionicons
             name={activeTab === "library" ? "barbell" : "barbell-outline"}
-            size={22}
+            size={24}
             color={activeTab === "library" ? Colors.primary : "#6B7280"}
           />
-          <Text
-            style={[
-              styles.dockTabText,
-              activeTab === "library" && styles.dockTabTextActive,
-            ]}
-          >
-            {t("selectTimer.libraryTab")}
-          </Text>
         </TouchableOpacity>
       </View>
 
@@ -738,95 +744,69 @@ const styles = StyleSheet.create({
   intervalPill: {
     height: "100%",
   },
-  buttonPanel: {
+  fabContainer: {
     position: "absolute",
-    left: 0,
-    right: 0,
-    flexDirection: "row",
-    paddingHorizontal: Spacing.screen,
-    paddingTop: Spacing.xs,
-    paddingBottom: Spacing.xs,
-    backgroundColor: "rgba(249, 250, 251, 0.95)",
+    right: Spacing.screen,
+    alignItems: "center",
     gap: Spacing.sm,
-    borderTopWidth: 1,
-    zIndex: 10,
+    zIndex: 20,
   },
-  createButton: {
-    flex: 1,
-    flexDirection: "row",
+  createFab: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: Colors.primary,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1.5,
-    borderColor: "#3B82F6",
-    height: Spacing.button.minHeight,
-    borderRadius: RADIUS.lg,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  createButtonText: {
-    color: "#3B82F6",
-    fontSize: FontSize.sm,
-    fontWeight: "700",
-  },
-  generateButton: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#059669",
-    height: Spacing.button.minHeight,
-    borderRadius: RADIUS.lg,
-    shadowColor: "#059669",
+    shadowColor: Colors.primary,
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.25,
     shadowRadius: 4,
-    elevation: 2,
+    elevation: 4,
   },
-  generateButtonText: {
-    color: "#FFFFFF",
-    fontSize: FontSize.sm,
-    fontWeight: "700",
+  generateFabWrapper: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    shadowColor: "#059669",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 6,
   },
-  buttonIcon: {
-    marginRight: 6,
+  generateFabGradient: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  bottomDock: {
+  floatingTabBar: {
     position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
+    left: Spacing.screen,
+    right: Spacing.screen,
     flexDirection: "row",
-    backgroundColor: "#FFFFFF",
-    borderTopWidth: 1,
-    borderTopColor: "#E5E7EB",
-    paddingTop: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: -2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 8,
+    backgroundColor: "rgba(255, 255, 255, 0.88)",
+    borderRadius: RADIUS.full,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    padding: 4,
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 6,
     zIndex: 15,
   },
-  dockTab: {
+  floatingTab: {
     flex: 1,
+    height: 44,
+    borderRadius: RADIUS.full,
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 4,
   },
-  dockTabActive: {},
-  dockTabText: {
-    fontSize: 11,
-    fontWeight: "600",
-    color: "#6B7280",
-    marginTop: 2,
-  },
-  dockTabTextActive: {
-    color: Colors.primary,
-    fontWeight: "700",
+  floatingTabActive: {
+    backgroundColor: "#EFF6FF",
   },
   loadingContainer: {
     flex: 1,

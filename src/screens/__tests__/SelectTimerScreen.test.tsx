@@ -27,39 +27,39 @@ describe("SelectTimerScreen", () => {
     });
   });
 
-  it("navigates to CreateTimer when 'Create Custom' button is pressed", async () => {
+  it("navigates to CreateTimer when 'Create Custom' FAB is pressed", async () => {
     const mockNavigation: any = {
       navigate: jest.fn(),
     };
 
-    const { getByText } = render(
+    const { getByTestId } = render(
       <SelectTimerScreen navigation={mockNavigation} route={{} as any} />
     );
 
     await waitFor(() => {
-      expect(getByText("Create Custom")).toBeTruthy();
+      expect(getByTestId("btn-create-custom")).toBeTruthy();
     });
 
-    const createBtn = getByText("Create Custom");
+    const createBtn = getByTestId("btn-create-custom");
     fireEvent.press(createBtn);
 
     expect(mockNavigation.navigate).toHaveBeenCalledWith("CreateTimer");
   });
 
-  it("navigates to GenerateTimer when 'Generate with AI' button is pressed", async () => {
+  it("navigates to GenerateTimer when 'Generate with AI' FAB is pressed", async () => {
     const mockNavigation: any = {
       navigate: jest.fn(),
     };
 
-    const { getByText } = render(
+    const { getByTestId } = render(
       <SelectTimerScreen navigation={mockNavigation} route={{} as any} />
     );
 
     await waitFor(() => {
-      expect(getByText("Generate with AI")).toBeTruthy();
+      expect(getByTestId("btn-generate-ai")).toBeTruthy();
     });
 
-    const generateBtn = getByText("Generate with AI");
+    const generateBtn = getByTestId("btn-generate-ai");
     fireEvent.press(generateBtn);
 
     expect(mockNavigation.navigate).toHaveBeenCalledWith("GenerateTimer");

@@ -154,6 +154,9 @@ describe("badgeService", () => {
   });
 
   it("unlocks volume, streak milestone, and imported shared badges", async () => {
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date("2026-08-30T12:00:00Z")); // Sunday
+
     const importedTimer: Timer = {
       id: "ai_shared_123",
       name: "Shared Routine",
@@ -163,7 +166,7 @@ describe("badgeService", () => {
       ],
     };
 
-    const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
+    const yesterday = "2026-08-29"; // Saturday
     await saveUserStats({
       ...DEFAULT_USER_STATS,
       totalWorkouts: 20,
@@ -190,6 +193,8 @@ describe("badgeService", () => {
     expect(result.newlyUnlocked.some((b) => b.id === "iron_lungs")).toBe(true);
     expect(result.newlyUnlocked.some((b) => b.id === "imported_gains")).toBe(true);
     expect(result.newlyUnlocked.some((b) => b.id === "weekend_warrior")).toBe(true);
+
+    jest.useRealTimers();
   });
 
   it("records viral sharing via mail/copy and unlocks sharing badges", async () => {
