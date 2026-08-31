@@ -222,9 +222,10 @@ export default function CreateTimerScreen({
         isAiGenerated: isAiGenerated ? true : undefined,
       };
 
-      if (editTimer) {
+      const existingIndex = savedTimers.findIndex((t) => t.id === timerToSave.id);
+      if (existingIndex >= 0) {
         // Update existing timer
-        savedTimers = savedTimers.map((t) => (t.id === timerToSave.id ? timerToSave : t));
+        savedTimers[existingIndex] = timerToSave;
       } else {
         // Create new timer
         savedTimers.push(timerToSave);

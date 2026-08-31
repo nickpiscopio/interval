@@ -367,6 +367,45 @@ describe("CreateTimerScreen", () => {
     });
   });
 
+  it("saves newly generated AI preview timer to AsyncStorage and navigates", async () => {
+    const generatedTimer: Timer = {
+      id: "ai_generated_12345",
+      name: "AI Fat Burn",
+      rounds: 4,
+      createdAt: Date.now(),
+      isAiGenerated: true,
+      intervals: [
+        { id: "ai_int_1", name: "Jumping Jacks", duration: 30, color: "#1ACC6C" },
+      ],
+    };
+
+    const mockNavigation: any = {
+      navigate: jest.fn(),
+      goBack: jest.fn(),
+      popToTop: jest.fn(),
+    };
+
+    const { getByTestId } = render(
+      <AlertProvider>
+        <CreateTimerScreen
+          navigation={mockNavigation}
+          route={{ params: { timer: generatedTimer } } as any}
+        />
+      </AlertProvider>
+    );
+
+    const saveBtn = getByTestId("icon-bookmark-outline");
+    fireEvent.press(saveBtn);
+
+    await waitFor(async () => {
+      expect(mockNavigation.popToTop).toHaveBeenCalled();
+      const data = await AsyncStorage.getItem("@hiit_timers");
+      expect(data).toBeTruthy();
+      const timers: Timer[] = JSON.parse(data!);
+      expect(timers.some((t) => t.id === "ai_generated_12345")).toBe(true);
+    });
+  });
+
   it("navigates back when header back button is pressed", () => {
     const mockNavigation: any = {
       goBack: jest.fn(),
