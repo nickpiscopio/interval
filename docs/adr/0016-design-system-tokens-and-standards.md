@@ -28,6 +28,8 @@ We decided to establish a comprehensive, single-source-of-truth design system co
    - `SHADOWS.modal`: Deep backdrop elevation for modals and bottom sheets (`shadowOffset: { width: 0, height: -4 }`, `shadowOpacity: 0.15`, `shadowRadius: 16`, `elevation: 10`).
 
 4. **Component Primitives Standards**:
+   - **Universal Bold Button Typography**: 100% of buttons with text (primary CTAs, secondary action cards, text/ghost links, dialog buttons, modal actions) must use bold lettering (`fontFamily: "Poppins-Bold"` / `fontWeight: "700"`).
+   - **Icon + Text Button Padding**: Buttons containing both an icon and text must maintain enhanced internal breathing room with `gap: Spacing.sm` (8px) or `marginRight: Spacing.sm` between icon and label, `paddingHorizontal: Spacing.lg` (24px), and `paddingVertical: Spacing.md` (16px).
    - **Primary CTA Buttons**: `minHeight: TOUCH_TARGET.cta` (56px) or `TOUCH_TARGET.min` (48px), `borderRadius: RADIUS.md` (16px), `fontFamily: "Poppins-Bold"`, white text.
    - **Header Back Buttons**: Left-aligned, transparent background (`backgroundColor: "transparent"`), 44x44 touch target (`TOUCH_TARGET.icon`), `activeOpacity: 0.6` press feedback (no haptic trigger), with standard arrow icon (`name="arrow-back"`, 24px, `Colors.textScale.primary`).
    - **Icon Buttons**: Fixed `TOUCH_TARGET.icon` (44px) or `TOUCH_TARGET.min` (48px) with `borderRadius: RADIUS.sm` (8px) for control panels (or `RADIUS.full` for circular navigation/floating buttons). 4 standard variants: `primary`, `neutral`, `destructive`, `ghost`.
@@ -38,7 +40,7 @@ We decided to establish a comprehensive, single-source-of-truth design system co
    - **Unscrolled State (`offsetY <= 0`)**: In-screen navigation headers blend seamlessly into the screen background (`backgroundColor: Colors.surface.screen`) with zero borders and zero drop shadows.
    - **Scrolled State (`offsetY > 0`)**: As content scrolls underneath the fixed header, a dynamic 12px directional gradient shadow (`colors: ["rgba(0, 0, 0, 0.15)", "rgba(0, 0, 0, 0.05)", "transparent"]`) appears immediately below the header (`zIndex: 9`, `pointerEvents: "none"`), establishing natural visual depth across `SelectTimerScreen`, `AwardsScreen`, and `CreateTimerScreen`.
    - **Dynamic Type & Accessibility**: Containers containing text must use `minHeight` rather than rigid fixed `height` to allow natural flex expansion without clipping when users increase device text size.
-   - **Scrollable Insets**: Scrollable lists must provide safe-area bottom insets above floating tabs and cards.
+   - **Scrollable Insets & Floating Actions**: Scrollable lists and views with fixed/docked bottom action bars (e.g., `CompletionScreen`, `CreateTimerScreen`) must float docked actions with `paddingHorizontal: Spacing.screen` (16px) and safe-area bottom insets, while providing a dynamic scroll bottom padding cushion equal to the action bar's measured height so all content remains fully viewable.
 
 6. **Bottom Sheets & Modals Standard**:
    - **Backdrop**: Translucent darkened overlay (`Colors.surface.overlay`) with animated opacity fade-in.

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   StyleSheet,
   View,
@@ -13,25 +13,30 @@ import { Audio } from "expo-av";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "expo-haptics";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { RootStackScreenProps } from "../types";
 import { encodeBase64 } from "../utils/base64";
 import { recordWorkoutCompletion, recordShare } from "../services/badgeService";
+import { getMotivationalCompletionMessage } from "../services/motivationalMessageService";
 import { Badge, UserStats } from "../model/Badge";
 import { getLocalizedBadge } from "../constants/badges";
 import { t } from "../i18n";
-import Spacing from "../constants/Spacing";
+import Spacing, { RADIUS, TOUCH_TARGET, SHADOWS } from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
+import Colors from "../constants/Colors";
 
 export default function CompletionScreen({
   route,
   navigation,
 }: RootStackScreenProps<"Completion">) {
+  const insets = useSafeAreaInsets();
   const { timer } = route.params;
 
   const [newlyUnlockedBadges, setNewlyUnlockedBadges] = useState<Badge[]>([]);
   const [activeModalBadge, setActiveModalBadge] = useState<Badge | null>(null);
   const [userStats, setUserStats] = useState<UserStats | null>(null);
+  const [actionsHeight, setActionsHeight] = useState<number>(0);
 
   // Calculate total seconds worked
   const totalSeconds = timer.intervals.reduce((sum, int) => sum + int.duration, 0) * timer.rounds;
@@ -179,22 +184,36 @@ export default function CompletionScreen({
     }
   }
 
+  const motivationalMessage = useMemo(() => {
+    return getMotivationalCompletionMessage({
+      durationSeconds: totalSeconds,
+      rounds: timer.rounds,
+    });
+  }, [totalSeconds, timer.rounds]);
+
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
       
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={[
+          styles.scrollContent,
+          { paddingBottom: (actionsHeight || 180) + Spacing.md },
+        ]}
+        showsVerticalScrollIndicator={false}
+      >
         <LinearGradient
           colors={["#FFFBEB", "#FEF3C7"]}
           style={styles.celebrationBg}
         >
           <View style={styles.trophyContainer}>
-            <Ionicons name="trophy" size={90} color="#F59E0B" />
-            <Text style={styles.badgeText}>{t("common.done").toUpperCase()}</Text>
+            <View style={styles.trophyBubble}>
+              <Ionicons name="trophy" size={44} color="#F59E0B" />
+            </View>
           </View>
 
           <Text style={styles.title}>{t("completion.title")}</Text>
-          <Text style={styles.subtitle}>{t("completion.subtitle", { name: timer.name })}</Text>
+          <Text style={styles.subtitle}>{motivationalMessage}</Text>
         </LinearGradient>
 
         {/* Workout Stats Details */}
@@ -263,41 +282,47 @@ export default function CompletionScreen({
             </View>
           </View>
         )}
-
-        {/* Share / Back buttons */}
-        <View style={styles.actionsContainer}>
-          <TouchableOpacity
-            style={styles.shareButtonContainer}
-            activeOpacity={0.9}
-            onPress={handleShare}
-          >
-            <LinearGradient
-              colors={["#3B82F6", "#1D4ED8"]}
-              style={styles.shareButton}
-            >
-              <Ionicons name="share-social" size={20} color="#FFFFFF" style={styles.icon} />
-              <Text style={styles.shareButtonText}>{t("completion.shareWorkout")}</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.trophyRoomButton}
-            activeOpacity={0.85}
-            onPress={() => navigation.navigate("Awards")}
-          >
-            <Ionicons name="trophy-outline" size={18} color="#D97706" style={styles.icon} />
-            <Text style={styles.trophyRoomButtonText}>{t("awards.title")}</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.doneButton}
-            activeOpacity={0.8}
-            onPress={() => navigation.popToTop()}
-          >
-            <Text style={styles.doneButtonText}>{t("completion.doneButton")}</Text>
-          </TouchableOpacity>
-        </View>
       </ScrollView>
+
+      {/* Floating Bottom Action Buttons */}
+      <View
+        style={[
+          styles.actionsContainer,
+          { paddingBottom: Math.max(insets.bottom, Spacing.md) },
+        ]}
+        onLayout={(e) => setActionsHeight(e.nativeEvent.layout.height)}
+      >
+        <TouchableOpacity
+          style={styles.shareButtonContainer}
+          activeOpacity={0.9}
+          onPress={handleShare}
+        >
+          <LinearGradient
+            colors={["#3B82F6", "#1D4ED8"]}
+            style={styles.shareButton}
+          >
+            <Ionicons name="share-social" size={20} color={Colors.white} style={styles.icon} />
+            <Text style={styles.shareButtonText}>{t("completion.shareWorkout")}</Text>
+          </LinearGradient>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.trophyRoomButton}
+          activeOpacity={0.85}
+          onPress={() => navigation.navigate("Awards")}
+        >
+          <Ionicons name="trophy-outline" size={18} color="#D97706" style={styles.icon} />
+          <Text style={styles.trophyRoomButtonText}>{t("awards.title")}</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.doneButton}
+          activeOpacity={0.8}
+          onPress={() => navigation.popToTop()}
+        >
+          <Text style={styles.doneButtonText}>{t("completion.doneButton")}</Text>
+        </TouchableOpacity>
+      </View>
 
       {/* Celebratory Award Unlock Popup Modal */}
       {activeModalBadge && (
@@ -357,68 +382,55 @@ export default function CompletionScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F9FAFB",
+    backgroundColor: Colors.surface.screen,
   },
   scrollContent: {
     paddingBottom: Spacing["2xl"],
   },
   celebrationBg: {
     alignItems: "center",
-    paddingTop: 70,
+    paddingTop: 54,
     paddingBottom: Spacing["2xl"],
-    borderBottomLeftRadius: Spacing.xl,
-    borderBottomRightRadius: Spacing.xl,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 3,
+    borderBottomLeftRadius: RADIUS.lg,
+    borderBottomRightRadius: RADIUS.lg,
+    ...SHADOWS.card,
   },
   trophyContainer: {
     alignItems: "center",
     marginBottom: Spacing.sm,
   },
-  badgeText: {
-    fontSize: FontSize.xs,
-    lineHeight: FontSize.lineHeight.xs,
-    fontFamily: "Poppins-Bold",
-    color: "#D97706",
-    letterSpacing: 2,
-    marginTop: Spacing.xs,
-    backgroundColor: "#FEF3C7",
-    paddingVertical: Spacing.xs,
-    paddingHorizontal: Spacing.md,
-    borderRadius: Spacing.radius.sm,
-    overflow: "hidden",
+  trophyBubble: {
+    width: 68,
+    height: 68,
+    borderRadius: RADIUS.full,
+    backgroundColor: Colors.surface.card,
+    justifyContent: "center",
+    alignItems: "center",
+    ...SHADOWS.card,
   },
   title: {
     fontSize: FontSize["2xl"],
     lineHeight: FontSize.lineHeight["2xl"],
     fontFamily: "Poppins-Bold",
-    color: "#1F2937",
+    color: Colors.textScale.primary,
     textAlign: "center",
+    marginTop: Spacing.xs,
   },
   subtitle: {
     fontSize: FontSize.sm,
     lineHeight: FontSize.lineHeight.sm,
-    fontFamily: "Poppins-Regular",
-    color: "#6B7280",
+    fontFamily: "Poppins-Medium",
+    color: Colors.textScale.secondary,
     textAlign: "center",
     marginTop: Spacing.xs,
-    paddingHorizontal: Spacing["2xl"],
+    paddingHorizontal: Spacing.xl,
   },
   statsCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: Spacing.radius.lg,
-    marginHorizontal: Spacing.lg,
-    padding: Spacing.lg,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 12,
-    elevation: 2,
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
+    backgroundColor: Colors.surface.card,
+    borderRadius: RADIUS.md,
+    marginHorizontal: Spacing.md,
+    padding: Spacing.md,
+    ...SHADOWS.card,
     marginTop: -Spacing.md,
   },
   workoutTitle: {
@@ -529,47 +541,48 @@ const styles = StyleSheet.create({
     color: "#6B7280",
   },
   actionsContainer: {
-    marginTop: Spacing.lg,
-    paddingHorizontal: Spacing.lg,
-    gap: Spacing.sm,
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: Colors.surface.screen,
+    paddingHorizontal: Spacing.screen,
+    paddingTop: Spacing.xs,
+    gap: Spacing.xs,
   },
   shareButtonContainer: {
-    minHeight: Spacing.touchTarget.cta,
-    borderRadius: Spacing.radius.md,
+    minHeight: TOUCH_TARGET.cta,
+    borderRadius: RADIUS.md,
     overflow: "hidden",
-    shadowColor: "#3B82F6",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 3,
+    ...SHADOWS.card,
   },
   shareButton: {
     width: "100%",
-    minHeight: Spacing.touchTarget.cta,
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.md,
+    minHeight: TOUCH_TARGET.cta,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.lg,
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
+    gap: Spacing.sm,
   },
   shareButtonText: {
     fontSize: FontSize.sm,
     lineHeight: FontSize.lineHeight.sm,
     fontFamily: "Poppins-Bold",
-    color: "#FFFFFF",
+    color: Colors.white,
     textAlign: "center",
   },
   trophyRoomButton: {
-    minHeight: Spacing.touchTarget.cta,
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.md,
-    borderRadius: Spacing.radius.md,
+    minHeight: TOUCH_TARGET.cta,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.lg,
+    borderRadius: RADIUS.md,
     backgroundColor: "#FEF3C7",
-    borderWidth: 1.5,
-    borderColor: "#FDE68A",
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
+    gap: Spacing.sm,
   },
   trophyRoomButtonText: {
     fontSize: FontSize.sm,
@@ -579,13 +592,9 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   doneButton: {
-    minHeight: Spacing.touchTarget.cta,
-    paddingVertical: Spacing.sm,
+    minHeight: TOUCH_TARGET.min,
+    paddingVertical: Spacing.xs,
     paddingHorizontal: Spacing.md,
-    borderRadius: Spacing.radius.md,
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1.5,
-    borderColor: "#D1D5DB",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -593,7 +602,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize.sm,
     lineHeight: FontSize.lineHeight.sm,
     fontFamily: "Poppins-Bold",
-    color: "#4B5563",
+    color: Colors.textScale.secondary,
     textAlign: "center",
   },
   icon: {
@@ -676,41 +685,38 @@ const styles = StyleSheet.create({
   },
   modalShareBtn: {
     width: "100%",
-    borderRadius: Spacing.radius.md,
+    borderRadius: RADIUS.md,
     overflow: "hidden",
     marginBottom: Spacing.sm,
-    shadowColor: "#3B82F6",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 3,
+    ...SHADOWS.card,
   },
   modalShareGradient: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.md,
-    minHeight: Spacing.touchTarget.cta,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.lg,
+    minHeight: TOUCH_TARGET.cta,
+    gap: Spacing.sm,
   },
   modalShareText: {
     fontSize: FontSize.sm,
     lineHeight: FontSize.lineHeight.sm,
     fontFamily: "Poppins-Bold",
-    color: "#FFFFFF",
+    color: Colors.white,
   },
   modalContinueBtn: {
     width: "100%",
-    minHeight: Spacing.touchTarget.cta,
+    minHeight: TOUCH_TARGET.cta,
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: Spacing.radius.md,
-    backgroundColor: "#F3F4F6",
+    borderRadius: RADIUS.md,
+    backgroundColor: Colors.neutralAction.surface,
   },
   modalContinueText: {
     fontSize: FontSize.sm,
     fontFamily: "Poppins-Bold",
-    color: "#4B5563",
+    color: Colors.textScale.primary,
   },
 });
 

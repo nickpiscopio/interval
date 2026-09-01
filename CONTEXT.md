@@ -49,6 +49,11 @@ A translucent floating bottom bar for switching between Workouts and Exercise Li
 _Avoid_: Tab Bar Dock, Bottom Action Sheet
 
 **Design System Tokens & Hierarchy**:
-Single-source-of-truth token architecture (`Colors`, `Spacing`, `FontSize`, `RADIUS`, `TOUCH_TARGET`, `SHADOWS`) strictly enforced across all components and screens without hardcoded values. Includes a 4-tier semantic corner radius scale (`RADIUS.sm: 8`, `RADIUS.md: 16`, `RADIUS.lg: 24`, `RADIUS.full: 9999`), clean borderless surface cards with `SHADOWS.card`, unified shadow presets, dynamic type accessibility scaling, and safe-area list scrolling depth.
-_Avoid_: Hardcoded Hex Codes, Arbitrary Pixel Heights, Inline Shadow Literals, Card Borders
+Single-source-of-truth token architecture (`Colors`, `Spacing`, `FontSize`, `RADIUS`, `TOUCH_TARGET`, `SHADOWS`) strictly enforced across all components and screens without hardcoded values. Includes a 4-tier semantic corner radius scale (`RADIUS.sm: 8`, `RADIUS.md: 16`, `RADIUS.lg: 24`, `RADIUS.full: 9999`), universal bold lettering for text buttons (`Poppins-Bold`), enhanced icon+text button padding (`gap: Spacing.sm`), clean borderless surface cards with `SHADOWS.card`, unified shadow presets, dynamic type accessibility scaling, and safe-area list scrolling depth.
+_Avoid_: Hardcoded Hex Codes, Arbitrary Pixel Heights, Inline Shadow Literals, Card Borders, Unbolded Button Text
+
+**Dynamic Contextual Motivations**:
+An intelligent post-workout motivation generator that dynamically evaluates workout duration, total rounds completed, and day of the week to deliver whimsical, fresh, and motivating celebration copy encouraging daily habit retention.
+_Avoid_: Static Victory Message, Generic Congratulations
+
 

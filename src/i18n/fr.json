@@ -130,7 +130,49 @@
     "shareMessage": "Je viens de terminer mon entraînement sur Interval ! ⚡️\n\nMinuteur : \"%{name}\" (%{rounds} tours, %{duration} de durée)%{streakText}%{badgeText}\n\n1. Télécharge l'application :\nApp Store : %{appStoreLink}\nPlay Store : %{playStoreLink}\n\n2. Ouvre ce lien pour charger la séance :\n%{deepLink}",
     "shareStreakText": "\nSérie : 🔥 Série de %{streak} Jours",
     "shareBadgeText": "\nDébloqué : 🏆 %{badges}",
-    "shareBadgeMessage": "🏆 Je viens de remporter le badge \"%{name}\"%{streakText} sur Interval !\n\n\"%{description}\"\n\nAtteins tes objectifs sportifs avec des minuteurs HIIT personnalisés :\nApp Store : %{appStoreLink}\nPlay Store : %{playStoreLink}"
+    "shareBadgeMessage": "🏆 Je viens de remporter le badge \"%{name}\"%{streakText} sur Interval !\n\n\"%{description}\"\n\nAtteins tes objectifs sportifs avec des minuteurs HIIT personnalisés :\nApp Store : %{appStoreLink}\nPlay Store : %{playStoreLink}",
+    "motivations": {
+      "monday": {
+        "v1": "Lundi conquis avec %{rounds} superbes tours ! Tu donnes le ton pour une semaine épique. Repose-toi bien et à demain !",
+        "v2": "Une excellente manière de commencer la semaine en force ! Le lundi n'avait aucune chance. Prêt à remettre ça demain ?"
+      },
+      "tuesday": {
+        "v1": "Deux jours consécutifs, un élan inarrêtable ! %{rounds} tours validés — gardons cette énergie pour demain !",
+        "v2": "Triomphe du mardi ! Présent et déterminé. Hâte de voir tes exploits demain !"
+      },
+      "wednesday": {
+        "v1": "Héros de milieu de semaine ! %{rounds} tours franchis avec brio. Demain, on continue de bâtir !",
+        "v2": "Cap de milieu de semaine franchi ! Tu n'as pas seulement survécu au mercredi, tu l'as dominé. À demain !"
+      },
+      "thursday": {
+        "v1": "Puissance du jeudi ! Le week-end approche, mais ton dévouement est encore plus fort. Garde cette même énergie demain !",
+        "v2": "Bientôt le week-end, et tu n'as rien lâché ! %{rounds} tours solides au compteur. Prêt pour vendredi ?"
+      },
+      "friday": {
+        "v1": "Vendredi et objectif atteint ! Tu as bien mérité ton week-end avec %{duration} d'effort intense. À demain !",
+        "v2": "Victoire du vendredi ! %{rounds} tours conquis comme un vrai champion. On se retrouve demain pour la suite ?"
+      },
+      "saturday": {
+        "v1": "Mode guerrier du week-end : ACTIVÉ ! Tu as choisi l'effort plutôt que la grasse matinée. Performance légendaire — à demain !",
+        "v2": "Séance de sport du samedi validée ! C'est ainsi que les champions passent leur week-end. Même heure demain ?"
+      },
+      "sunday": {
+        "v1": "Standard du dimanche établi ! %{rounds} tours d'excellence pour préparer une semaine formidable. À demain !",
+        "v2": "Clôture de la semaine au sommet de ta forme ! Détends-toi, récupère et repartons du bon pied demain !"
+      },
+      "quickSprint": {
+        "v1": "Rapide, intense et terminé ! La preuve qu'une courte séance déplace des montagnes. Même heure demain ?",
+        "v2": "Peu de temps, gros effort ! Tu as prouvé que la régularité gagne toujours. Reviens demain pour le deuxième round !"
+      },
+      "endurance": {
+        "v1": "Plus de %{duration} de pure détermination ! Tu as conquis %{rounds} tours — recharge tes batteries et reviens en force demain !",
+        "v2": "Endurance légendaire aujourd'hui ! %{rounds} tours intenses dans la poche. Repose-toi et à demain !"
+      },
+      "highRounds": {
+        "v1": "%{rounds} tours intenses conquis ! Cela demandait une vraie force mentale. Hydrate-toi et remettons ça demain !",
+        "v2": "Tu n'as pas seulement terminé %{rounds} tours : tu les as dominés. Repose ces muscles et recommençons demain !"
+      }
+    }
   },
   "awards": {
     "title": "Succès",

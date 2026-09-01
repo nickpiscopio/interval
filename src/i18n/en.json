@@ -130,7 +130,49 @@
     "shareMessage": "I just smashed my workout using Interval! ⚡️\n\nTimer: \"%{name}\" (%{rounds} rounds, %{duration} duration)%{streakText}%{badgeText}\n\n1. Download the app:\nApp Store: %{appStoreLink}\nPlay Store: %{playStoreLink}\n\n2. Open this link to load the timer:\n%{deepLink}",
     "shareStreakText": "\nStreak: 🔥 %{streak}-Day Streak",
     "shareBadgeText": "\nUnlocked: 🏆 %{badges}",
-    "shareBadgeMessage": "🏆 I just earned the \"%{name}\" badge%{streakText} on Interval!\n\n\"%{description}\"\n\nCrush your fitness goals with custom HIIT interval timers:\nApp Store: %{appStoreLink}\nPlay Store: %{playStoreLink}"
+    "shareBadgeMessage": "🏆 I just earned the \"%{name}\" badge%{streakText} on Interval!\n\n\"%{description}\"\n\nCrush your fitness goals with custom HIIT interval timers:\nApp Store: %{appStoreLink}\nPlay Store: %{playStoreLink}",
+    "motivations": {
+      "monday": {
+        "v1": "Monday crushed with %{rounds} strong rounds! You set the tone for an epic week. Rest up and see you tomorrow!",
+        "v2": "Way to kick off the week strong! Monday didn't stand a chance. Ready to bring that fire again tomorrow?"
+      },
+      "tuesday": {
+        "v1": "Two days in, unstoppable momentum! %{rounds} rounds down—let's keep this fire burning tomorrow!",
+        "v2": "Tuesday triumph! You showed up and delivered. Can't wait to see what you conquer tomorrow!"
+      },
+      "wednesday": {
+        "v1": "Hump day hero! Powered through %{rounds} rounds of midpoint magic. Tomorrow we keep building!",
+        "v2": "Midweek milestone achieved! You didn't just survive Wednesday—you dominated it. See you tomorrow!"
+      },
+      "thursday": {
+        "v1": "Thursday thunder! The weekend is close, but your dedication is closer. Bring that same energy tomorrow!",
+        "v2": "Almost to the weekend, but you didn't slow down! %{rounds} powerful rounds in the books. Ready for Friday?"
+      },
+      "friday": {
+        "v1": "Friday finish strong! You earned that weekend feeling with %{duration} of solid sweat. See you tomorrow!",
+        "v2": "Fri-YAY victory! %{rounds} rounds conquered like a true champion. Back for more tomorrow?"
+      },
+      "saturday": {
+        "v1": "Weekend warrior mode: UNLOCKED! You chose gains over sleeping in. Legendary effort—see you tomorrow!",
+        "v2": "Saturday sweat session in the books! That's how champions spend their weekend. Same time tomorrow?"
+      },
+      "sunday": {
+        "v1": "Sunday standard set! %{rounds} rounds of excellence to prepare for an epic week ahead. See you tomorrow!",
+        "v2": "Closing out the week at peak performance! Relax, recover, and let's start fresh tomorrow!"
+      },
+      "quickSprint": {
+        "v1": "Fast, fierce, and done! Proof that even a quick session moves mountains. Same time tomorrow?",
+        "v2": "Short on time, big on effort! You proved consistency wins every single time. Come back tomorrow for round two!"
+      },
+      "endurance": {
+        "v1": "Over %{duration} of pure grit! You conquered %{rounds} rounds—refuel, recharge, and bring that fire again tomorrow!",
+        "v2": "Legendary endurance today! %{rounds} tough rounds in the bag. Rest up and see you tomorrow!"
+      },
+      "highRounds": {
+        "v1": "%{rounds} intense rounds conquered! That took serious grit. Drink water and let's run it back tomorrow!",
+        "v2": "You didn't just finish %{rounds} rounds—you owned them. Rest those muscles and let's do it again tomorrow!"
+      }
+    }
   },
   "awards": {
     "title": "Achievements",

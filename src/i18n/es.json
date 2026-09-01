@@ -130,7 +130,49 @@
     "shareMessage": "¡Acabo de completar mi entrenamiento en Interval! ⚡️\n\nTemporizador: \"%{name}\" (%{rounds} rondas, %{duration} de duración)%{streakText}%{badgeText}\n\n1. Descarga la app:\nApp Store: %{appStoreLink}\nPlay Store: %{playStoreLink}\n\n2. Abre este enlace para cargar la rutina:\n%{deepLink}",
     "shareStreakText": "\nRacha: 🔥 Racha de %{streak} Días",
     "shareBadgeText": "\nDesbloqueado: 🏆 %{badges}",
-    "shareBadgeMessage": "🏆 ¡Acabo de ganar la insignia \"%{name}\"%{streakText} en Interval!\n\n\"%{description}\"\n\nAlcanza tus metas con temporizadores HIIT personalizados:\nApp Store: %{appStoreLink}\nPlay Store: %{playStoreLink}"
+    "shareBadgeMessage": "🏆 ¡Acabo de ganar la insignia \"%{name}\"%{streakText} en Interval!\n\n\"%{description}\"\n\nAlcanza tus metas con temporizadores HIIT personalizados:\nApp Store: %{appStoreLink}\nPlay Store: %{playStoreLink}",
+    "motivations": {
+      "monday": {
+        "v1": "¡Lunes conquistado con %{rounds} rondas increíbles! Marcaste el ritmo para una semana épica. ¡A descansar y nos vemos mañana!",
+        "v2": "¡Gran manera de arrancar la semana con fuerza! El lunes no tuvo oportunidad. ¿Listo para darlo todo mañana?"
+      },
+      "tuesday": {
+        "v1": "¡Dos días seguidos, un impulso imparable! %{rounds} rondas superadas: ¡mantengamos ese fuego encendido mañana!",
+        "v2": "¡Triunfo de martes! Te presentaste y cumpliste. ¡Ansiosos por ver lo que lograrás mañana!"
+      },
+      "wednesday": {
+        "v1": "¡Héroe de mitad de semana! Superaste %{rounds} rondas con pura determinación. ¡Mañana seguimos construyendo!",
+        "v2": "¡Hito de mitad de semana alcanzado! No solo sobreviviste al miércoles, lo dominaste. ¡A descansar para mañana!"
+      },
+      "thursday": {
+        "v1": "¡Fuerza de jueves! El fin de semana está cerca, pero tu dedicación está más cerca. ¡Trae esa misma energía mañana!",
+        "v2": "¡Casi en el fin de semana y no bajaste el ritmo! %{rounds} rondas poderosas completadas. ¿Listo para el viernes?"
+      },
+      "friday": {
+        "v1": "¡Viernes y meta cumplida! Te ganaste esa vibra de fin de semana con %{duration} de sudor puro. ¡Nos vemos mañana!",
+        "v2": "¡Victoria de viernes! %{rounds} rondas conquistadas como un auténtico campeón. ¿Vienes por más mañana?"
+      },
+      "saturday": {
+        "v1": "¡Modo guerrero de fin de semana: ACTIVADO! Elegiste superarte en vez de dormir más. Esfuerzo legendario: ¡nos vemos mañana!",
+        "v2": "¡Sesión de sudor de sábado completada! Así es como los campeones pasan su fin de semana. ¿A la misma hora mañana?"
+      },
+      "sunday": {
+        "v1": "¡Estándar de domingo establecido! %{rounds} rondas de excelencia para preparar una semana épica. ¡Nos vemos mañana!",
+        "v2": "¡Cerrando la semana al máximo rendimiento! Relájate, recupérate y ¡empecemos con todo mañana!"
+      },
+      "quickSprint": {
+        "v1": "¡Rápido, feroz y terminado! Prueba de que incluso una sesión corta mueve montañas. ¿A la misma hora mañana?",
+        "v2": "¡Poco tiempo, enorme esfuerzo! Demostraste que la constancia siempre gana. ¡Vuelve mañana por la revancha!"
+      },
+      "endurance": {
+        "v1": "¡Más de %{duration} de pura garra! Conquistaste %{rounds} rondas: ¡recárgate y vuelve con esa energía mañana!",
+        "v2": "¡Resistencia legendaria hoy! %{rounds} rondas duras en la bolsa. ¡Descansa y nos vemos mañana!"
+      },
+      "highRounds": {
+        "v1": "¡%{rounds} rondas intensas conquistadas! Eso requirió verdadera fuerza mental. ¡Toma agua y repitamos mañana!",
+        "v2": "No solo terminaste %{rounds} rondas: las dominaste. ¡Descansa esos músculos y hagámoslo de nuevo mañana!"
+      }
+    }
   },
   "awards": {
     "title": "Logros",
