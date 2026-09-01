@@ -22,15 +22,15 @@ We decided to establish a comprehensive, single-source-of-truth design system co
    - **Touch Targets**: `touchTarget.icon: 44`, `touchTarget.min: 48`, `touchTarget.cta: 56`.
 
 3. **Standardized Shadow Presets (`SHADOWS`)**:
-   - `SHADOWS.card`: Soft ambient elevation for surface cards (`shadowOffset: { width: 0, height: 2 }`, `shadowOpacity: 0.05`, `shadowRadius: 4`, `elevation: 2`).
-   - `SHADOWS.floating`: Medium elevation for floating panels & bottom cards (`shadowOffset: { width: 0, height: 4 }`, `shadowOpacity: 0.1`, `shadowRadius: 12`, `elevation: 6`).
-   - `SHADOWS.fab`: Vibrant colored drop shadow for primary & AI floating action buttons (`shadowOffset: { width: 0, height: 3 }`, `shadowOpacity: 0.3`, `shadowRadius: 6`, `elevation: 6`).
+   - `SHADOWS.card`: Ambient directional elevation for surface cards (`shadowOffset: { width: 2, height: 2 }`, `shadowOpacity: 0.05`, `shadowRadius: 4`, `elevation: 1`).
+   - `SHADOWS.floating`: Medium directional elevation for floating panels & bottom cards (`shadowOffset: { width: 4, height: 4 }`, `shadowOpacity: 0.1`, `shadowRadius: 12`, `elevation: 6`).
+   - `SHADOWS.fab`: Vibrant colored drop shadow for primary & AI floating action buttons (`shadowOffset: { width: 3, height: 3 }`, `shadowOpacity: 0.3`, `shadowRadius: 6`, `elevation: 6`).
    - `SHADOWS.modal`: Deep backdrop elevation for modals and bottom sheets (`shadowOffset: { width: 0, height: -4 }`, `shadowOpacity: 0.15`, `shadowRadius: 16`, `elevation: 10`).
 
 4. **Component Primitives Standards**:
    - **Primary CTA Buttons**: `minHeight: TOUCH_TARGET.cta` (56px) or `TOUCH_TARGET.min` (48px), `borderRadius: RADIUS.md` (16px), `fontFamily: "Poppins-Bold"`, white text.
    - **Icon Buttons**: Fixed `TOUCH_TARGET.icon` (44px) or `TOUCH_TARGET.min` (48px) with `borderRadius: RADIUS.sm` (8px) for control panels (or `RADIUS.full` for circular navigation/floating buttons). 4 standard variants: `primary`, `neutral`, `destructive`, `ghost`.
-   - **Cards & Containers**: `backgroundColor: Colors.surface.card`, `borderRadius: RADIUS.md`, `borderWidth: 1`, `borderColor: Colors.borderDefault`, `padding: Spacing.md`, `...SHADOWS.card`.
+   - **Cards & Containers**: Clean borderless surface cards with `backgroundColor: Colors.surface.card`, `borderRadius: RADIUS.md`, `padding: Spacing.md`, `...SHADOWS.card` (no outer border).
    - **Text Fields / Inputs**: `minHeight: TOUCH_TARGET.min` (48px), `backgroundColor: Colors.surface.screen`, `borderWidth: 1`, `borderColor: Colors.borderInput`, `borderRadius: RADIUS.sm`, `color: Colors.textScale.primary`.
 
 5. **Accessibility & Dynamic Type Scaling**:

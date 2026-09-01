@@ -280,8 +280,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface.card,
     borderRadius: RADIUS.md,
     padding: Spacing.md,
-    borderWidth: 1,
-    borderColor: Colors.borderDefault,
     ...SHADOWS.card,
   },
   highlightCard: {

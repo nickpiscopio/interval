@@ -469,14 +469,11 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.md,
     padding: Spacing.md,
     alignItems: "center",
-    borderWidth: 1,
-    borderColor: Colors.borderDefault,
     marginBottom: Spacing.xs,
     ...SHADOWS.card,
   },
   badgeCardLocked: {
     backgroundColor: Colors.surface.screen,
-    borderColor: Colors.borderDefault,
     opacity: 0.85,
   },
   badgeIconBubble: {

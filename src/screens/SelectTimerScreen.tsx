@@ -667,8 +667,6 @@ const styles = StyleSheet.create({
     paddingLeft: 0,
     padding: Spacing.md,
     ...SHADOWS.card,
-    borderWidth: 1,
-    borderColor: Colors.borderDefault,
   },
   cardDragging: {
     backgroundColor: Colors.surface.screen,

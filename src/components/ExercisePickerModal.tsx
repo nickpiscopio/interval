@@ -421,8 +421,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface.card,
     padding: Spacing.md,
     borderRadius: RADIUS.md,
-    borderWidth: 1,
-    borderColor: Colors.borderDefault,
     ...SHADOWS.card,
   },
   exerciseCardLeft: {

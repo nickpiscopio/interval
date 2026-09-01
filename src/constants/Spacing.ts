@@ -27,21 +27,21 @@ export const TOUCH_TARGET = {
 export const SHADOWS = {
   card: {
     shadowColor: "#000000",
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
-    elevation: 2,
+    elevation: 1
   },
   floating: {
     shadowColor: "#000000",
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 4, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 12,
     elevation: 6,
   },
   fab: {
     shadowColor: "#059669",
-    shadowOffset: { width: 0, height: 3 },
+    shadowOffset: { width: 3, height: 3 },
     shadowOpacity: 0.3,
     shadowRadius: 6,
     elevation: 6,
