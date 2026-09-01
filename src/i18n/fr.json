@@ -133,7 +133,7 @@
     "shareBadgeMessage": "🏆 Je viens de remporter le badge \"%{name}\"%{streakText} sur Interval !\n\n\"%{description}\"\n\nAtteins tes objectifs sportifs avec des minuteurs HIIT personnalisés :\nApp Store : %{appStoreLink}\nPlay Store : %{playStoreLink}"
   },
   "awards": {
-    "title": "Salle des Trophées",
+    "title": "Succès",
     "statsTitle": "Statistiques d'Entraînement",
     "currentStreak": "Série Actuelle",
     "longestStreak": "Meilleure Série",

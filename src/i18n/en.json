@@ -133,7 +133,7 @@
     "shareBadgeMessage": "🏆 I just earned the \"%{name}\" badge%{streakText} on Interval!\n\n\"%{description}\"\n\nCrush your fitness goals with custom HIIT interval timers:\nApp Store: %{appStoreLink}\nPlay Store: %{playStoreLink}"
   },
   "awards": {
-    "title": "Trophy Room",
+    "title": "Achievements",
     "statsTitle": "Workout Stats",
     "currentStreak": "Current Streak",
     "longestStreak": "Longest Streak",

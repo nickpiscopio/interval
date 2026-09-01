@@ -11,7 +11,7 @@ describe("AwardsScreen", () => {
     jest.clearAllMocks();
   });
 
-  it("renders trophy room with user stats and badges", async () => {
+  it("renders achievements with user stats and badges", async () => {
     await saveUserStats({
       totalWorkouts: 3,
       totalSeconds: 3660,
@@ -31,7 +31,7 @@ describe("AwardsScreen", () => {
     );
 
     await waitFor(() => {
-      expect(getAllByText("Trophy Room").length).toBeGreaterThan(0);
+      expect(getAllByText("Achievements").length).toBeGreaterThan(0);
       expect(getByText("First Step Hero")).toBeTruthy();
     });
 

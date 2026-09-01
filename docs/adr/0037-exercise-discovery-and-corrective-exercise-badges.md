@@ -28,4 +28,4 @@ With the introduction of the Physical Therapy & Corrective Exercise catalog and 
 
 ## Consequences
 - Reinforces user engagement and retention around daily mobility, rehabilitation, and anatomical exploration.
-- Integrates physical therapy into the gamified trophy room ecosystem.
+- Integrates physical therapy into the gamified achievements ecosystem.

@@ -417,6 +417,8 @@ export default function SelectTimerScreen({
             </TouchableOpacity>
 
             <TouchableOpacity
+              testID="btn-achievements"
+              accessibilityLabel={t("awards.title")}
               style={styles.trophyButton}
               activeOpacity={0.8}
               onPress={() => navigation.navigate("Awards")}

@@ -45,7 +45,7 @@ describe("CompletionScreen", () => {
     expect(mockNavigation.popToTop).toHaveBeenCalled();
   });
 
-  it("navigates to Awards screen when Trophy Room button is pressed", async () => {
+  it("navigates to Awards screen when Achievements button is pressed", async () => {
     const mockNavigation: any = {
       navigate: jest.fn(),
       popToTop: jest.fn(),
@@ -59,10 +59,10 @@ describe("CompletionScreen", () => {
     );
 
     await waitFor(() => {
-      expect(getByText("Trophy Room")).toBeTruthy();
+      expect(getByText("Achievements")).toBeTruthy();
     });
 
-    const trophyButton = getByText("Trophy Room");
+    const trophyButton = getByText("Achievements");
     fireEvent.press(trophyButton);
 
     expect(mockNavigation.navigate).toHaveBeenCalledWith("Awards");

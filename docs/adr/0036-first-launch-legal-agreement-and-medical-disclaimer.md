@@ -11,7 +11,7 @@ Interval provides HIIT workouts, custom interval timing, AI workout generation, 
    - Implement a blocking modal gate (`LegalDisclaimerModal`) on `SelectTimerScreen` that displays automatically upon first app launch if `@legal_disclaimer_accepted` is missing in `AsyncStorage`.
    - Prevent background interaction or dismissal until the user taps **"I Understand & Agree"**, which persists the acceptance status and unlocks the application.
 2. **Reviewable Menu & Legal Info Modal**:
-   - Add an Info/Legal button in the top header of `SelectTimerScreen` (adjacent to the Trophy Room button).
+   - Add an Info/Legal button in the top header of `SelectTimerScreen` (adjacent to the Achievements button).
    - Tapping the icon opens the reviewable `LegalDisclaimerModal` with full medical terms, assumption of risk, AI recommendation disclaimers, app version, and attribution.
 3. **Comprehensive 4-Part Plain-Language Disclaimer**:
    - *Voluntary Participation & Assumption of Risk*: User uses Interval voluntarily at their own risk with no compulsion.

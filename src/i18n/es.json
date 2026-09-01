@@ -133,7 +133,7 @@
     "shareBadgeMessage": "🏆 ¡Acabo de ganar la insignia \"%{name}\"%{streakText} en Interval!\n\n\"%{description}\"\n\nAlcanza tus metas con temporizadores HIIT personalizados:\nApp Store: %{appStoreLink}\nPlay Store: %{playStoreLink}"
   },
   "awards": {
-    "title": "Sala de Trofeos",
+    "title": "Logros",
     "statsTitle": "Estadísticas de Entrenamiento",
     "currentStreak": "Racha Actual",
     "longestStreak": "Mejor Racha",
