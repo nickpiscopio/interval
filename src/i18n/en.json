@@ -19,7 +19,9 @@
     "yes": "Yes",
     "no": "No",
     "ok": "OK",
-    "back": "Back"
+    "back": "Back",
+    "start": "Start",
+    "play": "Play"
   },
   "selectTimer": {
     "greeting": "Let's Workout! ⚡️",

@@ -44,7 +44,7 @@ describe("CreateTimerScreen", () => {
       </AlertProvider>
     );
 
-    const saveBtn = getByTestId("icon-bookmark-outline");
+    const saveBtn = getByTestId("icon-save-outline");
     fireEvent.press(saveBtn);
     expect(getByText("Please enter a name for your timer.")).toBeTruthy();
 
@@ -77,7 +77,7 @@ describe("CreateTimerScreen", () => {
     const minusRoundBtn = getByTestId("icon-remove");
     fireEvent.press(minusRoundBtn);
 
-    const saveBtn = getByTestId("icon-bookmark-outline");
+    const saveBtn = getByTestId("icon-save-outline");
     fireEvent.press(saveBtn);
 
     await waitFor(() => {
@@ -319,7 +319,7 @@ describe("CreateTimerScreen", () => {
       popToTop: jest.fn(),
     };
 
-    const { getByText, getByDisplayValue, getAllByTestId } = render(
+    const { getByText, getByDisplayValue, getByTestId } = render(
       <AlertProvider>
         <CreateTimerScreen
           navigation={mockNavigation}
@@ -331,8 +331,8 @@ describe("CreateTimerScreen", () => {
     expect(getByDisplayValue("Shared AI HIIT")).toBeTruthy();
     expect(getByText("Review & Import Shared Timer")).toBeTruthy();
 
-    const saveBtns = getAllByTestId("icon-download-outline");
-    fireEvent.press(saveBtns[1]);
+    const saveBtn = getByTestId("icon-save-outline");
+    fireEvent.press(saveBtn);
 
     await waitFor(() => {
       expect(mockNavigation.popToTop).toHaveBeenCalled();
@@ -394,7 +394,7 @@ describe("CreateTimerScreen", () => {
       </AlertProvider>
     );
 
-    const saveBtn = getByTestId("icon-bookmark-outline");
+    const saveBtn = getByTestId("icon-save-outline");
     fireEvent.press(saveBtn);
 
     await waitFor(async () => {

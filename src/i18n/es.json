@@ -19,7 +19,9 @@
     "yes": "Sí",
     "no": "No",
     "ok": "Aceptar",
-    "back": "Atrás"
+    "back": "Atrás",
+    "start": "Iniciar",
+    "play": "Reproducir"
   },
   "selectTimer": {
     "greeting": "¡A Entrenar! ⚡️",

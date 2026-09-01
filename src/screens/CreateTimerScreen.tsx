@@ -442,18 +442,30 @@ export default function CreateTimerScreen({
           {/* Timer Icon-Only Actions */}
           <View style={styles.timerActions}>
             {editTimer && !isImportMode && (
-              <TouchableOpacity onPress={deleteTimer} style={styles.deleteIconButton}>
+              <TouchableOpacity
+                testID="btn-delete-timer"
+                accessibilityLabel={t("common.delete")}
+                onPress={deleteTimer}
+                style={styles.deleteIconButton}
+              >
                 <Ionicons name="trash-outline" size={22} color="#E63946" />
               </TouchableOpacity>
             )}
-            <TouchableOpacity onPress={saveTimer} style={styles.saveIconButton}>
-              <Ionicons
-                name={isImportMode ? "download-outline" : "bookmark-outline"}
-                size={22}
-                color="#4B5563"
-              />
+            <View style={styles.actionSpacer} />
+            <TouchableOpacity
+              testID="btn-save-timer"
+              accessibilityLabel={t("common.save")}
+              onPress={saveTimer}
+              style={styles.saveIconButton}
+            >
+              <Ionicons name="save-outline" size={22} color="#4B5563" />
             </TouchableOpacity>
-            <TouchableOpacity onPress={startTimer} style={styles.startIconButton}>
+            <TouchableOpacity
+              testID="btn-start-timer"
+              accessibilityLabel={t("common.play", { defaultValue: "Start" })}
+              onPress={startTimer}
+              style={styles.startIconButton}
+            >
               <Ionicons name="play" size={22} color="#FFFFFF" />
             </TouchableOpacity>
           </View>
@@ -688,12 +700,16 @@ const styles = StyleSheet.create({
   },
   timerActions: {
     flexDirection: "row",
+    alignItems: "center",
     gap: Spacing.sm,
     marginTop: Spacing.xs,
   },
-  deleteIconButton: {
+  actionSpacer: {
     flex: 1,
-    minHeight: Spacing.touchTarget.min,
+  },
+  deleteIconButton: {
+    width: 44,
+    height: 44,
     borderRadius: Spacing.radius.sm,
     borderWidth: 1,
     borderColor: "#E63946",
@@ -702,8 +718,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   saveIconButton: {
-    flex: 1,
-    minHeight: Spacing.touchTarget.min,
+    width: 44,
+    height: 44,
     borderRadius: Spacing.radius.sm,
     borderWidth: 1,
     borderColor: "#D1D5DB",
@@ -712,8 +728,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   startIconButton: {
-    flex: 1.5,
-    minHeight: Spacing.touchTarget.min,
+    width: 44,
+    height: 44,
     borderRadius: Spacing.radius.sm,
     backgroundColor: Colors.primary,
     justifyContent: "center",

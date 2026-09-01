@@ -19,7 +19,9 @@
     "yes": "Oui",
     "no": "Non",
     "ok": "OK",
-    "back": "Retour"
+    "back": "Retour",
+    "start": "Démarrer",
+    "play": "Lire"
   },
   "selectTimer": {
     "greeting": "C'est l'heure du sport ! ⚡️",
