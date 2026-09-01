@@ -11,6 +11,7 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "expo-haptics";
 import DraggableFlatList, {
   RenderItemParams,
@@ -80,6 +81,8 @@ export default function CreateTimerScreen({
   const [editingInterval, setEditingInterval] = useState<Interval | null>(null);
   const [showEditIntervalModal, setShowEditIntervalModal] = useState<boolean>(false);
   const [showExercisePicker, setShowExercisePicker] = useState<boolean>(false);
+  const [isScrolled, setIsScrolled] = useState<boolean>(false);
+  const [headerHeight, setHeaderHeight] = useState<number>(0);
 
   // Initialize form if in edit/import mode
   useEffect(() => {
@@ -345,32 +348,43 @@ export default function CreateTimerScreen({
       style={styles.container}
       keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
     >
-      {/* Custom In-Screen Navigation Header */}
-      <View style={[styles.header, { paddingTop: Math.max(insets.top, 16) + Spacing.xs }]}>
-        <TouchableOpacity
-          testID="header-back-button"
-          accessibilityLabel={t("common.back", { defaultValue: "Back" })}
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            navigation.goBack();
-          }}
-          style={styles.backButton}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        >
-          <Ionicons name="arrow-back" size={24} color="#1F2937" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle} numberOfLines={1} ellipsizeMode="tail">
-          {headerTitle}
-        </Text>
-        <View style={styles.headerRightPlaceholder} />
+      {/* Header Container */}
+      <View onLayout={(e) => setHeaderHeight(e.nativeEvent.layout.height)}>
+        {/* Custom In-Screen Navigation Header */}
+        <View style={[styles.header, { paddingTop: Math.max(insets.top, 16) + Spacing.xs }]}>
+          <TouchableOpacity
+            testID="header-back-button"
+            accessibilityLabel={t("common.back", { defaultValue: "Back" })}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              navigation.goBack();
+            }}
+            style={styles.backButton}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Ionicons name="arrow-back" size={24} color={Colors.textScale.primary} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle} numberOfLines={1} ellipsizeMode="tail">
+            {headerTitle}
+          </Text>
+          <View style={styles.headerRightPlaceholder} />
+        </View>
+
+        {/* Header Banner */}
+        {isImportMode && (
+          <View style={styles.importBanner}>
+            <Ionicons name="download-outline" size={16} color={Colors.white} />
+            <Text style={styles.importBannerText}>{t("createTimer.importBanner")}</Text>
+          </View>
+        )}
       </View>
 
-      {/* Header Banner */}
-      {isImportMode && (
-        <View style={styles.importBanner}>
-          <Ionicons name="download-outline" size={16} color="#FFFFFF" />
-          <Text style={styles.importBannerText}>{t("createTimer.importBanner")}</Text>
-        </View>
+      {isScrolled && (
+        <LinearGradient
+          colors={["rgba(0, 0, 0, 0.15)", "rgba(0, 0, 0, 0.05)", "transparent"]}
+          style={[styles.headerShadowGradient, { top: headerHeight }]}
+          pointerEvents="none"
+        />
       )}
 
       {/* Interval Draggable List Area */}
@@ -386,6 +400,13 @@ export default function CreateTimerScreen({
           onDragEnd={({ data }) => {
             setIntervals(data);
           }}
+          onScrollOffsetChange={(offsetY) => {
+            setIsScrolled(offsetY > 0);
+          }}
+          onScroll={(e) => {
+            setIsScrolled(e.nativeEvent.contentOffset.y > 0);
+          }}
+          scrollEventThrottle={16}
           renderItem={renderIntervalItem}
           contentContainerStyle={styles.scrollContent}
           ListHeaderComponent={
@@ -507,9 +528,14 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: Spacing.screen,
     paddingVertical: Spacing.sm,
-    backgroundColor: Colors.surface.card,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.borderDefault,
+    backgroundColor: Colors.surface.screen,
+  },
+  headerShadowGradient: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    height: 12,
+    zIndex: 9,
   },
   backButton: {
     width: TOUCH_TARGET.icon,

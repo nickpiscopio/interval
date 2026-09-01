@@ -33,9 +33,11 @@ We decided to establish a comprehensive, single-source-of-truth design system co
    - **Cards & Containers**: Clean borderless surface cards with `backgroundColor: Colors.surface.card`, `borderRadius: RADIUS.md`, `padding: Spacing.md`, `...SHADOWS.card` (no outer border).
    - **Text Fields / Inputs**: `minHeight: TOUCH_TARGET.min` (48px), `backgroundColor: Colors.surface.screen`, `borderWidth: 1`, `borderColor: Colors.borderInput`, `borderRadius: RADIUS.sm`, `color: Colors.textScale.primary`.
 
-5. **Accessibility & Dynamic Type Scaling**:
-   - Containers containing text must use `minHeight` rather than rigid fixed `height` to allow natural flex expansion without clipping when users increase device text size.
-   - Scrollable lists must provide safe-area bottom insets above floating tabs and cards, rendering smooth elevation gradients when content scrolls underneath.
+5. **Dynamic Header Elevation & Scroll Shadows**:
+   - **Unscrolled State (`offsetY <= 0`)**: In-screen navigation headers blend seamlessly into the screen background (`backgroundColor: Colors.surface.screen`) with zero borders and zero drop shadows.
+   - **Scrolled State (`offsetY > 0`)**: As content scrolls underneath the fixed header, a dynamic 12px directional gradient shadow (`colors: ["rgba(0, 0, 0, 0.15)", "rgba(0, 0, 0, 0.05)", "transparent"]`) appears immediately below the header (`zIndex: 9`, `pointerEvents: "none"`), establishing natural visual depth across `SelectTimerScreen`, `AwardsScreen`, and `CreateTimerScreen`.
+   - **Dynamic Type & Accessibility**: Containers containing text must use `minHeight` rather than rigid fixed `height` to allow natural flex expansion without clipping when users increase device text size.
+   - **Scrollable Insets**: Scrollable lists must provide safe-area bottom insets above floating tabs and cards.
 
 6. **Bottom Sheets & Modals Standard**:
    - **Backdrop**: Translucent darkened overlay (`Colors.surface.overlay`) with animated opacity fade-in.

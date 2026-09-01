@@ -12,6 +12,7 @@ import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "expo-haptics";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { RootStackScreenProps } from "../types";
 import { Badge, UserStats } from "../model/Badge";
@@ -23,9 +24,12 @@ import FontSize from "../constants/FontSize";
 import Colors from "../constants/Colors";
 
 export default function AwardsScreen({ navigation }: RootStackScreenProps<"Awards">) {
+  const insets = useSafeAreaInsets();
   const [badges, setBadges] = useState<Badge[]>([]);
   const [stats, setStats] = useState<UserStats | null>(null);
   const [selectedBadge, setSelectedBadge] = useState<Badge | null>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [headerHeight, setHeaderHeight] = useState(0);
 
   useEffect(() => {
     loadData();
@@ -122,19 +126,35 @@ export default function AwardsScreen({ navigation }: RootStackScreenProps<"Award
       <StatusBar style="dark" />
 
       {/* Header Bar */}
-      <View style={styles.header}>
+      <View
+        style={[styles.header, { paddingTop: Math.max(insets.top, 16) + Spacing.xs }]}
+        onLayout={(e) => setHeaderHeight(e.nativeEvent.layout.height)}
+      >
         <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={styles.backButton}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-          <Ionicons name="arrow-back" size={24} color="#1F2937" />
+          <Ionicons name="arrow-back" size={24} color={Colors.textScale.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t("awards.title")}</Text>
         <View style={styles.headerRightPlaceholder} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+      {isScrolled && (
+        <LinearGradient
+          colors={["rgba(0, 0, 0, 0.15)", "rgba(0, 0, 0, 0.05)", "transparent"]}
+          style={[styles.headerShadowGradient, { top: headerHeight }]}
+          pointerEvents="none"
+        />
+      )}
+
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        onScroll={(e) => setIsScrolled(e.nativeEvent.contentOffset.y > 0)}
+        scrollEventThrottle={16}
+      >
         {/* User Stats Overview Banner */}
         <LinearGradient
           colors={["#1F2937", "#111827"]}
@@ -311,22 +331,28 @@ export default function AwardsScreen({ navigation }: RootStackScreenProps<"Award
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F9FAFB",
+    backgroundColor: Colors.surface.screen,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingTop: 54,
     paddingBottom: Spacing.sm,
     paddingHorizontal: Spacing.md,
-    backgroundColor: "#FFFFFF",
-    borderBottomWidth: 1,
-    borderBottomColor: "#E5E7EB",
+    backgroundColor: Colors.surface.screen,
+  },
+  headerShadowGradient: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    height: 12,
+    zIndex: 9,
   },
   backButton: {
-    width: 40,
-    height: 40,
+    width: TOUCH_TARGET.icon,
+    height: TOUCH_TARGET.icon,
+    borderRadius: RADIUS.full,
+    backgroundColor: Colors.neutralAction.surface,
     justifyContent: "center",
     alignItems: "center",
   },
