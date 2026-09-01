@@ -4,7 +4,7 @@ import { View, StyleSheet, Pressable, Text, ViewStyle } from "react-native";
 
 import Colors from '../constants/Colors';
 import FontSize from "../constants/FontSize";
-import Spacing from "../constants/Spacing";
+import Spacing, { RADIUS, SHADOWS } from "../constants/Spacing";
 
 export function PrimaryButton({
   title,
@@ -63,37 +63,29 @@ const componentStyles = StyleSheet.create({
   button: {
     paddingHorizontal: Spacing.button.horizontal,
     paddingVertical: Spacing.button.vertical,
-    minHeight: Spacing.button.minHeight,
+    minHeight: Spacing.touchTarget.cta,
     justifyContent: "center",
     alignItems: "center",
   },
   buttonText: {
-    color: "#ffffff",
-    fontWeight: "bold",
+    color: Colors.white,
+    fontFamily: "Poppins-Bold",
     fontSize: FontSize.button.title,
     textAlign: "center",
   },
   linearGradient: {
-    borderRadius: Spacing.button.borderRadius,
+    borderRadius: RADIUS.md,
   },
   shadowProp: {
-    shadowColor: Colors.shadow,
-    shadowOffset: { width: -2, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
+    ...SHADOWS.card,
   },
   pressedShadowProp: {
-    shadowColor: Colors.shadow,
-    shadowOffset: { width: -2, height: 5 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
+    ...SHADOWS.floating,
   },
   elevation: {
     elevation: 3,
-    shadowColor: Colors.shadow,
   },
   pressedElevation: {
-    elevation: 4,
-    shadowColor: Colors.shadow,
+    elevation: 5,
   },
 });

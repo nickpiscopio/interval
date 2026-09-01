@@ -24,7 +24,7 @@ import { normalizeInterval } from "../model/Interval";
 import { Exercise } from "../model/Exercise";
 import { DEFAULT_AI_TIMERS } from "../constants/defaultTimers";
 import { encodeBase64 } from "../utils/base64";
-import Spacing, { RADIUS } from "../constants/Spacing";
+import Spacing, { RADIUS, TOUCH_TARGET, SHADOWS } from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
 import Colors from "../constants/Colors";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -297,12 +297,14 @@ export default function SelectTimerScreen({
 
           <View style={styles.cardActionsRow}>
             <TouchableOpacity
+              testID="btn-share-timer"
+              accessibilityLabel={t("common.share")}
               style={styles.cardShareButton}
               activeOpacity={0.7}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               onPress={() => handleShareTimer(item)}
             >
-              <Ionicons name="share-outline" size={18} color="#6B7280" />
+              <Ionicons name="share-outline" size={18} color={Colors.textScale.secondary} />
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -563,7 +565,7 @@ export default function SelectTimerScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F9FAFB",
+    backgroundColor: Colors.surface.screen,
   },
   header: {
     position: "absolute",
@@ -572,13 +574,14 @@ const styles = StyleSheet.create({
     right: 0,
     zIndex: 10,
     paddingHorizontal: Spacing.screen,
-    paddingBottom: Spacing.md,
+    paddingBottom: Spacing.sm,
+    backgroundColor: Colors.surface.screen,
   },
   headerUnscrolled: {
-    backgroundColor: "#F9FAFB",
+    backgroundColor: Colors.surface.screen,
   },
   headerScrolled: {
-    backgroundColor: "rgba(255, 255, 255, 0.95)",
+    backgroundColor: Colors.surface.screen,
   },
   headerShadowGradient: {
     position: "absolute",
@@ -599,12 +602,12 @@ const styles = StyleSheet.create({
   greeting: {
     fontSize: FontSize["3xl"],
     fontWeight: "800",
-    color: "#111827",
+    color: Colors.textScale.primary,
     letterSpacing: -0.5,
   },
   subGreeting: {
     fontSize: FontSize.sm,
-    color: "#6B7280",
+    color: Colors.textScale.secondary,
     marginTop: 2,
   },
   headerActionsRow: {
@@ -613,23 +616,23 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   infoButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#F3F4F6",
+    width: TOUCH_TARGET.icon,
+    height: TOUCH_TARGET.icon,
+    borderRadius: RADIUS.full,
+    backgroundColor: Colors.neutralAction.surface,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: Colors.borderDefault,
   },
   trophyButton: {
     padding: Spacing.xs,
     borderRadius: RADIUS.full,
   },
   trophyIconWrap: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: TOUCH_TARGET.icon,
+    height: TOUCH_TARGET.icon,
+    borderRadius: RADIUS.full,
     backgroundColor: "#FEF3C7",
     alignItems: "center",
     justifyContent: "center",
@@ -659,23 +662,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.screen,
   },
   card: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Colors.surface.card,
     borderRadius: RADIUS.md,
     paddingLeft: 0,
     padding: Spacing.md,
-    shadowColor: "#000000",
-    shadowOffset: { width: 2, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 10,
-    elevation: 2,
-    borderWidth: 0,
-    borderColor: "#F3F4F6",
+    ...SHADOWS.card,
+    borderWidth: 1,
+    borderColor: Colors.borderDefault,
   },
   cardDragging: {
-    backgroundColor: "#F9FAFB",
-    shadowOpacity: 0.2,
-    shadowRadius: 12,
-    elevation: 8,
+    backgroundColor: Colors.surface.screen,
+    ...SHADOWS.floating,
     transform: [{ scale: 1 }],
   },
   cardHeader: {
@@ -696,7 +693,7 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: FontSize.base,
     fontWeight: "700",
-    color: "#111827",
+    color: Colors.textScale.primary,
     marginBottom: 4,
   },
   badgeRow: {
@@ -707,7 +704,7 @@ const styles = StyleSheet.create({
   badge: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#F3F4F6",
+    backgroundColor: Colors.neutralAction.surface,
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: RADIUS.sm,
@@ -721,14 +718,14 @@ const styles = StyleSheet.create({
   badgeText: {
     fontSize: 11,
     fontWeight: "600",
-    color: "#4B5563",
+    color: Colors.textScale.secondary,
   },
   aiBadgeText: {
     color: "#059669",
     fontWeight: "700",
   },
   durationBadge: {
-    backgroundColor: "#EFF6FF",
+    backgroundColor: Colors.surface.tintActive,
   },
   durationBadgeText: {
     color: "#1D4ED8",
@@ -742,15 +739,15 @@ const styles = StyleSheet.create({
   cardShareButton: {
     width: 36,
     height: 36,
-    borderRadius: 18,
-    backgroundColor: "#F3F4F6",
+    borderRadius: RADIUS.full,
+    backgroundColor: Colors.neutralAction.surface,
     alignItems: "center",
     justifyContent: "center",
   },
   cardPlayButton: {
     width: 36,
     height: 36,
-    borderRadius: 18,
+    borderRadius: RADIUS.full,
     backgroundColor: Colors.primary,
     alignItems: "center",
     justifyContent: "center",
@@ -766,39 +763,31 @@ const styles = StyleSheet.create({
     zIndex: 20,
   },
   createFab: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: TOUCH_TARGET.icon,
+    height: TOUCH_TARGET.icon,
+    borderRadius: RADIUS.full,
     backgroundColor: Colors.primary,
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 4,
+    ...SHADOWS.fab,
   },
   generateFabShadow: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    shadowColor: "#059669",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 6,
+    width: TOUCH_TARGET.cta,
+    height: TOUCH_TARGET.cta,
+    borderRadius: RADIUS.full,
+    ...SHADOWS.fab,
     backgroundColor: "transparent",
   },
   generateFabTouchable: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: TOUCH_TARGET.cta,
+    height: TOUCH_TARGET.cta,
+    borderRadius: RADIUS.full,
     overflow: "hidden",
   },
   generateFabGradient: {
     width: "100%",
     height: "100%",
-    borderRadius: 28,
+    borderRadius: RADIUS.full,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -807,27 +796,23 @@ const styles = StyleSheet.create({
     left: Spacing.screen,
     right: Spacing.screen,
     flexDirection: "row",
-    backgroundColor: "rgba(255, 255, 255, 0.88)",
+    backgroundColor: Colors.surface.floatingNav,
     borderRadius: RADIUS.full,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: Colors.borderDefault,
     padding: 4,
-    shadowColor: "#000000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 6,
+    ...SHADOWS.floating,
     zIndex: 15,
   },
   floatingTab: {
     flex: 1,
-    height: 44,
+    height: TOUCH_TARGET.icon,
     borderRadius: RADIUS.full,
     alignItems: "center",
     justifyContent: "center",
   },
   floatingTabActive: {
-    backgroundColor: "#EFF6FF",
+    backgroundColor: Colors.surface.tintActive,
   },
   loadingContainer: {
     flex: 1,
@@ -843,13 +828,13 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: FontSize.xl,
     fontWeight: "700",
-    color: "#374151",
+    color: Colors.textScale.heading,
     marginTop: Spacing.md,
     marginBottom: 4,
   },
   emptySubtitle: {
     fontSize: FontSize.sm,
-    color: "#9CA3AF",
+    color: Colors.textScale.muted,
     textAlign: "center",
   },
 });

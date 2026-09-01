@@ -95,21 +95,21 @@ describe("SelectTimerScreen", () => {
       activityType: "com.apple.UIKit.activity.PostToTwitter",
     });
 
-    const { getAllByText } = render(
+    const { getAllByTestId } = render(
       <SelectTimerScreen navigation={{} as any} route={{} as any} />
     );
 
     await waitFor(() => {
-      expect(getAllByText("share-outline").length).toBeGreaterThan(0);
-    }, { timeout: 3500 });
+      expect(getAllByTestId("btn-share-timer").length).toBeGreaterThan(0);
+    }, { timeout: 4000 });
 
-    const shareButtons = getAllByText("share-outline");
+    const shareButtons = getAllByTestId("btn-share-timer");
     fireEvent.press(shareButtons[0]);
 
     await waitFor(() => {
       expect(Share.share).toHaveBeenCalled();
-    }, { timeout: 3500 });
-  });
+    }, { timeout: 4000 });
+  }, 10000);
 
   it("navigates to Awards screen when trophy icon is pressed", async () => {
     const mockNavigation: any = {

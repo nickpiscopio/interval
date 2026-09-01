@@ -10,6 +10,7 @@ import {
   StyleSheet,
   SafeAreaView,
   Platform,
+  Dimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
@@ -22,10 +23,12 @@ import {
 } from "../constants/exerciseCatalog";
 import { Exercise, BodyPart } from "../model/Exercise";
 import { ExerciseDetailModal } from "./ExerciseDetailModal";
-import Spacing, { RADIUS } from "../constants/Spacing";
+import Spacing, { RADIUS, TOUCH_TARGET, SHADOWS } from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
 import Colors from "../constants/Colors";
 import { t } from "../i18n";
+
+const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 interface ExercisePickerModalProps {
   visible: boolean;
@@ -265,6 +268,27 @@ export function ExercisePickerModal({ visible, onClose, onSelect }: ExercisePick
 }
 
 const styles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    backgroundColor: Colors.surface.overlay,
+    justifyContent: "flex-end",
+  },
+  sheetContainer: {
+    backgroundColor: Colors.surface.card,
+    borderTopLeftRadius: RADIUS.lg,
+    borderTopRightRadius: RADIUS.lg,
+    maxHeight: SCREEN_HEIGHT * 0.9,
+    paddingTop: Spacing.sm,
+    ...SHADOWS.modal,
+  },
+  handleBar: {
+    width: 44,
+    height: 5,
+    borderRadius: RADIUS.xs,
+    backgroundColor: Colors.borderDefault,
+    alignSelf: "center",
+    marginBottom: Spacing.xs,
+  },
   container: {
     flex: 1,
     backgroundColor: "#F9FAFB",
@@ -283,33 +307,33 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: FontSize["2xl"],
     fontWeight: "800",
-    color: "#111827",
+    color: Colors.textScale.primary,
   },
   headerSubtitle: {
     fontSize: FontSize.sm,
-    color: "#6B7280",
+    color: Colors.textScale.secondary,
     marginTop: 2,
   },
   closeButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "#F3F4F6",
+    width: TOUCH_TARGET.icon,
+    height: TOUCH_TARGET.icon,
+    borderRadius: RADIUS.full,
+    backgroundColor: Colors.neutralAction.surface,
     alignItems: "center",
     justifyContent: "center",
   },
   searchBar: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Colors.surface.card,
     marginHorizontal: Spacing.md,
     marginTop: Spacing.xs,
     marginBottom: Spacing.xs,
     paddingHorizontal: Spacing.sm,
-    height: 42,
-    borderRadius: RADIUS.lg,
+    minHeight: TOUCH_TARGET.icon,
+    borderRadius: RADIUS.md,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: Colors.borderDefault,
   },
   searchIcon: {
     marginRight: Spacing.xs,
@@ -317,7 +341,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: FontSize.sm,
-    color: "#1F2937",
+    color: Colors.textScale.primary,
     paddingVertical: 6,
   },
   categoriesContainer: {
@@ -333,9 +357,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: RADIUS.full,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Colors.surface.card,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: Colors.borderDefault,
   },
   categoryChipActive: {
     backgroundColor: Colors.primary,
@@ -348,10 +372,10 @@ const styles = StyleSheet.create({
   categoryChipText: {
     fontSize: FontSize.xs,
     fontWeight: "600",
-    color: "#4B5563",
+    color: Colors.textScale.secondary,
   },
   categoryChipTextActive: {
-    color: "#FFFFFF",
+    color: Colors.white,
     fontWeight: "700",
   },
   bodyPartsContainer: {
@@ -366,22 +390,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 10,
     paddingVertical: 5,
-    borderRadius: RADIUS.md,
-    backgroundColor: "#F3F4F6",
+    borderRadius: RADIUS.sm,
+    backgroundColor: Colors.neutralAction.surface,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: Colors.borderDefault,
   },
   bodyPartChipActive: {
-    backgroundColor: "#374151",
-    borderColor: "#1F2937",
+    backgroundColor: Colors.textScale.heading,
+    borderColor: Colors.textScale.primary,
   },
   bodyPartChipText: {
     fontSize: FontSize.xs,
     fontWeight: "600",
-    color: "#4B5563",
+    color: Colors.textScale.secondary,
   },
   bodyPartChipTextActive: {
-    color: "#FFFFFF",
+    color: Colors.white,
   },
   listContent: {
     paddingHorizontal: Spacing.md,
@@ -394,11 +418,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Colors.surface.card,
     padding: Spacing.md,
     borderRadius: RADIUS.md,
     borderWidth: 1,
-    borderColor: "#F3F4F6",
+    borderColor: Colors.borderDefault,
+    ...SHADOWS.card,
   },
   exerciseCardLeft: {
     flexDirection: "row",
@@ -419,11 +444,11 @@ const styles = StyleSheet.create({
   exerciseName: {
     fontSize: FontSize.base,
     fontWeight: "700",
-    color: "#111827",
+    color: Colors.textScale.primary,
   },
   exerciseDescSnippet: {
     fontSize: FontSize.xs,
-    color: "#6B7280",
+    color: Colors.textScale.secondary,
     lineHeight: 16,
     marginTop: 4,
   },
@@ -446,12 +471,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: RADIUS.xs,
-    backgroundColor: "#F3F4F6",
+    backgroundColor: Colors.neutralAction.surface,
   },
   difficultyBadgeText: {
     fontSize: 10,
     fontWeight: "600",
-    color: "#6B7280",
+    color: Colors.textScale.secondary,
   },
   emptyContainer: {
     alignItems: "center",
@@ -461,12 +486,12 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: FontSize.lg,
     fontWeight: "700",
-    color: "#374151",
+    color: Colors.textScale.heading,
     marginTop: Spacing.sm,
   },
   emptySubtitle: {
     fontSize: FontSize.sm,
-    color: "#9CA3AF",
+    color: Colors.textScale.muted,
     marginTop: 4,
   },
 });

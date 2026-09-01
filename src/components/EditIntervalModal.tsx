@@ -17,7 +17,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 import { Interval } from "../model/Interval";
 import { t } from "../i18n";
-import Spacing from "../constants/Spacing";
+import Spacing, { RADIUS, TOUCH_TARGET, SHADOWS } from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
 import Colors from "../constants/Colors";
 
@@ -267,19 +267,15 @@ const styles = StyleSheet.create({
   },
   scrim: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 0, 0, 0.4)",
+    backgroundColor: Colors.surface.overlay,
   },
   sheetContainer: {
-    backgroundColor: "#FFFFFF",
-    borderTopLeftRadius: Spacing.radius.lg,
-    borderTopRightRadius: Spacing.radius.lg,
+    backgroundColor: Colors.surface.card,
+    borderTopLeftRadius: RADIUS.lg,
+    borderTopRightRadius: RADIUS.lg,
     paddingHorizontal: Spacing.lg,
     paddingTop: Spacing.md,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: -3 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 10,
+    ...SHADOWS.modal,
   },
   header: {
     flexDirection: "row",
@@ -290,7 +286,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: FontSize.lg,
     fontFamily: "Poppins-Bold",
-    color: Colors.text,
+    color: Colors.textScale.primary,
   },
   doneButton: {
     paddingVertical: Spacing.xs,
@@ -318,7 +314,7 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: FontSize.xs,
     fontFamily: "Poppins-Medium",
-    color: "#4B5563",
+    color: Colors.textScale.secondary,
     marginBottom: 4,
   },
   libraryPickerBtn: {
@@ -335,28 +331,28 @@ const styles = StyleSheet.create({
   },
   editorTextInput: {
     borderWidth: 1,
-    borderColor: "#E5E7EB",
-    borderRadius: Spacing.radius.sm,
+    borderColor: Colors.borderInput,
+    borderRadius: RADIUS.sm,
     paddingHorizontal: Spacing.sm,
     paddingVertical: Spacing.xs,
     fontSize: FontSize.sm,
     fontFamily: "Poppins-Regular",
-    color: Colors.text,
-    backgroundColor: "#F9FAFB",
-    height: 42,
+    color: Colors.textScale.primary,
+    backgroundColor: Colors.surface.screen,
+    minHeight: TOUCH_TARGET.min,
   },
   timeInput: {
     borderWidth: 1,
-    borderColor: "#E5E7EB",
-    borderRadius: Spacing.radius.sm,
+    borderColor: Colors.borderInput,
+    borderRadius: RADIUS.sm,
     paddingHorizontal: Spacing.sm,
     paddingVertical: Spacing.xs,
     fontSize: FontSize.sm,
     fontFamily: "Poppins-Regular",
-    color: Colors.text,
-    backgroundColor: "#F9FAFB",
+    color: Colors.textScale.primary,
+    backgroundColor: Colors.surface.screen,
     textAlign: "center",
-    height: 42,
+    minHeight: TOUCH_TARGET.min,
   },
   colorPalette: {
     flexDirection: "row",
@@ -373,8 +369,8 @@ const styles = StyleSheet.create({
   },
   colorCircleSelected: {
     borderWidth: 3,
-    borderColor: "#FFFFFF",
-    shadowColor: "#000",
+    borderColor: Colors.white,
+    shadowColor: Colors.black,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.25,
     shadowRadius: 2,
@@ -388,22 +384,22 @@ const styles = StyleSheet.create({
     marginTop: Spacing.xs,
   },
   deleteIconButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#FFF5F5",
+    width: TOUCH_TARGET.icon,
+    height: TOUCH_TARGET.icon,
+    borderRadius: RADIUS.sm,
+    backgroundColor: Colors.destructiveSurface,
     borderWidth: 1,
-    borderColor: "#FEE2E2",
+    borderColor: Colors.destructive,
     alignItems: "center",
     justifyContent: "center",
   },
   duplicateIconButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#F3F4F6",
+    width: TOUCH_TARGET.icon,
+    height: TOUCH_TARGET.icon,
+    borderRadius: RADIUS.sm,
+    backgroundColor: Colors.neutralAction.surface,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: Colors.neutralAction.border,
     alignItems: "center",
     justifyContent: "center",
   },

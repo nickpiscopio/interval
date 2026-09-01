@@ -6,14 +6,17 @@ import {
   ScrollView,
   TouchableOpacity,
   SafeAreaView,
+  Dimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { Text } from "./Themed";
 import Colors from "../constants/Colors";
-import Spacing, { RADIUS } from "../constants/Spacing";
+import Spacing, { RADIUS, TOUCH_TARGET, SHADOWS } from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
 import { t } from "../i18n";
+
+const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 export interface LegalDisclaimerModalProps {
   visible: boolean;
@@ -194,15 +197,7 @@ export function LegalDisclaimerModal({
 const styles = StyleSheet.create({
   safeContainer: {
     flex: 1,
-    backgroundColor: "#F9FAFB",
-  },
-  header: {
-    paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.md,
-    paddingBottom: Spacing.sm,
-    backgroundColor: "#FFFFFF",
-    borderBottomWidth: 1,
-    borderBottomColor: "#F3F4F6",
+    backgroundColor: Colors.surface.screen,
   },
   badgesRow: {
     flexDirection: "row",
@@ -248,23 +243,31 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 14,
     right: 18,
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "#F3F4F6",
+    width: TOUCH_TARGET.icon,
+    height: TOUCH_TARGET.icon,
+    borderRadius: RADIUS.full,
+    backgroundColor: Colors.neutralAction.surface,
     alignItems: "center",
     justifyContent: "center",
+    zIndex: 10,
+  },
+  header: {
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.xs,
+    paddingBottom: Spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.borderDefault,
   },
   title: {
     fontSize: FontSize["2xl"],
     fontWeight: "800",
-    color: "#111827",
+    color: Colors.textScale.primary,
     letterSpacing: -0.3,
     marginBottom: 4,
   },
   subtitle: {
     fontSize: FontSize.sm,
-    color: "#6B7280",
+    color: Colors.textScale.secondary,
     lineHeight: 18,
   },
   scrollContent: {
@@ -274,16 +277,12 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   card: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: RADIUS.lg,
+    backgroundColor: Colors.surface.card,
+    borderRadius: RADIUS.md,
     padding: Spacing.md,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 4,
-    elevation: 1,
+    borderColor: Colors.borderDefault,
+    ...SHADOWS.card,
   },
   highlightCard: {
     borderColor: "#A7F3D0",
@@ -306,11 +305,11 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: FontSize.base,
     fontWeight: "700",
-    color: "#111827",
+    color: Colors.textScale.primary,
   },
   cardBody: {
     fontSize: FontSize.sm,
-    color: "#4B5563",
+    color: Colors.textScale.secondary,
     lineHeight: 20,
   },
   versionWrap: {
@@ -319,20 +318,20 @@ const styles = StyleSheet.create({
   },
   versionText: {
     fontSize: FontSize.xs,
-    color: "#9CA3AF",
+    color: Colors.textScale.muted,
     fontWeight: "600",
   },
   footer: {
     paddingHorizontal: Spacing.lg,
     paddingTop: Spacing.sm,
     paddingBottom: Spacing.md,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Colors.surface.card,
     borderTopWidth: 1,
-    borderTopColor: "#F3F4F6",
+    borderTopColor: Colors.borderDefault,
   },
   termsNoticeText: {
     fontSize: FontSize.xs,
-    color: "#6B7280",
+    color: Colors.textScale.secondary,
     textAlign: "center",
     marginBottom: Spacing.xs,
     lineHeight: 16,
@@ -342,29 +341,25 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 14,
-    borderRadius: RADIUS.lg,
+    minHeight: TOUCH_TARGET.cta,
+    borderRadius: RADIUS.md,
     gap: 8,
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.25,
-    shadowRadius: 6,
-    elevation: 3,
+    ...SHADOWS.card,
   },
   primaryButtonText: {
-    color: "#FFFFFF",
+    color: Colors.white,
     fontSize: FontSize.base,
     fontWeight: "700",
   },
   secondaryButton: {
-    backgroundColor: "#F3F4F6",
+    backgroundColor: Colors.neutralAction.surface,
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 13,
-    borderRadius: RADIUS.lg,
+    minHeight: TOUCH_TARGET.min,
+    borderRadius: RADIUS.md,
   },
   secondaryButtonText: {
-    color: "#374151",
+    color: Colors.textScale.heading,
     fontSize: FontSize.sm,
     fontWeight: "700",
   },

@@ -10,7 +10,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import Colors from "../constants/Colors";
-import Spacing, { RADIUS } from "../constants/Spacing";
+import Spacing, { RADIUS, TOUCH_TARGET, SHADOWS } from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
 import { Text } from "./Themed";
 import { Exercise, BodyPart } from "../model/Exercise";
@@ -350,25 +350,21 @@ export function ExerciseLibraryView({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F9FAFB",
+    backgroundColor: Colors.surface.screen,
   },
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Colors.surface.card,
     marginHorizontal: Spacing.md,
     marginTop: Spacing.xs,
     marginBottom: Spacing.xs,
     paddingHorizontal: 12,
-    height: 44,
-    borderRadius: RADIUS.lg,
+    minHeight: TOUCH_TARGET.icon,
+    borderRadius: RADIUS.md,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
+    borderColor: Colors.borderDefault,
+    ...SHADOWS.card,
   },
   searchIcon: {
     marginRight: 8,
@@ -376,7 +372,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: FontSize.sm,
-    color: "#1F2937",
+    color: Colors.textScale.primary,
     paddingVertical: 8,
   },
   filterPillsWrapper: {
@@ -392,9 +388,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: RADIUS.full,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: Colors.surface.card,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: Colors.borderDefault,
   },
   filterPillSelected: {
     backgroundColor: Colors.primary,
@@ -407,10 +403,10 @@ const styles = StyleSheet.create({
   filterPillText: {
     fontSize: FontSize.xs,
     fontWeight: "600",
-    color: "#4B5563",
+    color: Colors.textScale.secondary,
   },
   filterPillTextSelected: {
-    color: "#FFFFFF",
+    color: Colors.white,
     fontWeight: "700",
   },
   bodyPartPillsWrapper: {
@@ -425,22 +421,22 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 10,
     paddingVertical: 6,
-    borderRadius: RADIUS.md,
-    backgroundColor: "#F3F4F6",
+    borderRadius: RADIUS.sm,
+    backgroundColor: Colors.neutralAction.surface,
     borderWidth: 1,
-    borderColor: "#E5E7EB",
+    borderColor: Colors.borderDefault,
   },
   bodyPartPillSelected: {
-    backgroundColor: "#374151",
-    borderColor: "#1F2937",
+    backgroundColor: Colors.textScale.heading,
+    borderColor: Colors.textScale.primary,
   },
   bodyPartPillText: {
     fontSize: FontSize.xs,
     fontWeight: "600",
-    color: "#4B5563",
+    color: Colors.textScale.secondary,
   },
   bodyPartPillTextSelected: {
-    color: "#FFFFFF",
+    color: Colors.white,
   },
   resultsHeader: {
     paddingHorizontal: Spacing.md,
@@ -449,7 +445,7 @@ const styles = StyleSheet.create({
   resultsCountText: {
     fontSize: FontSize.xs,
     fontWeight: "600",
-    color: "#9CA3AF",
+    color: Colors.textScale.muted,
     textTransform: "uppercase",
     letterSpacing: 0.5,
   },
@@ -458,16 +454,12 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   exerciseCard: {
-    backgroundColor: "#FFFFFF",
-    borderRadius: RADIUS.lg,
+    backgroundColor: Colors.surface.card,
+    borderRadius: RADIUS.md,
     padding: Spacing.md,
     borderWidth: 1,
-    borderColor: "#F3F4F6",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 6,
-    elevation: 1,
+    borderColor: Colors.borderDefault,
+    ...SHADOWS.card,
   },
   cardHeaderRow: {
     flexDirection: "row",
@@ -481,7 +473,7 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: FontSize.base,
     fontWeight: "700",
-    color: "#111827",
+    color: Colors.textScale.primary,
     marginBottom: 4,
   },
   cardTagsRow: {
@@ -503,16 +495,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: RADIUS.full,
-    backgroundColor: "#F3F4F6",
+    backgroundColor: Colors.neutralAction.surface,
   },
   cardDifficultyText: {
     fontSize: 10,
     fontWeight: "600",
-    color: "#6B7280",
+    color: Colors.textScale.secondary,
   },
   cardDescription: {
     fontSize: FontSize.xs,
-    color: "#4B5563",
+    color: Colors.textScale.secondary,
     lineHeight: 18,
     marginTop: 8,
   },
@@ -524,10 +516,10 @@ const styles = StyleSheet.create({
     marginTop: 10,
     paddingTop: 8,
     borderTopWidth: 1,
-    borderTopColor: "#F9FAFB",
+    borderTopColor: Colors.borderDefault,
   },
   cardBodyPartChip: {
-    backgroundColor: "#F3F4F6",
+    backgroundColor: Colors.neutralAction.surface,
     paddingHorizontal: 7,
     paddingVertical: 3,
     borderRadius: RADIUS.sm,
@@ -535,12 +527,12 @@ const styles = StyleSheet.create({
   cardBodyPartChipText: {
     fontSize: 10,
     fontWeight: "600",
-    color: "#4B5563",
+    color: Colors.textScale.secondary,
   },
   cardMoreBodyPartsText: {
     fontSize: 10,
     fontWeight: "600",
-    color: "#9CA3AF",
+    color: Colors.textScale.muted,
   },
   emptyState: {
     alignItems: "center",
@@ -550,13 +542,13 @@ const styles = StyleSheet.create({
   emptyStateTitle: {
     fontSize: FontSize.lg,
     fontWeight: "700",
-    color: "#374151",
+    color: Colors.textScale.heading,
     marginTop: Spacing.sm,
     marginBottom: 4,
   },
   emptyStateSubtitle: {
     fontSize: FontSize.sm,
-    color: "#9CA3AF",
+    color: Colors.textScale.muted,
     textAlign: "center",
     maxWidth: 240,
   },

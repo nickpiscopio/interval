@@ -19,14 +19,47 @@ export const RADIUS = {
 } as const;
 
 export const TOUCH_TARGET = {
+  icon: 44,
   min: 48,
   cta: 56,
+} as const;
+
+export const SHADOWS = {
+  card: {
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  floating: {
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  fab: {
+    shadowColor: "#059669",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 6,
+  },
+  modal: {
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 10,
+  },
 } as const;
 
 export default {
   ...SPACING,
   radius: RADIUS,
   touchTarget: TOUCH_TARGET,
+  shadows: SHADOWS,
 
   // Layout Semantic Aliases
   screen: SPACING.md, // 16px screen padding / margins

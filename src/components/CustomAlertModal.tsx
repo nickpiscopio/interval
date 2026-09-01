@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import Spacing from "../constants/Spacing";
+import Spacing, { RADIUS, TOUCH_TARGET, SHADOWS } from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
 import Colors from "../constants/Colors";
 
@@ -216,29 +216,26 @@ export function CustomAlertModal({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.55)",
+    backgroundColor: Colors.surface.overlay,
     justifyContent: "center",
     alignItems: "center",
-    padding: Spacing.lg,
+    paddingHorizontal: Spacing.xl,
   },
   alertCard: {
     width: "100%",
     maxWidth: 340,
-    backgroundColor: "#FFFFFF",
-    borderRadius: Spacing.radius.md + 4,
-    paddingVertical: Spacing.lg,
+    backgroundColor: Colors.surface.card,
+    borderRadius: RADIUS.md,
+    paddingTop: Spacing.xl,
+    paddingBottom: Spacing.lg,
     paddingHorizontal: Spacing.lg,
     alignItems: "center",
-    shadowColor: "#000000",
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.18,
-    shadowRadius: 24,
-    elevation: 10,
+    ...SHADOWS.modal,
   },
   iconContainer: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: TOUCH_TARGET.cta,
+    height: TOUCH_TARGET.cta,
+    borderRadius: RADIUS.full,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: Spacing.md,
@@ -247,7 +244,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize.lg,
     lineHeight: FontSize.lineHeight.lg,
     fontFamily: "Poppins-Bold",
-    color: "#1F2937",
+    color: Colors.textScale.primary,
     textAlign: "center",
     marginBottom: Spacing.xs,
   },
@@ -255,7 +252,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize.sm,
     lineHeight: FontSize.lineHeight.sm + 2,
     fontFamily: "Poppins-Regular",
-    color: "#4B5563",
+    color: Colors.textScale.secondary,
     textAlign: "center",
     marginBottom: Spacing.lg,
     paddingHorizontal: Spacing.xs,
@@ -274,10 +271,10 @@ const styles = StyleSheet.create({
   baseButton: {
     paddingVertical: Spacing.sm + 2,
     paddingHorizontal: Spacing.md,
-    borderRadius: Spacing.radius.sm,
+    borderRadius: RADIUS.sm,
     alignItems: "center",
     justifyContent: "center",
-    minHeight: Spacing.touchTarget.min,
+    minHeight: TOUCH_TARGET.min,
   },
   baseButtonText: {
     fontSize: FontSize.sm,
@@ -288,18 +285,18 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
   },
   defaultButtonText: {
-    color: "#FFFFFF",
+    color: Colors.white,
   },
   destructiveButton: {
-    backgroundColor: "#EF4444",
+    backgroundColor: Colors.destructive,
   },
   destructiveButtonText: {
-    color: "#FFFFFF",
+    color: Colors.white,
   },
   cancelButton: {
-    backgroundColor: "#F3F4F6",
+    backgroundColor: Colors.neutralAction.surface,
   },
   cancelButtonText: {
-    color: "#4B5563",
+    color: Colors.neutralAction.text,
   },
 });

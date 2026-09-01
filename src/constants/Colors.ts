@@ -85,7 +85,13 @@ export default {
   surface: {
     screen: SURFACE_SCREEN,
     card: SURFACE_CARD,
+    tintActive: "#EFF6FF",
+    overlay: "rgba(0, 0, 0, 0.4)",
+    floatingNav: "rgba(255, 255, 255, 0.88)",
   },
+  white: WHITE,
+  black: BLACK,
+  transparent: TRANSPARENT,
   borderDefault: BORDER_DEFAULT,
   borderInput: BORDER_INPUT,
 

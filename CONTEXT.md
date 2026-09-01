@@ -47,3 +47,8 @@ _Avoid_: Carousel Slider, Inline Accordion
 **Floating Navigation Bar & Action Buttons**:
 A translucent floating bottom bar for switching between Workouts and Exercise Library with stacked floating action buttons (FABs) on the bottom-right for timer generation and creation.
 _Avoid_: Tab Bar Dock, Bottom Action Sheet
+
+**Design System Tokens & Hierarchy**:
+Single-source-of-truth token architecture (`Colors`, `Spacing`, `FontSize`, `RADIUS`, `TOUCH_TARGET`, `SHADOWS`) strictly enforced across all components and screens without hardcoded values. Includes a 4-tier semantic corner radius scale (`RADIUS.sm: 8`, `RADIUS.md: 16`, `RADIUS.lg: 24`, `RADIUS.full: 9999`), unified shadow presets, dynamic type accessibility scaling, and safe-area list scrolling depth.
+_Avoid_: Hardcoded Hex Codes, Arbitrary Pixel Heights, Inline Shadow Literals
+
