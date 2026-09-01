@@ -35,7 +35,12 @@
     "workoutsTab": "Entraînements",
     "libraryTab": "Bibliothèque",
     "emptyTitle": "Pas encore de minuteurs",
-    "emptySubtitle": "Créez votre premier minuteur ou explorez la bibliothèque."
+    "emptySubtitle": "Créez votre premier minuteur ou explorez la bibliothèque.",
+    "selectedCount": "%{count} Sélectionné(s)",
+    "reorderTitle": "Réorganiser les Minuteurs",
+    "doneReorder": "Terminé",
+    "deleteConfirmTitle": "Supprimer les Minuteurs",
+    "deleteConfirmMessage": "Es-tu sûr de vouloir supprimer le(s) minuteur(s) sélectionné(s) ?"
   },
   "createTimer": {
     "titleCreate": "Créer un Minuteur",

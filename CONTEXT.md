@@ -56,4 +56,9 @@ _Avoid_: Hardcoded Hex Codes, Arbitrary Pixel Heights, Inline Shadow Literals, C
 An intelligent post-workout motivation generator that dynamically evaluates workout duration, total rounds completed, and day of the week to deliver whimsical, fresh, and motivating celebration copy encouraging daily habit retention.
 _Avoid_: Static Victory Message, Generic Congratulations
 
+**Contextual Selection & Reorder Header Mode**:
+A clean timer card list interaction where cards have no permanent drag handles. Long-pressing (holding) any card activates a contextual header bar allowing sharing, dedicated list drag-and-drop reordering, and batch deletion.
+_Avoid_: Permanent Drag Handles, Inline Delete Swipe Clutter
+
+
 

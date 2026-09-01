@@ -33,6 +33,7 @@ import { getUserStats, recordShare } from "../services/badgeService";
 import { UserStats } from "../model/Badge";
 import { ExerciseLibraryView } from "../components/ExerciseLibraryView";
 import { LegalDisclaimerModal } from "../components/LegalDisclaimerModal";
+import { useAlert } from "../context/AlertContext";
 import { t } from "../i18n";
 
 const STORAGE_KEY = "@hiit_timers";
@@ -43,6 +44,7 @@ const LEGAL_ACCEPTED_DATE_KEY = "@legal_disclaimer_accepted_date";
 export default function SelectTimerScreen({
   navigation,
 }: RootStackScreenProps<"Root">) {
+  const { showAlert } = useAlert();
   const [activeTab, setActiveTab] = useState<"workouts" | "library">("workouts");
   const [timers, setTimers] = useState<Timer[]>([]);
   const [userStats, setUserStats] = useState<UserStats | null>(null);
@@ -53,6 +55,9 @@ export default function SelectTimerScreen({
   const [showLegalGate, setShowLegalGate] = useState(false);
   const [showLegalReview, setShowLegalReview] = useState(false);
   const [legalAcceptedDate, setLegalAcceptedDate] = useState<string | null>(null);
+  const [selectedTimerIds, setSelectedTimerIds] = useState<string[]>([]);
+  const [isReorderMode, setIsReorderMode] = useState<boolean>(false);
+  const isSelectionActive = !isReorderMode && selectedTimerIds.length > 0;
   const isFocused = useIsFocused();
   const insets = useSafeAreaInsets();
   const hasLoadedRef = React.useRef(false);
@@ -246,80 +251,157 @@ export default function SelectTimerScreen({
     navigation.navigate("CreateTimer", { timer: customTimer });
   }
 
-  const renderTimerCard = ({ item, drag, isActive }: RenderItemParams<Timer>) => (
-    <ScaleDecorator>
-      <TouchableOpacity
-        style={[
-          styles.card,
-          isActive && styles.cardDragging,
-          { marginBottom: Spacing.cardGap },
-        ]}
-        activeOpacity={0.8}
-        onPress={() => navigation.navigate("CreateTimer", { timer: item })}
-      >
-        <View style={styles.cardHeader}>
-          <TouchableOpacity
-            onPressIn={() => {
+  function handleLongPressTimer(item: Timer) {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    if (!selectedTimerIds.includes(item.id)) {
+      setSelectedTimerIds((prev) => [...prev, item.id]);
+    }
+  }
+
+  function toggleSelectTimer(id: string) {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setSelectedTimerIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  }
+
+  function exitSelectionMode() {
+    setSelectedTimerIds([]);
+    setIsReorderMode(false);
+  }
+
+  function handleShareSelected() {
+    if (selectedTimerIds.length === 1) {
+      const timerToShare = timers.find((t) => t.id === selectedTimerIds[0]);
+      if (timerToShare) {
+        handleShareTimer(timerToShare);
+      }
+    }
+  }
+
+  function handleDeleteSelected() {
+    showAlert({
+      title: t("selectTimer.deleteConfirmTitle"),
+      message: t("selectTimer.deleteConfirmMessage"),
+      icon: "trash",
+      buttons: [
+        {
+          text: t("common.cancel"),
+          style: "cancel",
+        },
+        {
+          text: t("common.delete"),
+          style: "destructive",
+          onPress: async () => {
+            const remaining = timers.filter((t) => !selectedTimerIds.includes(t.id));
+            setTimers(remaining);
+            await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(remaining));
+            exitSelectionMode();
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          },
+        },
+      ],
+    });
+  }
+
+  const renderTimerCard = ({ item, drag, isActive }: RenderItemParams<Timer>) => {
+    const isSelected = isSelectionActive && selectedTimerIds.includes(item.id);
+
+    return (
+      <ScaleDecorator>
+        <TouchableOpacity
+          testID={`timer-card-${item.id}`}
+          style={[
+            styles.card,
+            isActive && styles.cardDragging,
+            isSelected && styles.cardSelected,
+            { marginBottom: Spacing.cardGap },
+          ]}
+          activeOpacity={0.8}
+          onPress={() => {
+            if (isSelectionActive) {
+              toggleSelectTimer(item.id);
+            } else if (!isReorderMode) {
+              navigation.navigate("CreateTimer", { timer: item });
+            }
+          }}
+          onLongPress={() => {
+            if (isReorderMode) {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               drag();
-            }}
-            style={styles.dragHandle}
-            hitSlop={{ top: 14, bottom: 14, left: 14, right: 14 }}
-          >
-            <MaterialIcons
-              name="drag-indicator"
-              size={22}
-              color={isActive ? Colors.primary : Colors.textScale.muted}
-            />
-          </TouchableOpacity>
-
-          <View style={styles.cardMetaContainer}>
-            <Text style={styles.cardTitle}>{item.name}</Text>
-            <View style={styles.badgeRow}>
-              {item.isAiGenerated && (
-                <View style={[styles.badge, styles.aiBadge]}>
-                  <Ionicons name="sparkles" size={12} color="#059669" />
-                  <Text style={[styles.badgeText, styles.aiBadgeText]}>AI</Text>
-                </View>
-              )}
-              <View style={styles.badge}>
-                <Ionicons name="repeat" size={12} color="#4B5563" />
-                <Text style={styles.badgeText}>{item.rounds} {t("common.rounds")}</Text>
+            } else if (!isSelectionActive) {
+              handleLongPressTimer(item);
+            }
+          }}
+          delayLongPress={250}
+        >
+          <View style={styles.cardHeader}>
+            {isSelectionActive && (
+              <View style={styles.selectIndicator}>
+                <Ionicons
+                  name={isSelected ? "checkmark-circle" : "ellipse-outline"}
+                  size={24}
+                  color={isSelected ? Colors.primary : Colors.textScale.muted}
+                />
               </View>
-              <View style={[styles.badge, styles.durationBadge]}>
-                <Ionicons name="time-outline" size={12} color="#1D4ED8" />
-                <Text style={[styles.badgeText, styles.durationBadgeText]}>
-                  {formatTime(calculateTotalDuration(item))}
-                </Text>
+            )}
+
+            {isReorderMode && (
+              <TouchableOpacity
+                onPressIn={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  drag();
+                }}
+                style={styles.dragHandle}
+                hitSlop={{ top: 14, bottom: 14, left: 14, right: 14 }}
+              >
+                <MaterialIcons
+                  name="drag-indicator"
+                  size={24}
+                  color={isActive ? Colors.primary : Colors.textScale.muted}
+                />
+              </TouchableOpacity>
+            )}
+
+            <View style={styles.cardMetaContainer}>
+              <Text style={styles.cardTitle}>{item.name}</Text>
+              <View style={styles.badgeRow}>
+                {item.isAiGenerated && (
+                  <View style={[styles.badge, styles.aiBadge]}>
+                    <Ionicons name="sparkles" size={12} color="#059669" />
+                    <Text style={[styles.badgeText, styles.aiBadgeText]}>AI</Text>
+                  </View>
+                )}
+                <View style={styles.badge}>
+                  <Ionicons name="repeat" size={12} color="#4B5563" />
+                  <Text style={styles.badgeText}>{item.rounds} {t("common.rounds")}</Text>
+                </View>
+                <View style={[styles.badge, styles.durationBadge]}>
+                  <Ionicons name="time-outline" size={12} color="#1D4ED8" />
+                  <Text style={[styles.badgeText, styles.durationBadgeText]}>
+                    {formatTime(calculateTotalDuration(item))}
+                  </Text>
+                </View>
               </View>
             </View>
-          </View>
 
-          <View style={styles.cardActionsRow}>
-            <TouchableOpacity
-              testID="btn-share-timer"
-              accessibilityLabel={t("common.share")}
-              style={styles.cardShareButton}
-              activeOpacity={0.7}
-              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-              onPress={() => handleShareTimer(item)}
-            >
-              <Ionicons name="share-outline" size={18} color={Colors.textScale.secondary} />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.cardPlayButton}
-              activeOpacity={0.7}
-              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-              onPress={() => navigation.navigate("Timer", { timer: item })}
-            >
-              <Ionicons name="play" size={18} color="#FFFFFF" />
-            </TouchableOpacity>
+            {!isSelectionActive && !isReorderMode && (
+              <TouchableOpacity
+                testID={`btn-play-timer-${item.id}`}
+                accessibilityLabel={t("common.play")}
+                style={styles.cardPlayButton}
+                activeOpacity={0.7}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                onPress={() => navigation.navigate("Timer", { timer: item })}
+              >
+                <Ionicons name="play" size={18} color="#FFFFFF" />
+              </TouchableOpacity>
+            )}
           </View>
-        </View>
-      </TouchableOpacity>
-    </ScaleDecorator>
-  );
+        </TouchableOpacity>
+      </ScaleDecorator>
+    );
+  };
 
   const bottomDockOffset = Math.max(insets.bottom, 12) + 64;
 
@@ -383,7 +465,7 @@ export default function SelectTimerScreen({
         </View>
       )}
 
-      {/* Header with Greeting & Trophy Room */}
+      {/* Header with Greeting & Contextual Selection Bar */}
       <View
         onLayout={(e) => setHeaderHeight(e.nativeEvent.layout.height)}
         style={[
@@ -392,50 +474,130 @@ export default function SelectTimerScreen({
           { paddingTop: Math.max(insets.top, 20) + Spacing.sm },
         ]}
       >
-        <View style={styles.headerTopRow}>
-          <View style={styles.headerTitles}>
-            <Text style={styles.greeting}>
-              {activeTab === "workouts"
-                ? t("selectTimer.greeting")
-                : t("exercises.libraryTitle")}
-            </Text>
-            <Text style={styles.subGreeting}>
-              {activeTab === "workouts"
-                ? t("selectTimer.subGreeting")
-                : t("exercises.librarySubtitle")}
-            </Text>
-          </View>
-          <View style={styles.headerActionsRow}>
+        {isSelectionActive || isReorderMode ? (
+          <View style={styles.headerSelectionRow}>
             <TouchableOpacity
-              testID="legal-info-header-btn"
-              style={styles.infoButton}
-              activeOpacity={0.8}
-              onPress={() => setShowLegalReview(true)}
-              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              testID="btn-close-selection"
+              accessibilityLabel={t("common.cancel")}
+              style={styles.headerIconButton}
+              activeOpacity={0.6}
+              onPress={exitSelectionMode}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              <Ionicons name="information-circle-outline" size={22} color="#6B7280" />
+              <Ionicons name="close" size={26} color={Colors.textScale.primary} />
             </TouchableOpacity>
 
-            <TouchableOpacity
-              testID="btn-achievements"
-              accessibilityLabel={t("awards.title")}
-              style={styles.trophyButton}
-              activeOpacity={0.8}
-              onPress={() => navigation.navigate("Awards")}
-            >
-              {userStats && userStats.currentStreak > 0 ? (
-                <View style={styles.streakBadge}>
-                  <Text style={styles.streakBadgeEmoji}>🔥</Text>
-                  <Text style={styles.streakBadgeCount}>{userStats.currentStreak}</Text>
-                </View>
-              ) : (
-                <View style={styles.trophyIconWrap}>
-                  <Ionicons name="trophy" size={22} color="#F59E0B" />
-                </View>
+            <Text style={styles.selectionTitle} numberOfLines={1}>
+              {isReorderMode
+                ? t("selectTimer.reorderTitle")
+                : t("selectTimer.selectedCount", { count: selectedTimerIds.length })}
+            </Text>
+
+            <View style={styles.selectionActionsRow}>
+              {!isReorderMode && selectedTimerIds.length === 1 && (
+                <TouchableOpacity
+                  testID="btn-header-share"
+                  accessibilityLabel={t("common.share")}
+                  style={styles.headerIconButton}
+                  activeOpacity={0.6}
+                  onPress={handleShareSelected}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                >
+                  <Ionicons name="share-social" size={22} color={Colors.textScale.primary} />
+                </TouchableOpacity>
               )}
-            </TouchableOpacity>
+
+              {!isReorderMode && (
+                <TouchableOpacity
+                  testID="btn-header-reorder"
+                  accessibilityLabel={t("selectTimer.reorderTitle")}
+                  style={styles.headerIconButton}
+                  activeOpacity={0.6}
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    setSelectedTimerIds([]);
+                    setIsReorderMode(true);
+                  }}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                >
+                  <MaterialIcons name="swap-vert" size={26} color={Colors.textScale.primary} />
+                </TouchableOpacity>
+              )}
+
+              {!isReorderMode && (
+                <TouchableOpacity
+                  testID="btn-header-delete"
+                  accessibilityLabel={t("common.delete")}
+                  style={styles.headerIconButton}
+                  activeOpacity={0.6}
+                  onPress={handleDeleteSelected}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                >
+                  <Ionicons name="trash" size={22} color={Colors.destructive} />
+                </TouchableOpacity>
+              )}
+
+              {isReorderMode && (
+                <TouchableOpacity
+                  testID="btn-header-done-reorder"
+                  style={styles.doneReorderButton}
+                  activeOpacity={0.7}
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    exitSelectionMode();
+                  }}
+                >
+                  <Text style={styles.doneReorderText}>{t("selectTimer.doneReorder")}</Text>
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
-        </View>
+        ) : (
+          <View style={styles.headerTopRow}>
+            <View style={styles.headerTitles}>
+              <Text style={styles.greeting}>
+                {activeTab === "workouts"
+                  ? t("selectTimer.greeting")
+                  : t("exercises.libraryTitle")}
+              </Text>
+              <Text style={styles.subGreeting}>
+                {activeTab === "workouts"
+                  ? t("selectTimer.subGreeting")
+                  : t("exercises.librarySubtitle")}
+              </Text>
+            </View>
+            <View style={styles.headerActionsRow}>
+              <TouchableOpacity
+                testID="legal-info-header-btn"
+                style={styles.infoButton}
+                activeOpacity={0.8}
+                onPress={() => setShowLegalReview(true)}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <Ionicons name="information-circle-outline" size={22} color="#6B7280" />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                testID="btn-achievements"
+                accessibilityLabel={t("awards.title")}
+                style={styles.trophyButton}
+                activeOpacity={0.8}
+                onPress={() => navigation.navigate("Awards")}
+              >
+                {userStats && userStats.currentStreak > 0 ? (
+                  <View style={styles.streakBadge}>
+                    <Text style={styles.streakBadgeEmoji}>🔥</Text>
+                    <Text style={styles.streakBadgeCount}>{userStats.currentStreak}</Text>
+                  </View>
+                ) : (
+                  <View style={styles.trophyIconWrap}>
+                    <Ionicons name="trophy" size={22} color="#F59E0B" />
+                  </View>
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
       </View>
 
       {isScrolled && activeTab === "workouts" && (
@@ -597,6 +759,50 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
+  headerSelectionRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    minHeight: TOUCH_TARGET.icon,
+  },
+  headerCloseButton: {
+    width: TOUCH_TARGET.icon,
+    height: TOUCH_TARGET.icon,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  selectionTitle: {
+    fontSize: FontSize.lg,
+    fontFamily: "Poppins-Bold",
+    color: Colors.textScale.primary,
+    flex: 1,
+    marginHorizontal: Spacing.sm,
+  },
+  selectionActionsRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.xs,
+  },
+  headerIconButton: {
+    width: TOUCH_TARGET.icon,
+    height: TOUCH_TARGET.icon,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  doneReorderButton: {
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.xs,
+    borderRadius: RADIUS.md,
+    backgroundColor: Colors.primary,
+    justifyContent: "center",
+    alignItems: "center",
+    minHeight: 36,
+  },
+  doneReorderText: {
+    fontSize: FontSize.sm,
+    fontFamily: "Poppins-Bold",
+    color: Colors.white,
+  },
   headerTitles: {
     flex: 1,
     marginRight: Spacing.sm,
@@ -666,9 +872,17 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: Colors.surface.card,
     borderRadius: RADIUS.md,
-    paddingLeft: 0,
     padding: Spacing.md,
     ...SHADOWS.card,
+  },
+  cardSelected: {
+    borderWidth: 2,
+    borderColor: Colors.primary,
+  },
+  selectIndicator: {
+    marginRight: Spacing.sm,
+    justifyContent: "center",
+    alignItems: "center",
   },
   cardDragging: {
     backgroundColor: Colors.surface.screen,
@@ -681,7 +895,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   dragHandle: {
-    paddingLeft: Spacing.sm,
     paddingRight: Spacing.sm,
     paddingVertical: Spacing.xs,
     justifyContent: "center",
@@ -730,19 +943,6 @@ const styles = StyleSheet.create({
   durationBadgeText: {
     color: "#1D4ED8",
     fontWeight: "600",
-  },
-  cardActionsRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  cardShareButton: {
-    width: 36,
-    height: 36,
-    borderRadius: RADIUS.full,
-    backgroundColor: Colors.neutralAction.surface,
-    alignItems: "center",
-    justifyContent: "center",
   },
   cardPlayButton: {
     width: 36,

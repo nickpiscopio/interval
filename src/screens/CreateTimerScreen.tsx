@@ -314,7 +314,6 @@ export default function CreateTimerScreen({
           style={[
             styles.intervalItem,
             isActive && styles.intervalItemDragging,
-            { borderLeftColor: item.color },
           ]}
         >
           {/* 6-Dot Drag Handle on the Far Left */}
@@ -332,6 +331,8 @@ export default function CreateTimerScreen({
               color={isActive ? Colors.primary : Colors.textScale.muted}
             />
           </TouchableOpacity>
+
+          <View style={[styles.intervalColorDot, { backgroundColor: item.color || "#1ACC6C" }]} />
 
           <View style={styles.intervalInfo}>
             <Text style={styles.intervalName}>{item.name}</Text>
@@ -610,11 +611,11 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface.screen,
     ...SHADOWS.floating,
   },
-  intervalColorStripe: {
-    width: 6,
-    height: "100%",
-    borderRadius: RADIUS.xs,
-    marginRight: Spacing.sm,
+  intervalColorDot: {
+    width: 10,
+    height: 10,
+    borderRadius: RADIUS.full,
+    marginRight: Spacing.xs,
   },
   intervalDragHandle: {
     paddingRight: Spacing.xs,

@@ -3,7 +3,12 @@ import { render, fireEvent, waitFor } from "@testing-library/react-native";
 import { Share } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import SelectTimerScreen from "../SelectTimerScreen";
+import { AlertProvider } from "../../context/AlertContext";
 import { DEFAULT_AI_TIMERS } from "../../constants/defaultTimers";
+
+function renderWithAlert(ui: React.ReactElement) {
+  return render(<AlertProvider>{ui}</AlertProvider>);
+}
 
 describe("SelectTimerScreen", () => {
   beforeEach(async () => {
@@ -17,7 +22,7 @@ describe("SelectTimerScreen", () => {
       navigate: jest.fn(),
     };
 
-    const { getByText } = render(
+    const { getByText } = renderWithAlert(
       <SelectTimerScreen navigation={mockNavigation} route={{} as any} />
     );
 
@@ -32,7 +37,7 @@ describe("SelectTimerScreen", () => {
       navigate: jest.fn(),
     };
 
-    const { getByTestId } = render(
+    const { getByTestId } = renderWithAlert(
       <SelectTimerScreen navigation={mockNavigation} route={{} as any} />
     );
 
@@ -51,7 +56,7 @@ describe("SelectTimerScreen", () => {
       navigate: jest.fn(),
     };
 
-    const { getByTestId } = render(
+    const { getByTestId } = renderWithAlert(
       <SelectTimerScreen navigation={mockNavigation} route={{} as any} />
     );
 
@@ -70,7 +75,7 @@ describe("SelectTimerScreen", () => {
       navigate: jest.fn(),
     };
 
-    const { getAllByText } = render(
+    const { getAllByText } = renderWithAlert(
       <SelectTimerScreen navigation={mockNavigation} route={{} as any} />
     );
 
@@ -89,34 +94,12 @@ describe("SelectTimerScreen", () => {
     );
   });
 
-  it("shares timer via deep link share button", async () => {
-    jest.spyOn(Share, "share").mockResolvedValueOnce({
-      action: Share.sharedAction,
-      activityType: "com.apple.UIKit.activity.PostToTwitter",
-    });
-
-    const { getAllByTestId } = render(
-      <SelectTimerScreen navigation={{} as any} route={{} as any} />
-    );
-
-    await waitFor(() => {
-      expect(getAllByTestId("btn-share-timer").length).toBeGreaterThan(0);
-    }, { timeout: 4000 });
-
-    const shareButtons = getAllByTestId("btn-share-timer");
-    fireEvent.press(shareButtons[0]);
-
-    await waitFor(() => {
-      expect(Share.share).toHaveBeenCalled();
-    }, { timeout: 4000 });
-  }, 10000);
-
   it("navigates to Awards screen when trophy icon is pressed", async () => {
     const mockNavigation: any = {
       navigate: jest.fn(),
     };
 
-    const { getByText } = render(
+    const { getByText } = renderWithAlert(
       <SelectTimerScreen navigation={mockNavigation} route={{} as any} />
     );
 
@@ -135,7 +118,7 @@ describe("SelectTimerScreen", () => {
       navigate: jest.fn(),
     };
 
-    const { getByText } = render(
+    const { getByText } = renderWithAlert(
       <SelectTimerScreen navigation={mockNavigation} route={{} as any} />
     );
 
@@ -171,7 +154,7 @@ describe("SelectTimerScreen", () => {
     await AsyncStorage.setItem("@hiit_initialized", "true");
     await AsyncStorage.setItem("@hiit_timers", JSON.stringify(existingTimers));
 
-    const { getByText, getAllByTestId } = render(
+    const { getByText, getByTestId, getAllByTestId } = renderWithAlert(
       <SelectTimerScreen navigation={{} as any} route={{} as any} />
     );
 
@@ -180,8 +163,18 @@ describe("SelectTimerScreen", () => {
       expect(getByText("20s")).toBeTruthy();
     }, { timeout: 3500 });
 
+    // Long press to enter selection and enter reorder mode
+    const card = getByTestId("timer-card-timer-custom-1");
+    fireEvent(card, "longPress");
+
+    const reorderBtn = getByTestId("btn-header-reorder");
+    fireEvent.press(reorderBtn);
+
     const dragHandles = getAllByTestId("icon-drag-indicator");
     fireEvent(dragHandles[0], "pressIn");
+
+    // Exit reorder mode and auto-clear selection mode
+    fireEvent.press(getByTestId("btn-header-done-reorder"));
 
     // Test list scroll event
     const list = getByText("Quick Tabata");
@@ -192,10 +185,6 @@ describe("SelectTimerScreen", () => {
         layoutMeasurement: { height: 600, width: 375 },
       },
     });
-
-    // Test card share button
-    const shareIcons = getAllByTestId("icon-share-outline");
-    fireEvent.press(shareIcons[0]);
   });
 
   it("switches to Exercise Library tab and starts quick routine or custom timer", async () => {
@@ -203,7 +192,7 @@ describe("SelectTimerScreen", () => {
       navigate: jest.fn(),
     };
 
-    const { getByTestId, getByText, getAllByText } = render(
+    const { getByTestId, getByText, getAllByText } = renderWithAlert(
       <SelectTimerScreen navigation={mockNavigation} route={{} as any} />
     );
 
@@ -264,7 +253,7 @@ describe("SelectTimerScreen", () => {
     await AsyncStorage.removeItem("@legal_disclaimer_accepted");
     await AsyncStorage.removeItem("@legal_disclaimer_accepted_date");
 
-    const { getByTestId, getByText, queryByTestId } = render(
+    const { getByTestId, getByText, queryByTestId } = renderWithAlert(
       <SelectTimerScreen navigation={{} as any} route={{} as any} />
     );
 
@@ -288,7 +277,7 @@ describe("SelectTimerScreen", () => {
     await AsyncStorage.setItem("@legal_disclaimer_accepted", "true");
     await AsyncStorage.setItem("@legal_disclaimer_accepted_date", "Aug 27, 2026");
 
-    const { getByTestId, getByText } = render(
+    const { getByTestId, getByText } = renderWithAlert(
       <SelectTimerScreen navigation={{} as any} route={{} as any} />
     );
 
@@ -306,5 +295,104 @@ describe("SelectTimerScreen", () => {
     const closeBtn = getByTestId("legal-modal-close-btn");
     fireEvent.press(closeBtn);
   });
+
+  it("enters selection mode on card long press and reveals contextual header actions", async () => {
+    const { getByTestId, getByText, queryByTestId } = renderWithAlert(
+      <SelectTimerScreen navigation={{} as any} route={{} as any} />
+    );
+
+    await waitFor(() => {
+      expect(getByText(DEFAULT_AI_TIMERS[0].name)).toBeTruthy();
+    }, { timeout: 3500 });
+
+    const firstCard = getByTestId(`timer-card-${DEFAULT_AI_TIMERS[0].id}`);
+    fireEvent(firstCard, "longPress");
+
+    expect(getByText("1 Selected")).toBeTruthy();
+    expect(getByTestId("btn-close-selection")).toBeTruthy();
+    expect(getByTestId("btn-header-share")).toBeTruthy();
+    expect(getByTestId("btn-header-reorder")).toBeTruthy();
+    expect(getByTestId("btn-header-delete")).toBeTruthy();
+
+    // Dismiss selection mode
+    fireEvent.press(getByTestId("btn-close-selection"));
+    expect(queryByTestId("btn-close-selection")).toBeNull();
+    expect(getByText("Let's Workout! ⚡️")).toBeTruthy();
+  });
+
+  it("toggles reorder mode and exits via Done button", async () => {
+    const { getByTestId, getByText, queryByTestId } = renderWithAlert(
+      <SelectTimerScreen navigation={{} as any} route={{} as any} />
+    );
+
+    await waitFor(() => {
+      expect(getByText(DEFAULT_AI_TIMERS[0].name)).toBeTruthy();
+    }, { timeout: 3500 });
+
+    const firstCard = getByTestId(`timer-card-${DEFAULT_AI_TIMERS[0].id}`);
+    fireEvent(firstCard, "longPress");
+
+    const reorderBtn = getByTestId("btn-header-reorder");
+    fireEvent.press(reorderBtn);
+
+    expect(getByText("Rearrange Timers")).toBeTruthy();
+    expect(getByTestId("btn-header-done-reorder")).toBeTruthy();
+
+    fireEvent.press(getByTestId("btn-header-done-reorder"));
+    expect(queryByTestId("btn-header-done-reorder")).toBeNull();
+  });
+
+  it("shares selected timer from contextual header", async () => {
+    const shareSpy = jest.spyOn(Share, "share").mockResolvedValueOnce({
+      action: Share.sharedAction,
+      activityType: "com.apple.UIKit.activity.PostToTwitter",
+    });
+
+    const { getByTestId, getByText } = renderWithAlert(
+      <SelectTimerScreen navigation={{} as any} route={{} as any} />
+    );
+
+    await waitFor(() => {
+      expect(getByText(DEFAULT_AI_TIMERS[0].name)).toBeTruthy();
+    }, { timeout: 3500 });
+
+    const firstCard = getByTestId(`timer-card-${DEFAULT_AI_TIMERS[0].id}`);
+    fireEvent(firstCard, "longPress");
+
+    const headerShareBtn = getByTestId("btn-header-share");
+    fireEvent.press(headerShareBtn);
+
+    expect(shareSpy).toHaveBeenCalled();
+  });
+
+  it("deletes selected timer via header delete action", async () => {
+    const { getByTestId, getByText, queryByText } = renderWithAlert(
+      <SelectTimerScreen navigation={{} as any} route={{} as any} />
+    );
+
+    await waitFor(() => {
+      expect(getByText(DEFAULT_AI_TIMERS[0].name)).toBeTruthy();
+    }, { timeout: 3500 });
+
+    const firstTimerName = DEFAULT_AI_TIMERS[0].name;
+    const firstCard = getByTestId(`timer-card-${DEFAULT_AI_TIMERS[0].id}`);
+    fireEvent(firstCard, "longPress");
+
+    const headerDeleteBtn = getByTestId("btn-header-delete");
+    fireEvent.press(headerDeleteBtn);
+
+    // CustomAlertModal confirm delete button
+    await waitFor(() => {
+      expect(getByText("Delete Timers")).toBeTruthy();
+      expect(getByText("Delete")).toBeTruthy();
+    });
+
+    fireEvent.press(getByText("Delete"));
+
+    await waitFor(() => {
+      expect(queryByText(firstTimerName)).toBeNull();
+    });
+  });
 });
+
 

@@ -35,7 +35,12 @@
     "workoutsTab": "Workouts",
     "libraryTab": "Exercise Library",
     "emptyTitle": "No Timers Yet",
-    "emptySubtitle": "Create your first timer or browse the exercise library to start."
+    "emptySubtitle": "Create your first timer or browse the exercise library to start.",
+    "selectedCount": "%{count} Selected",
+    "reorderTitle": "Rearrange Timers",
+    "doneReorder": "Done",
+    "deleteConfirmTitle": "Delete Timers",
+    "deleteConfirmMessage": "Are you sure you want to delete the selected timer(s)?"
   },
   "createTimer": {
     "titleCreate": "Create Timer",

@@ -35,7 +35,12 @@
     "workoutsTab": "Entrenamientos",
     "libraryTab": "Biblioteca",
     "emptyTitle": "Aún no hay temporizadores",
-    "emptySubtitle": "Crea tu primer temporizador o explora la biblioteca de ejercicios."
+    "emptySubtitle": "Crea tu primer temporizador o explora la biblioteca de ejercicios.",
+    "selectedCount": "%{count} Seleccionado(s)",
+    "reorderTitle": "Reordenar Temporizadores",
+    "doneReorder": "Listo",
+    "deleteConfirmTitle": "Eliminar Temporizadores",
+    "deleteConfirmMessage": "¿Estás seguro de que deseas eliminar el o los temporizadores seleccionados?"
   },
   "createTimer": {
     "titleCreate": "Crear Temporizador",
