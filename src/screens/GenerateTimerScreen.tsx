@@ -60,14 +60,12 @@ export default function GenerateTimerScreen({
         <TouchableOpacity
           testID="header-back-button"
           accessibilityLabel={t("common.back", { defaultValue: "Back" })}
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            navigation.goBack();
-          }}
+          activeOpacity={0.6}
+          onPress={() => navigation.goBack()}
           style={styles.backButton}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-          <Ionicons name="arrow-back" size={24} color="#1F2937" />
+          <Ionicons name="arrow-back" size={24} color={Colors.textScale.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle} numberOfLines={1} ellipsizeMode="tail">
           {t("generateTimer.title")}
@@ -232,15 +230,11 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: Spacing.screen,
     paddingVertical: Spacing.sm,
-    backgroundColor: Colors.surface.card,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.borderDefault,
+    backgroundColor: Colors.surface.screen,
   },
   backButton: {
     width: TOUCH_TARGET.icon,
     height: TOUCH_TARGET.icon,
-    borderRadius: RADIUS.full,
-    backgroundColor: Colors.neutralAction.surface,
     alignItems: "center",
     justifyContent: "center",
   },

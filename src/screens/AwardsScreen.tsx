@@ -132,6 +132,7 @@ export default function AwardsScreen({ navigation }: RootStackScreenProps<"Award
       >
         <TouchableOpacity
           onPress={() => navigation.goBack()}
+          activeOpacity={0.6}
           style={styles.backButton}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
@@ -351,8 +352,6 @@ const styles = StyleSheet.create({
   backButton: {
     width: TOUCH_TARGET.icon,
     height: TOUCH_TARGET.icon,
-    borderRadius: RADIUS.full,
-    backgroundColor: Colors.neutralAction.surface,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -360,10 +359,10 @@ const styles = StyleSheet.create({
     fontSize: FontSize.lg,
     lineHeight: FontSize.lineHeight.lg,
     fontFamily: "Poppins-Bold",
-    color: "#1F2937",
+    color: Colors.textScale.primary,
   },
   headerRightPlaceholder: {
-    width: 40,
+    width: TOUCH_TARGET.icon,
   },
   scrollContent: {
     padding: Spacing.md,

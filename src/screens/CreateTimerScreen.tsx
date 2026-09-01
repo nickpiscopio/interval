@@ -355,10 +355,8 @@ export default function CreateTimerScreen({
           <TouchableOpacity
             testID="header-back-button"
             accessibilityLabel={t("common.back", { defaultValue: "Back" })}
-            onPress={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              navigation.goBack();
-            }}
+            activeOpacity={0.6}
+            onPress={() => navigation.goBack()}
             style={styles.backButton}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
@@ -540,8 +538,6 @@ const styles = StyleSheet.create({
   backButton: {
     width: TOUCH_TARGET.icon,
     height: TOUCH_TARGET.icon,
-    borderRadius: RADIUS.full,
-    backgroundColor: Colors.neutralAction.surface,
     alignItems: "center",
     justifyContent: "center",
   },

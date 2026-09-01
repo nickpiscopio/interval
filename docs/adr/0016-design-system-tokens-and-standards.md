@@ -29,6 +29,7 @@ We decided to establish a comprehensive, single-source-of-truth design system co
 
 4. **Component Primitives Standards**:
    - **Primary CTA Buttons**: `minHeight: TOUCH_TARGET.cta` (56px) or `TOUCH_TARGET.min` (48px), `borderRadius: RADIUS.md` (16px), `fontFamily: "Poppins-Bold"`, white text.
+   - **Header Back Buttons**: Left-aligned, transparent background (`backgroundColor: "transparent"`), 44x44 touch target (`TOUCH_TARGET.icon`), `activeOpacity: 0.6` press feedback (no haptic trigger), with standard arrow icon (`name="arrow-back"`, 24px, `Colors.textScale.primary`).
    - **Icon Buttons**: Fixed `TOUCH_TARGET.icon` (44px) or `TOUCH_TARGET.min` (48px) with `borderRadius: RADIUS.sm` (8px) for control panels (or `RADIUS.full` for circular navigation/floating buttons). 4 standard variants: `primary`, `neutral`, `destructive`, `ghost`.
    - **Cards & Containers**: Clean borderless surface cards with `backgroundColor: Colors.surface.card`, `borderRadius: RADIUS.md`, `padding: Spacing.md`, `...SHADOWS.card` (no outer border).
    - **Text Fields / Inputs**: `minHeight: TOUCH_TARGET.min` (48px), `backgroundColor: Colors.surface.screen`, `borderWidth: 1`, `borderColor: Colors.borderInput`, `borderRadius: RADIUS.sm`, `color: Colors.textScale.primary`.
