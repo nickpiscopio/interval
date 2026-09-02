@@ -314,7 +314,6 @@ export default function SelectTimerScreen({
           style={[
             styles.card,
             isActive && styles.cardDragging,
-            isSelected && styles.cardSelected,
             { marginBottom: Spacing.cardGap },
           ]}
           activeOpacity={0.8}
@@ -335,6 +334,14 @@ export default function SelectTimerScreen({
           }}
           delayLongPress={250}
         >
+          {isSelected && (
+            <View
+              testID="card-selected-border"
+              style={styles.cardSelectedBorder}
+              pointerEvents="none"
+            />
+          )}
+
           <View style={styles.cardHeader}>
             {isSelectionActive && (
               <View style={styles.selectIndicator}>
@@ -875,9 +882,12 @@ const styles = StyleSheet.create({
     padding: Spacing.md,
     ...SHADOWS.card,
   },
-  cardSelected: {
+  cardSelectedBorder: {
+    ...StyleSheet.absoluteFillObject,
+    borderRadius: RADIUS.md,
     borderWidth: 2,
     borderColor: Colors.primary,
+    zIndex: 1,
   },
   selectIndicator: {
     marginRight: Spacing.sm,
@@ -887,7 +897,6 @@ const styles = StyleSheet.create({
   cardDragging: {
     backgroundColor: Colors.surface.screen,
     ...SHADOWS.floating,
-    transform: [{ scale: 1 }],
   },
   cardHeader: {
     flexDirection: "row",

@@ -26,8 +26,9 @@ Users need an uncluttered card layout that supports reordering, single/batch del
      - **Rearrange Icon Button (Right)**: Enters dedicated drag-and-drop reorder mode, automatically clearing active selection borders, revealing drag handles, and providing a "Done" button to complete list reorganization.
      - **Delete Icon Button (Right)**: Triggers confirmation alert to batch-delete selected timers.
 
-4. **Border Artifact Prevention**:
+4. **Border Artifact Prevention & Decoupled Selection Overlay**:
    - Clears selection states (`selectedTimerIds`) immediately upon entering or exiting reorder mode so rearranged cards return cleanly to borderless card surfaces without persistent borders.
+   - Decoupled selection borders from the outer card container: `styles.card` remains 100% borderless (`borderWidth: 0`), while selection highlighting is rendered via an internal absolute overlay (`cardSelectedBorder`, `...StyleSheet.absoluteFillObject`, `borderRadius: RADIUS.md`, `borderWidth: 2`, `borderColor: Colors.primary`, `pointerEvents: "none"`). This prevents React Native CoreAnimation/Elevation from resetting the outer shadow path to a sharp 0px rectangle upon deselection.
    - Removed single-sided border color properties (`borderLeftColor`) on draggable items in `CreateTimerScreen.tsx` in favor of dedicated color indicator dots (`intervalColorDot`).
 
 ## Consequences
