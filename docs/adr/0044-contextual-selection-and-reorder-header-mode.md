@@ -24,7 +24,7 @@ Users need an uncluttered card layout that supports reordering, single/batch del
      - **Selection Counter (Center)**: Displays selected count (`%{count} Selected`).
      - **Share Icon Button (Right)**: Directly shares the selected timer when 1 timer is selected.
      - **Rearrange Icon Button (Right)**: Enters dedicated drag-and-drop reorder mode, automatically clearing active selection borders, revealing drag handles, and providing a "Done" button to complete list reorganization.
-     - **Delete Icon Button (Right)**: Triggers confirmation alert to batch-delete selected timers.
+     - **Delete Icon Button (Right)**: Rendered in standard header icon styling (`Colors.textScale.primary`) alongside share and rearrange; triggers confirmation alert to batch-delete selected timers.
 
 4. **Border Artifact Prevention & Decoupled Selection Overlay**:
    - Clears selection states (`selectedTimerIds`) immediately upon entering or exiting reorder mode so rearranged cards return cleanly to borderless card surfaces without persistent borders.

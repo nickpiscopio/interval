@@ -55,11 +55,21 @@ export const SHADOWS = {
   },
 } as const;
 
+export const REORDER_SPRING_CONFIG = {
+  damping: 24,
+  mass: 0.15,
+  stiffness: 180,
+  overshootClamping: true,
+  restSpeedThreshold: 0.5,
+  restDisplacementThreshold: 0.5,
+} as const;
+
 export default {
   ...SPACING,
   radius: RADIUS,
   touchTarget: TOUCH_TARGET,
   shadows: SHADOWS,
+  reorderSpring: REORDER_SPRING_CONFIG,
 
   // Layout Semantic Aliases
   screen: SPACING.md, // 16px screen padding / margins

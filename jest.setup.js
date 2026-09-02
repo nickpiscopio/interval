@@ -190,6 +190,12 @@ jest.mock("react-native-draggable-flatlist", () => {
     __esModule: true,
     default: MockDraggableFlatList,
     ScaleDecorator: ({ children }) => children,
+    ShadowDecorator: ({ children }) => children,
+    OpacityDecorator: ({ children }) => children,
+    useOnCellActiveAnimation: () => ({
+      isActive: false,
+      onActiveAnim: { value: 0 },
+    }),
   };
 });
 

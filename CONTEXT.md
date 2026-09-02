@@ -60,5 +60,10 @@ _Avoid_: Static Victory Message, Generic Congratulations
 A clean timer card list interaction where cards have no permanent drag handles. Long-pressing (holding) any card activates a contextual header bar allowing sharing, dedicated list drag-and-drop reordering, and batch deletion.
 _Avoid_: Permanent Drag Handles, Inline Delete Swipe Clutter
 
+**Snappy Reorder Physics & Continuous Shadow Interpolation**:
+High-stiffness, overshoot-clamped spring physics (`REORDER_SPRING_CONFIG`) and real-time Reanimated shadow interpolation (`useOnCellActiveAnimation`), ensuring dragged items settle crisply in ~120ms to persist immediately while shadows smoothly glide between resting (`SHADOWS.card`) and floating states without sudden snapping or delay.
+_Avoid_: Sluggish Release Springs, Abrupt Shadow Popping
+
+
 
 

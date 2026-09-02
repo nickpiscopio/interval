@@ -24,7 +24,7 @@ import { normalizeInterval } from "../model/Interval";
 import { Exercise } from "../model/Exercise";
 import { DEFAULT_AI_TIMERS } from "../constants/defaultTimers";
 import { encodeBase64 } from "../utils/base64";
-import Spacing, { RADIUS, TOUCH_TARGET, SHADOWS } from "../constants/Spacing";
+import Spacing, { RADIUS, TOUCH_TARGET, SHADOWS, REORDER_SPRING_CONFIG } from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
 import Colors from "../constants/Colors";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -304,111 +304,113 @@ export default function SelectTimerScreen({
     });
   }
 
-  const renderTimerCard = ({ item, drag, isActive }: RenderItemParams<Timer>) => {
-    const isSelected = isSelectionActive && selectedTimerIds.includes(item.id);
+  const renderTimerCard = React.useCallback(
+    ({ item, drag, isActive }: RenderItemParams<Timer>) => {
+      const isSelected = isSelectionActive && selectedTimerIds.includes(item.id);
 
-    return (
-      <ScaleDecorator>
-        <TouchableOpacity
-          testID={`timer-card-${item.id}`}
-          style={[
-            styles.card,
-            isActive && styles.cardDragging,
-            { marginBottom: Spacing.cardGap },
-          ]}
-          activeOpacity={0.8}
-          onPress={() => {
-            if (isSelectionActive) {
-              toggleSelectTimer(item.id);
-            } else if (!isReorderMode) {
-              navigation.navigate("CreateTimer", { timer: item });
-            }
-          }}
-          onLongPress={() => {
-            if (isReorderMode) {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              drag();
-            } else if (!isSelectionActive) {
-              handleLongPressTimer(item);
-            }
-          }}
-          delayLongPress={250}
-        >
-          {isSelected && (
-            <View
-              testID="card-selected-border"
-              style={styles.cardSelectedBorder}
-              pointerEvents="none"
-            />
-          )}
-
-          <View style={styles.cardHeader}>
-            {isSelectionActive && (
-              <View style={styles.selectIndicator}>
-                <Ionicons
-                  name={isSelected ? "checkmark-circle" : "ellipse-outline"}
-                  size={24}
-                  color={isSelected ? Colors.primary : Colors.textScale.muted}
-                />
-              </View>
+      return (
+        <ScaleDecorator activeScale={1.03}>
+          <TouchableOpacity
+            testID={`timer-card-${item.id}`}
+            style={[
+              styles.card,
+              { marginBottom: Spacing.cardGap },
+            ]}
+            activeOpacity={0.8}
+            onPress={() => {
+              if (isSelectionActive) {
+                toggleSelectTimer(item.id);
+              } else if (!isReorderMode) {
+                navigation.navigate("CreateTimer", { timer: item });
+              }
+            }}
+            onLongPress={() => {
+              if (isReorderMode) {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                drag();
+              } else if (!isSelectionActive) {
+                handleLongPressTimer(item);
+              }
+            }}
+            delayLongPress={250}
+          >
+            {isSelected && (
+              <View
+                testID="card-selected-border"
+                style={styles.cardSelectedBorder}
+                pointerEvents="none"
+              />
             )}
 
-            {isReorderMode && (
-              <TouchableOpacity
-                onPressIn={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  drag();
-                }}
-                style={styles.dragHandle}
-                hitSlop={{ top: 14, bottom: 14, left: 14, right: 14 }}
-              >
-                <MaterialIcons
-                  name="drag-indicator"
-                  size={24}
-                  color={isActive ? Colors.primary : Colors.textScale.muted}
-                />
-              </TouchableOpacity>
-            )}
+            <View style={styles.cardHeader}>
+              {isSelectionActive && (
+                <View style={styles.selectIndicator}>
+                  <Ionicons
+                    name={isSelected ? "checkmark-circle" : "ellipse-outline"}
+                    size={24}
+                    color={isSelected ? Colors.primary : Colors.textScale.muted}
+                  />
+                </View>
+              )}
 
-            <View style={styles.cardMetaContainer}>
-              <Text style={styles.cardTitle}>{item.name}</Text>
-              <View style={styles.badgeRow}>
-                {item.isAiGenerated && (
-                  <View style={[styles.badge, styles.aiBadge]}>
-                    <Ionicons name="sparkles" size={12} color="#059669" />
-                    <Text style={[styles.badgeText, styles.aiBadgeText]}>AI</Text>
+              {isReorderMode && (
+                <TouchableOpacity
+                  onPressIn={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    drag();
+                  }}
+                  style={styles.dragHandle}
+                  hitSlop={{ top: 14, bottom: 14, left: 14, right: 14 }}
+                >
+                  <MaterialIcons
+                    name="drag-indicator"
+                    size={24}
+                    color={isActive ? Colors.primary : Colors.textScale.muted}
+                  />
+                </TouchableOpacity>
+              )}
+
+              <View style={styles.cardMetaContainer}>
+                <Text style={styles.cardTitle}>{item.name}</Text>
+                <View style={styles.badgeRow}>
+                  {item.isAiGenerated && (
+                    <View style={[styles.badge, styles.aiBadge]}>
+                      <Ionicons name="sparkles" size={12} color="#059669" />
+                      <Text style={[styles.badgeText, styles.aiBadgeText]}>AI</Text>
+                    </View>
+                  )}
+                  <View style={styles.badge}>
+                    <Ionicons name="repeat" size={12} color="#4B5563" />
+                    <Text style={styles.badgeText}>{item.rounds} {t("common.rounds")}</Text>
                   </View>
-                )}
-                <View style={styles.badge}>
-                  <Ionicons name="repeat" size={12} color="#4B5563" />
-                  <Text style={styles.badgeText}>{item.rounds} {t("common.rounds")}</Text>
-                </View>
-                <View style={[styles.badge, styles.durationBadge]}>
-                  <Ionicons name="time-outline" size={12} color="#1D4ED8" />
-                  <Text style={[styles.badgeText, styles.durationBadgeText]}>
-                    {formatTime(calculateTotalDuration(item))}
-                  </Text>
+                  <View style={[styles.badge, styles.durationBadge]}>
+                    <Ionicons name="time-outline" size={12} color="#1D4ED8" />
+                    <Text style={[styles.badgeText, styles.durationBadgeText]}>
+                      {formatTime(calculateTotalDuration(item))}
+                    </Text>
+                  </View>
                 </View>
               </View>
-            </View>
 
-            {!isSelectionActive && !isReorderMode && (
-              <TouchableOpacity
-                testID={`btn-play-timer-${item.id}`}
-                accessibilityLabel={t("common.play")}
-                style={styles.cardPlayButton}
-                activeOpacity={0.7}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                onPress={() => navigation.navigate("Timer", { timer: item })}
-              >
-                <Ionicons name="play" size={18} color="#FFFFFF" />
-              </TouchableOpacity>
-            )}
-          </View>
-        </TouchableOpacity>
-      </ScaleDecorator>
-    );
-  };
+              {!isSelectionActive && !isReorderMode && (
+                <TouchableOpacity
+                  testID={`btn-play-timer-${item.id}`}
+                  accessibilityLabel={t("common.play")}
+                  style={styles.cardPlayButton}
+                  activeOpacity={0.7}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  onPress={() => navigation.navigate("Timer", { timer: item })}
+                >
+                  <Ionicons name="play" size={18} color="#FFFFFF" />
+                </TouchableOpacity>
+              )}
+            </View>
+          </TouchableOpacity>
+        </ScaleDecorator>
+      );
+    },
+    [isSelectionActive, selectedTimerIds, isReorderMode, navigation]
+  );
 
   const bottomDockOffset = Math.max(insets.bottom, 12) + 64;
 
@@ -431,6 +433,8 @@ export default function SelectTimerScreen({
           <DraggableFlatList
             data={timers}
             keyExtractor={(item) => item.id}
+            animationConfig={REORDER_SPRING_CONFIG}
+            extraData={{ selectedTimerIds, isReorderMode, isSelectionActive }}
             onDragBegin={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
             }}
@@ -447,17 +451,21 @@ export default function SelectTimerScreen({
               },
             ]}
             onScrollOffsetChange={(offsetY) => {
-              setIsScrolled(offsetY > 1);
+              const nextScrolled = offsetY > 1;
+              setIsScrolled((prev) => (prev !== nextScrolled ? nextScrolled : prev));
             }}
             onScroll={(e) => {
               const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
               const offsetY = contentOffset.y;
-              setIsScrolled(offsetY > 0);
+              const nextScrolled = offsetY > 0;
+              setIsScrolled((prev) => (prev !== nextScrolled ? nextScrolled : prev));
               const remaining = contentSize.height - (offsetY + layoutMeasurement.height);
-              setHasMoreBelow(remaining > 10);
+              const nextHasMore = remaining > 10;
+              setHasMoreBelow((prev) => (prev !== nextHasMore ? nextHasMore : prev));
             }}
             onContentSizeChange={(_, contentHeight) => {
-              setHasMoreBelow(contentHeight > 550);
+              const nextHasMore = contentHeight > 550;
+              setHasMoreBelow((prev) => (prev !== nextHasMore ? nextHasMore : prev));
             }}
             scrollEventThrottle={16}
           />
@@ -540,7 +548,7 @@ export default function SelectTimerScreen({
                   onPress={handleDeleteSelected}
                   hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 >
-                  <Ionicons name="trash" size={22} color={Colors.destructive} />
+                  <Ionicons name="trash" size={22} color={Colors.textScale.primary} />
                 </TouchableOpacity>
               )}
 
@@ -893,10 +901,6 @@ const styles = StyleSheet.create({
     marginRight: Spacing.sm,
     justifyContent: "center",
     alignItems: "center",
-  },
-  cardDragging: {
-    backgroundColor: Colors.surface.screen,
-    ...SHADOWS.floating,
   },
   cardHeader: {
     flexDirection: "row",

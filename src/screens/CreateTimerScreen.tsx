@@ -26,7 +26,7 @@ import { ExercisePickerModal } from "../components/ExercisePickerModal";
 import { EditIntervalModal } from "../components/EditIntervalModal";
 import { t } from "../i18n";
 import { useAlert } from "../context/AlertContext";
-import Spacing, { RADIUS, TOUCH_TARGET, SHADOWS } from "../constants/Spacing";
+import Spacing, { RADIUS, TOUCH_TARGET, SHADOWS, REORDER_SPRING_CONFIG } from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
 import Colors from "../constants/Colors";
 
@@ -301,47 +301,43 @@ export default function CreateTimerScreen({
     });
   }
 
-  const renderIntervalItem = ({
-    item,
-    drag,
-    isActive,
-  }: RenderItemParams<Interval>) => {
-    return (
-      <ScaleDecorator>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          onPress={() => handleSelectInterval(item)}
-          style={[
-            styles.intervalItem,
-            isActive && styles.intervalItemDragging,
-          ]}
-        >
-          {/* 6-Dot Drag Handle on the Far Left */}
+  const renderIntervalItem = React.useCallback(
+    ({ item, drag, isActive }: RenderItemParams<Interval>) => {
+      return (
+        <ScaleDecorator activeScale={1.03}>
           <TouchableOpacity
-            onPressIn={() => {
-              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              drag();
-            }}
-            style={styles.intervalDragHandle}
-            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+            activeOpacity={0.8}
+            onPress={() => handleSelectInterval(item)}
+            style={styles.intervalItem}
           >
-            <MaterialIcons
-              name="drag-indicator"
-              size={20}
-              color={isActive ? Colors.primary : Colors.textScale.muted}
-            />
+            {/* 6-Dot Drag Handle on the Far Left */}
+            <TouchableOpacity
+              onPressIn={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                drag();
+              }}
+              style={styles.intervalDragHandle}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+            >
+              <MaterialIcons
+                name="drag-indicator"
+                size={20}
+                color={isActive ? Colors.primary : Colors.textScale.muted}
+              />
+            </TouchableOpacity>
+
+            <View style={[styles.intervalColorDot, { backgroundColor: item.color || "#1ACC6C" }]} />
+
+            <View style={styles.intervalInfo}>
+              <Text style={styles.intervalName}>{item.name}</Text>
+            </View>
+            <Text style={styles.intervalDuration}>{formatSeconds(item.duration)}</Text>
           </TouchableOpacity>
-
-          <View style={[styles.intervalColorDot, { backgroundColor: item.color || "#1ACC6C" }]} />
-
-          <View style={styles.intervalInfo}>
-            <Text style={styles.intervalName}>{item.name}</Text>
-          </View>
-          <Text style={styles.intervalDuration}>{formatSeconds(item.duration)}</Text>
-        </TouchableOpacity>
-      </ScaleDecorator>
-    );
-  };
+        </ScaleDecorator>
+      );
+    },
+    []
+  );
 
   return (
     <KeyboardAvoidingView
@@ -392,6 +388,8 @@ export default function CreateTimerScreen({
           ref={listRef}
           data={intervals}
           keyExtractor={(item) => item.id}
+          animationConfig={REORDER_SPRING_CONFIG}
+          extraData={intervals}
           keyboardShouldPersistTaps="handled"
           onDragBegin={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -400,10 +398,12 @@ export default function CreateTimerScreen({
             setIntervals(data);
           }}
           onScrollOffsetChange={(offsetY) => {
-            setIsScrolled(offsetY > 0);
+            const nextScrolled = offsetY > 0;
+            setIsScrolled((prev) => (prev !== nextScrolled ? nextScrolled : prev));
           }}
           onScroll={(e) => {
-            setIsScrolled(e.nativeEvent.contentOffset.y > 0);
+            const nextScrolled = e.nativeEvent.contentOffset.y > 0;
+            setIsScrolled((prev) => (prev !== nextScrolled ? nextScrolled : prev));
           }}
           scrollEventThrottle={16}
           renderItem={renderIntervalItem}
@@ -606,10 +606,6 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.md,
     minHeight: TOUCH_TARGET.min,
     ...SHADOWS.card,
-  },
-  intervalItemDragging: {
-    backgroundColor: Colors.surface.screen,
-    ...SHADOWS.floating,
   },
   intervalColorDot: {
     width: 10,
