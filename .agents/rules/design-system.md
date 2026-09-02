@@ -49,6 +49,7 @@ There should **NEVER** be an instance where colors, sizes, or spacing are hardco
 ### E. Surface Cards & Containers
 - Clean borderless surface cards: `backgroundColor: Colors.surface.card`, `borderRadius: RADIUS.md`, `padding: Spacing.md`, `...SHADOWS.card`.
 - **Zero borders**: Never add outer card borders (`borderWidth: 0`).
+- **Interval Card Color Accent Exception**: Interval list items in `CreateTimerScreen` use `borderLeftWidth: 6` with `borderLeftColor: item.color` for high-contrast interval identity, keeping top, bottom, and right borders at 0.
 
 ### F. Text Inputs / Fields
 - Minimum height: `minHeight: TOUCH_TARGET.min` (48px).

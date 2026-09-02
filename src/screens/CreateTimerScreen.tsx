@@ -308,7 +308,10 @@ export default function CreateTimerScreen({
           <TouchableOpacity
             activeOpacity={0.8}
             onPress={() => handleSelectInterval(item)}
-            style={styles.intervalItem}
+            style={[
+              styles.intervalItem,
+              { borderLeftColor: item.color || Colors.primary },
+            ]}
           >
             {/* 6-Dot Drag Handle on the Far Left */}
             <TouchableOpacity
@@ -325,8 +328,6 @@ export default function CreateTimerScreen({
                 color={isActive ? Colors.primary : Colors.textScale.muted}
               />
             </TouchableOpacity>
-
-            <View style={[styles.intervalColorDot, { backgroundColor: item.color || "#1ACC6C" }]} />
 
             <View style={styles.intervalInfo}>
               <Text style={styles.intervalName}>{item.name}</Text>
@@ -604,14 +605,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.md,
     marginBottom: Spacing.cardGap,
     borderRadius: RADIUS.md,
+    borderLeftWidth: 6,
+    borderLeftColor: Colors.primary,
     minHeight: TOUCH_TARGET.min,
     ...SHADOWS.card,
-  },
-  intervalColorDot: {
-    width: 10,
-    height: 10,
-    borderRadius: RADIUS.full,
-    marginRight: Spacing.xs,
   },
   intervalDragHandle: {
     paddingRight: Spacing.xs,
