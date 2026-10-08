@@ -1,17 +1,18 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
-  Modal,
+  StyleSheet,
   View,
   Text,
-  TextInput,
   TouchableOpacity,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-  TouchableWithoutFeedback,
-  Animated,
-  StyleSheet,
+  Dimensions,
 } from "react-native";
+import {
+  BottomSheetModal,
+  BottomSheetScrollView,
+  BottomSheetTextInput,
+  BottomSheetBackdrop,
+  BottomSheetBackdropProps,
+} from "@gorhom/bottom-sheet";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -21,6 +22,8 @@ import { t } from "../i18n";
 import Spacing, { RADIUS, TOUCH_TARGET, SHADOWS } from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
 import Colors from "../constants/Colors";
+
+const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 const COLOR_PALETTE = [
   "#1ACC6C", // Green
@@ -68,43 +71,16 @@ export function EditIntervalModal({
   onOpenExercisePicker,
 }: EditIntervalModalProps) {
   const insets = useSafeAreaInsets();
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const [durationInputText, setDurationInputText] = useState<string>("00:00:30");
-  const [internalVisible, setInternalVisible] = useState(visible);
-  const opacityAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(400)).current;
 
   useEffect(() => {
-    if (visible) {
-      setInternalVisible(true);
-      Animated.parallel([
-        Animated.timing(opacityAnim, {
-          toValue: 1,
-          duration: 250,
-          useNativeDriver: true,
-        }),
-        Animated.timing(slideAnim, {
-          toValue: 0,
-          duration: 250,
-          useNativeDriver: true,
-        }),
-      ]).start();
+    if (visible && interval) {
+      bottomSheetModalRef.current?.present();
     } else {
-      Animated.parallel([
-        Animated.timing(opacityAnim, {
-          toValue: 0,
-          duration: 250,
-          useNativeDriver: true,
-        }),
-        Animated.timing(slideAnim, {
-          toValue: 400,
-          duration: 250,
-          useNativeDriver: true,
-        }),
-      ]).start(() => {
-        setInternalVisible(false);
-      });
+      bottomSheetModalRef.current?.dismiss();
     }
-  }, [visible]);
+  }, [visible, interval]);
 
   useEffect(() => {
     if (interval) {
@@ -112,8 +88,22 @@ export function EditIntervalModal({
     }
   }, [interval?.id, interval?.duration, visible]);
 
-  const isVisible = visible || internalVisible;
-  if (!isVisible || !interval) return null;
+  const renderBackdrop = useCallback(
+    (props: BottomSheetBackdropProps) => (
+      <BottomSheetBackdrop
+        {...props}
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+        opacity={0.5}
+        pressBehavior="close"
+      />
+    ),
+    []
+  );
+
+  if (!visible || !interval) {
+    return null;
+  }
 
   function handleDurationChange(text: string) {
     const rawDigits = text.replace(/\D/g, "");
@@ -134,146 +124,144 @@ export function EditIntervalModal({
 
   function handleDone() {
     handleDurationBlur();
+    bottomSheetModalRef.current?.dismiss();
     onClose();
   }
 
   function handleDelete() {
+    bottomSheetModalRef.current?.dismiss();
     onDelete();
   }
 
   return (
-    <Modal
-      visible={visible || internalVisible}
-      transparent
-      animationType="none"
-      onRequestClose={handleDone}
+    <BottomSheetModal
+      ref={bottomSheetModalRef}
+      enableDynamicSizing
+      maxDynamicContentSize={SCREEN_HEIGHT * 0.9}
+      stackBehavior="push"
+      onDismiss={onClose}
+      backdropComponent={renderBackdrop}
+      backgroundStyle={styles.sheetBackground}
+      handleIndicatorStyle={styles.handleBar}
+      keyboardBehavior="interactive"
+      keyboardBlurBehavior="restore"
     >
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={styles.backdrop}
+      <BottomSheetScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[
+          styles.sheetContainer,
+          { paddingBottom: Math.max(insets.bottom, Spacing.md) },
+        ]}
       >
-        <TouchableWithoutFeedback onPress={handleDone}>
-          <Animated.View style={[styles.scrim, { opacity: opacityAnim }]} />
-        </TouchableWithoutFeedback>
+        {/* Header Bar */}
+        <View style={styles.header}>
+          <Text style={styles.title}>{t("createTimer.titleEdit")}</Text>
+          <TouchableOpacity
+            testID="edit-interval-done-btn"
+            onPress={handleDone}
+            style={styles.doneButton}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Text style={styles.doneButtonText}>{t("common.done")}</Text>
+          </TouchableOpacity>
+        </View>
 
-        <Animated.View
-          style={[
-            styles.sheetContainer,
-            {
-              paddingBottom: Math.max(insets.bottom, Spacing.md),
-              transform: [{ translateY: slideAnim }],
-            },
-          ]}
-        >
-          {/* Header Bar */}
-          <View style={styles.header}>
-            <Text style={styles.title}>{t("createTimer.titleEdit")}</Text>
-            <TouchableOpacity
-              testID="edit-interval-done-btn"
-              onPress={handleDone}
-              style={styles.doneButton}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            >
-              <Text style={styles.doneButtonText}>{t("common.done")}</Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Form Content */}
-          <View style={styles.editorInputRow}>
-            {/* Interval Name */}
-            <View style={styles.inputGroup}>
-              <View style={styles.inputLabelRow}>
-                <Text style={styles.inputLabel}>{t("createTimer.intervalNamePlaceholder")}</Text>
-                <TouchableOpacity
-                  style={styles.libraryPickerBtn}
-                  onPress={onOpenExercisePicker}
-                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                >
-                  <Ionicons name="barbell-outline" size={13} color={Colors.primary} />
-                  <Text style={styles.libraryPickerBtnText}>
-                    {t("exercisePicker.chooseExercise", { defaultValue: "Library" })}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-              <TextInput
-                style={styles.editorTextInput}
-                value={interval.name}
-                onChangeText={(name) => onUpdate({ name })}
-                placeholder={t("createTimer.intervalNamePlaceholder")}
-                placeholderTextColor="#9CA3AF"
-              />
+        {/* Form Content */}
+        <View style={styles.editorInputRow}>
+          {/* Interval Name */}
+          <View style={styles.inputGroup}>
+            <View style={styles.inputLabelRow}>
+              <Text style={styles.inputLabel}>{t("createTimer.intervalNamePlaceholder")}</Text>
+              <TouchableOpacity
+                style={styles.libraryPickerBtn}
+                onPress={onOpenExercisePicker}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <Ionicons name="barbell-outline" size={13} color={Colors.primary} />
+                <Text style={styles.libraryPickerBtnText}>
+                  {t("exercisePicker.chooseExercise", { defaultValue: "Library" })}
+                </Text>
+              </TouchableOpacity>
             </View>
-
-            {/* Duration */}
-            <View style={[styles.inputGroup, { flex: 0.55 }]}>
-              <Text style={styles.inputLabel}>{t("common.duration")}</Text>
-              <TextInput
-                style={styles.timeInput}
-                value={durationInputText}
-                onChangeText={handleDurationChange}
-                onBlur={handleDurationBlur}
-                keyboardType="number-pad"
-                selectTextOnFocus
-              />
-            </View>
+            <BottomSheetTextInput
+              style={styles.editorTextInput}
+              value={interval.name}
+              onChangeText={(name) => onUpdate({ name })}
+              placeholder={t("createTimer.intervalNamePlaceholder")}
+              placeholderTextColor="#9CA3AF"
+            />
           </View>
 
-          {/* Color Picker */}
-          <Text style={styles.inputLabel}>{t("createTimer.intervalColor")}</Text>
-          <View style={styles.colorPalette}>
-            {COLOR_PALETTE.map((color) => {
-              const isSelected = (interval.color || "#1ACC6C") === color;
-              return (
-                <TouchableOpacity
-                  key={color}
-                  onPress={() => onUpdate({ color })}
-                  style={[
-                    styles.colorCircle,
-                    { backgroundColor: color },
-                    isSelected && styles.colorCircleSelected,
-                  ]}
-                  activeOpacity={0.8}
-                >
-                  {isSelected && (
-                    <Ionicons name="checkmark" size={18} color="#FFFFFF" testID="icon-checkmark" />
-                  )}
-                </TouchableOpacity>
-              );
-            })}
+          {/* Duration */}
+          <View style={[styles.inputGroup, { flex: 0.55 }]}>
+            <Text style={styles.inputLabel}>{t("common.duration")}</Text>
+            <BottomSheetTextInput
+              style={styles.timeInput}
+              value={durationInputText}
+              onChangeText={handleDurationChange}
+              onBlur={handleDurationBlur}
+              keyboardType="number-pad"
+              selectTextOnFocus
+            />
           </View>
+        </View>
 
-          {/* Interval Actions: Delete & Duplicate */}
-          <View style={styles.intervalActions}>
-            <TouchableOpacity onPress={handleDelete} style={styles.deleteIconButton}>
-              <Ionicons name="trash-outline" size={22} color="#E63946" />
-            </TouchableOpacity>
-            <Spacer />
-            <TouchableOpacity onPress={onDuplicate} style={styles.duplicateIconButton}>
-              <Ionicons name="copy-outline" size={22} color="#4B5563" />
-            </TouchableOpacity>
-          </View>
-        </Animated.View>
-      </KeyboardAvoidingView>
-    </Modal>
+        {/* Color Picker */}
+        <Text style={styles.inputLabel}>{t("createTimer.intervalColor")}</Text>
+        <View style={styles.colorPalette}>
+          {COLOR_PALETTE.map((color) => {
+            const isSelected = (interval.color || "#1ACC6C") === color;
+            return (
+              <TouchableOpacity
+                key={color}
+                onPress={() => onUpdate({ color })}
+                style={[
+                  styles.colorCircle,
+                  { backgroundColor: color },
+                  isSelected && styles.colorCircleSelected,
+                ]}
+                activeOpacity={0.8}
+              >
+                {isSelected && (
+                  <Ionicons name="checkmark" size={18} color="#FFFFFF" testID="icon-checkmark" />
+                )}
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
+        {/* Interval Actions: Delete & Duplicate */}
+        <View style={styles.intervalActions}>
+          <TouchableOpacity onPress={handleDelete} style={styles.deleteIconButton}>
+            <Ionicons name="trash-outline" size={22} color="#E63946" />
+          </TouchableOpacity>
+          <Spacer />
+          <TouchableOpacity onPress={onDuplicate} style={styles.duplicateIconButton}>
+            <Ionicons name="copy-outline" size={22} color="#4B5563" />
+          </TouchableOpacity>
+        </View>
+      </BottomSheetScrollView>
+    </BottomSheetModal>
   );
 }
 
 const styles = StyleSheet.create({
-  backdrop: {
-    flex: 1,
-    justifyContent: "flex-end",
-  },
-  scrim: {
-    ...StyleSheet.absoluteFill,
-    backgroundColor: Colors.surface.overlay,
-  },
-  sheetContainer: {
+  sheetBackground: {
     backgroundColor: Colors.surface.card,
     borderTopLeftRadius: RADIUS.lg,
     borderTopRightRadius: RADIUS.lg,
-    paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.md,
     ...SHADOWS.modal,
+  },
+  handleBar: {
+    width: 44,
+    height: 5,
+    borderRadius: RADIUS.xs,
+    backgroundColor: Colors.borderDefault,
+    alignSelf: "center",
+  },
+  sheetContainer: {
+    paddingHorizontal: Spacing.lg,
+    paddingTop: Spacing.xs,
   },
   header: {
     flexDirection: "row",

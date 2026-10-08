@@ -21,7 +21,8 @@
     "ok": "Aceptar",
     "back": "Atrás",
     "start": "Iniciar",
-    "play": "Reproducir"
+    "play": "Reproducir",
+    "add": "Añadir"
   },
   "selectTimer": {
     "greeting": "¡A Entrenar! ⚡️",
@@ -55,6 +56,7 @@
     "rounds": "Rondas",
     "intervals": "Intervalos",
     "addInterval": "Añadir Intervalo",
+    "addFromLibrary": "Añadir Ejercicio",
     "intervalNamePlaceholder": "Nombre del intervalo",
     "seconds": "segundos",
     "saveWorkout": "Guardar Rutina",

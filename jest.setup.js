@@ -9,6 +9,15 @@ if (!global.window.dispatchEvent) {
   global.window.dispatchEvent = jest.fn();
 }
 
+// Mock @gorhom/bottom-sheet
+jest.mock("@gorhom/bottom-sheet", () => {
+  const actualMock = require("@gorhom/bottom-sheet/mock");
+  return {
+    ...actualMock,
+    BottomSheetBackdrop: () => null,
+  };
+});
+
 // Mock React Navigation useIsFocused
 jest.mock("@react-navigation/native", () => {
   const actualNav = jest.requireActual("@react-navigation/native");

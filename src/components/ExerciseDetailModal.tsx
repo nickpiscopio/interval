@@ -1,14 +1,16 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useRef, useEffect, useCallback, useMemo } from "react";
 import {
-  Modal,
   StyleSheet,
   TouchableOpacity,
-  TouchableWithoutFeedback,
-  ScrollView,
   View,
   Dimensions,
-  Animated,
 } from "react-native";
+import {
+  BottomSheetModal,
+  BottomSheetScrollView,
+  BottomSheetBackdrop,
+  BottomSheetBackdropProps,
+} from "@gorhom/bottom-sheet";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import Colors from "../constants/Colors";
@@ -43,47 +45,36 @@ export function ExerciseDetailModal({
   onStartQuickRoutine,
   onCreateCustomTimer,
 }: ExerciseDetailModalProps) {
-  const [internalVisible, setInternalVisible] = useState(visible);
-  const opacityAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(400)).current;
+  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
+  const snapPoints = useMemo(() => ["88%"], []);
 
   useEffect(() => {
-    if (visible) {
-      setInternalVisible(true);
-      Animated.parallel([
-        Animated.timing(opacityAnim, {
-          toValue: 1,
-          duration: 250,
-          useNativeDriver: true,
-        }),
-        Animated.timing(slideAnim, {
-          toValue: 0,
-          duration: 250,
-          useNativeDriver: true,
-        }),
-      ]).start();
+    if (visible && exercise) {
+      bottomSheetModalRef.current?.present();
     } else {
-      Animated.parallel([
-        Animated.timing(opacityAnim, {
-          toValue: 0,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-        Animated.timing(slideAnim, {
-          toValue: 400,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-      ]).start(() => {
-        setInternalVisible(false);
-      });
+      bottomSheetModalRef.current?.dismiss();
     }
-  }, [visible]);
+  }, [visible, exercise]);
 
-  const isVisible = visible || internalVisible;
-  if (!isVisible || !exercise) return null;
+  const renderBackdrop = useCallback(
+    (props: BottomSheetBackdropProps) => (
+      <BottomSheetBackdrop
+        {...props}
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+        opacity={0.5}
+        pressBehavior="close"
+      />
+    ),
+    []
+  );
+
+  if (!visible || !exercise) {
+    return null;
+  }
 
   function handleClose() {
+    bottomSheetModalRef.current?.dismiss();
     onClose();
   }
 
@@ -92,7 +83,7 @@ export function ExerciseDetailModal({
     if (onSelectExercise) {
       onSelectExercise(exercise!);
     }
-    onClose();
+    handleClose();
   }
 
   function handleStartQuickRoutine() {
@@ -100,7 +91,7 @@ export function ExerciseDetailModal({
     if (onStartQuickRoutine) {
       onStartQuickRoutine(exercise!);
     }
-    onClose();
+    handleClose();
   }
 
   function handleCreateCustomTimer() {
@@ -108,7 +99,7 @@ export function ExerciseDetailModal({
     if (onCreateCustomTimer) {
       onCreateCustomTimer(exercise!);
     }
-    onClose();
+    handleClose();
   }
 
   const categoryColorMap: Record<string, string> = {
@@ -123,186 +114,176 @@ export function ExerciseDetailModal({
   const badgeColor = categoryColorMap[exercise.category] || Colors.primary;
 
   return (
-    <Modal
-      visible={visible || internalVisible}
-      transparent
-      animationType="none"
-      onRequestClose={handleClose}
+    <BottomSheetModal
+      ref={bottomSheetModalRef}
+      snapPoints={snapPoints}
+      stackBehavior="push"
+      onDismiss={onClose}
+      backdropComponent={renderBackdrop}
+      backgroundStyle={styles.sheetBackground}
+      handleIndicatorStyle={styles.handleBar}
     >
-      <TouchableWithoutFeedback onPress={handleClose}>
-        <Animated.View style={[styles.overlay, { opacity: opacityAnim }]}>
-          <TouchableWithoutFeedback>
-            <Animated.View style={[styles.sheetContainer, { transform: [{ translateY: slideAnim }] }]}>
-              {/* Header Handle */}
-              <View style={styles.handleBar} />
+      <View style={styles.sheetContainer}>
+        {/* Close Button */}
+        <TouchableOpacity
+          testID="exercise-detail-close-btn"
+          style={styles.closeButton}
+          onPress={handleClose}
+          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+        >
+          <Ionicons name="close" size={22} color="#6B7280" />
+        </TouchableOpacity>
 
-              {/* Close Button */}
+        <BottomSheetScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
+          {/* Category & Difficulty Header Tags */}
+          <View style={styles.tagsRow}>
+            <View
+              style={[
+                styles.categoryBadge,
+                { backgroundColor: badgeColor + "18", borderColor: badgeColor + "40" },
+              ]}
+            >
+              <Ionicons
+                name={exercise.category === "corrective" ? "medical" : "fitness"}
+                size={13}
+                color={badgeColor}
+              />
+              <Text style={[styles.categoryBadgeText, { color: badgeColor }]}>
+                {getLocalizedCategoryName(exercise.category)}
+              </Text>
+            </View>
+
+            <View style={styles.difficultyBadge}>
+              <Text style={styles.difficultyBadgeText}>
+                {exercise.difficulty.toUpperCase()}
+              </Text>
+            </View>
+          </View>
+
+          {/* Exercise Title */}
+          <Text style={styles.exerciseTitle}>{exercise.name}</Text>
+
+          {/* Friendly Body Part Focus Chips */}
+          {exercise.bodyParts && exercise.bodyParts.length > 0 && (
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionHeading}>
+                {t("exercises.bodyPartFocus")}
+              </Text>
+              <View style={styles.bodyPartsWrap}>
+                {exercise.bodyParts.map((bp: BodyPart) => (
+                  <View key={bp} style={styles.bodyPartChip}>
+                    <Ionicons name="body-outline" size={13} color="#4B5563" />
+                    <Text style={styles.bodyPartChipText}>
+                      {getLocalizedBodyPartName(bp)}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
+
+          {/* Target Muscles */}
+          {exercise.targetMuscles && exercise.targetMuscles.length > 0 && (
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionHeading}>
+                {t("exercises.targetMuscles")}
+              </Text>
+              <View style={styles.bodyPartsWrap}>
+                {exercise.targetMuscles.map((muscle) => (
+                  <View key={muscle} style={styles.muscleChip}>
+                    <Text style={styles.muscleChipText}>{muscle}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
+
+          {/* Description / Clinical Benefit */}
+          {exercise.description ? (
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionHeading}>
+                {t("exercises.aboutAndBenefits")}
+              </Text>
+              <View style={styles.descriptionCard}>
+                <Text style={styles.descriptionText}>{exercise.description}</Text>
+              </View>
+            </View>
+          ) : null}
+
+          {/* Step-by-Step Instructions */}
+          {exercise.instructions && exercise.instructions.length > 0 && (
+            <View style={styles.sectionContainer}>
+              <Text style={styles.sectionHeading}>
+                {t("exercises.instructionsHeading")}
+              </Text>
+              {exercise.instructions.map((step, idx) => (
+                <View key={idx} style={styles.instructionStepRow}>
+                  <View style={styles.stepNumberBadge}>
+                    <Text style={styles.stepNumberText}>{idx + 1}</Text>
+                  </View>
+                  <Text style={styles.stepText}>{step}</Text>
+                </View>
+              ))}
+            </View>
+          )}
+        </BottomSheetScrollView>
+
+        {/* Action Buttons Footer */}
+        <View style={styles.footerActions}>
+          {mode === "library" ? (
+            <View style={styles.libraryActionsRow}>
               <TouchableOpacity
-                testID="exercise-detail-close-btn"
-                style={styles.closeButton}
-                onPress={handleClose}
-                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                style={styles.quickStartButton}
+                activeOpacity={0.85}
+                onPress={handleStartQuickRoutine}
               >
-                <Ionicons name="close" size={22} color="#6B7280" />
+                <Ionicons name="play" size={18} color="#FFFFFF" />
+                <Text style={styles.quickStartButtonText}>
+                  {t("exercises.startQuickRoutine")}
+                </Text>
               </TouchableOpacity>
 
-              <ScrollView
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={styles.scrollContent}
+              <TouchableOpacity
+                style={styles.createCustomButton}
+                activeOpacity={0.85}
+                onPress={handleCreateCustomTimer}
               >
-                {/* Category & Difficulty Header Tags */}
-                <View style={styles.tagsRow}>
-                  <View
-                    style={[
-                      styles.categoryBadge,
-                      { backgroundColor: badgeColor + "18", borderColor: badgeColor + "40" },
-                    ]}
-                  >
-                    <Ionicons
-                      name={exercise.category === "corrective" ? "medical" : "fitness"}
-                      size={13}
-                      color={badgeColor}
-                    />
-                    <Text style={[styles.categoryBadgeText, { color: badgeColor }]}>
-                      {getLocalizedCategoryName(exercise.category)}
-                    </Text>
-                  </View>
-
-                  <View style={styles.difficultyBadge}>
-                    <Text style={styles.difficultyBadgeText}>
-                      {exercise.difficulty.toUpperCase()}
-                    </Text>
-                  </View>
-                </View>
-
-                {/* Exercise Title */}
-                <Text style={styles.exerciseTitle}>{exercise.name}</Text>
-
-                {/* Friendly Body Part Focus Chips */}
-                {exercise.bodyParts && exercise.bodyParts.length > 0 && (
-                  <View style={styles.sectionContainer}>
-                    <Text style={styles.sectionHeading}>
-                      {t("exercises.bodyPartFocus")}
-                    </Text>
-                    <View style={styles.bodyPartsWrap}>
-                      {exercise.bodyParts.map((bp: BodyPart) => (
-                        <View key={bp} style={styles.bodyPartChip}>
-                          <Ionicons name="body-outline" size={13} color="#4B5563" />
-                          <Text style={styles.bodyPartChipText}>
-                            {getLocalizedBodyPartName(bp)}
-                          </Text>
-                        </View>
-                      ))}
-                    </View>
-                  </View>
-                )}
-
-                {/* Target Muscles */}
-                {exercise.targetMuscles && exercise.targetMuscles.length > 0 && (
-                  <View style={styles.sectionContainer}>
-                    <Text style={styles.sectionHeading}>
-                      {t("exercises.targetMuscles")}
-                    </Text>
-                    <View style={styles.bodyPartsWrap}>
-                      {exercise.targetMuscles.map((muscle) => (
-                        <View key={muscle} style={styles.muscleChip}>
-                          <Text style={styles.muscleChipText}>{muscle}</Text>
-                        </View>
-                      ))}
-                    </View>
-                  </View>
-                )}
-
-                {/* Description / Clinical Benefit */}
-                {exercise.description ? (
-                  <View style={styles.sectionContainer}>
-                    <Text style={styles.sectionHeading}>
-                      {t("exercises.aboutAndBenefits")}
-                    </Text>
-                    <View style={styles.descriptionCard}>
-                      <Text style={styles.descriptionText}>{exercise.description}</Text>
-                    </View>
-                  </View>
-                ) : null}
-
-                {/* Step-by-Step Instructions */}
-                {exercise.instructions && exercise.instructions.length > 0 && (
-                  <View style={styles.sectionContainer}>
-                    <Text style={styles.sectionHeading}>
-                      {t("exercises.instructionsHeading")}
-                    </Text>
-                    {exercise.instructions.map((step, idx) => (
-                      <View key={idx} style={styles.instructionStepRow}>
-                        <View style={styles.stepNumberBadge}>
-                          <Text style={styles.stepNumberText}>{idx + 1}</Text>
-                        </View>
-                        <Text style={styles.stepText}>{step}</Text>
-                      </View>
-                    ))}
-                  </View>
-                )}
-              </ScrollView>
-
-              {/* Action Buttons Footer */}
-              <View style={styles.footerActions}>
-                {mode === "library" ? (
-                  <View style={styles.libraryActionsRow}>
-                    <TouchableOpacity
-                      style={styles.quickStartButton}
-                      activeOpacity={0.85}
-                      onPress={handleStartQuickRoutine}
-                    >
-                      <Ionicons name="play" size={18} color="#FFFFFF" />
-                      <Text style={styles.quickStartButtonText}>
-                        {t("exercises.startQuickRoutine")}
-                      </Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                      style={styles.createCustomButton}
-                      activeOpacity={0.85}
-                      onPress={handleCreateCustomTimer}
-                    >
-                      <Ionicons name="add-circle-outline" size={18} color={Colors.primary} />
-                      <Text style={styles.createCustomButtonText}>
-                        {t("exercises.createCustomWorkout")}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                ) : (
-                  <TouchableOpacity
-                    style={styles.selectButton}
-                    activeOpacity={0.85}
-                    onPress={handleSelect}
-                  >
-                    <Ionicons name="checkmark-circle" size={20} color="#FFFFFF" />
-                    <Text style={styles.selectButtonText}>
-                      {t("exercises.addToTimer")}
-                    </Text>
-                  </TouchableOpacity>
-                )}
-              </View>
-            </Animated.View>
-          </TouchableWithoutFeedback>
-        </Animated.View>
-      </TouchableWithoutFeedback>
-    </Modal>
+                <Ionicons name="add-circle-outline" size={18} color={Colors.primary} />
+                <Text style={styles.createCustomButtonText}>
+                  {t("exercises.createCustomWorkout")}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <TouchableOpacity
+              style={styles.selectButton}
+              activeOpacity={0.85}
+              onPress={handleSelect}
+            >
+              <Ionicons name="checkmark-circle" size={20} color="#FFFFFF" />
+              <Text style={styles.selectButtonText}>
+                {t("exercises.addToTimer")}
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
+    </BottomSheetModal>
   );
 }
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: Colors.surface.overlay,
-    justifyContent: "flex-end",
-  },
-  sheetContainer: {
+  sheetBackground: {
     backgroundColor: Colors.surface.card,
     borderTopLeftRadius: RADIUS.lg,
     borderTopRightRadius: RADIUS.lg,
-    maxHeight: SCREEN_HEIGHT * 0.85,
-    paddingTop: Spacing.sm,
     ...SHADOWS.modal,
+  },
+  sheetContainer: {
+    flex: 1,
   },
   handleBar: {
     width: 44,
@@ -310,11 +291,10 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.xs,
     backgroundColor: Colors.borderDefault,
     alignSelf: "center",
-    marginBottom: Spacing.xs,
   },
   closeButton: {
     position: "absolute",
-    top: 14,
+    top: 4,
     right: 18,
     width: TOUCH_TARGET.icon,
     height: TOUCH_TARGET.icon,
@@ -334,6 +314,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: Spacing.xs,
     marginBottom: Spacing.xs,
+    paddingRight: 40,
   },
   categoryBadge: {
     flexDirection: "row",

@@ -68,6 +68,38 @@ describe("ExercisePickerModal Component", () => {
     });
   });
 
+  it("allows 1-tap quick add directly from exercise card", async () => {
+    const onSelect = jest.fn();
+    const onClose = jest.fn();
+
+    const { getByTestId } = render(
+      <ExercisePickerModal visible={true} onClose={onClose} onSelect={onSelect} />
+    );
+
+    const quickAddBtn = getByTestId("btn-quick-add-tibialis_raises");
+    fireEvent.press(quickAddBtn);
+
+    await waitFor(() => {
+      expect(onSelect).toHaveBeenCalledWith(
+        expect.objectContaining({ id: "tibialis_raises", name: "Tibialis Raises" })
+      );
+      expect(onClose).toHaveBeenCalled();
+    });
+  });
+
+  it("navigates back from detail view to catalog list", () => {
+    const { getByText, getByTestId, queryByText } = render(
+      <ExercisePickerModal visible={true} onClose={jest.fn()} onSelect={jest.fn()} />
+    );
+
+    fireEvent.press(getByText("Tibialis Raises"));
+    expect(getByText("Add to Timer")).toBeTruthy();
+
+    fireEvent.press(getByTestId("exercise-detail-back-btn"));
+    expect(queryByText("Add to Timer")).toBeNull();
+    expect(getByText("Tibialis Raises")).toBeTruthy();
+  });
+
   it("displays empty state when no search matches", () => {
     const { getByPlaceholderText, getByText } = render(
       <ExercisePickerModal visible={true} onClose={jest.fn()} onSelect={jest.fn()} />

@@ -21,7 +21,8 @@
     "ok": "OK",
     "back": "Back",
     "start": "Start",
-    "play": "Play"
+    "play": "Play",
+    "add": "Add"
   },
   "selectTimer": {
     "greeting": "Let's Workout! ⚡️",
@@ -55,6 +56,7 @@
     "rounds": "Rounds",
     "intervals": "Intervals",
     "addInterval": "Add Interval",
+    "addFromLibrary": "Add Exercise",
     "intervalNamePlaceholder": "Interval name",
     "seconds": "seconds",
     "saveWorkout": "Save Workout",

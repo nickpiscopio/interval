@@ -145,8 +145,9 @@ export default function CreateTimerScreen({
   function handlePickExercise(exercise: Exercise) {
     const categoryColors: Record<string, string> = {
       cardio: "#1ACC6C",
+      corrective: "#10B981",
       upper: "#3B82F6",
-      lower: "#F59E0B",
+      lower: "#F9C74F",
       abs: "#8338EC",
       total: "#E63946",
     };
@@ -412,7 +413,12 @@ export default function CreateTimerScreen({
           ListHeaderComponent={
             <View style={styles.intervalListHeader}>
               <Text style={styles.sectionTitle}>{t("createTimer.intervals")}</Text>
-              <TouchableOpacity style={styles.addIntervalLink} onPress={addInterval}>
+              <TouchableOpacity
+                testID="btn-add-interval"
+                style={styles.addIntervalLink}
+                onPress={addInterval}
+                activeOpacity={0.7}
+              >
                 <Ionicons name="add-circle" size={18} color={Colors.primary} />
                 <Text style={styles.addIntervalLinkText}>{t("createTimer.addInterval")}</Text>
               </TouchableOpacity>

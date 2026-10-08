@@ -21,7 +21,8 @@
     "ok": "OK",
     "back": "Retour",
     "start": "Démarrer",
-    "play": "Lire"
+    "play": "Lire",
+    "add": "Ajouter"
   },
   "selectTimer": {
     "greeting": "C'est l'heure du sport ! ⚡️",
@@ -55,6 +56,7 @@
     "rounds": "Tours",
     "intervals": "Intervalles",
     "addInterval": "Ajouter un Intervalle",
+    "addFromLibrary": "Ajouter un Exercice",
     "intervalNamePlaceholder": "Nom de l'intervalle",
     "seconds": "secondes",
     "saveWorkout": "Enregistrer l'Entraînement",
