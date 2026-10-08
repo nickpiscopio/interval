@@ -9,7 +9,7 @@ import {
   ScrollView,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { Audio } from "expo-av";
+import { createAudioPlayer, AudioPlayer } from "expo-audio";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "expo-haptics";
@@ -50,23 +50,17 @@ export default function CompletionScreen({
 
   // Play fanfare victory audio on screen load
   useEffect(() => {
-    let soundObj: Audio.Sound | null = null;
-    async function playFanfare() {
-      try {
-        const { sound } = await Audio.Sound.createAsync(
-          require("../../assets/sounds/fanfare.mp3")
-        );
-        soundObj = sound;
-        await sound.playAsync();
-      } catch (e) {
-        console.warn("Failed to play fanfare sound:", e);
-      }
+    let player: AudioPlayer | null = null;
+    try {
+      player = createAudioPlayer(require("../../assets/sounds/fanfare.mp3"));
+      player.play();
+    } catch (e) {
+      console.warn("Failed to play fanfare sound:", e);
     }
-    playFanfare();
 
     return () => {
-      if (soundObj) {
-        soundObj.unloadAsync().catch(() => {});
+      if (player) {
+        player.release();
       }
     };
   }, []);

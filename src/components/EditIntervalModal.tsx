@@ -16,6 +16,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 
 import { Interval } from "../model/Interval";
+import { Spacer } from "./Spacer";
 import { t } from "../i18n";
 import Spacing, { RADIUS, TOUCH_TARGET, SHADOWS } from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
@@ -219,11 +220,7 @@ export function EditIntervalModal({
 
           {/* Color Picker */}
           <Text style={styles.inputLabel}>{t("createTimer.intervalColor")}</Text>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.colorPalette}
-          >
+          <View style={styles.colorPalette}>
             {COLOR_PALETTE.map((color) => {
               const isSelected = (interval.color || "#1ACC6C") === color;
               return (
@@ -243,13 +240,14 @@ export function EditIntervalModal({
                 </TouchableOpacity>
               );
             })}
-          </ScrollView>
+          </View>
 
           {/* Interval Actions: Delete & Duplicate */}
           <View style={styles.intervalActions}>
             <TouchableOpacity onPress={handleDelete} style={styles.deleteIconButton}>
               <Ionicons name="trash-outline" size={22} color="#E63946" />
             </TouchableOpacity>
+            <Spacer />
             <TouchableOpacity onPress={onDuplicate} style={styles.duplicateIconButton}>
               <Ionicons name="copy-outline" size={22} color="#4B5563" />
             </TouchableOpacity>
@@ -266,7 +264,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   scrim: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: Colors.surface.overlay,
   },
   sheetContainer: {
@@ -356,14 +354,16 @@ const styles = StyleSheet.create({
   },
   colorPalette: {
     flexDirection: "row",
-    gap: Spacing.sm,
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: Spacing.xs,
     paddingVertical: Spacing.xs,
     marginBottom: Spacing.sm,
   },
   colorCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -372,15 +372,13 @@ const styles = StyleSheet.create({
     borderColor: Colors.white,
     shadowColor: Colors.black,
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.25,
-    shadowRadius: 2,
-    elevation: 3,
+    shadowOpacity: 0.2,
+    shadowRadius: 1.5,
+    elevation: 2,
   },
   intervalActions: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "flex-end",
-    gap: Spacing.md,
     marginTop: Spacing.xs,
   },
   deleteIconButton: {

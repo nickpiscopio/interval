@@ -38,7 +38,11 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "expo-localization"
+      "expo-localization",
+      "expo-status-bar",
+      "expo-video",
+      "expo-web-browser",
+      "expo-audio"
     ],
     "runtimeVersion": {
       "policy": "sdkVersion"

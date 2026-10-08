@@ -594,7 +594,8 @@ const styles = StyleSheet.create({
   },
   addIntervalLinkText: {
     fontSize: FontSize.xs,
-    fontFamily: "Poppins-SemiBold",
+    fontFamily: "Poppins-Bold",
+    fontWeight: "700",
     color: Colors.primary,
   },
   intervalItem: {
@@ -602,7 +603,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: Colors.surface.card,
     paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.md,
+    paddingLeft: Spacing.sm,
+    paddingRight: Spacing.md,
     marginBottom: Spacing.cardGap,
     borderRadius: RADIUS.md,
     borderLeftWidth: 6,

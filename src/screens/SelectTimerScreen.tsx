@@ -891,7 +891,7 @@ const styles = StyleSheet.create({
     ...SHADOWS.card,
   },
   cardSelectedBorder: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     borderRadius: RADIUS.md,
     borderWidth: 2,
     borderColor: Colors.primary,

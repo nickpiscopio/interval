@@ -54,24 +54,26 @@ jest.mock("expo-haptics", () => ({
   },
 }));
 
-// Mock Expo AV
-jest.mock("expo-av", () => ({
-  Audio: {
-    Sound: {
-      createAsync: jest.fn(async () => ({
-        sound: {
-          playAsync: jest.fn().mockResolvedValue({}),
-          unloadAsync: jest.fn().mockResolvedValue({}),
-          stopAsync: jest.fn().mockResolvedValue({}),
-          replayAsync: jest.fn().mockResolvedValue({}),
-          setPositionAsync: jest.fn().mockResolvedValue({}),
-        },
-        status: {},
-      })),
-    },
-    setAudioModeAsync: jest.fn().mockResolvedValue({}),
-  },
-}));
+// Mock Expo Audio
+jest.mock("expo-audio", () => {
+  const createMockPlayer = () => ({
+    play: jest.fn(),
+    pause: jest.fn(),
+    seekTo: jest.fn().mockResolvedValue(undefined),
+    release: jest.fn(),
+    replace: jest.fn(),
+    addListener: jest.fn(() => ({ remove: jest.fn() })),
+    removeListener: jest.fn(),
+    currentStatus: { playing: false, currentTime: 0, duration: 0 },
+  });
+  return {
+    createAudioPlayer: jest.fn(() => createMockPlayer()),
+    useAudioPlayer: jest.fn(() => createMockPlayer()),
+    useAudioPlayerStatus: jest.fn(() => ({ playing: false, currentTime: 0, duration: 0 })),
+    setAudioModeAsync: jest.fn().mockResolvedValue(undefined),
+    setIsAudioActiveAsync: jest.fn().mockResolvedValue(undefined),
+  };
+});
 
 // Mock Expo Video
 jest.mock("expo-video", () => ({

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, Animated, Easing } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { Audio } from "expo-av";
+import { createAudioPlayer, AudioPlayer } from "expo-audio";
 import { Ionicons } from "@expo/vector-icons";
 
 import { RootStackScreenProps } from "../types";
@@ -19,7 +19,7 @@ export default function TimerScreen({
   const { timer } = route.params;
 
   // Sound Ref
-  const beepSoundRef = useRef<Audio.Sound | null>(null);
+  const beepPlayerRef = useRef<AudioPlayer | null>(null);
 
   // Animated background progress (1 -> 0 over interval duration in ms)
   const progressAnim = useRef(new Animated.Value(1)).current;
@@ -43,25 +43,25 @@ export default function TimerScreen({
 
   async function loadSounds(): Promise<void> {
     try {
-      const { sound } = await Audio.Sound.createAsync(
+      beepPlayerRef.current = createAudioPlayer(
         require("../../assets/sounds/beep.mp3")
       );
-      beepSoundRef.current = sound;
     } catch (e) {
       console.warn("Failed to load audio beep:", e);
     }
   }
 
   async function unloadSounds(): Promise<void> {
-    if (beepSoundRef.current) {
-      await beepSoundRef.current.unloadAsync().catch(() => {});
-      beepSoundRef.current = null;
+    if (beepPlayerRef.current) {
+      beepPlayerRef.current.release();
+      beepPlayerRef.current = null;
     }
   }
 
   function playBeep(): void {
-    if (beepSoundRef.current) {
-      beepSoundRef.current.replayAsync().catch(() => {});
+    if (beepPlayerRef.current) {
+      beepPlayerRef.current.seekTo(0).catch(() => {});
+      beepPlayerRef.current.play();
     }
   }
 
