@@ -35,4 +35,10 @@ describe("Interval Model", () => {
     expect(normalized.id).toContain("int_");
     expect(normalized.name).toBe("Lunges");
   });
+
+  it("preserves sound when present and leaves it absent otherwise", () => {
+    const base = { name: "A", duration: 5, color: "#fff" };
+    expect(normalizeInterval({ ...base, sound: "beep_3" }).sound).toBe("beep_3");
+    expect(normalizeInterval(base).sound).toBeUndefined();
+  });
 });

@@ -9,8 +9,12 @@ A configured workout template consisting of a sequence of intervals and a number
 _Avoid_: Workout, Preset
 
 **Interval**:
-A designated time segment of a Timer, which has a specific duration, background color, and optional exercise reference.
+A designated time segment of a Timer, which has a specific duration, background color, Interval Sound, and optional exercise reference.
 _Avoid_: Step, Phase, Block
+
+**Interval Sound**:
+The audio cue an Interval plays when it begins, chosen from a fixed list of bundled sounds or "None" for silence.
+_Avoid_: Alarm, Ringtone, Beep (a beep is just one of the sounds)
 
 **Exercise**:
 A bodyweight physical movement (e.g., Pushups) performed during an interval, containing instructional metadata and video demonstrations.

@@ -15,10 +15,17 @@ import {
 } from "@gorhom/bottom-sheet";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { createAudioPlayer, AudioPlayer } from "expo-audio";
 
 import { Interval } from "../model/Interval";
 import { Spacer } from "./Spacer";
 import { t } from "../i18n";
+import {
+  INTERVAL_SOUNDS,
+  NONE_SOUND_ID,
+  resolveSoundId,
+  resolveSoundSource,
+} from "../constants/Sounds";
 import Spacing, { RADIUS, TOUCH_TARGET, SHADOWS } from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
 import Colors from "../constants/Colors";
@@ -75,6 +82,30 @@ export function EditIntervalModal({
   const insets = useSafeAreaInsets();
   const bottomSheetModalRef = useRef<BottomSheetModal>(null);
   const [durationInputText, setDurationInputText] = useState<string>("00:00:30");
+  const previewPlayerRef = useRef<AudioPlayer | null>(null);
+
+  function releasePreview() {
+    if (previewPlayerRef.current) {
+      previewPlayerRef.current.release();
+      previewPlayerRef.current = null;
+    }
+  }
+
+  useEffect(() => releasePreview, []);
+
+  function handleSelectSound(id: string) {
+    onUpdate({ sound: id });
+    releasePreview();
+    const source = resolveSoundSource(id);
+    if (!source) return;
+    try {
+      const player = createAudioPlayer(source);
+      previewPlayerRef.current = player;
+      player.play();
+    } catch (e) {
+      console.warn("Failed to preview sound:", e);
+    }
+  }
 
   useEffect(() => {
     if (visible && interval) {
@@ -247,6 +278,43 @@ export function EditIntervalModal({
           })}
         </View>
 
+        {/* Sound Picker */}
+        <Text style={styles.inputLabel}>{t("createTimer.intervalSound")}</Text>
+        <View style={styles.soundPalette}>
+          {[
+            ...INTERVAL_SOUNDS.map((s) => ({ id: s.id, label: t(s.labelKey) })),
+            { id: NONE_SOUND_ID, label: t("createTimer.soundNone") },
+          ].map((sound) => {
+            const isSelected = resolveSoundId(interval.sound) === sound.id;
+            return (
+              <TouchableOpacity
+                key={sound.id}
+                testID={`sound-pill-${sound.id}`}
+                onPress={() => handleSelectSound(sound.id)}
+                style={[styles.soundPill, isSelected && styles.soundPillSelected]}
+                activeOpacity={0.8}
+              >
+                <Ionicons
+                  name={sound.id === NONE_SOUND_ID ? "volume-mute-outline" : "volume-high-outline"}
+                  size={FontSize.md}
+                  color={isSelected ? Colors.primary : Colors.textScale.secondary}
+                />
+                <Text style={[styles.soundPillText, isSelected && styles.soundPillTextSelected]}>
+                  {sound.label}
+                </Text>
+                {isSelected && (
+                  <Ionicons
+                    name="checkmark"
+                    size={FontSize.md}
+                    color={Colors.primary}
+                    testID={`sound-checkmark-${sound.id}`}
+                  />
+                )}
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
         {/* Interval Actions: Delete & Duplicate */}
         <View style={styles.intervalActions}>
           <TouchableOpacity onPress={handleDelete} style={styles.deleteIconButton}>
@@ -371,6 +439,36 @@ const styles = StyleSheet.create({
     borderRadius: 17,
     alignItems: "center",
     justifyContent: "center",
+  },
+  soundPalette: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: Spacing.xs,
+    paddingHorizontal: Spacing.xs,
+    paddingVertical: Spacing.xs,
+    marginBottom: Spacing.sm,
+  },
+  soundPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.xs,
+    minHeight: TOUCH_TARGET.min,
+    paddingHorizontal: Spacing.sm,
+    borderRadius: RADIUS.full,
+    borderWidth: 1,
+    borderColor: Colors.borderInput,
+    backgroundColor: Colors.surface.screen,
+  },
+  soundPillSelected: {
+    borderColor: Colors.primary,
+  },
+  soundPillText: {
+    fontSize: FontSize.sm,
+    fontFamily: "Poppins-Medium",
+    color: Colors.textScale.secondary,
+  },
+  soundPillTextSelected: {
+    color: Colors.primary,
   },
   intervalActions: {
     flexDirection: "row",

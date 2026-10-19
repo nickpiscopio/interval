@@ -9,7 +9,6 @@ import {
   ScrollView,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { createAudioPlayer, AudioPlayer } from "expo-audio";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "expo-haptics";
@@ -48,23 +47,6 @@ export default function CompletionScreen({
     return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
   }
 
-  // Play fanfare victory audio on screen load
-  useEffect(() => {
-    let player: AudioPlayer | null = null;
-    try {
-      player = createAudioPlayer(require("../../assets/sounds/fanfare.mp3"));
-      player.play();
-    } catch (e) {
-      console.warn("Failed to play fanfare sound:", e);
-    }
-
-    return () => {
-      if (player) {
-        player.release();
-      }
-    };
-  }, []);
-
   // Record workout completion and check for new badges
   useEffect(() => {
     async function processCompletion() {
@@ -97,6 +79,7 @@ export default function CompletionScreen({
           duration: int.duration,
           color: int.color,
           exerciseId: int.exerciseId,
+          sound: int.sound,
         })),
       };
 

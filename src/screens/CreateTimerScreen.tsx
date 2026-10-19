@@ -244,6 +244,7 @@ export default function CreateTimerScreen({
         duration: resolvedDuration,
         color: editingInterval.color,
         exerciseId: editingInterval.exerciseId,
+        sound: editingInterval.sound,
       };
       setIntervals((prev) => [...prev, committedInterval, duplicated]);
       setEditingInterval(duplicated);
@@ -262,6 +263,7 @@ export default function CreateTimerScreen({
       duration: resolvedDuration,
       color: editingInterval.color,
       exerciseId: editingInterval.exerciseId,
+      sound: editingInterval.sound,
     };
     const updated = [...intervals];
     updated[index] = {

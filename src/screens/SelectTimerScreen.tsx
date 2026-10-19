@@ -167,6 +167,7 @@ export default function SelectTimerScreen({
           name: i.name,
           duration: i.duration,
           color: i.color,
+          sound: i.sound,
         })),
         isAiGenerated: timer.isAiGenerated,
       };

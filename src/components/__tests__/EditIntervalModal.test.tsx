@@ -115,3 +115,64 @@ describe("EditIntervalModal", () => {
     expect(getByPlaceholderText("00:00:30")).toBeTruthy();
   });
 });
+
+describe("EditIntervalModal sound picker", () => {
+  const { createAudioPlayer } = require("expo-audio");
+  const base = { id: "int-1", name: "Work", duration: 30, color: "#3B82F6" };
+
+  function setup(interval: any, onUpdate = jest.fn()) {
+    const utils = render(
+      <EditIntervalModal
+        visible={true}
+        interval={interval}
+        onClose={jest.fn()}
+        onUpdate={onUpdate}
+        onDelete={jest.fn()}
+        onDuplicate={jest.fn()}
+        onOpenExercisePicker={jest.fn()}
+      />
+    );
+    return { ...utils, onUpdate };
+  }
+
+  beforeEach(() => createAudioPlayer.mockClear());
+
+  it("renders every sound plus None and checks Beep when absent", () => {
+    const { getByText, getByTestId, queryByTestId } = setup(base);
+    expect(getByText("Interval Sound")).toBeTruthy();
+    expect(getByText("Beep")).toBeTruthy();
+    expect(getByText("Triple Beep")).toBeTruthy();
+    expect(getByText("None")).toBeTruthy();
+    expect(getByTestId("sound-checkmark-beep")).toBeTruthy();
+    expect(queryByTestId("sound-checkmark-beep_3")).toBeNull();
+  });
+
+  it("checks the stored sound", () => {
+    const { getByTestId } = setup({ ...base, sound: "none" });
+    expect(getByTestId("sound-checkmark-none")).toBeTruthy();
+  });
+
+  it("selects a sound and previews it", () => {
+    const { getByText, onUpdate } = setup(base);
+    fireEvent.press(getByText("Triple Beep"));
+    expect(onUpdate).toHaveBeenCalledWith({ sound: "beep_3" });
+    expect(createAudioPlayer).toHaveBeenCalledTimes(1);
+    expect(createAudioPlayer.mock.results[0].value.play).toHaveBeenCalled();
+  });
+
+  it("selects None without a preview", () => {
+    const { getByText, onUpdate } = setup(base);
+    fireEvent.press(getByText("None"));
+    expect(onUpdate).toHaveBeenCalledWith({ sound: "none" });
+    expect(createAudioPlayer).not.toHaveBeenCalled();
+  });
+
+  it("releases the previous preview when replaced and on unmount", () => {
+    const { getByText, unmount } = setup(base);
+    fireEvent.press(getByText("Beep"));
+    fireEvent.press(getByText("Triple Beep"));
+    expect(createAudioPlayer.mock.results[0].value.release).toHaveBeenCalled();
+    unmount();
+    expect(createAudioPlayer.mock.results[1].value.release).toHaveBeenCalled();
+  });
+});

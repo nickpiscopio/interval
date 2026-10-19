@@ -4,6 +4,7 @@ export interface Interval {
   name: string;
   duration: number; // in seconds
   exerciseId?: string;
+  sound?: string; // Interval Sound catalog ID; absent means default beep
   durationLeftInMillis?: number;
   totalDuration?: number;
 }
@@ -22,6 +23,7 @@ export function normalizeInterval(
     name: interval.name,
     duration: interval.duration,
     exerciseId: interval.exerciseId,
+    sound: interval.sound,
     durationLeftInMillis: interval.durationLeftInMillis,
     totalDuration: interval.totalDuration,
   };

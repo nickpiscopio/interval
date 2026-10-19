@@ -9,6 +9,7 @@ import { Interval } from "../model/Interval";
 import { t } from "../i18n";
 import { useAlert } from "../context/AlertContext";
 import Spacing from "../constants/Spacing";
+import { resolveSoundId, resolveSoundSource } from "../constants/Sounds";
 import FontSize from "../constants/FontSize";
 
 export default function TimerScreen({
@@ -19,7 +20,7 @@ export default function TimerScreen({
   const { timer } = route.params;
 
   // Sound Ref
-  const beepPlayerRef = useRef<AudioPlayer | null>(null);
+  const soundPlayersRef = useRef<Map<string, AudioPlayer>>(new Map());
 
   // Animated background progress (1 -> 0 over interval duration in ms)
   const progressAnim = useRef(new Animated.Value(1)).current;
@@ -42,26 +43,29 @@ export default function TimerScreen({
   const currentInterval = flatIntervals[currentIntervalIndex];
 
   async function loadSounds(): Promise<void> {
-    try {
-      beepPlayerRef.current = createAudioPlayer(
-        require("../../assets/sounds/beep.mp3")
-      );
-    } catch (e) {
-      console.warn("Failed to load audio beep:", e);
+    for (const int of timer.intervals) {
+      const id = resolveSoundId(int.sound);
+      if (soundPlayersRef.current.has(id)) continue;
+      const source = resolveSoundSource(id);
+      if (!source) continue;
+      try {
+        soundPlayersRef.current.set(id, createAudioPlayer(source));
+      } catch (e) {
+        console.warn("Failed to load interval sound:", e);
+      }
     }
   }
 
   async function unloadSounds(): Promise<void> {
-    if (beepPlayerRef.current) {
-      beepPlayerRef.current.release();
-      beepPlayerRef.current = null;
-    }
+    soundPlayersRef.current.forEach((player) => player.release());
+    soundPlayersRef.current.clear();
   }
 
-  function playBeep(): void {
-    if (beepPlayerRef.current) {
-      beepPlayerRef.current.seekTo(0).catch(() => {});
-      beepPlayerRef.current.play();
+  function playIntervalSound(interval?: Interval): void {
+    const player = soundPlayersRef.current.get(resolveSoundId(interval?.sound));
+    if (player) {
+      player.seekTo(0).catch(() => {});
+      player.play();
     }
   }
 
@@ -103,7 +107,7 @@ export default function TimerScreen({
     }
 
     loadSounds().then(() => {
-      playBeep();
+      playIntervalSound(list[0]);
     });
     isPausedRef.current = false;
     startCountDown();
@@ -145,7 +149,7 @@ export default function TimerScreen({
           setDurationLeft(nextInt.duration || 0);
           setTotalDuration(nextDurationMs);
           startProgressAnim(nextDurationMs, 1);
-          playBeep();
+          playIntervalSound(nextInt);
         }
       }
     }, tickMs);
@@ -169,7 +173,7 @@ export default function TimerScreen({
     if (nextPaused) {
       progressAnim.stopAnimation();
     } else {
-      playBeep();
+      playIntervalSound(flatIntervalsRef.current[currentIndexRef.current]);
       const fraction = totalDurationRef.current > 0 ? durationLeftRef.current / totalDurationRef.current : 1;
       startProgressAnim(durationLeftRef.current, fraction);
     }

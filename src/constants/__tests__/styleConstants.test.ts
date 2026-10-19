@@ -18,12 +18,6 @@ describe("Style Constants", () => {
     expect(Spacing.xl).toBeGreaterThan(0);
   });
 
-  it("exports valid sounds", () => {
-    const Sounds = require("../Sounds").default;
-    expect(Sounds.beep1).toContain("beep_1.mp3");
-    expect(Sounds.beep2).toContain("beep_2.mp3");
-  });
-
   it("exports valid font sizes and line heights", () => {
     expect(FontSize.xs).toBeGreaterThan(0);
     expect(FontSize.sm).toBeGreaterThan(0);
