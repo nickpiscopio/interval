@@ -135,12 +135,12 @@ describe("CreateTimerScreen", () => {
     fireEvent.press(lowInterval);
 
     expect(getByText("Edit Interval")).toBeTruthy();
-    // Tap Done to close modal
-    const doneBtn = getByText("Done");
+    // Tap Done checkmark button to close modal
+    const doneBtn = getByTestId("edit-interval-done-btn");
     fireEvent.press(doneBtn);
 
     await waitFor(() => {
-      expect(queryByText("Done")).toBeNull();
+      expect(queryByText("Edit Interval")).toBeNull();
     });
   });
 
@@ -182,7 +182,7 @@ describe("CreateTimerScreen", () => {
     fireEvent.press(duplicateBtn);
 
     // Close modal
-    fireEvent.press(getByText("Done"));
+    fireEvent.press(getByTestId("edit-interval-done-btn"));
     await waitFor(() => {
       expect(getByText("Interval 3 (Copy)")).toBeTruthy();
       expect(getByText("Interval 3")).toBeTruthy();
@@ -265,8 +265,8 @@ describe("CreateTimerScreen", () => {
     const checkmark = getByTestId("icon-checkmark");
     fireEvent.press(checkmark);
 
-    // Tap Done
-    fireEvent.press(getByText("Done"));
+    // Tap Done checkmark button
+    fireEvent.press(getByTestId("edit-interval-done-btn"));
     await waitFor(() => {
       expect(getByText("Burpees Warmup")).toBeTruthy();
     });
@@ -359,7 +359,7 @@ describe("CreateTimerScreen", () => {
       goBack: jest.fn(),
     };
 
-    const { getByDisplayValue, getByText } = render(
+    const { getByDisplayValue, getByText, getByTestId } = render(
       <AlertProvider>
         <CreateTimerScreen navigation={mockNavigation} route={{} as any} />
       </AlertProvider>
@@ -373,8 +373,8 @@ describe("CreateTimerScreen", () => {
     fireEvent.changeText(lowDurationInput, "055832");
     expect(getByDisplayValue("05:58:32")).toBeTruthy();
 
-    // Tap Done
-    fireEvent.press(getByText("Done"));
+    // Tap Done checkmark button
+    fireEvent.press(getByTestId("edit-interval-done-btn"));
     await waitFor(() => {
       expect(getByText("5h 58m 32s")).toBeTruthy();
     });
@@ -459,29 +459,29 @@ describe("CreateTimerScreen", () => {
       expect(queryByText("Interval 3")).toBeNull();
     });
 
-    // 2. Add interval, set duration to 0 and tap Done -> discarded
+    // 2. Add interval, set duration to 0 and tap Done checkmark -> discarded
     fireEvent.press(getByText("Add Interval"));
     const durationInput = getByPlaceholderText("00:00:30");
     fireEvent.changeText(durationInput, "0");
     fireEvent(durationInput, "blur");
-    fireEvent.press(getByText("Done"));
+    fireEvent.press(getByTestId("edit-interval-done-btn"));
     await waitFor(() => {
       expect(queryByText("Edit Interval")).toBeNull();
       expect(queryByText("Interval 3")).toBeNull();
     });
 
-    // 3. Add interval, tap Done with untouched defaults -> added as Interval 3 (30s)
+    // 3. Add interval, tap Done checkmark with untouched defaults -> added as Interval 3 (30s)
     fireEvent.press(getByText("Add Interval"));
-    fireEvent.press(getByText("Done"));
+    fireEvent.press(getByTestId("edit-interval-done-btn"));
     await waitFor(() => {
       expect(getByText("Interval 3")).toBeTruthy();
     });
 
-    // 4. Edit existing Interval 3, clear name, and tap Done -> falls back to Interval 3
+    // 4. Edit existing Interval 3, clear name, and tap Done checkmark -> falls back to Interval 3
     fireEvent.press(getByText("Interval 3"));
     const nameInput = getByPlaceholderText("Interval 3");
     fireEvent.changeText(nameInput, "");
-    fireEvent.press(getByText("Done"));
+    fireEvent.press(getByTestId("edit-interval-done-btn"));
     await waitFor(() => {
       expect(getByText("Interval 3")).toBeTruthy();
     });

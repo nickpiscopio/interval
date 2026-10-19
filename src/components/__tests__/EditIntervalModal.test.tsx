@@ -2,6 +2,12 @@ import React from "react";
 import { render, fireEvent, waitFor } from "@testing-library/react-native";
 import { EditIntervalModal } from "../EditIntervalModal";
 import { Interval } from "../../model/Interval";
+import { StyleSheet } from "react-native";
+import Spacing, { TOUCH_TARGET } from "../../constants/Spacing";
+import Colors from "../../constants/Colors";
+import FontSize from "../../constants/FontSize";
+
+const styleOf = (el: any) => StyleSheet.flatten(el.props.style) ?? {};
 
 describe("EditIntervalModal", () => {
   const sampleInterval: Interval = {
@@ -46,7 +52,11 @@ describe("EditIntervalModal", () => {
     );
 
     expect(getByText("Edit Interval")).toBeTruthy();
-    expect(getByText("Done")).toBeTruthy();
+    expect(getByTestId("edit-interval-done-btn")).toBeTruthy();
+    expect(getByTestId("edit-interval-done-icon")).toBeTruthy();
+
+    // Section title
+    expect(getByText("Interval Name")).toBeTruthy();
 
     // Edit Name
     const nameInput = getByPlaceholderText("Interval name");
@@ -89,8 +99,8 @@ describe("EditIntervalModal", () => {
       expect(onDelete).toHaveBeenCalled();
     });
 
-    // Done Action
-    const doneBtn = getByText("Done");
+    // Done Action via Checkmark Button
+    const doneBtn = getByTestId("edit-interval-done-btn");
     fireEvent.press(doneBtn);
     await waitFor(() => {
       expect(onClose).toHaveBeenCalled();
@@ -137,19 +147,47 @@ describe("EditIntervalModal sound picker", () => {
 
   beforeEach(() => createAudioPlayer.mockClear());
 
-  it("renders every sound plus None and checks Beep when absent", () => {
+  it("renders sound pills without speaker or checkmark icons and highlights selected with active tinting", () => {
     const { getByText, getByTestId, queryByTestId } = setup(base);
     expect(getByText("Interval Sound")).toBeTruthy();
     expect(getByText("Beep")).toBeTruthy();
     expect(getByText("Triple Beep")).toBeTruthy();
     expect(getByText("None")).toBeTruthy();
-    expect(getByTestId("sound-checkmark-beep")).toBeTruthy();
+
+    // Checkmark icons should not be present
+    expect(queryByTestId("sound-checkmark-beep")).toBeNull();
     expect(queryByTestId("sound-checkmark-beep_3")).toBeNull();
+    expect(queryByTestId("sound-checkmark-none")).toBeNull();
+
+    // Active pill styling (AI Workout Generator style)
+    const beepPill = styleOf(getByTestId("sound-pill-beep"));
+    expect(beepPill.borderWidth).toBe(1.5);
+    expect(beepPill.borderColor).toBe(Colors.primary);
+    expect(beepPill.backgroundColor).toBe(Colors.surface.tintActive);
+
+    const beepText = styleOf(getByTestId("sound-pill-text-beep"));
+    expect(beepText.fontFamily).toBe("Poppins-Bold");
+    expect(beepText.color).toBe(Colors.primary);
+
+    // Resting pill styling
+    const nonePill = styleOf(getByTestId("sound-pill-none"));
+    expect(nonePill.borderWidth).toBe(1.5);
+    expect(nonePill.borderColor).toBe(Colors.borderInput);
+    expect(nonePill.backgroundColor).toBe(Colors.surface.card);
+
+    const noneText = styleOf(getByTestId("sound-pill-text-none"));
+    expect(noneText.fontFamily).toBe("Poppins-Medium");
+    expect(noneText.color).toBe(Colors.textScale.primary);
   });
 
-  it("checks the stored sound", () => {
+  it("highlights stored sound with active pill styling", () => {
     const { getByTestId } = setup({ ...base, sound: "none" });
-    expect(getByTestId("sound-checkmark-none")).toBeTruthy();
+    const nonePill = styleOf(getByTestId("sound-pill-none"));
+    expect(nonePill.borderColor).toBe(Colors.primary);
+    expect(nonePill.backgroundColor).toBe(Colors.surface.tintActive);
+
+    const beepPill = styleOf(getByTestId("sound-pill-beep"));
+    expect(beepPill.borderColor).toBe(Colors.borderInput);
   });
 
   it("selects a sound and previews it", () => {
@@ -176,3 +214,101 @@ describe("EditIntervalModal sound picker", () => {
     expect(createAudioPlayer.mock.results[1].value.release).toHaveBeenCalled();
   });
 });
+
+describe("EditIntervalModal sheet spacing & layout refinement", () => {
+  const interval = { id: "int-1", name: "Work", duration: 30, color: "#3B82F6" };
+
+  function renderSheet() {
+    return render(
+      <EditIntervalModal
+        visible={true}
+        interval={interval}
+        onClose={jest.fn()}
+        onUpdate={jest.fn()}
+        onDelete={jest.fn()}
+        onDuplicate={jest.fn()}
+        onOpenExercisePicker={jest.fn()}
+      />
+    );
+  }
+
+  it("pads the sheet content 16px on the sides and 8px on top", () => {
+    const { getByTestId } = renderSheet();
+    const content = StyleSheet.flatten(getByTestId("edit-interval-sheet").props.contentContainerStyle);
+    expect(content.paddingHorizontal).toBe(Spacing.md);
+    expect(content.paddingTop).toBe(Spacing.sm);
+  });
+
+  it("separates the header from the form by 16px and renders a 44x44 checkmark button", () => {
+    const { getByTestId } = renderSheet();
+    expect(styleOf(getByTestId("edit-interval-header")).marginBottom).toBe(Spacing.md);
+
+    const doneBtn = styleOf(getByTestId("edit-interval-done-btn"));
+    expect(doneBtn.width).toBe(TOUCH_TARGET.icon);
+    expect(doneBtn.height).toBe(TOUCH_TARGET.icon);
+    expect(getByTestId("edit-interval-done-icon").props.children).toBe("checkmark");
+  });
+
+  it("separates sections by 24px", () => {
+    const { getByTestId } = renderSheet();
+    expect(styleOf(getByTestId("edit-interval-input-row")).marginBottom).toBe(Spacing.lg);
+    expect(styleOf(getByTestId("edit-interval-color-palette")).marginBottom).toBe(Spacing.lg);
+    expect(styleOf(getByTestId("edit-interval-sound-palette")).marginBottom).toBe(Spacing.lg);
+    expect(styleOf(getByTestId("edit-interval-actions")).marginTop ?? 0).toBe(0);
+  });
+
+  it("bolds section titles in Title Case with Poppins-Bold", () => {
+    const { getByTestId } = renderSheet();
+    const nameLabel = getByTestId("edit-interval-name-label");
+    const durationLabel = getByTestId("edit-interval-duration-label");
+    const colorLabel = getByTestId("edit-interval-color-label");
+    const soundLabel = getByTestId("edit-interval-sound-label");
+
+    expect(nameLabel.props.children).toBe("Interval Name");
+    expect(durationLabel.props.children).toBe("Duration");
+    expect(colorLabel.props.children).toBe("Interval Color");
+    expect(soundLabel.props.children).toBe("Interval Sound");
+
+    for (const label of [nameLabel, durationLabel, colorLabel, soundLabel]) {
+      const s = styleOf(label);
+      expect(s.fontFamily).toBe("Poppins-Bold");
+    }
+  });
+
+  it("normalizes label rows so name and duration inputs align vertically without duplicate margins", () => {
+    const { getByTestId } = renderSheet();
+    const nameLabelRow = styleOf(getByTestId("edit-interval-name-label-row"));
+    const durationLabelRow = styleOf(getByTestId("edit-interval-duration-label-row"));
+
+    expect(nameLabelRow.marginBottom).toBe(Spacing.sm);
+    expect(durationLabelRow.marginBottom).toBe(Spacing.sm);
+    expect(nameLabelRow.minHeight).toBe(20);
+    expect(durationLabelRow.minHeight).toBe(20);
+
+    const nameLabel = styleOf(getByTestId("edit-interval-name-label"));
+    const durationLabel = styleOf(getByTestId("edit-interval-duration-label"));
+    expect(nameLabel.marginBottom ?? 0).toBe(0);
+    expect(durationLabel.marginBottom ?? 0).toBe(0);
+  });
+
+  it("gives the interval name input 16px horizontal inner padding", () => {
+    const { getByTestId } = renderSheet();
+    const nameInput = styleOf(getByTestId("edit-interval-name-input"));
+    const durationInput = styleOf(getByTestId("edit-interval-duration-input"));
+
+    expect(nameInput.paddingHorizontal).toBe(Spacing.md);
+    expect(durationInput.paddingHorizontal).toBe(Spacing.sm);
+  });
+
+  it("adds no inner padding to palettes and gaps sound pills by 8px", () => {
+    const { getByTestId } = renderSheet();
+    const color = styleOf(getByTestId("edit-interval-color-palette"));
+    const sound = styleOf(getByTestId("edit-interval-sound-palette"));
+    for (const s of [color, sound]) {
+      expect(s.paddingHorizontal).toBeUndefined();
+      expect(s.paddingVertical).toBeUndefined();
+    }
+    expect(sound.gap).toBe(Spacing.sm);
+  });
+});
+

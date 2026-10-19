@@ -62,6 +62,7 @@
     "intervals": "Intervals",
     "addInterval": "Add Interval",
     "addFromLibrary": "Add Exercise",
+    "intervalNameLabel": "Interval Name",
     "intervalNamePlaceholder": "Interval name",
     "defaultIntervalName": "Interval %{number}",
     "seconds": "seconds",

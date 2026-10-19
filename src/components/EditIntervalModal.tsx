@@ -193,6 +193,7 @@ export function EditIntervalModal({
       keyboardBlurBehavior="restore"
     >
       <BottomSheetScrollView
+        testID="edit-interval-sheet"
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
           styles.sheetContainer,
@@ -200,24 +201,32 @@ export function EditIntervalModal({
         ]}
       >
         {/* Header Bar */}
-        <View style={styles.header}>
+        <View testID="edit-interval-header" style={styles.header}>
           <Text style={styles.title}>{t("createTimer.titleEdit")}</Text>
           <TouchableOpacity
             testID="edit-interval-done-btn"
+            accessibilityLabel={t("common.done", { defaultValue: "Done" })}
             onPress={handleDone}
-            style={styles.doneButton}
+            style={styles.doneIconButton}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <Text style={styles.doneButtonText}>{t("common.done")}</Text>
+            <Ionicons
+              name="checkmark"
+              size={24}
+              color={Colors.primary}
+              testID="edit-interval-done-icon"
+            />
           </TouchableOpacity>
         </View>
 
         {/* Form Content */}
-        <View style={styles.editorInputRow}>
+        <View testID="edit-interval-input-row" style={styles.editorInputRow}>
           {/* Interval Name */}
           <View style={styles.inputGroup}>
-            <View style={styles.inputLabelRow}>
-              <Text style={styles.inputLabel}>{t("createTimer.intervalNamePlaceholder")}</Text>
+            <View testID="edit-interval-name-label-row" style={styles.inputLabelRow}>
+              <Text testID="edit-interval-name-label" style={[styles.inputLabel, styles.inputLabelInRow]}>
+                {t("createTimer.intervalNameLabel")}
+              </Text>
               <TouchableOpacity
                 style={styles.libraryPickerBtn}
                 onPress={onOpenExercisePicker}
@@ -230,6 +239,7 @@ export function EditIntervalModal({
               </TouchableOpacity>
             </View>
             <BottomSheetTextInput
+              testID="edit-interval-name-input"
               style={styles.editorTextInput}
               value={interval.name}
               onChangeText={(name) => onUpdate({ name })}
@@ -244,8 +254,13 @@ export function EditIntervalModal({
 
           {/* Duration */}
           <View style={[styles.inputGroup, { flex: 0.55 }]}>
-            <Text style={styles.inputLabel}>{t("common.duration")}</Text>
+            <View testID="edit-interval-duration-label-row" style={styles.inputLabelRow}>
+              <Text testID="edit-interval-duration-label" style={[styles.inputLabel, styles.inputLabelInRow]}>
+                {t("common.duration")}
+              </Text>
+            </View>
             <BottomSheetTextInput
+              testID="edit-interval-duration-input"
               style={styles.timeInput}
               value={durationInputText}
               onChangeText={handleDurationChange}
@@ -259,8 +274,10 @@ export function EditIntervalModal({
         </View>
 
         {/* Color Picker */}
-        <Text style={styles.inputLabel}>{t("createTimer.intervalColor")}</Text>
-        <View style={styles.colorPalette}>
+        <Text testID="edit-interval-color-label" style={styles.inputLabel}>
+          {t("createTimer.intervalColor")}
+        </Text>
+        <View testID="edit-interval-color-palette" style={styles.colorPalette}>
           {COLOR_PALETTE.map((color) => {
             const isSelected = (interval.color || "#1ACC6C") === color;
             return (
@@ -279,8 +296,10 @@ export function EditIntervalModal({
         </View>
 
         {/* Sound Picker */}
-        <Text style={styles.inputLabel}>{t("createTimer.intervalSound")}</Text>
-        <View style={styles.soundPalette}>
+        <Text testID="edit-interval-sound-label" style={styles.inputLabel}>
+          {t("createTimer.intervalSound")}
+        </Text>
+        <View testID="edit-interval-sound-palette" style={styles.soundPalette}>
           {[
             ...INTERVAL_SOUNDS.map((s) => ({ id: s.id, label: t(s.labelKey) })),
             { id: NONE_SOUND_ID, label: t("createTimer.soundNone") },
@@ -294,29 +313,19 @@ export function EditIntervalModal({
                 style={[styles.soundPill, isSelected && styles.soundPillSelected]}
                 activeOpacity={0.8}
               >
-                <Ionicons
-                  name={sound.id === NONE_SOUND_ID ? "volume-mute-outline" : "volume-high-outline"}
-                  size={FontSize.md}
-                  color={isSelected ? Colors.primary : Colors.textScale.secondary}
-                />
-                <Text style={[styles.soundPillText, isSelected && styles.soundPillTextSelected]}>
+                <Text
+                  testID={`sound-pill-text-${sound.id}`}
+                  style={[styles.soundPillText, isSelected && styles.soundPillTextSelected]}
+                >
                   {sound.label}
                 </Text>
-                {isSelected && (
-                  <Ionicons
-                    name="checkmark"
-                    size={FontSize.md}
-                    color={Colors.primary}
-                    testID={`sound-checkmark-${sound.id}`}
-                  />
-                )}
               </TouchableOpacity>
             );
           })}
         </View>
 
         {/* Interval Actions: Delete & Duplicate */}
-        <View style={styles.intervalActions}>
+        <View testID="edit-interval-actions" style={styles.intervalActions}>
           <TouchableOpacity onPress={handleDelete} style={styles.deleteIconButton}>
             <Ionicons name="trash-outline" size={22} color="#E63946" />
           </TouchableOpacity>
@@ -345,33 +354,30 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   sheetContainer: {
-    paddingHorizontal: Spacing.lg,
-    paddingTop: Spacing.xs,
+    paddingHorizontal: Spacing.md,
+    paddingTop: Spacing.sm,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: Spacing.sm,
+    marginBottom: Spacing.md,
   },
   title: {
     fontSize: FontSize.lg,
     fontFamily: "Poppins-Bold",
     color: Colors.textScale.primary,
   },
-  doneButton: {
-    paddingVertical: Spacing.xs,
-    paddingHorizontal: Spacing.sm,
-  },
-  doneButtonText: {
-    fontSize: FontSize.md,
-    fontFamily: "Poppins-Bold",
-    color: Colors.primary,
+  doneIconButton: {
+    width: TOUCH_TARGET.icon,
+    height: TOUCH_TARGET.icon,
+    alignItems: "center",
+    justifyContent: "center",
   },
   editorInputRow: {
     flexDirection: "row",
     gap: Spacing.sm,
-    marginBottom: Spacing.sm,
+    marginBottom: Spacing.lg,
   },
   inputGroup: {
     flex: 1,
@@ -380,13 +386,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 4,
+    minHeight: 20,
+    marginBottom: Spacing.sm,
   },
   inputLabel: {
     fontSize: FontSize.xs,
-    fontFamily: "Poppins-Medium",
+    fontFamily: "Poppins-Bold",
     color: Colors.textScale.secondary,
-    marginBottom: 4,
+    marginBottom: Spacing.sm,
+  },
+  inputLabelInRow: {
+    marginBottom: 0,
   },
   libraryPickerBtn: {
     flexDirection: "row",
@@ -404,7 +414,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.borderInput,
     borderRadius: RADIUS.sm,
-    paddingHorizontal: Spacing.sm,
+    paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.xs,
     fontSize: FontSize.sm,
     fontFamily: "Poppins-Regular",
@@ -429,9 +439,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: Spacing.xs,
-    paddingVertical: Spacing.xs,
-    marginBottom: Spacing.sm,
+    marginBottom: Spacing.lg,
   },
   colorCircle: {
     width: 34,
@@ -443,37 +451,39 @@ const styles = StyleSheet.create({
   soundPalette: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: Spacing.xs,
-    paddingHorizontal: Spacing.xs,
-    paddingVertical: Spacing.xs,
-    marginBottom: Spacing.sm,
+    gap: Spacing.sm,
+    marginBottom: Spacing.lg,
   },
   soundPill: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: Spacing.xs,
     minHeight: TOUCH_TARGET.min,
-    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
     borderRadius: RADIUS.full,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: Colors.borderInput,
-    backgroundColor: Colors.surface.screen,
+    backgroundColor: Colors.surface.card,
+    justifyContent: "center",
+    alignItems: "center",
   },
   soundPillSelected: {
     borderColor: Colors.primary,
+    backgroundColor: Colors.surface.tintActive,
   },
   soundPillText: {
     fontSize: FontSize.sm,
+    lineHeight: FontSize.lineHeight.sm,
     fontFamily: "Poppins-Medium",
-    color: Colors.textScale.secondary,
+    color: Colors.textScale.primary,
+    textAlign: "center",
   },
   soundPillTextSelected: {
     color: Colors.primary,
+    fontFamily: "Poppins-Bold",
   },
   intervalActions: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: Spacing.xs,
+    marginTop: 0,
   },
   deleteIconButton: {
     width: TOUCH_TARGET.icon,

@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   scrollContent: {
-    paddingHorizontal: Spacing.lg,
+    paddingHorizontal: Spacing.md,
     paddingTop: Spacing.xs,
     paddingBottom: Spacing.md,
   },
@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   footerActions: {
-    paddingHorizontal: Spacing.lg,
+    paddingHorizontal: Spacing.md,
     paddingTop: Spacing.sm,
     paddingBottom: Spacing.md,
     backgroundColor: Colors.surface.card,

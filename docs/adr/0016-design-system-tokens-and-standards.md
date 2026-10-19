@@ -46,7 +46,8 @@ We decided to establish a comprehensive, single-source-of-truth design system co
    - **Backdrop**: Translucent darkened overlay (`Colors.surface.overlay`) with animated opacity fade-in.
    - **Sheet Transitions**: Slide-up transition (`animationType="slide"`).
    - **Top Corners**: Rounded top corners (`borderTopLeftRadius: RADIUS.lg`, `borderTopRightRadius: RADIUS.lg`).
-   - **Dismissal**: Top-right "Done" / close button and tapping the backdrop dismisses the sheet.
+   - **Dismissal**: Top-right checkmark / close button and tapping the backdrop dismisses the sheet.
+   - **Sheet Spacing**: Content padding is `Spacing.md` (16px) on the sides and `Spacing.sm` (8px) on top; bottom padding is `max(safe-area inset, Spacing.md)`. Sections are separated by `Spacing.lg` (24px), labels sit `Spacing.sm` (8px) above their controls, and chip/pill/swatch palettes have no extra inner padding so they align with input edges.
 
 7. **Standardized Loading Indicator System**:
    - **Full Viewport Replacement**: Centered loading indicator (`ActivityIndicator size="large" color={Colors.primary}`).

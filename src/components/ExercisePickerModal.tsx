@@ -546,7 +546,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   detailScrollContent: {
-    paddingHorizontal: Spacing.lg,
+    paddingHorizontal: Spacing.md,
     paddingTop: Spacing.sm,
     paddingBottom: Spacing.xl,
   },
@@ -640,7 +640,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   detailFooter: {
-    paddingHorizontal: Spacing.lg,
+    paddingHorizontal: Spacing.md,
     paddingTop: Spacing.sm,
     paddingBottom: Spacing.md,
     backgroundColor: Colors.surface.card,
