@@ -41,8 +41,8 @@ A numeric text entry mechanism for interval duration that queues digits right-to
 _Avoid_: Time Picker Wheel, Single-Digit Parser
 
 **Interval Edit Bottom Sheet**:
-A dedicated slide-up bottom sheet modal (`animationType="slide"`) with an animated transparent fade-in backdrop for inspecting and editing an individual interval's name, duration, and color with a top-right "Done" button and self-contained keyboard avoidance.
-_Avoid_: Carousel Slider, Inline Accordion
+A dedicated slide-up bottom sheet modal (`animationType="slide"`) with an animated transparent fade-in backdrop for inspecting and editing an individual interval's name, duration, and color with a top-right "Done" button, dynamic sequence placeholder fallback (`Interval X` and `00:00:30` default duration), deferred addition until saved/done, duplicate duration validation, and self-contained keyboard avoidance.
+_Avoid_: Carousel Slider, Inline Accordion, Optimistic Empty Interval Addition
 
 **Floating Navigation Bar & Action Buttons**:
 A translucent floating bottom bar for switching between Workouts and Exercise Library with stacked floating action buttons (FABs) on the bottom-right for timer generation and creation.

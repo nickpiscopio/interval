@@ -151,34 +151,49 @@ describe("CreateTimerScreen", () => {
       goBack: jest.fn(),
     };
 
-    const { getByText, getAllByText, getByTestId, getAllByTestId, queryByText } = render(
+    const { getByText, getAllByText, getByPlaceholderText, getByTestId, getAllByTestId, queryByText } = render(
       <AlertProvider>
         <CreateTimerScreen navigation={mockNavigation} route={{} as any} />
       </AlertProvider>
     );
 
-    // Add new interval -> immediately opens modal
+    // Add new interval -> opens modal in draft mode
     const addIntervalBtn = getByText("Add Interval");
     fireEvent.press(addIntervalBtn);
 
     expect(getByText("Edit Interval")).toBeTruthy();
+    // Verify interval is NOT added to the list until saved
+    expect(queryByText("Interval 3")).toBeNull();
 
-    // Duplicate interval
+    // If duration is 0, duplicate warns and prevents duplication
+    const durationInput = getByPlaceholderText("00:00:30");
+    fireEvent.changeText(durationInput, "0");
+    fireEvent(durationInput, "blur");
+
     const duplicateBtn = getByTestId("icon-copy-outline");
+    fireEvent.press(duplicateBtn);
+    expect(getByText("All intervals must have a duration greater than 0.")).toBeTruthy();
+    // Dismiss alert
+    fireEvent.press(getByText("OK"));
+
+    // Reset duration to valid and duplicate
+    fireEvent.changeText(durationInput, "30");
+    fireEvent(durationInput, "blur");
     fireEvent.press(duplicateBtn);
 
     // Close modal
     fireEvent.press(getByText("Done"));
     await waitFor(() => {
-      expect(getByText("Add Interval (Copy)")).toBeTruthy();
+      expect(getByText("Interval 3 (Copy)")).toBeTruthy();
+      expect(getByText("Interval 3")).toBeTruthy();
     });
 
     // Reopen modal on duplicated item and delete it
-    fireEvent.press(getByText("Add Interval (Copy)"));
+    fireEvent.press(getByText("Interval 3 (Copy)"));
     const trashBtn = getByTestId("icon-trash-outline");
     fireEvent.press(trashBtn);
     await waitFor(() => {
-      expect(queryByText("Add Interval (Copy)")).toBeNull();
+      expect(queryByText("Interval 3 (Copy)")).toBeNull();
     });
 
     // Open and delete Low Interval
@@ -192,13 +207,11 @@ describe("CreateTimerScreen", () => {
     fireEvent.press(getByText("High Interval"));
     fireEvent.press(getByTestId("icon-trash-outline"));
 
-    // Open remaining Add Interval and try deleting last one -> triggers warning
+    // Open remaining Interval 3 and try deleting last one -> triggers warning
     await waitFor(() => {
-      const items = getAllByText("Add Interval");
-      expect(items.length).toBeGreaterThan(0);
+      expect(getByText("Interval 3")).toBeTruthy();
     });
-    const addIntervalItems = getAllByText("Add Interval");
-    fireEvent.press(addIntervalItems[addIntervalItems.length - 1]);
+    fireEvent.press(getByText("Interval 3"));
     fireEvent.press(getByTestId("icon-trash-outline"));
     expect(getByText("Please add at least one interval.")).toBeTruthy();
 
@@ -421,5 +434,56 @@ describe("CreateTimerScreen", () => {
     fireEvent.press(backBtn);
 
     expect(mockNavigation.goBack).toHaveBeenCalled();
+  });
+
+  it("handles deferred new interval lifecycle: discard on delete, discard on 0 duration, and save with default placeholders", async () => {
+    const mockNavigation: any = {
+      setOptions: jest.fn(),
+      navigate: jest.fn(),
+      goBack: jest.fn(),
+    };
+
+    const { getByText, getByPlaceholderText, getByTestId, queryByText } = render(
+      <AlertProvider>
+        <CreateTimerScreen navigation={mockNavigation} route={{} as any} />
+      </AlertProvider>
+    );
+
+    // 1. Add interval and discard using delete button
+    fireEvent.press(getByText("Add Interval"));
+    expect(getByText("Edit Interval")).toBeTruthy();
+    expect(getByPlaceholderText("Interval 3")).toBeTruthy();
+    fireEvent.press(getByTestId("icon-trash-outline"));
+    await waitFor(() => {
+      expect(queryByText("Edit Interval")).toBeNull();
+      expect(queryByText("Interval 3")).toBeNull();
+    });
+
+    // 2. Add interval, set duration to 0 and tap Done -> discarded
+    fireEvent.press(getByText("Add Interval"));
+    const durationInput = getByPlaceholderText("00:00:30");
+    fireEvent.changeText(durationInput, "0");
+    fireEvent(durationInput, "blur");
+    fireEvent.press(getByText("Done"));
+    await waitFor(() => {
+      expect(queryByText("Edit Interval")).toBeNull();
+      expect(queryByText("Interval 3")).toBeNull();
+    });
+
+    // 3. Add interval, tap Done with untouched defaults -> added as Interval 3 (30s)
+    fireEvent.press(getByText("Add Interval"));
+    fireEvent.press(getByText("Done"));
+    await waitFor(() => {
+      expect(getByText("Interval 3")).toBeTruthy();
+    });
+
+    // 4. Edit existing Interval 3, clear name, and tap Done -> falls back to Interval 3
+    fireEvent.press(getByText("Interval 3"));
+    const nameInput = getByPlaceholderText("Interval 3");
+    fireEvent.changeText(nameInput, "");
+    fireEvent.press(getByText("Done"));
+    await waitFor(() => {
+      expect(getByText("Interval 3")).toBeTruthy();
+    });
   });
 });

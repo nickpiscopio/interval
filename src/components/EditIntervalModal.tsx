@@ -54,6 +54,7 @@ function parseHHMMSSToSeconds(formatted: string): number {
 export interface EditIntervalModalProps {
   visible: boolean;
   interval: Interval | null;
+  sequenceNumber?: number;
   onClose: () => void;
   onUpdate: (updated: Partial<Interval>) => void;
   onDelete: () => void;
@@ -64,6 +65,7 @@ export interface EditIntervalModalProps {
 export function EditIntervalModal({
   visible,
   interval,
+  sequenceNumber,
   onClose,
   onUpdate,
   onDelete,
@@ -84,7 +86,13 @@ export function EditIntervalModal({
 
   useEffect(() => {
     if (interval) {
-      setDurationInputText(formatHHMMSS(interval.duration));
+      if (interval.duration > 0) {
+        setDurationInputText(formatHHMMSS(interval.duration));
+      } else if (interval.duration === 0) {
+        setDurationInputText("00:00:00");
+      } else {
+        setDurationInputText("");
+      }
     }
   }, [interval?.id, interval?.duration, visible]);
 
@@ -107,6 +115,11 @@ export function EditIntervalModal({
 
   function handleDurationChange(text: string) {
     const rawDigits = text.replace(/\D/g, "");
+    if (!rawDigits) {
+      setDurationInputText("");
+      onUpdate({ duration: -1 });
+      return;
+    }
     const truncated = rawDigits.slice(-6);
     const padded = truncated.padStart(6, "0");
     const formatted = `${padded.slice(0, 2)}:${padded.slice(2, 4)}:${padded.slice(4, 6)}`;
@@ -116,10 +129,12 @@ export function EditIntervalModal({
   }
 
   function handleDurationBlur() {
+    if (!durationInputText) {
+      return;
+    }
     const totalSeconds = parseHHMMSSToSeconds(durationInputText);
-    const finalSeconds = totalSeconds < 1 ? 1 : totalSeconds;
-    setDurationInputText(formatHHMMSS(finalSeconds));
-    onUpdate({ duration: finalSeconds });
+    setDurationInputText(formatHHMMSS(totalSeconds));
+    onUpdate({ duration: totalSeconds });
   }
 
   function handleDone() {
@@ -187,7 +202,11 @@ export function EditIntervalModal({
               style={styles.editorTextInput}
               value={interval.name}
               onChangeText={(name) => onUpdate({ name })}
-              placeholder={t("createTimer.intervalNamePlaceholder")}
+              placeholder={
+                sequenceNumber
+                  ? t("createTimer.defaultIntervalName", { number: sequenceNumber })
+                  : t("createTimer.intervalNamePlaceholder")
+              }
               placeholderTextColor="#9CA3AF"
             />
           </View>
@@ -200,6 +219,8 @@ export function EditIntervalModal({
               value={durationInputText}
               onChangeText={handleDurationChange}
               onBlur={handleDurationBlur}
+              placeholder="00:00:30"
+              placeholderTextColor="#9CA3AF"
               keyboardType="number-pad"
               selectTextOnFocus
             />

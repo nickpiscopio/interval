@@ -58,6 +58,7 @@
     "addInterval": "Añadir Intervalo",
     "addFromLibrary": "Añadir Ejercicio",
     "intervalNamePlaceholder": "Nombre del intervalo",
+    "defaultIntervalName": "Intervalo %{number}",
     "seconds": "segundos",
     "saveWorkout": "Guardar Rutina",
     "deleteWorkout": "Eliminar Rutina",

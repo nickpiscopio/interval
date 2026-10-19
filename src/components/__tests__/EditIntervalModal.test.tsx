@@ -63,10 +63,14 @@ describe("EditIntervalModal", () => {
     fireEvent.changeText(durationInput, "30");
     expect(onUpdate).toHaveBeenCalledWith({ duration: 30 });
 
-    // Blur normalizes minimum 1s
+    // Change duration to 0 and blur
     fireEvent.changeText(durationInput, "0");
     fireEvent(durationInput, "blur");
-    expect(onUpdate).toHaveBeenCalledWith({ duration: 1 });
+    expect(onUpdate).toHaveBeenCalledWith({ duration: 0 });
+
+    // Clear duration
+    fireEvent.changeText(durationInput, "");
+    expect(onUpdate).toHaveBeenCalledWith({ duration: -1 });
 
     // Select Color
     const checkmark = getByTestId("icon-checkmark");
@@ -91,5 +95,23 @@ describe("EditIntervalModal", () => {
     await waitFor(() => {
       expect(onClose).toHaveBeenCalled();
     });
+  });
+
+  it("renders dynamic sequenceNumber placeholder and duration placeholder for new interval", () => {
+    const { getByPlaceholderText } = render(
+      <EditIntervalModal
+        visible={true}
+        interval={{ id: "new-1", name: "", duration: -1, color: "#1ACC6C" }}
+        sequenceNumber={3}
+        onClose={jest.fn()}
+        onUpdate={jest.fn()}
+        onDelete={jest.fn()}
+        onDuplicate={jest.fn()}
+        onOpenExercisePicker={jest.fn()}
+      />
+    );
+
+    expect(getByPlaceholderText("Interval 3")).toBeTruthy();
+    expect(getByPlaceholderText("00:00:30")).toBeTruthy();
   });
 });
