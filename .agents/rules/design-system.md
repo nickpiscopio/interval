@@ -2,6 +2,10 @@
 
 Whenever creating, modifying, or refactoring UI components, layouts, or screens in this repository, you MUST strictly adhere to the design system.
 
+**Consistency is key for design principles and must be followed throughout the entire application.**
+
+The design system rules must **NEVER** be broken unless explicitly authorized by the user. If the user does authorize an exception, a formal Architecture Decision Record (ADR) MUST be created documenting why the rule was broken, the reasoning, and the exact scope of the exception.
+
 There should **NEVER** be an instance where colors, sizes, or spacing are hardcoded. These must all come from the design system tokens. Buttons, cards, shadows, text buttons, text fields, icon buttons, and corner radii must remain 100% consistent across all screens.
 
 ---

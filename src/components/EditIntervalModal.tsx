@@ -215,15 +215,11 @@ export function EditIntervalModal({
               <TouchableOpacity
                 key={color}
                 onPress={() => onUpdate({ color })}
-                style={[
-                  styles.colorCircle,
-                  { backgroundColor: color },
-                  isSelected && styles.colorCircleSelected,
-                ]}
+                style={[styles.colorCircle, { backgroundColor: color }]}
                 activeOpacity={0.8}
               >
                 {isSelected && (
-                  <Ionicons name="checkmark" size={18} color="#FFFFFF" testID="icon-checkmark" />
+                  <Ionicons name="checkmark" size={20} color="#FFFFFF" testID="icon-checkmark" />
                 )}
               </TouchableOpacity>
             );
@@ -354,15 +350,6 @@ const styles = StyleSheet.create({
     borderRadius: 17,
     alignItems: "center",
     justifyContent: "center",
-  },
-  colorCircleSelected: {
-    borderWidth: 3,
-    borderColor: Colors.white,
-    shadowColor: Colors.black,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.5,
-    elevation: 2,
   },
   intervalActions: {
     flexDirection: "row",
