@@ -22,7 +22,6 @@ import { RootStackScreenProps } from "../types";
 import { Timer } from "../model/Timer";
 import { Interval, generateIntervalId, normalizeInterval } from "../model/Interval";
 import { Exercise } from "../model/Exercise";
-import { ExercisePickerModal } from "../components/ExercisePickerModal";
 import { EditIntervalModal } from "../components/EditIntervalModal";
 import { t } from "../i18n";
 import { useAlert } from "../context/AlertContext";
@@ -81,7 +80,6 @@ export default function CreateTimerScreen({
   const [editingInterval, setEditingInterval] = useState<Interval | null>(null);
   const [isAddingNewInterval, setIsAddingNewInterval] = useState<boolean>(false);
   const [showEditIntervalModal, setShowEditIntervalModal] = useState<boolean>(false);
-  const [showExercisePicker, setShowExercisePicker] = useState<boolean>(false);
   const [isScrolled, setIsScrolled] = useState<boolean>(false);
   const [headerHeight, setHeaderHeight] = useState<number>(0);
 
@@ -620,14 +618,7 @@ export default function CreateTimerScreen({
         onUpdate={updateInterval}
         onDelete={deleteSelectedInterval}
         onDuplicate={duplicateSelectedInterval}
-        onOpenExercisePicker={() => setShowExercisePicker(true)}
-      />
-
-      {/* Exercise Library Picker Modal */}
-      <ExercisePickerModal
-        visible={showExercisePicker}
-        onClose={() => setShowExercisePicker(false)}
-        onSelect={handlePickExercise}
+        onSelectExercise={handlePickExercise}
       />
     </KeyboardAvoidingView>
   );
@@ -658,6 +649,7 @@ const styles = StyleSheet.create({
     height: TOUCH_TARGET.icon,
     alignItems: "center",
     justifyContent: "center",
+    marginLeft: -10,
   },
   headerTitle: {
     fontSize: FontSize.lg,

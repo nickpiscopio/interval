@@ -1,30 +1,23 @@
-import React, { useRef, useEffect, useCallback, useMemo } from "react";
+import React from "react";
 import {
   StyleSheet,
   TouchableOpacity,
   View,
-  Dimensions,
 } from "react-native";
-import {
-  BottomSheetModal,
-  BottomSheetScrollView,
-  BottomSheetBackdrop,
-  BottomSheetBackdropProps,
-} from "@gorhom/bottom-sheet";
+import { BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import Colors from "../constants/Colors";
 import Spacing, { RADIUS, TOUCH_TARGET, SHADOWS } from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
 import { Text } from "./Themed";
+import { BottomSheetFrame } from "./BottomSheetFrame";
 import { Exercise, BodyPart } from "../model/Exercise";
 import {
   getLocalizedCategoryName,
   getLocalizedBodyPartName,
 } from "../constants/exerciseCatalog";
 import { t } from "../i18n";
-
-const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 export interface ExerciseDetailModalProps {
   visible: boolean;
@@ -45,36 +38,11 @@ export function ExerciseDetailModal({
   onStartQuickRoutine,
   onCreateCustomTimer,
 }: ExerciseDetailModalProps) {
-  const bottomSheetModalRef = useRef<BottomSheetModal>(null);
-  const snapPoints = useMemo(() => ["88%"], []);
-
-  useEffect(() => {
-    if (visible && exercise) {
-      bottomSheetModalRef.current?.present();
-    } else {
-      bottomSheetModalRef.current?.dismiss();
-    }
-  }, [visible, exercise]);
-
-  const renderBackdrop = useCallback(
-    (props: BottomSheetBackdropProps) => (
-      <BottomSheetBackdrop
-        {...props}
-        disappearsOnIndex={-1}
-        appearsOnIndex={0}
-        opacity={0.5}
-        pressBehavior="close"
-      />
-    ),
-    []
-  );
-
   if (!visible || !exercise) {
     return null;
   }
 
   function handleClose() {
-    bottomSheetModalRef.current?.dismiss();
     onClose();
   }
 
@@ -114,15 +82,7 @@ export function ExerciseDetailModal({
   const badgeColor = categoryColorMap[exercise.category] || Colors.primary;
 
   return (
-    <BottomSheetModal
-      ref={bottomSheetModalRef}
-      snapPoints={snapPoints}
-      stackBehavior="push"
-      onDismiss={onClose}
-      backdropComponent={renderBackdrop}
-      backgroundStyle={styles.sheetBackground}
-      handleIndicatorStyle={styles.handleBar}
-    >
+    <BottomSheetFrame visible={visible} onClose={onClose}>
       <View style={styles.sheetContainer}>
         {/* Close Button */}
         <TouchableOpacity
@@ -135,6 +95,7 @@ export function ExerciseDetailModal({
         </TouchableOpacity>
 
         <BottomSheetScrollView
+          style={styles.scroll}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
@@ -271,31 +232,21 @@ export function ExerciseDetailModal({
           )}
         </View>
       </View>
-    </BottomSheetModal>
+    </BottomSheetFrame>
   );
 }
 
 const styles = StyleSheet.create({
-  sheetBackground: {
-    backgroundColor: Colors.surface.card,
-    borderTopLeftRadius: RADIUS.lg,
-    borderTopRightRadius: RADIUS.lg,
-    ...SHADOWS.modal,
-  },
   sheetContainer: {
-    flex: 1,
+    flexShrink: 1,
   },
-  handleBar: {
-    width: 44,
-    height: 5,
-    borderRadius: RADIUS.xs,
-    backgroundColor: Colors.borderDefault,
-    alignSelf: "center",
+  scroll: {
+    flexShrink: 1,
   },
   closeButton: {
     position: "absolute",
-    top: 4,
-    right: 18,
+    top: 0,
+    right: 0,
     width: TOUCH_TARGET.icon,
     height: TOUCH_TARGET.icon,
     borderRadius: RADIUS.full,
@@ -305,7 +256,6 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   scrollContent: {
-    paddingHorizontal: Spacing.md,
     paddingTop: Spacing.xs,
     paddingBottom: Spacing.md,
   },
@@ -429,9 +379,7 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   footerActions: {
-    paddingHorizontal: Spacing.md,
     paddingTop: Spacing.sm,
-    paddingBottom: Spacing.md,
     backgroundColor: Colors.surface.card,
     borderTopWidth: 1,
     borderTopColor: Colors.borderDefault,
