@@ -237,6 +237,7 @@ const styles = StyleSheet.create({
     height: TOUCH_TARGET.icon,
     alignItems: "center",
     justifyContent: "center",
+    marginLeft: -10,
   },
   headerTitle: {
     fontSize: FontSize.lg,

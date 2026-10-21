@@ -45,16 +45,16 @@ A numeric text entry mechanism for interval duration that queues digits right-to
 _Avoid_: Time Picker Wheel, Single-Digit Parser
 
 **Interval Edit Bottom Sheet**:
-A dedicated slide-up bottom sheet modal (`animationType="slide"`) with an animated transparent fade-in backdrop for inspecting and editing an individual interval's name, duration, color, and Interval Sound with a top-right checkmark button, dynamic sequence placeholder fallback (`Interval X` and `00:00:30` default duration), deferred addition until saved/done, duplicate duration validation, and self-contained keyboard avoidance.
-_Avoid_: Carousel Slider, Inline Accordion, Optimistic Empty Interval Addition
+A dedicated slide-up bottom sheet modal (`@gorhom/bottom-sheet`) for inspecting and editing an individual interval's name, duration, color, and Interval Sound with a top-right checkmark button (`checkmark-sharp`) bounded strictly to a 44x44 touch target with zero hitSlop spillover and an optical offset (`marginRight: -10`) aligning the glyph flush at 16px from the right boundary, in-sheet drill-down navigation to the Exercise Library (expanding to 90% height with an icon-only back button without circular backdrop and no close button), safe-area bottom clearance (`insets.bottom + Spacing.lg`), dynamic sequence placeholder fallback (`Interval X` and `00:00:30` default duration), deferred addition until saved/done, duplicate duration validation, and self-contained keyboard avoidance.
+_Avoid_: Carousel Slider, Inline Accordion, Optimistic Empty Interval Addition, Stacked Bottom Sheet Modals, Circular Border Back Buttons in Sheet Headers, Touch Target Whitespace Spillover
 
 **Floating Navigation Bar & Action Buttons**:
 A translucent floating bottom bar for switching between Workouts and Exercise Library with stacked floating action buttons (FABs) on the bottom-right for timer generation and creation.
 _Avoid_: Tab Bar Dock, Bottom Action Sheet
 
 **Design System Tokens & Hierarchy**:
-Single-source-of-truth token architecture (`Colors`, `Spacing`, `FontSize`, `RADIUS`, `TOUCH_TARGET`, `SHADOWS`) strictly enforced across all components and screens without hardcoded values. Includes a 4-tier semantic corner radius scale (`RADIUS.sm: 8`, `RADIUS.md: 16`, `RADIUS.lg: 24`, `RADIUS.full: 9999`), universal bold lettering for text buttons (`Poppins-Bold`), enhanced icon+text button padding (`gap: Spacing.sm`), clean borderless surface cards with `SHADOWS.card`, unified shadow presets, dynamic type accessibility scaling, and safe-area list scrolling depth.
-_Avoid_: Hardcoded Hex Codes, Arbitrary Pixel Heights, Inline Shadow Literals, Card Borders, Unbolded Button Text
+Single-source-of-truth token architecture (`Colors`, `Spacing`, `FontSize`, `RADIUS`, `TOUCH_TARGET`, `SHADOWS`) strictly enforced across all components and screens without hardcoded values. Includes a 4-tier semantic corner radius scale (`RADIUS.sm: 8`, `RADIUS.md: 16`, `RADIUS.lg: 24`, `RADIUS.full: 9999`), universal bold lettering for text buttons (`Poppins-Bold`), enhanced icon+text button padding (`gap: Spacing.sm`), clean borderless surface cards with `SHADOWS.card`, optical icon alignment (`marginLeft: -10` on back buttons, `marginRight: -10` on right actions) aligning 24px glyphs flush with the 16px content margin while maintaining vertical centering with titles, edge-to-edge scrollable card architecture where items own `marginHorizontal: Spacing.md` and boundary margins so cards scroll cleanly under headers without clipping drop shadows, unified shadow presets, dynamic type accessibility scaling, and safe-area list scrolling depth.
+_Avoid_: Hardcoded Hex Codes, Arbitrary Pixel Heights, Inline Shadow Literals, Card Borders, Unbolded Button Text, Padded Scroll Containers Clipping Card Shadows, Misaligned Header Glyph Margins
 
 **Dynamic Contextual Motivations**:
 An intelligent post-workout motivation generator that dynamically evaluates workout duration, total rounds completed, and day of the week to deliver whimsical, fresh, and motivating celebration copy encouraging daily habit retention.

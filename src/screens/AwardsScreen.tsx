@@ -131,6 +131,8 @@ export default function AwardsScreen({ navigation }: RootStackScreenProps<"Award
         onLayout={(e) => setHeaderHeight(e.nativeEvent.layout.height)}
       >
         <TouchableOpacity
+          testID="header-back-button"
+          accessibilityLabel={t("common.back", { defaultValue: "Back" })}
           onPress={() => navigation.goBack()}
           activeOpacity={0.6}
           style={styles.backButton}
@@ -354,6 +356,7 @@ const styles = StyleSheet.create({
     height: TOUCH_TARGET.icon,
     justifyContent: "center",
     alignItems: "center",
+    marginLeft: -10,
   },
   headerTitle: {
     fontSize: FontSize.lg,

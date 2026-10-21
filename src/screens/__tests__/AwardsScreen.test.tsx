@@ -1,6 +1,6 @@
 import React from "react";
 import { render, fireEvent, waitFor } from "@testing-library/react-native";
-import { Share } from "react-native";
+import { Share, StyleSheet } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AwardsScreen from "../AwardsScreen";
 import { saveUserStats } from "../../services/badgeService";
@@ -26,7 +26,7 @@ describe("AwardsScreen", () => {
       goBack: jest.fn(),
     };
 
-    const { getByText, getAllByText } = render(
+    const { getByText, getAllByText, getByTestId } = render(
       <AwardsScreen navigation={mockNavigation} route={{} as any} />
     );
 
@@ -36,7 +36,9 @@ describe("AwardsScreen", () => {
     });
 
     // Test back button
-    const backButton = getByText("arrow-back");
+    const backButton = getByTestId("header-back-button");
+    const style = StyleSheet.flatten(backButton.props.style);
+    expect(style.marginLeft).toBe(-10);
     fireEvent.press(backButton);
     expect(mockNavigation.goBack).toHaveBeenCalled();
   });

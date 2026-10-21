@@ -10,11 +10,50 @@ if (!global.window.dispatchEvent) {
 }
 
 // Mock @gorhom/bottom-sheet
+// The modal renders a pressable backdrop (forwarding pressBehavior "close" to
+// the sheet's onDismiss) and surfaces its received props as `sheetProps` on a
+// `bottom-sheet-modal` View so tests can assert the configuration contract.
 jest.mock("@gorhom/bottom-sheet", () => {
+  const React = require("react");
+  const { View, Pressable } = require("react-native");
   const actualMock = require("@gorhom/bottom-sheet/mock");
+  const DismissContext = React.createContext(() => {});
+
+  const BottomSheetBackdrop = ({ pressBehavior }) => {
+    const onDismiss = React.useContext(DismissContext);
+    return React.createElement(Pressable, {
+      testID: "bottom-sheet-backdrop",
+      onPress: () => {
+        if (pressBehavior === "close") onDismiss();
+      },
+    });
+  };
+
+  class BottomSheetModal extends React.Component {
+    present() {}
+    dismiss() {}
+    render() {
+      const { children, backdropComponent, onDismiss, ...rest } = this.props;
+      return React.createElement(
+        View,
+        { testID: "bottom-sheet-modal", sheetProps: { ...rest, onDismiss } },
+        React.createElement(
+          DismissContext.Provider,
+          { value: () => onDismiss && onDismiss() },
+          backdropComponent
+            ? backdropComponent({ animatedIndex: { value: 0 }, animatedPosition: { value: 0 }, style: {} })
+            : null,
+          children
+        )
+      );
+    }
+  }
+
   return {
     ...actualMock,
-    BottomSheetBackdrop: () => null,
+    BottomSheetBackdrop,
+    BottomSheetModal,
+    BottomSheetView: ({ children, ...props }) => React.createElement(View, props, children),
   };
 });
 

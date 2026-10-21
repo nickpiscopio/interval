@@ -1,6 +1,8 @@
 import React from "react";
+import { StyleSheet } from "react-native";
 import { render, fireEvent, waitFor } from "@testing-library/react-native";
 import { ExerciseLibraryView } from "../ExerciseLibraryView";
+import Spacing from "../../constants/Spacing";
 
 describe("ExerciseLibraryView Component", () => {
   it("renders exercises and filters by category and body part", () => {
@@ -76,5 +78,40 @@ describe("ExerciseLibraryView Component", () => {
     await waitFor(() => {
       expect(onQuickRoutine).toHaveBeenCalled();
     });
+  });
+
+  it("enforces unclipped card shadows and marginHorizontal on cards and search bar without listContent horizontal padding", () => {
+    const { getByPlaceholderText, getByTestId } = render(
+      <ExerciseLibraryView
+        onStartQuickRoutine={jest.fn()}
+        onCreateCustomTimer={jest.fn()}
+      />
+    );
+
+    const card = getByTestId("exercise-card-tibialis_raises");
+    const cardStyle = StyleSheet.flatten(card.props.style);
+    expect(cardStyle.marginHorizontal).toBe(Spacing.md);
+    expect(cardStyle.shadowOpacity ?? cardStyle.elevation).toBeTruthy();
+
+    const searchBar = getByTestId("exercise-search-bar");
+    const searchStyle = StyleSheet.flatten(searchBar.props.style);
+    expect(searchStyle.marginHorizontal).toBe(Spacing.md);
+  });
+
+  it("provides edge-to-edge filter carousels with 16px contentContainerStyle padding and unclipped natural scrolling seam", () => {
+    const { getByTestId } = render(
+      <ExerciseLibraryView
+        onStartQuickRoutine={jest.fn()}
+        onCreateCustomTimer={jest.fn()}
+      />
+    );
+
+    const categoriesCarousel = getByTestId("categories-carousel");
+    const catStyle = StyleSheet.flatten(categoriesCarousel.props.contentContainerStyle);
+    expect(catStyle.paddingHorizontal).toBe(Spacing.md);
+
+    const bodyPartsCarousel = getByTestId("body-parts-carousel");
+    const bpStyle = StyleSheet.flatten(bodyPartsCarousel.props.contentContainerStyle);
+    expect(bpStyle.paddingHorizontal).toBe(Spacing.md);
   });
 });

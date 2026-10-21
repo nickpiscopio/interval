@@ -1,8 +1,8 @@
 import React from "react";
-import { render, fireEvent, waitFor } from "@testing-library/react-native";
+import { render, fireEvent, waitFor, act } from "@testing-library/react-native";
 import { EditIntervalModal } from "../EditIntervalModal";
 import { Interval } from "../../model/Interval";
-import { StyleSheet } from "react-native";
+import { StyleSheet, BackHandler } from "react-native";
 import Spacing, { TOUCH_TARGET } from "../../constants/Spacing";
 import Colors from "../../constants/Colors";
 import FontSize from "../../constants/FontSize";
@@ -53,7 +53,9 @@ describe("EditIntervalModal", () => {
 
     expect(getByText("Edit Interval")).toBeTruthy();
     expect(getByTestId("edit-interval-done-btn")).toBeTruthy();
-    expect(getByTestId("edit-interval-done-icon")).toBeTruthy();
+    const doneIcon = getByTestId("edit-interval-done-icon");
+    expect(doneIcon.props.children).toBe("checkmark-sharp");
+    expect(doneIcon.props.size).toBe(24);
 
     // Section title
     expect(getByText("Interval Name")).toBeTruthy();
@@ -67,6 +69,7 @@ describe("EditIntervalModal", () => {
     const libraryBtn = getByText("Library");
     fireEvent.press(libraryBtn);
     expect(onOpenExercisePicker).toHaveBeenCalled();
+    fireEvent.press(getByTestId("exercise-picker-back-btn"));
 
     // Duration Shift Register
     const durationInput = getByDisplayValue("00:00:45");
@@ -232,29 +235,26 @@ describe("EditIntervalModal sheet spacing & layout refinement", () => {
     );
   }
 
-  it("pads the sheet content 16px on the sides and 8px on top", () => {
-    const { getByTestId } = renderSheet();
-    const content = StyleSheet.flatten(getByTestId("edit-interval-sheet").props.contentContainerStyle);
-    expect(content.paddingHorizontal).toBe(Spacing.md);
-    expect(content.paddingTop).toBe(Spacing.sm);
-  });
-
   it("separates the header from the form by 16px and renders a 44x44 checkmark button", () => {
     const { getByTestId } = renderSheet();
     expect(styleOf(getByTestId("edit-interval-header")).marginBottom).toBe(Spacing.md);
 
-    const doneBtn = styleOf(getByTestId("edit-interval-done-btn"));
+    const doneTouchable = getByTestId("edit-interval-done-btn");
+    const doneBtn = styleOf(doneTouchable);
     expect(doneBtn.width).toBe(TOUCH_TARGET.icon);
     expect(doneBtn.height).toBe(TOUCH_TARGET.icon);
-    expect(getByTestId("edit-interval-done-icon").props.children).toBe("checkmark");
+    expect(doneBtn.marginRight).toBe(-10);
+    expect(doneTouchable.props.hitSlop).toBeUndefined();
+    expect(getByTestId("edit-interval-done-icon").props.children).toBe("checkmark-sharp");
   });
 
-  it("separates sections by 24px", () => {
+  it("separates sections by 24px and gives actions bottom margin", () => {
     const { getByTestId } = renderSheet();
     expect(styleOf(getByTestId("edit-interval-input-row")).marginBottom).toBe(Spacing.lg);
     expect(styleOf(getByTestId("edit-interval-color-palette")).marginBottom).toBe(Spacing.lg);
     expect(styleOf(getByTestId("edit-interval-sound-palette")).marginBottom).toBe(Spacing.lg);
     expect(styleOf(getByTestId("edit-interval-actions")).marginTop ?? 0).toBe(0);
+    expect(styleOf(getByTestId("edit-interval-actions")).marginBottom).toBe(Spacing.xs);
   });
 
   it("bolds section titles in Title Case with Poppins-Bold", () => {
@@ -310,5 +310,98 @@ describe("EditIntervalModal sheet spacing & layout refinement", () => {
     }
     expect(sound.gap).toBe(Spacing.sm);
   });
+
+  it("styles library button with 4px gap and -1px offsets on the dumbbell icon", () => {
+    const { getByTestId } = renderSheet();
+    const libraryBtn = styleOf(getByTestId("edit-interval-library-btn"));
+    expect(libraryBtn.gap).toBe(4);
+
+    const icon = getByTestId("icon-barbell-outline");
+    const iconStyle = styleOf(icon);
+    expect(iconStyle.transform).toEqual([{ translateY: -1 }, { translateX: -1 }]);
+  });
+
+  it("applies safe-area-aware bottom padding on the scroll container and bottom margin on action buttons", () => {
+    const { getByTestId } = renderSheet();
+    const sheet = getByTestId("edit-interval-sheet");
+    const contentStyle = StyleSheet.flatten(sheet.props.contentContainerStyle);
+    // In jest.setup, insets.bottom = 34. 34 + Spacing.lg (24) = 58.
+    expect(contentStyle.paddingBottom).toBe(34 + Spacing.lg);
+
+    const actions = styleOf(getByTestId("edit-interval-actions"));
+    expect(actions.marginBottom).toBe(Spacing.xs);
+  });
+
+  it("navigates into library in the same bottom sheet and returns via back button", () => {
+    const { getByText, getByTestId, queryByTestId } = renderSheet();
+    expect(getByTestId("edit-interval-header")).toBeTruthy();
+
+    // Tap Library
+    fireEvent.press(getByText("Library"));
+
+    // Library view displayed inside same sheet with 90% snap point and no close button
+    expect(queryByTestId("edit-interval-header")).toBeNull();
+    expect(getByTestId("exercise-picker-back-btn")).toBeTruthy();
+    expect(queryByTestId("exercise-picker-close-btn")).toBeNull();
+    expect(getByText("Tibialis Raises")).toBeTruthy();
+
+    const modal = getByTestId("bottom-sheet-modal");
+    expect(modal.props.sheetProps.snapPoints).toEqual(["90%"]);
+
+    // Tap back button
+    fireEvent.press(getByTestId("exercise-picker-back-btn"));
+
+    // Returns to Edit Interval view
+    expect(getByTestId("edit-interval-header")).toBeTruthy();
+    expect(queryByTestId("exercise-picker-back-btn")).toBeNull();
+  });
+
+  it("selects exercise from in-sheet library and returns to edit form", () => {
+    const onUpdate = jest.fn();
+    const onSelectExercise = jest.fn();
+    const { getByText, getByTestId } = render(
+      <EditIntervalModal
+        visible={true}
+        interval={interval}
+        onClose={jest.fn()}
+        onUpdate={onUpdate}
+        onDelete={jest.fn()}
+        onDuplicate={jest.fn()}
+        onSelectExercise={onSelectExercise}
+      />
+    );
+
+    fireEvent.press(getByText("Library"));
+    const quickAddBtn = getByTestId("btn-quick-add-tibialis_raises");
+    fireEvent.press(quickAddBtn);
+
+    expect(onSelectExercise).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "tibialis_raises", name: "Tibialis Raises" })
+    );
+    expect(getByTestId("edit-interval-header")).toBeTruthy();
+  });
+
+  it("returns from library mode to edit mode when hardware back button is pressed", () => {
+    let backHandler: (() => boolean) | null = null;
+    jest.spyOn(BackHandler, "addEventListener").mockImplementation((_event, handler) => {
+      backHandler = handler as () => boolean;
+      return { remove: jest.fn() } as any;
+    });
+
+    const { getByText, getByTestId, queryByTestId } = renderSheet();
+    fireEvent.press(getByText("Library"));
+    expect(queryByTestId("edit-interval-header")).toBeNull();
+
+    // Trigger hardware back
+    expect(backHandler).not.toBeNull();
+    let consumed: boolean | undefined;
+    act(() => {
+      consumed = backHandler!();
+    });
+    expect(consumed).toBe(true);
+    expect(getByTestId("edit-interval-header")).toBeTruthy();
+  });
 });
+
+
 

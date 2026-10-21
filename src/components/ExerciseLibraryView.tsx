@@ -122,7 +122,7 @@ export function ExerciseLibraryView({
   return (
     <View style={styles.container}>
       {/* Search Bar */}
-      <View style={styles.searchContainer}>
+      <View testID="exercise-search-bar" style={styles.searchContainer}>
         <Ionicons name="search" size={18} color="#9CA3AF" style={styles.searchIcon} />
         <TextInput
           style={styles.searchInput}
@@ -148,6 +148,7 @@ export function ExerciseLibraryView({
       {/* Category Filter Pills */}
       <View style={styles.filterPillsWrapper}>
         <ScrollView
+          testID="categories-carousel"
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.filterPillsRow}
@@ -196,6 +197,7 @@ export function ExerciseLibraryView({
       {/* Body Part Filter Pills */}
       <View style={styles.bodyPartPillsWrapper}>
         <ScrollView
+          testID="body-parts-carousel"
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.bodyPartPillsRow}
@@ -268,6 +270,7 @@ export function ExerciseLibraryView({
           const badgeColor = categoryColorMap[item.category] || Colors.primary;
           return (
             <TouchableOpacity
+              testID={`exercise-card-${item.id}`}
               style={styles.exerciseCard}
               activeOpacity={0.7}
               onPress={() => handleCardPress(item)}
@@ -450,12 +453,12 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   listContent: {
-    paddingHorizontal: Spacing.md,
     gap: 10,
   },
   exerciseCard: {
     backgroundColor: Colors.surface.card,
     borderRadius: RADIUS.md,
+    marginHorizontal: Spacing.md,
     padding: Spacing.md,
     ...SHADOWS.card,
   },

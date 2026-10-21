@@ -1,4 +1,5 @@
 import React from "react";
+import { StyleSheet } from "react-native";
 import { render, fireEvent, waitFor } from "@testing-library/react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CreateTimerScreen from "../CreateTimerScreen";
@@ -431,6 +432,8 @@ describe("CreateTimerScreen", () => {
     );
 
     const backBtn = getByTestId("header-back-button");
+    const style = StyleSheet.flatten(backBtn.props.style);
+    expect(style.marginLeft).toBe(-10);
     fireEvent.press(backBtn);
 
     expect(mockNavigation.goBack).toHaveBeenCalled();
