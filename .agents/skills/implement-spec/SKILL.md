@@ -18,6 +18,8 @@ Communication to and from subagents should be sparse. Communicate primarily thro
 
 ## Steps
 
+At the start of each step, announce your progress to the user in the format: `[Step x/10] <Step Title>`. For variable loops (e.g. implementing and merging tickets), format the announcement with sub-progress: `[Step x/10] (Ticket i/n: <Ticket Title>)`.
+
 1. Read the spec and tickets to understand the task graph.
 
 2. (optional) Use an **exploration subagent** to conduct any exploration required by the tickets - relevant codebase files or external documentation. Ensure the exploration subagent can save files - it should save its markdown notes in a directory outside the repo, accessible by all future subagents. This lets **implementer subagents** focus on implementation rather than exploration.
@@ -38,3 +40,5 @@ Communication to and from subagents should be sparse. Communicate primarily thro
 8. If a draft PR exists, mark it ready for review. Otherwise, resolve each ticket the way the issue tracker closes work, and report the integration branch.
 
 9. Clean up all **implementer subagent** worktrees.
+
+10. Clean up the ephemeral feature scratch directory (`.scratch/YYYY-MM-DD-<feature-slug>/`) once implementation, verification, and PR/reporting are completed.

@@ -32,7 +32,7 @@ npm run test:all
 ```
 
 ## Definition of Done (DoD) Checklist
-Before completing any user request or feature:
+Before completing any user request or feature, announce each verification step to the user in the format: `[Step x/4] <Step Title>`:
 1. **Tests Added**: Unit and UI tests must be added or updated for new or modified functionality.
 2. **Coverage Verified**: Run `npm run test:coverage` and confirm all test suites pass with statements >= 90% and lines >= 90%.
 3. **Localization Checked**: Ensure all UI strings use `t(...)` keys and exist with 100% parity across `en.json`, `es.json`, and `fr.json`.

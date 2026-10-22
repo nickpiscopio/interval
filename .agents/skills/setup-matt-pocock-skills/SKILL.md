@@ -16,6 +16,8 @@ This is a prompt-driven skill, not a deterministic script. Explore, present what
 
 ## Process
 
+At the start of each step, announce your progress to the user in the format: `[Step x/5] <Step Title>`.
+
 ### 1. Explore
 
 Look at the current repo to understand its starting state. Read whatever exists; don't assume:
@@ -43,7 +45,7 @@ Default posture: these skills were designed for GitHub. If a `git remote` points
 
 - **GitHub**: issues live in the repo's GitHub Issues (uses the `gh` CLI)
 - **GitLab**: issues live in the repo's GitLab Issues (uses the [`glab`](https://gitlab.com/gitlab-org/cli) CLI)
-- **Local markdown**: issues live as files under `.scratch/<feature>/` in this repo (good for solo projects or repos without a remote)
+- **Local markdown**: issues live as files under `.scratch/YYYY-MM-DD-<feature-slug>/` in this repo (good for solo projects or repos without a remote)
 - **Other** (Jira, Linear, etc.): ask the user to describe the workflow in one paragraph; the skill will record it as freeform prose
 
 Record the choice in `docs/agents/issue-tracker.md`. The GitHub and GitLab templates carry a "PRs as a request surface" flag, defaulted **off**. Leave it off and don't raise it: a user who wants external PRs in the triage queue can flip the flag in the file later.

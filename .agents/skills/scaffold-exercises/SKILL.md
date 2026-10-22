@@ -43,6 +43,8 @@ If the subfolder has code, it also needs a `main.ts` (>1 line). But for stubs, a
 
 ## Workflow
 
+At the start of each step, announce your progress to the user in the format: `[Step x/5] <Step Title>`.
+
 1. **Parse the plan** - extract section names, exercise names, and variant types
 2. **Create directories** - `mkdir -p` for each path
 3. **Create stub readmes** - one `readme.md` per variant folder with a title

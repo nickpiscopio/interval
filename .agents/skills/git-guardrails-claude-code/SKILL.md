@@ -19,6 +19,8 @@ When blocked, Claude sees a message telling it that it does not have authority t
 
 ## Steps
 
+At the start of each step, announce your progress to the user in the format: `[Step x/5] <Step Title>`.
+
 ### 1. Ask scope
 
 Ask the user: install for **this project only** (`.claude/settings.json`) or **all projects** (`~/.claude/settings.json`)?

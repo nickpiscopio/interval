@@ -15,6 +15,8 @@ This command is _informed_ by the project's domain model and built on a shared d
 
 ## Process
 
+At the start of each step, announce your progress to the user in the format: `[Step x/3] <Step Title>`.
+
 ### 1. Explore
 
 **Scope before you scan: YAGNI.** Deepening a module pays off by making future changes to it easier, so put extra weight on the parts of the codebase that have recently changed. Decide *where* to look before you look:

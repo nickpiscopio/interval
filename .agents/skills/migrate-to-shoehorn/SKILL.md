@@ -104,6 +104,8 @@ getUser(fromAny({ body: { id: 123 } }));
 
 ## Workflow
 
+At the start of each step, announce your progress to the user in the format: `[Step x/2] <Step Title>`.
+
 1. **Gather requirements** - ask user:
    - What test files have `as` assertions causing problems?
    - Are they dealing with large objects where only some properties matter?

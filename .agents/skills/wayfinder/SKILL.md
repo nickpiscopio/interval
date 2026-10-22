@@ -106,7 +106,7 @@ Two modes. Either way, **never resolve more than one ticket per session**, with 
 
 ### Chart the map
 
-User invokes with a loose idea.
+User invokes with a loose idea. At the start of each step, announce your progress to the user in the format: `[Step x/6] <Step Title>`.
 
 1. **Name the destination.** Call the Skill tool twice, for "grilling" and "domain-modeling", to pin down what this map is finding its way to: the spec, decision, or change. The destination fixes the scope, so it's settled first.
 2. **Map the frontier.** Grill again, **breadth-first** this time: fan out across the whole space rather than deep on any one thread, surfacing the open decisions and the first steps takeable now. **If this surfaces no fog** (the way to the destination is already clear, the whole journey small enough for one session), you don't need a map. Stop and ask the user how they'd like to proceed.
@@ -117,7 +117,7 @@ User invokes with a loose idea.
 
 ### Work through the map
 
-User invokes with a map (URL or number). A ticket is **optional**: without one, you pick the next decision, not the user.
+User invokes with a map (URL or number). A ticket is **optional**: without one, you pick the next decision, not the user. At the start of each step, announce your progress to the user in the format: `[Step x/5] <Step Title>`.
 
 1. Load the **map**: the low-res view, not every ticket body.
 2. Choose the ticket. If the user named one, use it. Otherwise take the first frontier ticket in order. **Claim it**: assign it to yourself before any work.

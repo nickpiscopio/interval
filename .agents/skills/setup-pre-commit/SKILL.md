@@ -14,6 +14,8 @@ description: Set up Husky pre-commit hooks with lint-staged (Prettier), type che
 
 ## Steps
 
+At the start of each step, announce your progress to the user in the format: `[Step x/8] <Step Title>`.
+
 ### 1. Detect package manager
 
 Check for `package-lock.json` (npm), `pnpm-lock.yaml` (pnpm), `yarn.lock` (yarn), `bun.lockb` (bun). Use whichever is present. Default to npm if unclear.

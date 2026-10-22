@@ -14,6 +14,8 @@ The issue tracker should have been provided to you. If not, tell the user to run
 
 ## Process
 
+At the start of each step, announce your progress to the user in the format: `[Step x/5] <Step Title>`.
+
 ### 1. Pin the fixed point
 
 Whatever the user said is the fixed point (a commit SHA, branch name, tag, `main`, `HEAD~5`, etc.). If they didn't specify one, ask for it.

@@ -36,6 +36,8 @@ Layering (which packages may depend on which) is a *different* concern and is le
 
 ## Steps
 
+At the start of each step, announce your progress to the user in the format: `[Step x/7] <Step Title>`.
+
 ### 1. Detect the environment
 
 - **Package manager**: `pnpm-lock.yaml` → pnpm, `yarn.lock` → yarn, `bun.lockb` → bun, else npm. Use it for every command below (`pnpm`/`yarn`/`npm run`/`bunx`).

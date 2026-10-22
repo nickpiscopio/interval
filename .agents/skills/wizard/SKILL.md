@@ -13,6 +13,8 @@ A wizard is ephemeral by default: built for one run, saved to a scratch or `scri
 
 ## Process
 
+At the start of each step, announce your progress to the user in the format: `[Step x/4] <Step Title>`.
+
 ### 1. Scope the procedure
 
 Work out every manual step the human must take and every value that gets captured along the way. Read the repo first, don't ask cold:
