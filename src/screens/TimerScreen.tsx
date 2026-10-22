@@ -57,13 +57,23 @@ export default function TimerScreen({
   }
 
   async function unloadSounds(): Promise<void> {
-    soundPlayersRef.current.forEach((player) => player.release());
+    soundPlayersRef.current.forEach((player) => {
+      try {
+        player.pause();
+      } catch {}
+      try {
+        player.release();
+      } catch {}
+    });
     soundPlayersRef.current.clear();
   }
 
   function playIntervalSound(interval?: Interval): void {
     const player = soundPlayersRef.current.get(resolveSoundId(interval?.sound));
     if (player) {
+      try {
+        player.pause();
+      } catch {}
       player.seekTo(0).catch(() => {});
       player.play();
     }
@@ -138,6 +148,7 @@ export default function TimerScreen({
           // Workout finished!
           clearInterval(timerIdRef.current);
           progressAnim.stopAnimation();
+          unloadSounds();
           navigation.replace("Completion", { timer });
         } else {
           currentIndexRef.current = nextIdx;
@@ -208,6 +219,7 @@ export default function TimerScreen({
           onPress: () => {
             clearInterval(timerIdRef.current);
             progressAnim.stopAnimation();
+            unloadSounds();
             navigation.popToTop();
           },
         },

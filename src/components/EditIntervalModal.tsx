@@ -86,7 +86,12 @@ export function EditIntervalModal({
 
   function releasePreview() {
     if (previewPlayerRef.current) {
-      previewPlayerRef.current.release();
+      try {
+        previewPlayerRef.current.pause();
+      } catch {}
+      try {
+        previewPlayerRef.current.release();
+      } catch {}
       previewPlayerRef.current = null;
     }
   }
@@ -96,8 +101,15 @@ export function EditIntervalModal({
   useEffect(() => {
     if (!visible) {
       setViewMode("edit");
+      releasePreview();
     }
   }, [visible]);
+
+  useEffect(() => {
+    if (viewMode === "library") {
+      releasePreview();
+    }
+  }, [viewMode]);
 
   useEffect(() => {
     if (!visible) return;
@@ -112,6 +124,9 @@ export function EditIntervalModal({
   }, [visible, viewMode]);
 
   function handleSelectSound(id: string) {
+    if (resolveSoundId(interval?.sound) === id) {
+      return;
+    }
     onUpdate({ sound: id });
     releasePreview();
     const source = resolveSoundSource(id);

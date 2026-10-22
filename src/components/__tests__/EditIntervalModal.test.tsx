@@ -208,13 +208,81 @@ describe("EditIntervalModal sound picker", () => {
     expect(createAudioPlayer).not.toHaveBeenCalled();
   });
 
-  it("releases the previous preview when replaced and on unmount", () => {
-    const { getByText, unmount } = setup(base);
+  it("ignores duplicate tap on the already selected sound", () => {
+    const { getByText, onUpdate } = setup(base); // default resolved sound is 'beep'
     fireEvent.press(getByText("Beep"));
+    expect(onUpdate).not.toHaveBeenCalled();
+    expect(createAudioPlayer).not.toHaveBeenCalled();
+  });
+
+  it("pauses and releases the previous preview when replaced", () => {
+    const { getByText } = setup(base);
     fireEvent.press(getByText("Triple Beep"));
-    expect(createAudioPlayer.mock.results[0].value.release).toHaveBeenCalled();
+    expect(createAudioPlayer).toHaveBeenCalledTimes(1);
+    const firstPlayer = createAudioPlayer.mock.results[0].value;
+
+    fireEvent.press(getByText("Double Beep"));
+    expect(firstPlayer.pause).toHaveBeenCalledTimes(1);
+    expect(firstPlayer.release).toHaveBeenCalledTimes(1);
+  });
+
+  it("pauses and releases the active preview player on unmount", () => {
+    const { getByText, unmount } = setup(base);
+    fireEvent.press(getByText("Triple Beep"));
+    const player = createAudioPlayer.mock.results[0].value;
     unmount();
-    expect(createAudioPlayer.mock.results[1].value.release).toHaveBeenCalled();
+    expect(player.pause).toHaveBeenCalledTimes(1);
+    expect(player.release).toHaveBeenCalledTimes(1);
+  });
+
+  it("pauses and releases the active preview player when sheet is closed", () => {
+    const onUpdate = jest.fn();
+    const { getByText, rerender } = render(
+      <EditIntervalModal
+        visible={true}
+        interval={base}
+        onClose={jest.fn()}
+        onUpdate={onUpdate}
+        onDelete={jest.fn()}
+        onDuplicate={jest.fn()}
+      />
+    );
+    fireEvent.press(getByText("Triple Beep"));
+    const player = createAudioPlayer.mock.results[0].value;
+    expect(player.pause).not.toHaveBeenCalled();
+
+    rerender(
+      <EditIntervalModal
+        visible={false}
+        interval={base}
+        onClose={jest.fn()}
+        onUpdate={onUpdate}
+        onDelete={jest.fn()}
+        onDuplicate={jest.fn()}
+      />
+    );
+    expect(player.pause).toHaveBeenCalledTimes(1);
+    expect(player.release).toHaveBeenCalledTimes(1);
+  });
+
+  it("pauses and releases the active preview player when navigating to in-sheet library", () => {
+    const { getByText } = render(
+      <EditIntervalModal
+        visible={true}
+        interval={base}
+        onClose={jest.fn()}
+        onUpdate={jest.fn()}
+        onDelete={jest.fn()}
+        onDuplicate={jest.fn()}
+      />
+    );
+    fireEvent.press(getByText("Triple Beep"));
+    const player = createAudioPlayer.mock.results[0].value;
+    expect(player.pause).not.toHaveBeenCalled();
+
+    fireEvent.press(getByText("Library"));
+    expect(player.pause).toHaveBeenCalledTimes(1);
+    expect(player.release).toHaveBeenCalledTimes(1);
   });
 });
 
