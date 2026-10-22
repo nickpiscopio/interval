@@ -16,7 +16,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.plyonest.interval",
-      "buildNumber": 35
+      "buildNumber": "35"
     },
     "android": {
       "adaptiveIcon": {
