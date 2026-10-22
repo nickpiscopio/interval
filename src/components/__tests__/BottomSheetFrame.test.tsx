@@ -177,5 +177,17 @@ describe("BottomSheetFrame", () => {
 
     expect(onClose).not.toHaveBeenCalled();
   });
+
+  it("applies noPadding style when noPadding prop is true", () => {
+    const { getByTestId } = render(
+      <BottomSheetFrame visible onClose={jest.fn()} noPadding={true}>
+        <Text>no padding content</Text>
+      </BottomSheetFrame>
+    );
+    const content = getByTestId("bottom-sheet-content");
+    const style = StyleSheet.flatten(content.props.style);
+    expect(style.paddingTop).toBe(0);
+    expect(style.paddingHorizontal).toBe(0);
+  });
 });
 

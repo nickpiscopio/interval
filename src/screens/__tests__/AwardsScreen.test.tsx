@@ -103,4 +103,32 @@ describe("AwardsScreen", () => {
       expect(Share.share).toHaveBeenCalled();
     });
   });
+
+  it("dismisses badge modal when tapping outside on modal-overlay and omits How to Unlock tag for locked badges", async () => {
+    const { getByText, getAllByText, getByTestId, queryByText } = render(
+      <AwardsScreen navigation={{} as any} route={{} as any} />
+    );
+
+    await waitFor(() => {
+      expect(getByText("Rehab Rookie")).toBeTruthy();
+    });
+
+    // Rehab Rookie is locked by default
+    fireEvent.press(getByText("Rehab Rookie"));
+
+    await waitFor(() => {
+      expect(getAllByText("Rehab Rookie").length).toBe(2);
+    });
+
+    // "How to Unlock" tag should NOT be displayed
+    expect(queryByText("How to Unlock")).toBeNull();
+
+    // Tap outside overlay to dismiss
+    const overlay = getByTestId("modal-overlay");
+    fireEvent.press(overlay);
+
+    await waitFor(() => {
+      expect(getAllByText("Rehab Rookie").length).toBe(1);
+    });
+  });
 });

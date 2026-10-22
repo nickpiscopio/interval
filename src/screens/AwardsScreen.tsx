@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Modal,
   Share,
+  Pressable,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
@@ -275,10 +276,18 @@ export default function AwardsScreen({ navigation }: RootStackScreenProps<"Award
           visible={Boolean(selectedBadge)}
           transparent
           animationType="fade"
+          statusBarTranslucent={true}
           onRequestClose={() => setSelectedBadge(null)}
         >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
+          <Pressable
+            testID="modal-overlay"
+            style={styles.modalOverlay}
+            onPress={() => setSelectedBadge(null)}
+          >
+            <Pressable
+              style={styles.modalContent}
+              onPress={(e) => e.stopPropagation()}
+            >
               <TouchableOpacity
                 style={styles.modalCloseBtn}
                 onPress={() => setSelectedBadge(null)}
@@ -303,7 +312,7 @@ export default function AwardsScreen({ navigation }: RootStackScreenProps<"Award
               <Text style={styles.modalBadgeTagline}>{selectedBadge.tagline}</Text>
               <Text style={styles.modalBadgeDesc}>{selectedBadge.description}</Text>
 
-              {selectedBadge.unlockedAt ? (
+              {selectedBadge.unlockedAt && (
                 <TouchableOpacity
                   style={styles.modalShareBtn}
                   activeOpacity={0.9}
@@ -317,14 +326,9 @@ export default function AwardsScreen({ navigation }: RootStackScreenProps<"Award
                     <Text style={styles.modalShareText}>{t("awards.shareBadge")}</Text>
                   </LinearGradient>
                 </TouchableOpacity>
-              ) : (
-                <View style={styles.modalLockedPill}>
-                  <Ionicons name="lock-closed" size={16} color="#6B7280" />
-                  <Text style={styles.modalLockedPillText}>{t("awards.howToUnlock")}</Text>
-                </View>
               )}
-            </View>
-          </View>
+            </Pressable>
+          </Pressable>
         </Modal>
       )}
     </View>
@@ -670,19 +674,5 @@ const styles = StyleSheet.create({
     lineHeight: FontSize.lineHeight.sm,
     fontFamily: "Poppins-Bold",
     color: "#FFFFFF",
-  },
-  modalLockedPill: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: Spacing.xs,
-    backgroundColor: "#F3F4F6",
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.md,
-    borderRadius: Spacing.radius.md,
-  },
-  modalLockedPillText: {
-    fontSize: FontSize.xs,
-    fontFamily: "Poppins-Medium",
-    color: "#6B7280",
   },
 });

@@ -205,6 +205,7 @@ export function EditIntervalModal({
       visible={visible}
       onClose={onClose}
       snapPoints={viewMode === "library" ? ["90%"] : undefined}
+      noPadding={viewMode === "library"}
     >
       {viewMode === "library" ? (
         <ExercisePickerView

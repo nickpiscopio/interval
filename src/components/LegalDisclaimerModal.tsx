@@ -186,60 +186,57 @@ export function LegalDisclaimerModal({
     <BottomSheetFrame
       visible={visible}
       onClose={handleClose}
-      snapPoints={["90%"]}
     >
-      <View style={styles.sheetContainer}>
-        {/* Header Bar */}
-        <View style={styles.sheetHeader}>
-          {/* Row 1: Flex row with Title on the left and transparent Close Button on the right */}
-          <View style={styles.headerRow1}>
-            <Text style={styles.title}>{t("legal.title")}</Text>
-            <TouchableOpacity
-              testID="legal-modal-close-btn"
-              style={styles.closeButton}
-              onPress={handleClose}
-              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-            >
-              <Ionicons name="close" size={22} color="#6B7280" />
-            </TouchableOpacity>
-          </View>
-
-          {/* Row 2: App version text caption */}
-          <Text style={styles.versionCaption}>
-            {t("legal.appVersionLabel", { version: appVersion })}
-          </Text>
-
-          {/* Row 3: Flex row containing warning badge and accepted-date badge */}
-          <View style={styles.badgesRow}>
-            <View style={styles.warningBadge}>
-              <Ionicons name="shield-checkmark" size={14} color="#DC2626" />
-              <Text style={styles.warningBadgeText}>
-                {t("legal.badgeWarning")}
-              </Text>
-            </View>
-
-            {acceptedDate && (
-              <View style={styles.agreedBadge}>
-                <Ionicons name="checkmark-circle" size={14} color="#059669" />
-                <Text style={styles.agreedBadgeText}>
-                  {t("legal.agreedOnDate", { date: acceptedDate })}
-                </Text>
-              </View>
-            )}
-          </View>
-
-          {/* Row 4: Subtitle notice paragraph */}
-          <Text style={styles.subtitle}>{t("legal.subtitle")}</Text>
+      {/* Header Bar */}
+      <View style={styles.sheetHeader}>
+        {/* Row 1: Flex row with Title on the left and transparent Close Button on the right */}
+        <View style={styles.headerRow1}>
+          <Text style={styles.title}>{t("legal.title")}</Text>
+          <TouchableOpacity
+            testID="legal-modal-close-btn"
+            style={styles.closeButton}
+            onPress={handleClose}
+            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+          >
+            <Ionicons name="close" size={22} color="#6B7280" />
+          </TouchableOpacity>
         </View>
 
-        {/* Scrollable Legal Sections */}
-        <BottomSheetScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.sheetScrollContent}
-        >
-          {renderLegalCards()}
-        </BottomSheetScrollView>
+        {/* Row 2: App version text caption */}
+        <Text style={styles.versionCaption}>
+          {t("legal.appVersionLabel", { version: appVersion })}
+        </Text>
+
+        {/* Row 3: Flex row containing warning badge and accepted-date badge */}
+        <View style={styles.badgesRow}>
+          <View style={styles.warningBadge}>
+            <Ionicons name="shield-checkmark" size={14} color="#DC2626" />
+            <Text style={styles.warningBadgeText}>
+              {t("legal.badgeWarning")}
+            </Text>
+          </View>
+
+          {acceptedDate && (
+            <View style={styles.agreedBadge}>
+              <Ionicons name="checkmark-circle" size={14} color="#059669" />
+              <Text style={styles.agreedBadgeText}>
+                {t("legal.agreedOnDate", { date: acceptedDate })}
+              </Text>
+            </View>
+          )}
+        </View>
+
+        {/* Row 4: Subtitle notice paragraph */}
+        <Text style={styles.subtitle}>{t("legal.subtitle")}</Text>
       </View>
+
+      {/* Scrollable Legal Sections */}
+      <BottomSheetScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.sheetScrollContent}
+      >
+        {renderLegalCards()}
+      </BottomSheetScrollView>
     </BottomSheetFrame>
   );
 }
@@ -248,9 +245,6 @@ const styles = StyleSheet.create({
   safeContainer: {
     flex: 1,
     backgroundColor: Colors.surface.screen,
-  },
-  sheetContainer: {
-    flex: 1,
   },
   gateHeader: {
     paddingHorizontal: Spacing.md,

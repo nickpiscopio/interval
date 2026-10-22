@@ -20,7 +20,7 @@ export function ExercisePickerModal({ visible, onClose, onSelect }: ExercisePick
   }
 
   return (
-    <BottomSheetFrame visible={visible} onClose={onClose}>
+    <BottomSheetFrame visible={visible} onClose={onClose} noPadding={true}>
       <ExercisePickerView onClose={onClose} onSelect={handleSelect} />
     </BottomSheetFrame>
   );

@@ -209,7 +209,7 @@ describe("SelectTimerScreen", () => {
     fireEvent.press(libraryTab);
 
     await waitFor(() => {
-      expect(getByText("Exercise Library 📚")).toBeTruthy();
+      expect(getByText("Exercise Library")).toBeTruthy();
       expect(getByText("Tibialis Raises")).toBeTruthy();
     }, { timeout: 3500 });
 

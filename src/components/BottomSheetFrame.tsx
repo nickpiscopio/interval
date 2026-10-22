@@ -20,18 +20,21 @@ export interface BottomSheetFrameProps {
   onClose: () => void;
   /** Optional snap points (e.g. ["90%"]). Disables dynamic sizing when provided. */
   snapPoints?: (string | number)[];
+  /** Whether to omit default container padding (useful when child manages its own margins). */
+  noPadding?: boolean;
   children: React.ReactNode;
 }
 
 /**
  * The app's bottom sheet standard (ADR 0016 §6): no drag handle, no swipe
  * gestures, automatic sizing capped at 90% of screen height (or explicit snap points),
- * 16px padding, and Android back dismissal. Sheets render their own headers as children.
+ * 16px padding (or 0 when noPadding=true), and Android back dismissal. Sheets render their own headers as children.
  */
 export function BottomSheetFrame({
   visible,
   onClose,
   snapPoints,
+  noPadding = false,
   children,
 }: BottomSheetFrameProps) {
   const insets = useSafeAreaInsets();
@@ -117,7 +120,7 @@ export function BottomSheetFrame({
         <View
           testID="bottom-sheet-content"
           style={[
-            styles.content,
+            noPadding ? styles.noPadding : styles.content,
             styles.fullHeight,
             { paddingBottom: Math.max(insets.bottom, Spacing.md) },
           ]}
@@ -128,7 +131,7 @@ export function BottomSheetFrame({
         <BottomSheetView
           testID="bottom-sheet-content"
           style={[
-            styles.content,
+            noPadding ? styles.noPadding : styles.content,
             { paddingBottom: Math.max(insets.bottom, Spacing.md) },
           ]}
         >
@@ -149,6 +152,10 @@ const styles = StyleSheet.create({
   content: {
     paddingTop: Spacing.md,
     paddingHorizontal: Spacing.md,
+  },
+  noPadding: {
+    paddingTop: 0,
+    paddingHorizontal: 0,
   },
   fullHeight: {
     flex: 1,
