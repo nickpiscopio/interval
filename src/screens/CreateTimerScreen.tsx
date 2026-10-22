@@ -774,9 +774,9 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: FontSize.xs,
     lineHeight: FontSize.lineHeight.xs,
-    fontFamily: "Poppins-Medium",
+    fontFamily: "Poppins-Bold",
     color: Colors.textScale.secondary,
-    marginBottom: Spacing.xs,
+    marginBottom: Spacing.inputLabelGap,
   },
   editorTextInput: {
     minHeight: TOUCH_TARGET.min,

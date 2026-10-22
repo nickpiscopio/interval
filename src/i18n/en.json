@@ -77,7 +77,7 @@
     "validationNameRequired": "Please enter a name for your timer.",
     "validationIntervalRequired": "Please add at least one interval.",
     "validationDurationRequired": "All intervals must have a duration greater than 0.",
-    "timerNameLabel": "Timer Name",
+    "timerNameLabel": "Name",
     "saveError": "Failed to save timer. Please try again."
   },
   "generateTimer": {

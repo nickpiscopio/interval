@@ -223,7 +223,7 @@ export function EditIntervalModal({
         >
           {/* Header Bar */}
           <View testID="edit-interval-header" style={styles.header}>
-            <Text style={styles.title}>{t("createTimer.titleEdit")}</Text>
+            <Text testID="edit-interval-title" style={styles.title}>{t("createTimer.titleEdit")}</Text>
             <TouchableOpacity
               testID="edit-interval-done-btn"
               accessibilityLabel={t("common.done", { defaultValue: "Done" })}
@@ -380,6 +380,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.md,
   },
   title: {
+    flex: 1,
     fontSize: FontSize.lg,
     fontFamily: "Poppins-Bold",
     color: Colors.textScale.primary,
@@ -404,13 +405,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     minHeight: 20,
-    marginBottom: Spacing.sm,
+    marginBottom: Spacing.inputLabelGap,
   },
   inputLabel: {
     fontSize: FontSize.xs,
     fontFamily: "Poppins-Bold",
     color: Colors.textScale.secondary,
-    marginBottom: Spacing.sm,
+    marginBottom: Spacing.inputLabelGap,
   },
   inputLabelInRow: {
     marginBottom: 0,

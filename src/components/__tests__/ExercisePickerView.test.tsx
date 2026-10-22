@@ -58,7 +58,10 @@ describe("ExercisePickerView", () => {
     // Tap on an exercise card to inspect it
     fireEvent.press(getByText("Tibialis Raises"));
 
-    // Verify detail view is rendered
+    // Verify detail view is rendered with header layout (back button on left, title adjacent, badges beneath)
+    expect(getByTestId("exercise-detail-header")).toBeTruthy();
+    expect(getByTestId("exercise-detail-title").props.children).toBe("Tibialis Raises");
+    expect(getByTestId("exercise-detail-tags-row")).toBeTruthy();
     expect(getByTestId("exercise-detail-add-to-timer-btn")).toBeTruthy();
     expect(queryByTestId("exercise-picker-close-btn")).toBeNull();
 
@@ -71,6 +74,30 @@ describe("ExercisePickerView", () => {
     // Press detail back button to return to catalog
     fireEvent.press(detailBackBtn);
     expect(getByPlaceholderText("Search exercises...")).toBeTruthy();
+  });
+
+  it("renders in-sheet exercise detail view with Input Label section headings and clean numbered instructions", () => {
+    const { getByText, queryByText } = render(
+      <ExercisePickerView onSelect={jest.fn()} />
+    );
+
+    // Tap on an exercise card to inspect it
+    fireEvent.press(getByText("Tibialis Raises"));
+
+    const bodyPartHeading = getByText("Body Part Focus");
+    const headingStyle = StyleSheet.flatten(bodyPartHeading.props.style);
+    expect(headingStyle.fontFamily).toBe("Poppins-Bold");
+    expect(headingStyle.fontSize).toBe(12);
+    expect(headingStyle.marginBottom).toBe(Spacing.inputLabelGap);
+    expect(headingStyle.textTransform).toBeUndefined();
+
+    // Plain numbered instructions
+    expect(getByText("1. Stand with back flat against a wall, feet about 1-2 feet out.")).toBeTruthy();
+    expect(getByText("2. Keeping knees straight, pull toes and balls of feet up toward shins.")).toBeTruthy();
+    expect(getByText("3. Hold the contraction at the top for 1 second.")).toBeTruthy();
+
+    // No circular badge numbers
+    expect(queryByText("1")).toBeNull();
   });
 
   it("applies marginHorizontal: Spacing.md and unclipped shadows to cards and search bar without container clipping", () => {

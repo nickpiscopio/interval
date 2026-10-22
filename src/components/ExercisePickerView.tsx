@@ -108,28 +108,46 @@ export function ExercisePickerView({ onBack, onClose, onSelect }: ExercisePicker
         /*  EXERCISE DETAIL & INSTRUCTIONS VIEW                       */
         /* ========================================================== */
         <View style={styles.detailContainer}>
-          {/* Header: Back & Close */}
-          <View style={styles.detailHeader}>
+          {/* Detail Header: Back button, Title adjacent, Badges beneath */}
+          <View testID="exercise-detail-header" style={styles.detailHeader}>
             <TouchableOpacity
               testID="exercise-detail-back-btn"
               accessibilityLabel={t("common.back")}
               style={styles.backButton}
               onPress={() => setInspectingExercise(null)}
-              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
             >
               <Ionicons name="arrow-back" size={24} color={Colors.textScale.primary} />
             </TouchableOpacity>
 
-            {onClose && (
-              <TouchableOpacity
-                testID="exercise-picker-close-btn"
-                style={styles.closeButton}
-                onPress={handleClose}
-                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-              >
-                <Ionicons name="close" size={22} color="#6B7280" />
-              </TouchableOpacity>
-            )}
+            <View style={styles.detailHeaderTitleContainer}>
+              <Text testID="exercise-detail-title" style={styles.detailTitle}>{inspectingExercise.name}</Text>
+              <View testID="exercise-detail-tags-row" style={styles.tagsRow}>
+                <View
+                  style={[
+                    styles.categoryBadge,
+                    {
+                      backgroundColor: `${inspectingColor}18`,
+                      borderColor: `${inspectingColor}40`,
+                    },
+                  ]}
+                >
+                  <Ionicons
+                    name={inspectingExercise.category === "corrective" ? "medical" : "fitness"}
+                    size={13}
+                    color={inspectingColor}
+                  />
+                  <Text style={[styles.categoryBadgeText, { color: inspectingColor }]}>
+                    {getLocalizedCategoryName(inspectingExercise.category)}
+                  </Text>
+                </View>
+
+                <View style={styles.difficultyBadge}>
+                  <Text style={styles.difficultyBadgeText}>
+                    {inspectingExercise.difficulty.toUpperCase()}
+                  </Text>
+                </View>
+              </View>
+            </View>
           </View>
 
           {/* Scrollable Exercise Content */}
@@ -138,36 +156,6 @@ export function ExercisePickerView({ onBack, onClose, onSelect }: ExercisePicker
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.detailScrollContent}
           >
-            {/* Category & Difficulty Header Tags */}
-            <View style={styles.tagsRow}>
-              <View
-                style={[
-                  styles.categoryBadge,
-                  {
-                    backgroundColor: `${inspectingColor}18`,
-                    borderColor: `${inspectingColor}40`,
-                  },
-                ]}
-              >
-                <Ionicons
-                  name={inspectingExercise.category === "corrective" ? "medical" : "fitness"}
-                  size={13}
-                  color={inspectingColor}
-                />
-                <Text style={[styles.categoryBadgeText, { color: inspectingColor }]}>
-                  {getLocalizedCategoryName(inspectingExercise.category)}
-                </Text>
-              </View>
-
-              <View style={styles.difficultyBadge}>
-                <Text style={styles.difficultyBadgeText}>
-                  {inspectingExercise.difficulty.toUpperCase()}
-                </Text>
-              </View>
-            </View>
-
-            {/* Title */}
-            <Text style={styles.detailTitle}>{inspectingExercise.name}</Text>
 
             {/* Body Part Focus */}
             {inspectingExercise.bodyParts && inspectingExercise.bodyParts.length > 0 && (
@@ -216,10 +204,7 @@ export function ExercisePickerView({ onBack, onClose, onSelect }: ExercisePicker
                 <Text style={styles.sectionHeading}>{t("exercises.instructionsHeading")}</Text>
                 {inspectingExercise.instructions.map((step, idx) => (
                   <View key={idx} style={styles.instructionStepRow}>
-                    <View style={styles.stepNumberBadge}>
-                      <Text style={styles.stepNumberText}>{idx + 1}</Text>
-                    </View>
-                    <Text style={styles.stepText}>{step}</Text>
+                    <Text style={styles.stepText}>{`${idx + 1}. ${step}`}</Text>
                   </View>
                 ))}
               </View>
@@ -508,13 +493,10 @@ const styles = StyleSheet.create({
   },
   detailHeader: {
     flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    alignItems: "flex-start",
     paddingHorizontal: Spacing.md,
     paddingTop: Spacing.xs,
     paddingBottom: Spacing.xs,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.borderDefault,
   },
   backButton: {
     width: TOUCH_TARGET.icon,
@@ -524,27 +506,30 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginLeft: -10,
   },
+  detailHeaderTitleContainer: {
+    flex: 1,
+    marginLeft: Spacing.xs,
+  },
+  detailTitle: {
+    fontSize: FontSize.lg,
+    lineHeight: FontSize.lineHeight.lg,
+    fontFamily: "Poppins-Bold",
+    color: Colors.textScale.primary,
+    marginBottom: Spacing.xs,
+  },
   detailScrollContent: {
     paddingHorizontal: Spacing.md,
     paddingTop: Spacing.sm,
     paddingBottom: Spacing.xl,
   },
-  detailTitle: {
-    fontSize: FontSize["2xl"],
-    fontWeight: "800",
-    color: Colors.textScale.primary,
-    marginBottom: Spacing.sm,
-  },
   sectionContainer: {
-    marginTop: Spacing.sm,
+    marginBottom: Spacing.lg,
   },
   sectionHeading: {
     fontSize: FontSize.xs,
-    fontWeight: "700",
+    fontFamily: "Poppins-Bold",
     color: Colors.textScale.secondary,
-    textTransform: "uppercase",
-    letterSpacing: 0.8,
-    marginBottom: 6,
+    marginBottom: Spacing.inputLabelGap,
   },
   bodyPartsWrap: {
     flexDirection: "row",
@@ -596,21 +581,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-start",
     marginBottom: Spacing.xs,
-    gap: Spacing.xs,
-  },
-  stepNumberBadge: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: `${Colors.primary}18`,
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 2,
-  },
-  stepNumberText: {
-    fontSize: FontSize.xs,
-    fontWeight: "700",
-    color: Colors.primary,
   },
   stepText: {
     flex: 1,

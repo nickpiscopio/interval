@@ -26,7 +26,11 @@ describe("CreateTimerScreen", () => {
     );
 
     expect(getByPlaceholderText("Morning Blast")).toBeTruthy();
-    expect(getByText("Timer Name")).toBeTruthy();
+    const nameLabel = getByText("Name");
+    expect(nameLabel).toBeTruthy();
+    const labelStyle = StyleSheet.flatten(nameLabel.props.style);
+    expect(labelStyle.fontFamily).toBe("Poppins-Bold");
+    expect(labelStyle.marginBottom).toBe(4);
     expect(getByText("Timer Details")).toBeTruthy();
     expect(getByText("High Interval")).toBeTruthy();
     expect(getByText("Low Interval")).toBeTruthy();

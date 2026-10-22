@@ -74,6 +74,7 @@ export default {
   // Layout Semantic Aliases
   screen: SPACING.md, // 16px screen padding / margins
   cardGap: SPACING.sm, // 8px gap between cards and list items
+  inputLabelGap: SPACING.xs, // 4px optical gap between input labels and controls
 
   // Backward compatibility mappings
   window: {
@@ -89,6 +90,7 @@ export default {
   input: {
     margin: SPACING.md,       // 16
     padding: SPACING.sm,      // 8
+    labelMargin: SPACING.xs,  // 4
     border: {
       width: 2,
       radius: RADIUS.sm,      // 8

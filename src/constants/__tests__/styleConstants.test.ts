@@ -18,6 +18,11 @@ describe("Style Constants", () => {
     expect(Spacing.xl).toBeGreaterThan(0);
   });
 
+  it("exports optical input label spacing tokens", () => {
+    expect(Spacing.inputLabelGap).toBe(4);
+    expect(Spacing.input.labelMargin).toBe(4);
+  });
+
   it("exports valid font sizes and line heights", () => {
     expect(FontSize.xs).toBeGreaterThan(0);
     expect(FontSize.sm).toBeGreaterThan(0);

@@ -84,48 +84,50 @@ export function ExerciseDetailModal({
   return (
     <BottomSheetFrame visible={visible} onClose={onClose}>
       <View style={styles.sheetContainer}>
-        {/* Close Button */}
-        <TouchableOpacity
-          testID="exercise-detail-close-btn"
-          style={styles.closeButton}
-          onPress={handleClose}
-          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-        >
-          <Ionicons name="close" size={22} color="#6B7280" />
-        </TouchableOpacity>
+        {/* Detail Header: Back & Title + Tags */}
+        <View testID="exercise-detail-header" style={styles.detailHeader}>
+          <TouchableOpacity
+            testID="exercise-detail-back-btn"
+            accessibilityLabel={t("common.back")}
+            style={styles.backButton}
+            onPress={handleClose}
+          >
+            <Ionicons name="arrow-back" size={24} color={Colors.textScale.primary} />
+          </TouchableOpacity>
+
+          <View style={styles.detailHeaderTitleContainer}>
+            <Text testID="exercise-detail-title" style={styles.detailTitle}>{exercise.name}</Text>
+            <View testID="exercise-detail-tags-row" style={styles.tagsRow}>
+              <View
+                style={[
+                  styles.categoryBadge,
+                  { backgroundColor: badgeColor + "18", borderColor: badgeColor + "40" },
+                ]}
+              >
+                <Ionicons
+                  name={exercise.category === "corrective" ? "medical" : "fitness"}
+                  size={13}
+                  color={badgeColor}
+                />
+                <Text style={[styles.categoryBadgeText, { color: badgeColor }]}>
+                  {getLocalizedCategoryName(exercise.category)}
+                </Text>
+              </View>
+
+              <View style={styles.difficultyBadge}>
+                <Text style={styles.difficultyBadgeText}>
+                  {exercise.difficulty.toUpperCase()}
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
 
         <BottomSheetScrollView
           style={styles.scroll}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
-          {/* Category & Difficulty Header Tags */}
-          <View style={styles.tagsRow}>
-            <View
-              style={[
-                styles.categoryBadge,
-                { backgroundColor: badgeColor + "18", borderColor: badgeColor + "40" },
-              ]}
-            >
-              <Ionicons
-                name={exercise.category === "corrective" ? "medical" : "fitness"}
-                size={13}
-                color={badgeColor}
-              />
-              <Text style={[styles.categoryBadgeText, { color: badgeColor }]}>
-                {getLocalizedCategoryName(exercise.category)}
-              </Text>
-            </View>
-
-            <View style={styles.difficultyBadge}>
-              <Text style={styles.difficultyBadgeText}>
-                {exercise.difficulty.toUpperCase()}
-              </Text>
-            </View>
-          </View>
-
-          {/* Exercise Title */}
-          <Text style={styles.exerciseTitle}>{exercise.name}</Text>
 
           {/* Friendly Body Part Focus Chips */}
           {exercise.bodyParts && exercise.bodyParts.length > 0 && (
@@ -182,10 +184,7 @@ export function ExerciseDetailModal({
               </Text>
               {exercise.instructions.map((step, idx) => (
                 <View key={idx} style={styles.instructionStepRow}>
-                  <View style={styles.stepNumberBadge}>
-                    <Text style={styles.stepNumberText}>{idx + 1}</Text>
-                  </View>
-                  <Text style={styles.stepText}>{step}</Text>
+                  <Text style={styles.stepText}>{`${idx + 1}. ${step}`}</Text>
                 </View>
               ))}
             </View>
@@ -243,17 +242,29 @@ const styles = StyleSheet.create({
   scroll: {
     flexShrink: 1,
   },
-  closeButton: {
-    position: "absolute",
-    top: 0,
-    right: 0,
+  detailHeader: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginBottom: Spacing.md,
+  },
+  backButton: {
     width: TOUCH_TARGET.icon,
     height: TOUCH_TARGET.icon,
-    borderRadius: RADIUS.full,
-    backgroundColor: Colors.neutralAction.surface,
+    backgroundColor: "transparent",
     alignItems: "center",
     justifyContent: "center",
-    zIndex: 10,
+    marginLeft: -10,
+  },
+  detailHeaderTitleContainer: {
+    flex: 1,
+    marginLeft: Spacing.xs,
+  },
+  detailTitle: {
+    fontSize: FontSize.lg,
+    lineHeight: FontSize.lineHeight.lg,
+    fontFamily: "Poppins-Bold",
+    color: Colors.textScale.primary,
+    marginBottom: Spacing.xs,
   },
   scrollContent: {
     paddingTop: Spacing.xs,
@@ -263,8 +274,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: Spacing.xs,
-    marginBottom: Spacing.xs,
-    paddingRight: 40,
   },
   categoryBadge: {
     flexDirection: "row",
@@ -290,23 +299,14 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: Colors.textScale.secondary,
   },
-  exerciseTitle: {
-    fontSize: FontSize["2xl"],
-    fontWeight: "800",
-    color: Colors.textScale.primary,
-    marginBottom: Spacing.md,
-    lineHeight: 30,
-  },
   sectionContainer: {
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.lg,
   },
   sectionHeading: {
     fontSize: FontSize.xs,
-    fontWeight: "700",
+    fontFamily: "Poppins-Bold",
     color: Colors.textScale.secondary,
-    textTransform: "uppercase",
-    letterSpacing: 0.8,
-    marginBottom: Spacing.xs,
+    marginBottom: Spacing.inputLabelGap,
   },
   bodyPartsWrap: {
     flexDirection: "row",
@@ -356,21 +356,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-start",
     marginBottom: Spacing.xs,
-  },
-  stepNumberBadge: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: Colors.primary + "18",
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: Spacing.xs,
-    marginTop: 2,
-  },
-  stepNumberText: {
-    fontSize: FontSize.xs,
-    fontWeight: "700",
-    color: Colors.primary,
   },
   stepText: {
     flex: 1,

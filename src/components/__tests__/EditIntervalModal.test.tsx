@@ -221,7 +221,7 @@ describe("EditIntervalModal sound picker", () => {
 describe("EditIntervalModal sheet spacing & layout refinement", () => {
   const interval = { id: "int-1", name: "Work", duration: 30, color: "#3B82F6" };
 
-  function renderSheet() {
+  function renderSheet(overrides: Partial<React.ComponentProps<typeof EditIntervalModal>> = {}) {
     return render(
       <EditIntervalModal
         visible={true}
@@ -231,6 +231,7 @@ describe("EditIntervalModal sheet spacing & layout refinement", () => {
         onDelete={jest.fn()}
         onDuplicate={jest.fn()}
         onOpenExercisePicker={jest.fn()}
+        {...overrides}
       />
     );
   }
@@ -280,8 +281,8 @@ describe("EditIntervalModal sheet spacing & layout refinement", () => {
     const nameLabelRow = styleOf(getByTestId("edit-interval-name-label-row"));
     const durationLabelRow = styleOf(getByTestId("edit-interval-duration-label-row"));
 
-    expect(nameLabelRow.marginBottom).toBe(Spacing.sm);
-    expect(durationLabelRow.marginBottom).toBe(Spacing.sm);
+    expect(nameLabelRow.marginBottom).toBe(Spacing.inputLabelGap);
+    expect(durationLabelRow.marginBottom).toBe(Spacing.inputLabelGap);
     expect(nameLabelRow.minHeight).toBe(20);
     expect(durationLabelRow.minHeight).toBe(20);
 
@@ -289,6 +290,35 @@ describe("EditIntervalModal sheet spacing & layout refinement", () => {
     const durationLabel = styleOf(getByTestId("edit-interval-duration-label"));
     expect(nameLabel.marginBottom ?? 0).toBe(0);
     expect(durationLabel.marginBottom ?? 0).toBe(0);
+  });
+
+  it("applies optical 4px inputLabelGap to color and sound section labels", () => {
+    const { getByTestId } = renderSheet();
+    const colorLabel = styleOf(getByTestId("edit-interval-color-label"));
+    const soundLabel = styleOf(getByTestId("edit-interval-sound-label"));
+
+    expect(colorLabel.marginBottom).toBe(Spacing.inputLabelGap);
+    expect(soundLabel.marginBottom).toBe(Spacing.inputLabelGap);
+    expect(Spacing.inputLabelGap).toBe(4);
+  });
+
+  it("expands header title with flex: 1 and isolates done button touch target to 44x44", () => {
+    const onClose = jest.fn();
+    const { getByTestId } = renderSheet({ onClose });
+
+    const title = styleOf(getByTestId("edit-interval-title"));
+    expect(title.flex).toBe(1);
+
+    const doneTouchable = getByTestId("edit-interval-done-btn");
+    const doneBtn = styleOf(doneTouchable);
+    expect(doneBtn.width).toBe(44);
+    expect(doneBtn.height).toBe(44);
+    expect(doneBtn.marginRight).toBe(-10);
+    expect(doneTouchable.props.hitSlop).toBeUndefined();
+
+    // Done button triggers onClose
+    fireEvent.press(doneTouchable);
+    expect(onClose).toHaveBeenCalled();
   });
 
   it("gives the interval name input 16px horizontal inner padding", () => {
