@@ -50,8 +50,10 @@
     "namePlaceholder": "Morning Blast",
     "timerNamePlaceholder": "Morning Blast",
     "importBanner": "Review & Import Shared Timer",
-    "intervalColor": "Interval Color",
-    "intervalSound": "Interval Sound",
+    "intervalColor": "Color",
+    "intervalSound": "Sound",
+    "colorLabel": "Color",
+    "soundLabel": "Sound",
     "soundBeep": "Beep",
     "soundBeep2": "Double Beep",
     "soundBeep3": "Triple Beep",
@@ -62,7 +64,8 @@
     "intervals": "Intervals",
     "addInterval": "Add Interval",
     "addFromLibrary": "Add Exercise",
-    "intervalNameLabel": "Interval Name",
+    "intervalNameLabel": "Name",
+    "nameLabel": "Name",
     "intervalNamePlaceholder": "Interval name",
     "defaultIntervalName": "Interval %{number}",
     "seconds": "seconds",
@@ -81,8 +84,8 @@
     "saveError": "Failed to save timer. Please try again."
   },
   "generateTimer": {
-    "title": "AI Workout Generator",
-    "description": "Tell us a little about what you are looking for to allow Interval's AI to create a custom bodyweight exercise timer for you!",
+    "title": "Workout Generator",
+    "description": "Tell us a little about what you are looking for to create a custom bodyweight exercise timer for you!",
     "goalQuestion": "What is your fitness goal?",
     "goalWeightLoss": "Lose weight",
     "goalTone": "Get toned",
@@ -909,6 +912,8 @@
     "createCustomWorkout": "Create Custom Workout",
     "addToTimer": "Add to Timer",
     "searchPlaceholder": "Search exercises, body parts, or instructions...",
+    "categoryLabel": "Category",
+    "bodyPartLabel": "Body Part",
     "allCategories": "All",
     "allBodyParts": "All Body Parts",
     "resultsCount": "%{count} exercises",
@@ -1354,7 +1359,9 @@
     "all": "All",
     "noResults": "No exercises found",
     "emptyTitle": "No exercises found",
-    "emptySubtitle": "Try searching a different joint, body part, or keyword."
+    "emptySubtitle": "Try searching a different joint, body part, or keyword.",
+    "addBtn": "Add",
+    "noExercises": "No exercises found"
   },
   "badges": {
     "first_step_hero": {

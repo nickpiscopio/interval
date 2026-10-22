@@ -58,7 +58,7 @@ describe("EditIntervalModal", () => {
     expect(doneIcon.props.size).toBe(24);
 
     // Section title
-    expect(getByText("Interval Name")).toBeTruthy();
+    expect(getByText("Name")).toBeTruthy();
 
     // Edit Name
     const nameInput = getByPlaceholderText("Interval name");
@@ -152,7 +152,7 @@ describe("EditIntervalModal sound picker", () => {
 
   it("renders sound pills without speaker or checkmark icons and highlights selected with active tinting", () => {
     const { getByText, getByTestId, queryByTestId } = setup(base);
-    expect(getByText("Interval Sound")).toBeTruthy();
+    expect(getByText("Sound")).toBeTruthy();
     expect(getByText("Beep")).toBeTruthy();
     expect(getByText("Triple Beep")).toBeTruthy();
     expect(getByText("None")).toBeTruthy();
@@ -265,19 +265,22 @@ describe("EditIntervalModal sheet spacing & layout refinement", () => {
     const colorLabel = getByTestId("edit-interval-color-label");
     const soundLabel = getByTestId("edit-interval-sound-label");
 
-    expect(nameLabel.props.children).toBe("Interval Name");
+    expect(nameLabel.props.children).toBe("Name");
     expect(durationLabel.props.children).toBe("Duration");
-    expect(colorLabel.props.children).toBe("Interval Color");
-    expect(soundLabel.props.children).toBe("Interval Sound");
+    expect(colorLabel.props.children).toBe("Color");
+    expect(soundLabel.props.children).toBe("Sound");
 
     for (const label of [nameLabel, durationLabel, colorLabel, soundLabel]) {
       const s = styleOf(label);
       expect(s.fontFamily).toBe("Poppins-Bold");
     }
+
+    const libraryBtn = getByTestId("edit-interval-library-btn");
+    const libraryText = libraryBtn.findByType ? libraryBtn : getByTestId("edit-interval-name-label-row");
   });
 
   it("normalizes label rows so name and duration inputs align vertically without duplicate margins", () => {
-    const { getByTestId } = renderSheet();
+    const { getByTestId, getByText } = renderSheet();
     const nameLabelRow = styleOf(getByTestId("edit-interval-name-label-row"));
     const durationLabelRow = styleOf(getByTestId("edit-interval-duration-label-row"));
 
@@ -285,6 +288,11 @@ describe("EditIntervalModal sheet spacing & layout refinement", () => {
     expect(durationLabelRow.marginBottom).toBe(Spacing.inputLabelGap);
     expect(nameLabelRow.minHeight).toBe(20);
     expect(durationLabelRow.minHeight).toBe(20);
+    expect(nameLabelRow.alignItems).toBe("flex-end");
+    expect(durationLabelRow.alignItems).toBe("flex-end");
+
+    const libraryBtnText = getByText("Library");
+    expect(styleOf(libraryBtnText).fontFamily).toBe("Poppins-Bold");
 
     const nameLabel = styleOf(getByTestId("edit-interval-name-label"));
     const durationLabel = styleOf(getByTestId("edit-interval-duration-label"));

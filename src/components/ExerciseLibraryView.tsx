@@ -2,17 +2,17 @@ import React, { useState, useMemo } from "react";
 import {
   StyleSheet,
   View,
+  Text,
   TextInput,
   TouchableOpacity,
-  FlatList,
   ScrollView,
+  FlatList,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import Colors from "../constants/Colors";
 import Spacing, { RADIUS, TOUCH_TARGET, SHADOWS } from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
-import { Text } from "./Themed";
 import { Exercise, BodyPart } from "../model/Exercise";
 import {
   EXERCISE_CATALOG,
@@ -26,8 +26,11 @@ import { recordExerciseSearch, recordExerciseInspection } from "../services/badg
 import { t } from "../i18n";
 
 export interface ExerciseLibraryViewProps {
-  onStartQuickRoutine: (exercise: Exercise) => void;
-  onCreateCustomTimer: (exercise: Exercise) => void;
+  onStartQuickRoutine?: (exercise: Exercise) => void;
+  onCreateCustomTimer?: (exercise: Exercise) => void;
+  onSelect?: (exercise: Exercise) => void;
+  onBack?: () => void;
+  onClose?: () => void;
   bottomPadding?: number;
 }
 
@@ -44,6 +47,9 @@ const CATEGORIES = [
 export function ExerciseLibraryView({
   onStartQuickRoutine,
   onCreateCustomTimer,
+  onSelect,
+  onBack,
+  onClose,
   bottomPadding = 80,
 }: ExerciseLibraryViewProps) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -97,6 +103,13 @@ export function ExerciseLibraryView({
     setSelectedExercise(exercise);
   }
 
+  function handleQuickAdd(exercise: Exercise) {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (onSelect) {
+      onSelect(exercise);
+    }
+  }
+
   function handleSearchChange(text: string) {
     setSearchQuery(text);
     if (text.trim().length >= 2) {
@@ -121,12 +134,51 @@ export function ExerciseLibraryView({
 
   return (
     <View style={styles.container}>
+      {/* Optional In-Sheet Header with Back & Close */}
+      {(onBack || onClose) && (
+        <View style={styles.sheetHeader}>
+          <View style={styles.sheetHeaderLeft}>
+            {onBack && (
+              <TouchableOpacity
+                testID="exercise-picker-back-btn"
+                accessibilityLabel={t("common.back")}
+                style={styles.backButton}
+                onPress={onBack}
+                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+              >
+                <Ionicons name="arrow-back" size={24} color={Colors.textScale.primary} />
+              </TouchableOpacity>
+            )}
+            <View style={styles.headerTitleWrap}>
+              <Text style={styles.headerTitle}>{t("exercisePicker.title")}</Text>
+              <Text style={styles.headerSubtitle}>
+                {t("exercisePicker.subtitle", { count: filteredExercises.length })}
+              </Text>
+            </View>
+          </View>
+          {onClose && (
+            <TouchableOpacity
+              testID="exercise-picker-close-btn"
+              style={styles.closeButton}
+              onPress={onClose}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+            >
+              <Ionicons name="close" size={24} color="#6B7280" />
+            </TouchableOpacity>
+          )}
+        </View>
+      )}
+
       {/* Search Bar */}
       <View testID="exercise-search-bar" style={styles.searchContainer}>
         <Ionicons name="search" size={18} color="#9CA3AF" style={styles.searchIcon} />
         <TextInput
           style={styles.searchInput}
-          placeholder={t("exercises.searchPlaceholder")}
+          placeholder={
+            onSelect
+              ? t("exercisePicker.searchPlaceholder", { defaultValue: "Search exercises..." })
+              : t("exercises.searchPlaceholder")
+          }
           placeholderTextColor="#9CA3AF"
           value={searchQuery}
           onChangeText={handleSearchChange}
@@ -146,6 +198,9 @@ export function ExerciseLibraryView({
       </View>
 
       {/* Category Filter Pills */}
+      <Text testID="exercise-category-label" style={styles.filterSectionLabel}>
+        {t("exercises.categoryLabel")}
+      </Text>
       <View style={styles.filterPillsWrapper}>
         <ScrollView
           testID="categories-carousel"
@@ -195,6 +250,9 @@ export function ExerciseLibraryView({
       </View>
 
       {/* Body Part Filter Pills */}
+      <Text testID="exercise-body-part-label" style={styles.filterSectionLabel}>
+        {t("exercises.bodyPartLabel")}
+      </Text>
       <View style={styles.bodyPartPillsWrapper}>
         <ScrollView
           testID="body-parts-carousel"
@@ -296,7 +354,28 @@ export function ExerciseLibraryView({
                     </View>
                   </View>
                 </View>
-                <Ionicons name="chevron-forward" size={18} color="#9CA3AF" />
+
+                {/* Card Actions: Quick Add (in picker mode) + Chevron */}
+                <View style={styles.cardActionsRow}>
+                  {onSelect && (
+                    <TouchableOpacity
+                      testID={`btn-quick-add-${item.id}`}
+                      style={styles.quickAddButton}
+                      activeOpacity={0.8}
+                      onPress={(e) => {
+                        e?.stopPropagation?.();
+                        handleQuickAdd(item);
+                      }}
+                      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                    >
+                      <Ionicons name="add" size={16} color="#FFFFFF" />
+                      <Text style={styles.quickAddButtonText}>
+                        {t("exercisePicker.addBtn", { defaultValue: "Add" })}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                  <Ionicons name="chevron-forward" size={18} color="#9CA3AF" />
+                </View>
               </View>
 
               {/* Description Snippet */}
@@ -329,7 +408,11 @@ export function ExerciseLibraryView({
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <Ionicons name="search-outline" size={44} color="#D1D5DB" />
-            <Text style={styles.emptyStateTitle}>{t("exercises.noExercisesFound")}</Text>
+            <Text style={styles.emptyStateTitle}>
+              {onSelect
+                ? t("exercisePicker.noExercises", { defaultValue: "No exercises found" })
+                : t("exercises.noExercisesFound")}
+            </Text>
             <Text style={styles.emptyStateSubtitle}>
               {t("exercises.noExercisesSubtitle")}
             </Text>
@@ -341,8 +424,13 @@ export function ExerciseLibraryView({
       <ExerciseDetailModal
         visible={selectedExercise !== null}
         exercise={selectedExercise}
-        mode="library"
+        mode={onSelect ? "picker" : "library"}
         onClose={() => setSelectedExercise(null)}
+        onSelectExercise={(ex) => {
+          if (onSelect) {
+            onSelect(ex);
+          }
+        }}
         onStartQuickRoutine={onStartQuickRoutine}
         onCreateCustomTimer={onCreateCustomTimer}
       />
@@ -354,6 +442,51 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.surface.screen,
+  },
+  sheetHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: Spacing.md,
+    paddingTop: Spacing.xs,
+    paddingBottom: Spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.borderDefault,
+    marginBottom: Spacing.xs,
+  },
+  sheetHeaderLeft: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+  backButton: {
+    width: TOUCH_TARGET.icon,
+    height: TOUCH_TARGET.icon,
+    backgroundColor: "transparent",
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: -10,
+  },
+  headerTitleWrap: {
+    marginLeft: Spacing.xs,
+    flex: 1,
+  },
+  headerTitle: {
+    fontSize: FontSize.lg,
+    fontWeight: "800",
+    color: Colors.textScale.primary,
+  },
+  headerSubtitle: {
+    fontSize: FontSize.xs,
+    color: Colors.textScale.muted,
+  },
+  closeButton: {
+    width: TOUCH_TARGET.icon,
+    height: TOUCH_TARGET.icon,
+    borderRadius: RADIUS.full,
+    backgroundColor: Colors.neutralAction.surface,
+    alignItems: "center",
+    justifyContent: "center",
   },
   searchContainer: {
     flexDirection: "row",
@@ -378,8 +511,15 @@ const styles = StyleSheet.create({
     color: Colors.textScale.primary,
     paddingVertical: 8,
   },
+  filterSectionLabel: {
+    fontSize: FontSize.xs,
+    fontFamily: "Poppins-Bold",
+    color: Colors.textScale.secondary,
+    paddingHorizontal: Spacing.md,
+    marginBottom: Spacing.inputLabelGap,
+  },
   filterPillsWrapper: {
-    marginBottom: 6,
+    marginBottom: Spacing.xs,
   },
   filterPillsRow: {
     paddingHorizontal: Spacing.md,
@@ -413,7 +553,7 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
   bodyPartPillsWrapper: {
-    marginBottom: Spacing.xs,
+    marginBottom: 0,
   },
   bodyPartPillsRow: {
     paddingHorizontal: Spacing.md,
@@ -453,6 +593,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   listContent: {
+    paddingTop: Spacing.sm,
     gap: 10,
   },
   exerciseCard: {
@@ -503,6 +644,25 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: Colors.textScale.secondary,
   },
+  cardActionsRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  quickAddButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: RADIUS.full,
+  },
+  quickAddButtonText: {
+    color: Colors.white,
+    fontSize: 11,
+    fontWeight: "700",
+  },
   cardDescription: {
     fontSize: FontSize.xs,
     color: Colors.textScale.secondary,
@@ -521,17 +681,16 @@ const styles = StyleSheet.create({
   },
   cardBodyPartChip: {
     backgroundColor: Colors.neutralAction.surface,
-    paddingHorizontal: 7,
+    paddingHorizontal: 8,
     paddingVertical: 3,
-    borderRadius: RADIUS.sm,
+    borderRadius: RADIUS.xs,
   },
   cardBodyPartChipText: {
-    fontSize: 10,
-    fontWeight: "600",
+    fontSize: 11,
     color: Colors.textScale.secondary,
   },
   cardMoreBodyPartsText: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: "600",
     color: Colors.textScale.muted,
   },
@@ -539,18 +698,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 60,
+    paddingHorizontal: Spacing.xl,
   },
   emptyStateTitle: {
-    fontSize: FontSize.lg,
+    fontSize: FontSize.md,
     fontWeight: "700",
-    color: Colors.textScale.heading,
+    color: Colors.textScale.primary,
     marginTop: Spacing.sm,
-    marginBottom: 4,
   },
   emptyStateSubtitle: {
-    fontSize: FontSize.sm,
+    fontSize: FontSize.xs,
     color: Colors.textScale.muted,
     textAlign: "center",
-    maxWidth: 240,
+    marginTop: 4,
+    lineHeight: 18,
   },
 });

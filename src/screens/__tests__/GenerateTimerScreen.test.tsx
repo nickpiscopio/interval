@@ -2,6 +2,7 @@ import React from "react";
 import { StyleSheet } from "react-native";
 import { render, fireEvent, act } from "@testing-library/react-native";
 import GenerateTimerScreen from "../GenerateTimerScreen";
+import Spacing from "../../constants/Spacing";
 
 describe("GenerateTimerScreen", () => {
   beforeEach(() => {
@@ -10,6 +11,23 @@ describe("GenerateTimerScreen", () => {
 
   afterEach(() => {
     jest.useRealTimers();
+  });
+
+  it("renders rebranded 'Workout Generator' title, description without AI, and 16px screen padding", () => {
+    const { getByText, getByTestId, queryByText } = render(
+      <GenerateTimerScreen navigation={{} as any} route={{} as any} />
+    );
+
+    expect(getByText("Workout Generator")).toBeTruthy();
+    expect(queryByText("AI Workout Generator")).toBeNull();
+
+    const desc = getByText(/Tell us a little about what you are looking for/);
+    expect(desc).toBeTruthy();
+    expect(desc.props.children).not.toContain("AI");
+
+    const scroll = getByTestId("generate-timer-scroll");
+    const contentStyle = StyleSheet.flatten(scroll.props.contentContainerStyle);
+    expect(contentStyle.padding).toBe(Spacing.md);
   });
 
   it("renders fitness survey questions and options", () => {

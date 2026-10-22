@@ -402,7 +402,7 @@ const styles = StyleSheet.create({
   },
   inputLabelRow: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-end",
     justifyContent: "space-between",
     minHeight: 20,
     marginBottom: Spacing.inputLabelGap,
@@ -428,7 +428,7 @@ const styles = StyleSheet.create({
   },
   libraryPickerBtnText: {
     fontSize: FontSize.xs,
-    fontFamily: "Poppins-Medium",
+    fontFamily: "Poppins-Bold",
     color: Colors.primary,
   },
   editorTextInput: {

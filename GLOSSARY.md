@@ -45,7 +45,7 @@ A numeric text entry mechanism for interval duration that queues digits right-to
 _Avoid_: Time Picker Wheel, Single-Digit Parser
 
 **Interval Edit Bottom Sheet**:
-A dedicated slide-up bottom sheet modal (`@gorhom/bottom-sheet`) for inspecting and editing an individual interval's name, duration, color, and Interval Sound with a top-right checkmark button (`checkmark-sharp`) bounded strictly to a 44x44 touch target with zero hitSlop spillover and an optical offset (`marginRight: -10`) aligning the glyph flush at 16px from the right boundary, in-sheet drill-down navigation to the Exercise Library (expanding to 90% height with an icon-only back button without circular backdrop and no close button), safe-area bottom clearance (`insets.bottom + Spacing.lg`), dynamic sequence placeholder fallback (`Interval X` and `00:00:30` default duration), deferred addition until saved/done, duplicate duration validation, and self-contained keyboard avoidance.
+A dedicated slide-up bottom sheet modal (`@gorhom/bottom-sheet`) for inspecting and editing an individual interval's name, duration, color, and Interval Sound with concise form labels ('Name', 'Duration', 'Color', 'Sound'), bold library launcher button (`Poppins-Bold`), a top-right checkmark button (`checkmark-sharp`) bounded strictly to a 44x44 touch target with zero hitSlop spillover and an optical offset (`marginRight: -10`) aligning the glyph flush at 16px from the right boundary, in-sheet drill-down navigation to the Exercise Library (expanding to 90% height with an icon-only back button without circular backdrop and no close button), safe-area bottom clearance (`insets.bottom + Spacing.lg`), dynamic sequence placeholder fallback (`Interval X` and `00:00:30` default duration), deferred addition until saved/done, duplicate duration validation, and self-contained keyboard avoidance.
 _Avoid_: Carousel Slider, Inline Accordion, Optimistic Empty Interval Addition, Stacked Bottom Sheet Modals, Circular Border Back Buttons in Sheet Headers, Touch Target Whitespace Spillover
 
 **Floating Navigation Bar & Action Buttons**:
@@ -53,7 +53,7 @@ A translucent floating bottom bar for switching between Workouts and Exercise Li
 _Avoid_: Tab Bar Dock, Bottom Action Sheet
 
 **Input Label**:
-A micro-typography field identifier placed directly above interactive inputs, form fields, and selector palettes (`FontSize.xs: 12`, `Poppins-Bold`, `Colors.textScale.secondary`) with optical spacing (`Spacing.inputLabelGap: 4`).
+A micro-typography field identifier placed directly above interactive inputs, form fields, filter carousels (e.g., 'Category' and 'Body Part' in the Exercise Library), and selector palettes (`FontSize.xs: 12`, `Poppins-Bold`, `Colors.textScale.secondary`) with optical spacing (`Spacing.inputLabelGap: 4`).
 _Avoid_: Field Header, Input Header, Form Header
 
 **Design System Tokens & Hierarchy**:

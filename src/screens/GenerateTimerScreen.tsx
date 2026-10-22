@@ -73,7 +73,7 @@ export default function GenerateTimerScreen({
         <View style={styles.headerRightPlaceholder} />
       </View>
 
-      <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <ScrollView testID="generate-timer-scroll" style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.description}>
         {t("generateTimer.description")}
       </Text>
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface.screen,
   },
   content: {
-    padding: Spacing.lg,
+    padding: Spacing.md,
     paddingBottom: Spacing["2xl"],
   },
   description: {

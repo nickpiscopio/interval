@@ -50,8 +50,10 @@
     "namePlaceholder": "Énergie Matinale",
     "timerNamePlaceholder": "Énergie Matinale",
     "importBanner": "Vérifier et Importer le Minuteur Partagé",
-    "intervalColor": "Couleur de l'Intervalle",
-    "intervalSound": "Son de l'Intervalle",
+    "intervalColor": "Couleur",
+    "intervalSound": "Son",
+    "colorLabel": "Couleur",
+    "soundLabel": "Son",
     "soundBeep": "Bip",
     "soundBeep2": "Double Bip",
     "soundBeep3": "Triple Bip",
@@ -62,7 +64,8 @@
     "intervals": "Intervalles",
     "addInterval": "Ajouter un Intervalle",
     "addFromLibrary": "Ajouter un Exercice",
-    "intervalNameLabel": "Nom de l'Intervalle",
+    "intervalNameLabel": "Nom",
+    "nameLabel": "Nom",
     "intervalNamePlaceholder": "Nom de l'intervalle",
     "defaultIntervalName": "Intervalle %{number}",
     "seconds": "secondes",
@@ -81,8 +84,8 @@
     "saveError": "Échec de l'enregistrement du minuteur. Veuillez réessayer."
   },
   "generateTimer": {
-    "title": "Générateur d'Entraînement IA",
-    "description": "Indiquez-nous ce que vous recherchez pour permettre à l'IA d'Interval de créer un minuteur d'exercices au poids du corps sur mesure !",
+    "title": "Générateur d'Entraînement",
+    "description": "Indiquez-nous ce que vous recherchez pour créer un minuteur d'exercices au poids du corps sur mesure !",
     "goalQuestion": "Quel est votre objectif sportif ?",
     "goalWeightLoss": "Perdre du poids",
     "goalTone": "Se tonifier",
@@ -909,6 +912,8 @@
     "createCustomWorkout": "Créer Entraînement Personnalisé",
     "addToTimer": "Ajouter au Minuteur",
     "searchPlaceholder": "Rechercher des exercices, zones ou instructions...",
+    "categoryLabel": "Catégorie",
+    "bodyPartLabel": "Partie du Corps",
     "allCategories": "Tous",
     "allBodyParts": "Toutes les Zones",
     "resultsCount": "%{count} exercices",
@@ -1354,7 +1359,9 @@
     "all": "Tous",
     "noResults": "Aucun exercice trouvé",
     "emptyTitle": "Aucun exercice trouvé",
-    "emptySubtitle": "Essayez de rechercher une autre articulation, zone ou mot-clé."
+    "emptySubtitle": "Essayez de rechercher une autre articulation, zone ou mot-clé.",
+    "addBtn": "Ajouter",
+    "noExercises": "Aucun exercice trouvé"
   },
   "badges": {
     "first_step_hero": {

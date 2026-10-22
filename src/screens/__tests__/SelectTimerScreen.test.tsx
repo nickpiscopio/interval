@@ -5,6 +5,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import SelectTimerScreen from "../SelectTimerScreen";
 import { AlertProvider } from "../../context/AlertContext";
 import { DEFAULT_AI_TIMERS } from "../../constants/defaultTimers";
+import { RADIUS } from "../../constants/Spacing";
 
 function renderWithAlert(ui: React.ReactElement) {
   return render(<AlertProvider>{ui}</AlertProvider>);
@@ -75,13 +76,20 @@ describe("SelectTimerScreen", () => {
       navigate: jest.fn(),
     };
 
-    const { getAllByText } = renderWithAlert(
+    const { getAllByText, getByTestId } = renderWithAlert(
       <SelectTimerScreen navigation={mockNavigation} route={{} as any} />
     );
 
     await waitFor(() => {
       expect(getAllByText("play").length).toBeGreaterThan(0);
     }, { timeout: 3500 });
+
+    const playBtn = getByTestId(`btn-play-timer-${DEFAULT_AI_TIMERS[0].id}`);
+    expect(playBtn.props.style).toEqual(
+      expect.objectContaining({
+        borderRadius: RADIUS.sm,
+      })
+    );
 
     const playButtons = getAllByText("play");
     fireEvent.press(playButtons[0]);

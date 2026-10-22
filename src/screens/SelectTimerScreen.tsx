@@ -961,7 +961,7 @@ const styles = StyleSheet.create({
   cardPlayButton: {
     width: 36,
     height: 36,
-    borderRadius: RADIUS.full,
+    borderRadius: RADIUS.sm,
     backgroundColor: Colors.primary,
     alignItems: "center",
     justifyContent: "center",

@@ -6,6 +6,8 @@ import CreateTimerScreen from "../CreateTimerScreen";
 import { AlertProvider } from "../../context/AlertContext";
 import { Timer } from "../../model/Timer";
 
+import FontSize from "../../constants/FontSize";
+
 describe("CreateTimerScreen", () => {
   beforeEach(async () => {
     await AsyncStorage.clear();
@@ -19,7 +21,7 @@ describe("CreateTimerScreen", () => {
       goBack: jest.fn(),
     };
 
-    const { getByText, getByPlaceholderText } = render(
+    const { getByText, getByPlaceholderText, getByTestId } = render(
       <AlertProvider>
         <CreateTimerScreen navigation={mockNavigation} route={{} as any} />
       </AlertProvider>
@@ -34,6 +36,16 @@ describe("CreateTimerScreen", () => {
     expect(getByText("Timer Details")).toBeTruthy();
     expect(getByText("High Interval")).toBeTruthy();
     expect(getByText("Low Interval")).toBeTruthy();
+
+    const addIntervalText = getByText("Add Interval");
+    expect(addIntervalText).toBeTruthy();
+    const addIntervalStyle = StyleSheet.flatten(addIntervalText.props.style);
+    expect(addIntervalStyle.fontSize).toBe(FontSize.sm);
+    expect(addIntervalStyle.fontFamily).toBe("Poppins-Bold");
+
+    const bottomContainer = getByTestId("bottom-docked-container");
+    const bottomContainerStyle = StyleSheet.flatten(bottomContainer.props.style);
+    expect(bottomContainerStyle.paddingTop).toBe(0);
   });
 
   it("validates empty timer name on save and on start", () => {

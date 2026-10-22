@@ -532,7 +532,7 @@ export default function CreateTimerScreen({
       </View>
 
       {/* Bottom Docked Timer Details Card */}
-      <View style={[styles.bottomContainer, { paddingBottom: Math.max(insets.bottom, Spacing.md) }]}>
+      <View testID="bottom-docked-container" style={[styles.bottomContainer, { paddingBottom: Math.max(insets.bottom, Spacing.md) }]}>
         <View style={styles.card}>
           <Text style={styles.cardTitle}>{t("createTimer.titleDetails")}</Text>
 
@@ -701,7 +701,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   addIntervalLinkText: {
-    fontSize: FontSize.xs,
+    fontSize: FontSize.sm,
     fontFamily: "Poppins-Bold",
     fontWeight: "700",
     color: Colors.primary,
@@ -748,7 +748,7 @@ const styles = StyleSheet.create({
   bottomContainer: {
     backgroundColor: Colors.surface.screen,
     paddingHorizontal: Spacing.md,
-    paddingTop: Spacing.xs,
+    paddingTop: 0,
   },
   card: {
     backgroundColor: Colors.surface.card,

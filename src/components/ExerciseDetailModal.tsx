@@ -219,6 +219,7 @@ export function ExerciseDetailModal({
             </View>
           ) : (
             <TouchableOpacity
+              testID="exercise-detail-add-to-timer-btn"
               style={styles.selectButton}
               activeOpacity={0.85}
               onPress={handleSelect}

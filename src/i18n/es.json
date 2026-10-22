@@ -50,8 +50,10 @@
     "namePlaceholder": "Energía Matutina",
     "timerNamePlaceholder": "Energía Matutina",
     "importBanner": "Revisar e Importar Minutero Compartido",
-    "intervalColor": "Color del Intervalo",
-    "intervalSound": "Sonido del Intervalo",
+    "intervalColor": "Color",
+    "intervalSound": "Sonido",
+    "colorLabel": "Color",
+    "soundLabel": "Sonido",
     "soundBeep": "Pitido",
     "soundBeep2": "Doble Pitido",
     "soundBeep3": "Triple Pitido",
@@ -62,7 +64,8 @@
     "intervals": "Intervalos",
     "addInterval": "Añadir Intervalo",
     "addFromLibrary": "Añadir Ejercicio",
-    "intervalNameLabel": "Nombre del Intervalo",
+    "intervalNameLabel": "Nombre",
+    "nameLabel": "Nombre",
     "intervalNamePlaceholder": "Nombre del intervalo",
     "defaultIntervalName": "Intervalo %{number}",
     "seconds": "segundos",
@@ -81,8 +84,8 @@
     "saveError": "Error al guardar el temporizador. Inténtalo de nuevo."
   },
   "generateTimer": {
-    "title": "Generador de Rutinas IA",
-    "description": "¡Cuéntanos qué estás buscando y la IA de Interval creará un temporizador de peso corporal a tu medida!",
+    "title": "Generador de Rutinas",
+    "description": "¡Cuéntanos qué estás buscando para crear un temporizador de peso corporal a tu medida!",
     "goalQuestion": "¿Cuál es tu objetivo fitness?",
     "goalWeightLoss": "Perder peso",
     "goalTone": "Tonificar",
@@ -909,6 +912,8 @@
     "createCustomWorkout": "Crear Entrenamiento Personalizado",
     "addToTimer": "Añadir al Temporizador",
     "searchPlaceholder": "Buscar ejercicios, partes del cuerpo o instrucciones...",
+    "categoryLabel": "Categoría",
+    "bodyPartLabel": "Parte del Cuerpo",
     "allCategories": "Todos",
     "allBodyParts": "Todas las Partes",
     "resultsCount": "%{count} ejercicios",
@@ -1354,7 +1359,9 @@
     "all": "Todos",
     "noResults": "No se encontraron ejercicios",
     "emptyTitle": "No se encontraron ejercicios",
-    "emptySubtitle": "Intenta buscar otra articulación, parte del cuerpo o palabra clave."
+    "emptySubtitle": "Intenta buscar otra articulación, parte del cuerpo o palabra clave.",
+    "addBtn": "Añadir",
+    "noExercises": "No se encontraron ejercicios"
   },
   "badges": {
     "first_step_hero": {
