@@ -1,9 +1,11 @@
 import React from "react";
 import { render, fireEvent, waitFor } from "@testing-library/react-native";
-import { Share } from "react-native";
+import { Share, StyleSheet } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { createAudioPlayer } from "expo-audio";
 import CompletionScreen from "../CompletionScreen";
 import { Timer } from "../../model/Timer";
+import Colors from "../../constants/Colors";
 
 describe("CompletionScreen", () => {
   const mockTimer: Timer = {
@@ -19,6 +21,22 @@ describe("CompletionScreen", () => {
   beforeEach(async () => {
     await AsyncStorage.clear();
     jest.clearAllMocks();
+  });
+
+  it("plays triple beep on mount and unloads player on unmount", () => {
+    const { unmount } = render(
+      <CompletionScreen
+        navigation={{} as any}
+        route={{ params: { timer: mockTimer } } as any}
+      />
+    );
+
+    expect(createAudioPlayer).toHaveBeenCalled();
+    const playerInstance = (createAudioPlayer as jest.Mock).mock.results[0].value;
+    expect(playerInstance.play).toHaveBeenCalled();
+
+    unmount();
+    expect(playerInstance.release).toHaveBeenCalled();
   });
 
   it("renders workout summary stats and navigates back to timers", async () => {
@@ -93,13 +111,13 @@ describe("CompletionScreen", () => {
     });
   });
 
-  it("handles newly unlocked badge modal and sharing badge", async () => {
+  it("handles newly unlocked badge modal, dismisses on backdrop tap, and checks overlay style", async () => {
     jest.spyOn(Share, "share").mockResolvedValueOnce({
       action: Share.sharedAction,
       activityType: "com.apple.UIKit.activity.PostToTwitter",
     });
 
-    const { getByText, getAllByText, queryByText } = render(
+    const { getByText, getAllByText, getByTestId, queryByText } = render(
       <CompletionScreen
         navigation={{} as any}
         route={{ params: { timer: mockTimer } } as any}
@@ -118,14 +136,20 @@ describe("CompletionScreen", () => {
       expect(getByText("Share Badge")).toBeTruthy();
     });
 
+    // Overlay backdrop has unified opacity
+    const overlay = getByTestId("modal-overlay");
+    const overlayStyle = StyleSheet.flatten(overlay.props.style);
+    expect(overlayStyle.backgroundColor).toBe(Colors.surface.overlay);
+
     // Share achievement from modal
     const shareAchievementBtn = getByText("Share Badge");
     fireEvent.press(shareAchievementBtn);
 
-    // Dismiss badge modal
-    const continueBtn = getByText("OK");
-    fireEvent.press(continueBtn);
+    // Tap outside on modal-overlay to dismiss
+    fireEvent.press(overlay);
 
-    expect(queryByText("Share Badge")).toBeNull();
+    await waitFor(() => {
+      expect(queryByText("Share Badge")).toBeNull();
+    });
   });
 });

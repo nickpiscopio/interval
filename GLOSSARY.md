@@ -72,6 +72,10 @@ _Avoid_: Permanent Drag Handles, Inline Delete Swipe Clutter
 High-stiffness, overshoot-clamped spring physics (`REORDER_SPRING_CONFIG`) and real-time Reanimated shadow interpolation (`useOnCellActiveAnimation`), ensuring dragged items settle crisply in ~120ms to persist immediately while shadows smoothly glide between resting (`SHADOWS.card`) and floating states without sudden snapping or delay.
 _Avoid_: Sluggish Release Springs, Abrupt Shadow Popping
 
+**Workout Completion Audio**:
+An automatic audio celebration cue (`beep_3` triple beep) that triggers when the final interval finishes and the Workout Completed screen is presented, reinforcing routine conclusion.
+_Avoid_: Mid-Timer Completion Sound, Silent Completion Screen
 
-
-
+**Badge & Award Modal Overlay**:
+A standardized celebration and inspection dialog featuring a unified translucent backdrop (`Colors.surface.overlay`), full-screen safe area coverage (`statusBarTranslucent={true}`), and tap-to-dismiss backdrop pressability.
+_Avoid_: Opaque Dark Overlays, Unresponsive Backdrop Taps, Status Bar Clipping

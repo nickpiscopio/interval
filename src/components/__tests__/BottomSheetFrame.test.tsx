@@ -188,6 +188,32 @@ describe("BottomSheetFrame", () => {
     const style = StyleSheet.flatten(content.props.style);
     expect(style.paddingTop).toBe(0);
     expect(style.paddingHorizontal).toBe(0);
+    expect(style.overflow).toBe("hidden");
+    expect(style.borderTopLeftRadius).toBeDefined();
+    expect(style.borderTopRightRadius).toBeDefined();
+  });
+
+  it("applies top corner radius and overflow hidden to preserve rounded corners", () => {
+    const { getByTestId } = render(
+      <BottomSheetFrame visible onClose={jest.fn()}>
+        <Text>content</Text>
+      </BottomSheetFrame>
+    );
+    const content = getByTestId("bottom-sheet-content");
+    const style = StyleSheet.flatten(content.props.style);
+    expect(style.overflow).toBe("hidden");
+    expect(style.borderTopLeftRadius).toBeDefined();
+    expect(style.borderTopRightRadius).toBeDefined();
+  });
+
+  it("does not report dismiss when initially mounted with visible=false", () => {
+    const onClose = jest.fn();
+    render(
+      <BottomSheetFrame visible={false} onClose={onClose}>
+        <Text>hidden</Text>
+      </BottomSheetFrame>
+    );
+    expect(onClose).not.toHaveBeenCalled();
   });
 });
 

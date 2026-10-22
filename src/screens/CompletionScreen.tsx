@@ -7,12 +7,14 @@ import {
   Share,
   Modal,
   ScrollView,
+  Pressable,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "expo-haptics";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { createAudioPlayer } from "expo-audio";
 
 import { RootStackScreenProps } from "../types";
 import { encodeBase64 } from "../utils/base64";
@@ -20,6 +22,7 @@ import { recordWorkoutCompletion, recordShare } from "../services/badgeService";
 import { getMotivationalCompletionMessage } from "../services/motivationalMessageService";
 import { Badge, UserStats } from "../model/Badge";
 import { getLocalizedBadge } from "../constants/badges";
+import { resolveSoundSource } from "../constants/Sounds";
 import { t } from "../i18n";
 import Spacing, { RADIUS, TOUCH_TARGET, SHADOWS } from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
@@ -46,6 +49,29 @@ export default function CompletionScreen({
     const secs = seconds % 60;
     return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
   }
+
+  // Play completion triple beep on mount
+  useEffect(() => {
+    let player: ReturnType<typeof createAudioPlayer> | null = null;
+    const source = resolveSoundSource("beep_3");
+    if (source) {
+      try {
+        player = createAudioPlayer(source);
+        player.play();
+      } catch (error) {
+        console.warn("Failed to play completion sound:", error);
+      }
+    }
+    return () => {
+      if (player) {
+        try {
+          player.release();
+        } catch {
+          // ignore cleanup errors
+        }
+      }
+    };
+  }, []);
 
   // Record workout completion and check for new badges
   useEffect(() => {
@@ -307,10 +333,18 @@ export default function CompletionScreen({
           visible={Boolean(activeModalBadge)}
           transparent
           animationType="fade"
+          statusBarTranslucent={true}
           onRequestClose={() => setActiveModalBadge(null)}
         >
-          <View style={styles.modalOverlay}>
-            <View style={styles.modalContent}>
+          <Pressable
+            testID="modal-overlay"
+            style={styles.modalOverlay}
+            onPress={() => setActiveModalBadge(null)}
+          >
+            <Pressable
+              style={styles.modalContent}
+              onPress={(e) => e.stopPropagation()}
+            >
               <View style={styles.modalBadgeHeaderPill}>
                 <Ionicons name="sparkles" size={14} color="#D97706" />
                 <Text style={styles.modalBadgeHeaderText}>{t("completion.newBadgeUnlocked").toUpperCase()}</Text>
@@ -348,8 +382,8 @@ export default function CompletionScreen({
               >
                 <Text style={styles.modalContinueText}>{t("common.ok")}</Text>
               </TouchableOpacity>
-            </View>
-          </View>
+            </Pressable>
+          </Pressable>
         </Modal>
       )}
     </View>
@@ -587,22 +621,18 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    backgroundColor: Colors.surface.overlay,
     justifyContent: "center",
     alignItems: "center",
     padding: Spacing.lg,
   },
   modalContent: {
     width: "100%",
-    backgroundColor: "#FFFFFF",
-    borderRadius: Spacing.radius.lg,
+    backgroundColor: Colors.surface.card,
+    borderRadius: RADIUS.md,
     padding: Spacing.xl,
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-    elevation: 10,
+    ...SHADOWS.modal,
   },
   modalBadgeHeaderPill: {
     flexDirection: "row",

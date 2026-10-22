@@ -192,4 +192,19 @@ describe("ExerciseLibraryView Component", () => {
     expect(getByText("Create Custom Workout")).toBeTruthy();
     expect(queryByText("Add to Timer")).toBeNull();
   });
+
+  it("renders in-sheet header with title and back button, without redundant subtitle, and with transparent container", () => {
+    const onBack = jest.fn();
+    const { getByTestId, getByText, queryByText } = render(
+      <ExerciseLibraryView onBack={onBack} onSelect={jest.fn()} />
+    );
+
+    expect(getByTestId("exercise-picker-back-btn")).toBeTruthy();
+    expect(getByText("Exercise Library")).toBeTruthy();
+    // Redundant totals subtitle "%{count} bodyweight exercises" should NOT exist
+    expect(queryByText(/bodyweight exercises/i)).toBeNull();
+
+    fireEvent.press(getByTestId("exercise-picker-back-btn"));
+    expect(onBack).toHaveBeenCalled();
+  });
 });

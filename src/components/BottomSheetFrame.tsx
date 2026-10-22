@@ -41,16 +41,26 @@ export function BottomSheetFrame({
   const sheetRef = useRef<BottomSheetModal>(null);
   const backReportedRef = useRef(false);
   const isDismissingProgrammatically = useRef(false);
+  const isPresentedRef = useRef(false);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
 
+  const snapPointsKey = snapPoints ? snapPoints.join(",") : "";
+  const memoizedSnapPoints = React.useMemo(
+    () => snapPoints,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [snapPointsKey]
+  );
+
   useEffect(() => {
     if (visible) {
+      isPresentedRef.current = true;
       isDismissingProgrammatically.current = false;
       sheetRef.current?.present();
-    } else {
+    } else if (isPresentedRef.current) {
       isDismissingProgrammatically.current = true;
       sheetRef.current?.dismiss();
+      isPresentedRef.current = false;
     }
   }, [visible]);
 
@@ -59,6 +69,7 @@ export function BottomSheetFrame({
     // Handlers registered later run first, so the topmost sheet closes only.
     const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
       backReportedRef.current = true;
+      isPresentedRef.current = false;
       sheetRef.current?.dismiss();
       onCloseRef.current();
       return true;
@@ -67,6 +78,7 @@ export function BottomSheetFrame({
   }, [visible]);
 
   const handleDismiss = useCallback(() => {
+    isPresentedRef.current = false;
     // A back press already reported the close; skip the follow-up dismiss event.
     if (backReportedRef.current) {
       backReportedRef.current = false;
@@ -93,18 +105,21 @@ export function BottomSheetFrame({
     []
   );
 
-  const hasExplicitSnapPoints = Boolean(snapPoints && snapPoints.length > 0);
+  const hasExplicitSnapPoints = Boolean(
+    memoizedSnapPoints && memoizedSnapPoints.length > 0
+  );
 
   return (
     <BottomSheetModal
       ref={sheetRef}
+      style={styles.sheetModal}
       enableDynamicSizing={!hasExplicitSnapPoints}
       maxDynamicContentSize={
         hasExplicitSnapPoints
           ? undefined
           : Dimensions.get("window").height * SHEET_MAX_HEIGHT_RATIO
       }
-      snapPoints={hasExplicitSnapPoints ? snapPoints : undefined}
+      snapPoints={hasExplicitSnapPoints ? memoizedSnapPoints : undefined}
       handleComponent={null}
       enablePanDownToClose={false}
       enableHandlePanningGesture={false}
@@ -143,6 +158,11 @@ export function BottomSheetFrame({
 }
 
 const styles = StyleSheet.create({
+  sheetModal: {
+    borderTopLeftRadius: RADIUS.lg,
+    borderTopRightRadius: RADIUS.lg,
+    overflow: "hidden",
+  },
   background: {
     backgroundColor: Colors.surface.card,
     borderTopLeftRadius: RADIUS.lg,
@@ -152,10 +172,16 @@ const styles = StyleSheet.create({
   content: {
     paddingTop: Spacing.md,
     paddingHorizontal: Spacing.md,
+    borderTopLeftRadius: RADIUS.lg,
+    borderTopRightRadius: RADIUS.lg,
+    overflow: "hidden",
   },
   noPadding: {
     paddingTop: 0,
     paddingHorizontal: 0,
+    borderTopLeftRadius: RADIUS.lg,
+    borderTopRightRadius: RADIUS.lg,
+    overflow: "hidden",
   },
   fullHeight: {
     flex: 1,

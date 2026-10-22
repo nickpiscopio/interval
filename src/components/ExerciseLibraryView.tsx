@@ -132,8 +132,10 @@ export function ExerciseLibraryView({
     total: "#0891B2",
   };
 
+  const isSheetMode = Boolean(onBack || onClose);
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, isSheetMode && styles.sheetContainer]}>
       {/* Optional In-Sheet Header with Back & Close */}
       {(onBack || onClose) && (
         <View style={styles.sheetHeader}>
@@ -151,9 +153,6 @@ export function ExerciseLibraryView({
             )}
             <View style={styles.headerTitleWrap}>
               <Text style={styles.headerTitle}>{t("exercisePicker.title")}</Text>
-              <Text style={styles.headerSubtitle}>
-                {t("exercisePicker.subtitle", { count: filteredExercises.length })}
-              </Text>
             </View>
           </View>
           {onClose && (
@@ -443,6 +442,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.surface.screen,
   },
+  sheetContainer: {
+    backgroundColor: "transparent",
+  },
   sheetHeader: {
     flexDirection: "row",
     alignItems: "center",
@@ -475,10 +477,6 @@ const styles = StyleSheet.create({
     fontSize: FontSize.lg,
     fontWeight: "800",
     color: Colors.textScale.primary,
-  },
-  headerSubtitle: {
-    fontSize: FontSize.xs,
-    color: Colors.textScale.muted,
   },
   closeButton: {
     width: TOUCH_TARGET.icon,

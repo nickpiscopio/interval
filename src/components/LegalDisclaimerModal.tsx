@@ -182,10 +182,13 @@ export function LegalDisclaimerModal({
     );
   }
 
+const LEGAL_SHEET_SNAP_POINTS = ["90%"];
+
   return (
     <BottomSheetFrame
       visible={visible}
       onClose={handleClose}
+      snapPoints={LEGAL_SHEET_SNAP_POINTS}
     >
       {/* Header Bar */}
       <View style={styles.sheetHeader}>
@@ -232,6 +235,7 @@ export function LegalDisclaimerModal({
 
       {/* Scrollable Legal Sections */}
       <BottomSheetScrollView
+        style={styles.sheetScroll}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.sheetScrollContent}
       >
@@ -336,6 +340,9 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.md,
     paddingBottom: Spacing.xl,
     gap: 12,
+  },
+  sheetScroll: {
+    flex: 1,
   },
   sheetScrollContent: {
     paddingTop: Spacing.xs,

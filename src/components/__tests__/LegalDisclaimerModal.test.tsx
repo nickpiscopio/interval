@@ -73,6 +73,10 @@ describe("LegalDisclaimerModal Component", () => {
       })
     );
 
+    // BottomSheetModal receives 90% snap point
+    const modal = getByTestId("bottom-sheet-modal");
+    expect(modal.props.sheetProps.snapPoints).toEqual(["90%"]);
+
     fireEvent.press(topCloseBtn);
     expect(onClose).toHaveBeenCalledTimes(1);
   });
