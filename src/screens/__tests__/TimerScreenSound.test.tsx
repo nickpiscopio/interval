@@ -77,31 +77,62 @@ describe("TimerScreen interval sounds", () => {
     expect(playsFor(BEEP)).toBe(1);
   });
 
-  it("pauses the player before seek and play on interval start, transition, and resume", async () => {
+  it("stops and releases previous player before playing new one on transition and pause/resume", async () => {
     const { getByText } = renderTimer([
       { id: "a", name: "A", duration: 1, color: "#fff", sound: "beep_3" },
       { id: "b", name: "B", duration: 1, color: "#fff", sound: "beep" },
     ]);
     await flush();
     const beep3Player = getPlayer(BEEP_3);
-    const beepPlayer = getPlayer(BEEP);
 
-    expect(beep3Player.pause).toHaveBeenCalled();
-    expect(beep3Player.seekTo).toHaveBeenCalledWith(0);
-    expect(beep3Player.play).toHaveBeenCalled();
+    // Initial start: freshly created, seekTo is never needed, play is called
+    expect(beep3Player.seekTo).not.toHaveBeenCalled();
+    expect(beep3Player.play).toHaveBeenCalledTimes(1);
 
-    // Advance to next interval
+    // Advance to next interval (transition to B)
     act(() => {
       jest.advanceTimersByTime(1100);
     });
-    expect(beepPlayer.pause).toHaveBeenCalled();
-    expect(beepPlayer.seekTo).toHaveBeenCalledWith(0);
-    expect(beepPlayer.play).toHaveBeenCalled();
+    await flush();
 
-    // Pause and resume
+    // Previous player for A is stopped and released
+    expect(beep3Player.pause).toHaveBeenCalled();
+    expect(beep3Player.release).toHaveBeenCalled();
+
+    const beepPlayer = getPlayer(BEEP);
+    expect(beepPlayer.seekTo).not.toHaveBeenCalled();
+    expect(beepPlayer.play).toHaveBeenCalledTimes(1);
+
+    // Pause: stops and releases active player
+    fireEvent.press(getByText("pause"));
+    await flush();
+    expect(beepPlayer.pause).toHaveBeenCalled();
+    expect(beepPlayer.release).toHaveBeenCalled();
+
+    // Resume: creates a fresh player and plays cleanly without seekTo
+    fireEvent.press(getByText("play"));
+    await flush();
+    expect(playsFor(BEEP)).toBe(2);
+  });
+
+  it("plays cleanly from 0 without calling seekTo on fresh interval cues", async () => {
+    const { getByText } = renderTimer([
+      { id: "a", name: "A", duration: 5, color: "#fff", sound: "beep" },
+    ]);
+    await flush();
+
+    const beepPlayer = getPlayer(BEEP);
+    expect(beepPlayer.play).toHaveBeenCalledTimes(1);
+    expect(beepPlayer.seekTo).not.toHaveBeenCalled();
+
     fireEvent.press(getByText("pause"));
     fireEvent.press(getByText("play"));
-    expect(beepPlayer.pause).toHaveBeenCalledTimes(2);
+    await flush();
+
+    const mock = createAudioPlayer as jest.Mock;
+    const secondPlayer = mock.mock.results[1].value;
+    expect(secondPlayer.seekTo).not.toHaveBeenCalled();
+    expect(secondPlayer.play).toHaveBeenCalledTimes(1);
   });
 
   it("plays the current interval's sound on resume", async () => {
@@ -111,6 +142,7 @@ describe("TimerScreen interval sounds", () => {
     await flush();
     fireEvent.press(getByText("pause"));
     fireEvent.press(getByText("play"));
+    await flush();
     expect(playsFor(BEEP_3)).toBe(2);
   });
 
@@ -121,6 +153,7 @@ describe("TimerScreen interval sounds", () => {
     await flush();
     fireEvent.press(getByText("pause"));
     fireEvent.press(getByText("play"));
+    await flush();
     expect(createAudioPlayer).not.toHaveBeenCalled();
   });
 
@@ -133,26 +166,24 @@ describe("TimerScreen interval sounds", () => {
     act(() => {
       jest.advanceTimersByTime(1100);
     });
+    await flush();
     expect(playsFor(BEEP)).toBe(2);
   });
 
-  it("pauses and releases all preloaded players upon unmount", async () => {
+  it("pauses and releases active player upon unmount", async () => {
     const { unmount } = renderTimer([
       { id: "a", name: "A", duration: 5, color: "#fff", sound: "beep_3" },
       { id: "b", name: "B", duration: 5, color: "#fff", sound: "beep" },
     ]);
     await flush();
     const beep3Player = getPlayer(BEEP_3);
-    const beepPlayer = getPlayer(BEEP);
 
     unmount();
     expect(beep3Player.pause).toHaveBeenCalled();
     expect(beep3Player.release).toHaveBeenCalled();
-    expect(beepPlayer.pause).toHaveBeenCalled();
-    expect(beepPlayer.release).toHaveBeenCalled();
   });
 
-  it("pauses and releases all preloaded players upon workout completion", async () => {
+  it("pauses and releases active player upon workout completion", async () => {
     const { navigation } = renderTimer([
       { id: "a", name: "A", duration: 1, color: "#fff", sound: "beep_3" },
     ]);
@@ -168,7 +199,7 @@ describe("TimerScreen interval sounds", () => {
     expect(beep3Player.release).toHaveBeenCalled();
   });
 
-  it("pauses and releases all preloaded players upon leaving the workout via exit alert", async () => {
+  it("pauses and releases active player upon leaving the workout via exit alert", async () => {
     const { getByText, navigation } = renderTimer([
       { id: "a", name: "A", duration: 5, color: "#fff", sound: "beep_3" },
     ]);

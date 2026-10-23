@@ -23,7 +23,7 @@ export default function TimerScreen({
   const { timer } = route.params;
 
   // Sound Ref
-  const soundPlayersRef = useRef<Map<string, AudioPlayer>>(new Map());
+  const activePlayerRef = useRef<AudioPlayer | null>(null);
 
   // Animated background progress (1 -> 0 over interval duration in ms)
   const progressAnim = useRef(new Animated.Value(1)).current;
@@ -53,40 +53,30 @@ export default function TimerScreen({
     deactivateKeepAwake(KEEP_AWAKE_TAG);
   }
 
-  async function loadSounds(): Promise<void> {
-    for (const int of timer.intervals) {
-      const id = resolveSoundId(int.sound);
-      if (soundPlayersRef.current.has(id)) continue;
-      const source = resolveSoundSource(id);
-      if (!source) continue;
+  function stopAndReleaseSound(): void {
+    if (activePlayerRef.current) {
       try {
-        soundPlayersRef.current.set(id, createAudioPlayer(source));
-      } catch (e) {
-        console.warn("Failed to load interval sound:", e);
-      }
+        activePlayerRef.current.pause();
+      } catch {}
+      try {
+        activePlayerRef.current.release();
+      } catch {}
+      activePlayerRef.current = null;
     }
   }
 
-  async function unloadSounds(): Promise<void> {
-    soundPlayersRef.current.forEach((player) => {
-      try {
-        player.pause();
-      } catch {}
-      try {
-        player.release();
-      } catch {}
-    });
-    soundPlayersRef.current.clear();
-  }
-
   function playIntervalSound(interval?: Interval): void {
-    const player = soundPlayersRef.current.get(resolveSoundId(interval?.sound));
-    if (player) {
-      try {
-        player.pause();
-      } catch {}
-      player.seekTo(0).catch(() => {});
+    const soundId = resolveSoundId(interval?.sound);
+    const source = resolveSoundSource(soundId);
+    stopAndReleaseSound();
+    if (!source) return;
+
+    try {
+      const player = createAudioPlayer(source);
+      activePlayerRef.current = player;
       player.play();
+    } catch (e) {
+      console.warn("Failed to play interval sound:", e);
     }
   }
 
@@ -125,11 +115,9 @@ export default function TimerScreen({
       totalDurationRef.current = list[0].duration * 1000;
       setTotalDuration(list[0].duration * 1000);
       startProgressAnim(list[0].duration * 1000, 1);
+      playIntervalSound(list[0]);
     }
 
-    loadSounds().then(() => {
-      playIntervalSound(list[0]);
-    });
     isPausedRef.current = false;
     activateScreenLock();
     startCountDown();
@@ -137,7 +125,7 @@ export default function TimerScreen({
     return () => {
       clearInterval(timerIdRef.current);
       progressAnim.stopAnimation();
-      unloadSounds();
+      stopAndReleaseSound();
       deactivateScreenLock();
     };
   }, [timer]);
@@ -161,7 +149,7 @@ export default function TimerScreen({
           // Workout finished!
           clearInterval(timerIdRef.current);
           progressAnim.stopAnimation();
-          unloadSounds();
+          stopAndReleaseSound();
           deactivateScreenLock();
           navigation.replace("Completion", { timer });
         } else {
@@ -198,6 +186,7 @@ export default function TimerScreen({
     if (nextPaused) {
       progressAnim.stopAnimation();
       deactivateScreenLock();
+      stopAndReleaseSound();
     } else {
       activateScreenLock();
       playIntervalSound(flatIntervalsRef.current[currentIndexRef.current]);
@@ -212,6 +201,7 @@ export default function TimerScreen({
     setIsPaused(true);
     progressAnim.stopAnimation();
     deactivateScreenLock();
+    stopAndReleaseSound();
 
     showAlert({
       title: t("timer.exitTitle"),
@@ -237,7 +227,7 @@ export default function TimerScreen({
           onPress: () => {
             clearInterval(timerIdRef.current);
             progressAnim.stopAnimation();
-            unloadSounds();
+            stopAndReleaseSound();
             deactivateScreenLock();
             navigation.popToTop();
           },

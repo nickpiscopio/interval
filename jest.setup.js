@@ -104,16 +104,32 @@ jest.mock("expo-haptics", () => ({
 
 // Mock Expo Audio
 jest.mock("expo-audio", () => {
-  const createMockPlayer = () => ({
-    play: jest.fn(),
-    pause: jest.fn(),
-    seekTo: jest.fn().mockResolvedValue(undefined),
-    release: jest.fn(),
-    replace: jest.fn(),
-    addListener: jest.fn(() => ({ remove: jest.fn() })),
-    removeListener: jest.fn(),
-    currentStatus: { playing: false, currentTime: 0, duration: 0 },
-  });
+  const createMockPlayer = () => {
+    let currentTime = 0;
+    return {
+      get currentTime() {
+        return currentTime;
+      },
+      set currentTime(val) {
+        currentTime = val;
+      },
+      play: jest.fn(() => {
+        currentTime = 0.5;
+      }),
+      pause: jest.fn(),
+      seekTo: jest.fn().mockImplementation((seconds) => {
+        currentTime = seconds;
+        return Promise.resolve();
+      }),
+      release: jest.fn(),
+      replace: jest.fn(),
+      addListener: jest.fn(() => ({ remove: jest.fn() })),
+      removeListener: jest.fn(),
+      get currentStatus() {
+        return { playing: false, currentTime, duration: 0 };
+      },
+    };
+  };
   return {
     createAudioPlayer: jest.fn(() => createMockPlayer()),
     useAudioPlayer: jest.fn(() => createMockPlayer()),

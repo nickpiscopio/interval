@@ -13,7 +13,7 @@ A designated time segment of a Timer, which has a specific duration, background 
 _Avoid_: Step, Phase, Block
 
 **Interval Sound**:
-The audio cue an Interval plays when it begins or when the timer resumes, chosen from a fixed list of bundled sounds or "None" for silence. Plays strictly once as a crisp, non-looping cue upon interval entry and timer resume, pauses before rewinding/playing to prevent buffer collisions, releases all native player resources on completion, exit, or unmount without lingering instances, and previews strictly once per distinct selection change in the Interval Edit Bottom Sheet with duplicate taps suppressed.
+The audio cue an Interval plays when it begins or when the timer resumes, chosen from a fixed list of bundled sounds or "None" for silence. Plays strictly once as a crisp, non-looping cue upon interval entry and timer resume using a clean one-shot audio player without rewinding buffer collisions, releases all native player resources on stop, completion, exit, or unmount without lingering instances, and previews strictly once per distinct selection change in the Interval Edit Bottom Sheet with duplicate taps suppressed.
 _Avoid_: Alarm, Ringtone, Beep (a beep is just one of the sounds)
 
 **Exercise**:
