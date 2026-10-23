@@ -3,6 +3,7 @@ import { StyleSheet, View, Text, TouchableOpacity, Animated, Easing } from "reac
 import { StatusBar } from "expo-status-bar";
 import { createAudioPlayer, AudioPlayer } from "expo-audio";
 import { Ionicons } from "@expo/vector-icons";
+import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
 
 import { RootStackScreenProps } from "../types";
 import { Interval } from "../model/Interval";
@@ -11,6 +12,8 @@ import { useAlert } from "../context/AlertContext";
 import Spacing from "../constants/Spacing";
 import { resolveSoundId, resolveSoundSource } from "../constants/Sounds";
 import FontSize from "../constants/FontSize";
+
+const KEEP_AWAKE_TAG = "timer-running";
 
 export default function TimerScreen({
   route,
@@ -41,6 +44,14 @@ export default function TimerScreen({
   const isPausedRef = useRef(false);
 
   const currentInterval = flatIntervals[currentIntervalIndex];
+
+  function activateScreenLock(): void {
+    activateKeepAwakeAsync(KEEP_AWAKE_TAG).catch(() => {});
+  }
+
+  function deactivateScreenLock(): void {
+    deactivateKeepAwake(KEEP_AWAKE_TAG);
+  }
 
   async function loadSounds(): Promise<void> {
     for (const int of timer.intervals) {
@@ -120,12 +131,14 @@ export default function TimerScreen({
       playIntervalSound(list[0]);
     });
     isPausedRef.current = false;
+    activateScreenLock();
     startCountDown();
 
     return () => {
       clearInterval(timerIdRef.current);
       progressAnim.stopAnimation();
       unloadSounds();
+      deactivateScreenLock();
     };
   }, [timer]);
 
@@ -149,6 +162,7 @@ export default function TimerScreen({
           clearInterval(timerIdRef.current);
           progressAnim.stopAnimation();
           unloadSounds();
+          deactivateScreenLock();
           navigation.replace("Completion", { timer });
         } else {
           currentIndexRef.current = nextIdx;
@@ -183,7 +197,9 @@ export default function TimerScreen({
     isPausedRef.current = nextPaused;
     if (nextPaused) {
       progressAnim.stopAnimation();
+      deactivateScreenLock();
     } else {
+      activateScreenLock();
       playIntervalSound(flatIntervalsRef.current[currentIndexRef.current]);
       const fraction = totalDurationRef.current > 0 ? durationLeftRef.current / totalDurationRef.current : 1;
       startProgressAnim(durationLeftRef.current, fraction);
@@ -195,6 +211,7 @@ export default function TimerScreen({
     isPausedRef.current = true;
     setIsPaused(true);
     progressAnim.stopAnimation();
+    deactivateScreenLock();
 
     showAlert({
       title: t("timer.exitTitle"),
@@ -208,6 +225,7 @@ export default function TimerScreen({
             setIsPaused(wasPaused);
             isPausedRef.current = wasPaused;
             if (!wasPaused) {
+              activateScreenLock();
               const fraction = totalDurationRef.current > 0 ? durationLeftRef.current / totalDurationRef.current : 1;
               startProgressAnim(durationLeftRef.current, fraction);
             }
@@ -220,6 +238,7 @@ export default function TimerScreen({
             clearInterval(timerIdRef.current);
             progressAnim.stopAnimation();
             unloadSounds();
+            deactivateScreenLock();
             navigation.popToTop();
           },
         },

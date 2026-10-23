@@ -1,5 +1,6 @@
 import React from "react";
 import { render, fireEvent, act } from "@testing-library/react-native";
+import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
 import TimerScreen from "../TimerScreen";
 import { AlertProvider } from "../../context/AlertContext";
 import { Timer } from "../../model/Timer";
@@ -17,6 +18,7 @@ describe("TimerScreen", () => {
 
   beforeEach(() => {
     jest.useFakeTimers();
+    jest.clearAllMocks();
   });
 
   afterEach(() => {
@@ -136,5 +138,51 @@ describe("TimerScreen", () => {
     expect(mockNavigation.replace).toHaveBeenCalledWith("Completion", {
       timer: mockTimer,
     });
+    expect(deactivateKeepAwake).toHaveBeenCalledWith("timer-running");
+  });
+
+  it("manages screen wake lock lifecycle across mount, pause, resume, alert, and unmount", () => {
+    const mockNavigation: any = {
+      navigate: jest.fn(),
+      goBack: jest.fn(),
+      replace: jest.fn(),
+      popToTop: jest.fn(),
+    };
+
+    const { getByText, unmount } = render(
+      <AlertProvider>
+        <TimerScreen
+          navigation={mockNavigation}
+          route={{ params: { timer: mockTimer } } as any}
+        />
+      </AlertProvider>
+    );
+
+    // Should activate keep awake on mount
+    expect(activateKeepAwakeAsync).toHaveBeenCalledWith("timer-running");
+
+    // Pause timer -> should deactivate keep awake
+    const pauseIcon = getByText("pause");
+    fireEvent.press(pauseIcon);
+    expect(deactivateKeepAwake).toHaveBeenCalledWith("timer-running");
+
+    // Resume timer -> should re-activate keep awake
+    const playIcon = getByText("play");
+    fireEvent.press(playIcon);
+    expect(activateKeepAwakeAsync).toHaveBeenCalledTimes(2);
+
+    // Open close dialog -> should deactivate keep awake
+    const closeBtn = getByText("close");
+    fireEvent.press(closeBtn);
+    expect(deactivateKeepAwake).toHaveBeenCalledWith("timer-running");
+
+    // Dismiss close dialog with 'Keep Going' -> should re-activate
+    const cancelBtn = getByText("Keep Going");
+    fireEvent.press(cancelBtn);
+    expect(activateKeepAwakeAsync).toHaveBeenCalledTimes(3);
+
+    // Unmount -> should ensure keep awake is deactivated
+    unmount();
+    expect(deactivateKeepAwake).toHaveBeenCalledWith("timer-running");
   });
 });

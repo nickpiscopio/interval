@@ -79,3 +79,7 @@ _Avoid_: Mid-Timer Completion Sound, Silent Completion Screen
 **Badge & Award Modal Overlay**:
 A standardized celebration and inspection dialog featuring a unified translucent backdrop (`Colors.surface.overlay`), full-screen safe area coverage (`statusBarTranslucent={true}`), and tap-to-dismiss backdrop pressability.
 _Avoid_: Opaque Dark Overlays, Unresponsive Backdrop Taps, Status Bar Clipping
+
+**Screen Wake Lock**:
+The display preservation mechanism that keeps the device screen illuminated and prevents the operating system from dimming or sleeping while a Timer is actively running, guaranteeing uninterrupted countdown progression and interval audio cues.
+_Avoid_: Always-On Display, Screen Sleeplessness, Screen Saver Disable

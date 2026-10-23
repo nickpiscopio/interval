@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import React, { useRef } from "react";
 import {
   View,
   Text,
@@ -22,7 +22,7 @@ export function Input({
   style?: ViewStyle | ViewStyle[];
   leftAlignText?: boolean;
 }) {
-  const textInputRef = useRef<TextInput>(null);
+  const textInputRef = useRef<React.ComponentRef<typeof TextInput>>(null);
 
   function focusTextInput() {
     textInputRef.current?.focus();

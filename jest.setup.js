@@ -275,3 +275,10 @@ jest.mock("react-native-safe-area-context", () => {
     initialWindowMetrics: { insets, frame },
   };
 });
+
+// Mock Expo Keep Awake
+jest.mock("expo-keep-awake", () => ({
+  activateKeepAwakeAsync: jest.fn().mockResolvedValue(undefined),
+  deactivateKeepAwake: jest.fn(),
+  useKeepAwake: jest.fn(),
+}));
