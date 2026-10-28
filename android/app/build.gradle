@@ -1,8 +1,18 @@
+import groovy.json.JsonSlurper
+
 apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
 
 def projectRoot = rootDir.getAbsoluteFile().getParentFile().getAbsolutePath()
+
+def getAppVersion() {
+    def inputFile = new File(rootProject.projectDir, '../app.json')
+    def packageJson = new JsonSlurper().parseText(inputFile.text)
+    return packageJson.expo
+}
+
+def expoConfig = getAppVersion()
 
 /**
  * This is the configuration block to customize your React Native Android app.
@@ -92,6 +102,9 @@ android {
         applicationId 'com.anonymous.interval'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
+
+        versionCode expoConfig.android.versionCode ?: 1
+        versionName expoConfig.version ?: "1.0.1"
 
         buildConfigField "String", "REACT_NATIVE_RELEASE_LEVEL", "\"${findProperty('reactNativeReleaseLevel') ?: 'stable'}\""
     }
