@@ -24,6 +24,10 @@ _Avoid_: Workout, Activity
 A full repetition of the sequence of intervals defined in a Timer.
 _Avoid_: Set, Cycle
 
+**Total Time**:
+The aggregate duration of a Timer across all rounds, equal to the sum of its Interval durations multiplied by the number of Rounds.
+_Avoid_: Total Duration, Workout Length
+
 **Physical Therapy / Corrective Exercise**:
 A targeted mobility, stability, or rehabilitation movement designed to strengthen specific joints, relieve tension, or aid recovery.
 _Avoid_: Rehab Drill, Clinical Protocol

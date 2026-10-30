@@ -8,6 +8,26 @@ import { Timer } from "../../model/Timer";
 
 import FontSize from "../../constants/FontSize";
 
+function renderCreateTimerScreen(routeParams?: { timer?: Timer }) {
+  const mockNavigation: any = {
+    setOptions: jest.fn(),
+    navigate: jest.fn(),
+    goBack: jest.fn(),
+    popToTop: jest.fn(),
+  };
+
+  const utils = render(
+    <AlertProvider>
+      <CreateTimerScreen
+        navigation={mockNavigation}
+        route={(routeParams ? { params: routeParams } : {}) as any}
+      />
+    </AlertProvider>
+  );
+
+  return { ...utils, mockNavigation };
+}
+
 describe("CreateTimerScreen", () => {
   beforeEach(async () => {
     await AsyncStorage.clear();
@@ -15,17 +35,8 @@ describe("CreateTimerScreen", () => {
   });
 
   it("renders with default intervals in create mode", () => {
-    const mockNavigation: any = {
-      setOptions: jest.fn(),
-      navigate: jest.fn(),
-      goBack: jest.fn(),
-    };
-
-    const { getByText, getByPlaceholderText, getByTestId } = render(
-      <AlertProvider>
-        <CreateTimerScreen navigation={mockNavigation} route={{} as any} />
-      </AlertProvider>
-    );
+    const { getByText, getByPlaceholderText, getByTestId } =
+      renderCreateTimerScreen();
 
     expect(getByPlaceholderText("Morning Blast")).toBeTruthy();
     const nameLabel = getByText("Name");
@@ -46,20 +57,14 @@ describe("CreateTimerScreen", () => {
     const bottomContainer = getByTestId("bottom-docked-container");
     const bottomContainerStyle = StyleSheet.flatten(bottomContainer.props.style);
     expect(bottomContainerStyle.paddingTop).toBe(0);
+
+    const totalTimeBadge = getByTestId("timer-total-time-badge");
+    expect(totalTimeBadge.props.accessibilityLabel).toBe("Total Time: 2m 15s");
+    expect(getByText("2m 15s")).toBeTruthy();
   });
 
   it("validates empty timer name on save and on start", () => {
-    const mockNavigation: any = {
-      setOptions: jest.fn(),
-      navigate: jest.fn(),
-      goBack: jest.fn(),
-    };
-
-    const { getByText, getByTestId } = render(
-      <AlertProvider>
-        <CreateTimerScreen navigation={mockNavigation} route={{} as any} />
-      </AlertProvider>
-    );
+    const { getByText, getByTestId } = renderCreateTimerScreen();
 
     const saveBtn = getByTestId("icon-save-outline");
     fireEvent.press(saveBtn);
@@ -71,18 +76,8 @@ describe("CreateTimerScreen", () => {
   });
 
   it("saves valid timer to AsyncStorage and navigates back", async () => {
-    const mockNavigation: any = {
-      setOptions: jest.fn(),
-      navigate: jest.fn(),
-      goBack: jest.fn(),
-      popToTop: jest.fn(),
-    };
-
-    const { getByText, getByPlaceholderText, getByTestId } = render(
-      <AlertProvider>
-        <CreateTimerScreen navigation={mockNavigation} route={{} as any} />
-      </AlertProvider>
-    );
+    const { getByPlaceholderText, getByTestId, mockNavigation } =
+      renderCreateTimerScreen();
 
     const nameInput = getByPlaceholderText("Morning Blast");
     fireEvent.changeText(nameInput, "Core Crusher");
@@ -106,17 +101,8 @@ describe("CreateTimerScreen", () => {
   });
 
   it("starts workout directly when play button is pressed", () => {
-    const mockNavigation: any = {
-      setOptions: jest.fn(),
-      navigate: jest.fn(),
-      goBack: jest.fn(),
-    };
-
-    const { getByTestId, getByPlaceholderText } = render(
-      <AlertProvider>
-        <CreateTimerScreen navigation={mockNavigation} route={{} as any} />
-      </AlertProvider>
-    );
+    const { getByTestId, getByPlaceholderText, mockNavigation } =
+      renderCreateTimerScreen();
 
     const nameInput = getByPlaceholderText("Morning Blast");
     fireEvent.changeText(nameInput, "Instant Workout");
@@ -135,17 +121,7 @@ describe("CreateTimerScreen", () => {
   });
 
   it("opens Edit Interval bottom sheet modal when tapping an interval and dismisses with Done", async () => {
-    const mockNavigation: any = {
-      setOptions: jest.fn(),
-      navigate: jest.fn(),
-      goBack: jest.fn(),
-    };
-
-    const { getByText, getByTestId, queryByText, queryByTestId } = render(
-      <AlertProvider>
-        <CreateTimerScreen navigation={mockNavigation} route={{} as any} />
-      </AlertProvider>
-    );
+    const { getByText, getByTestId, queryByText } = renderCreateTimerScreen();
 
     // Tap Low Interval to open bottom sheet
     const lowInterval = getByText("Low Interval");
@@ -162,17 +138,13 @@ describe("CreateTimerScreen", () => {
   });
 
   it("duplicates interval, deletes interval, and warns when trying to delete last interval", async () => {
-    const mockNavigation: any = {
-      setOptions: jest.fn(),
-      navigate: jest.fn(),
-      goBack: jest.fn(),
-    };
-
-    const { getByText, getAllByText, getByPlaceholderText, getByTestId, getAllByTestId, queryByText } = render(
-      <AlertProvider>
-        <CreateTimerScreen navigation={mockNavigation} route={{} as any} />
-      </AlertProvider>
-    );
+    const {
+      getByText,
+      getByPlaceholderText,
+      getByTestId,
+      getAllByTestId,
+      queryByText,
+    } = renderCreateTimerScreen();
 
     // Add new interval -> opens modal in draft mode
     const addIntervalBtn = getByText("Add Interval");
@@ -239,17 +211,8 @@ describe("CreateTimerScreen", () => {
   });
 
   it("opens exercise library picker modal and selects exercise", async () => {
-    const mockNavigation: any = {
-      setOptions: jest.fn(),
-      navigate: jest.fn(),
-      goBack: jest.fn(),
-    };
-
-    const { getByText, getByDisplayValue, getByTestId } = render(
-      <AlertProvider>
-        <CreateTimerScreen navigation={mockNavigation} route={{} as any} />
-      </AlertProvider>
-    );
+    const { getByText, getByDisplayValue, getByTestId } =
+      renderCreateTimerScreen();
 
     // Open bottom sheet
     fireEvent.press(getByText("High Interval"));
@@ -301,23 +264,14 @@ describe("CreateTimerScreen", () => {
     };
     await AsyncStorage.setItem("@hiit_timers", JSON.stringify([mockTimer]));
 
-    const mockNavigation: any = {
-      setOptions: jest.fn(),
-      navigate: jest.fn(),
-      goBack: jest.fn(),
-      popToTop: jest.fn(),
-    };
-
-    const { getByDisplayValue, getByText, getByTestId } = render(
-      <AlertProvider>
-        <CreateTimerScreen
-          navigation={mockNavigation}
-          route={{ params: { timer: mockTimer } } as any}
-        />
-      </AlertProvider>
-    );
+    const { getByDisplayValue, getByText, getByTestId, mockNavigation } =
+      renderCreateTimerScreen({ timer: mockTimer });
 
     expect(getByDisplayValue("Existing Workout")).toBeTruthy();
+    expect(getByTestId("timer-total-time-badge").props.accessibilityLabel).toBe(
+      "Total Time: 2m 40s"
+    );
+    expect(getByText("2m 40s")).toBeTruthy();
 
     // Delete existing timer via trash icon in timer actions
     const trashIcon = getByTestId("icon-trash-outline");
@@ -342,24 +296,15 @@ describe("CreateTimerScreen", () => {
       ],
     };
 
-    const mockNavigation: any = {
-      setOptions: jest.fn(),
-      navigate: jest.fn(),
-      goBack: jest.fn(),
-      popToTop: jest.fn(),
-    };
-
-    const { getByText, getByDisplayValue, getByTestId } = render(
-      <AlertProvider>
-        <CreateTimerScreen
-          navigation={mockNavigation}
-          route={{ params: { timer: importedTimer } } as any}
-        />
-      </AlertProvider>
-    );
+    const { getByText, getByDisplayValue, getByTestId, mockNavigation } =
+      renderCreateTimerScreen({ timer: importedTimer });
 
     expect(getByDisplayValue("Shared AI HIIT")).toBeTruthy();
     expect(getByText("Review & Import Shared Timer")).toBeTruthy();
+    expect(getByTestId("timer-total-time-badge").props.accessibilityLabel).toBe(
+      "Total Time: 1m"
+    );
+    expect(getByText("1m")).toBeTruthy();
 
     const saveBtn = getByTestId("icon-save-outline");
     fireEvent.press(saveBtn);
@@ -370,17 +315,8 @@ describe("CreateTimerScreen", () => {
   });
 
   it("handles right-to-left 6-digit shift register for duration input in bottom sheet", async () => {
-    const mockNavigation: any = {
-      setOptions: jest.fn(),
-      navigate: jest.fn(),
-      goBack: jest.fn(),
-    };
-
-    const { getByDisplayValue, getByText, getByTestId } = render(
-      <AlertProvider>
-        <CreateTimerScreen navigation={mockNavigation} route={{} as any} />
-      </AlertProvider>
-    );
+    const { getByDisplayValue, getByText, getByTestId } =
+      renderCreateTimerScreen();
 
     // Open Low Interval modal (15s) -> "00:00:15"
     fireEvent.press(getByText("Low Interval"));
@@ -409,20 +345,9 @@ describe("CreateTimerScreen", () => {
       ],
     };
 
-    const mockNavigation: any = {
-      navigate: jest.fn(),
-      goBack: jest.fn(),
-      popToTop: jest.fn(),
-    };
-
-    const { getByTestId } = render(
-      <AlertProvider>
-        <CreateTimerScreen
-          navigation={mockNavigation}
-          route={{ params: { timer: generatedTimer } } as any}
-        />
-      </AlertProvider>
-    );
+    const { getByTestId, mockNavigation } = renderCreateTimerScreen({
+      timer: generatedTimer,
+    });
 
     const saveBtn = getByTestId("icon-save-outline");
     fireEvent.press(saveBtn);
@@ -437,15 +362,7 @@ describe("CreateTimerScreen", () => {
   });
 
   it("navigates back when header back button is pressed", () => {
-    const mockNavigation: any = {
-      goBack: jest.fn(),
-    };
-
-    const { getByTestId } = render(
-      <AlertProvider>
-        <CreateTimerScreen navigation={mockNavigation} route={{} as any} />
-      </AlertProvider>
-    );
+    const { getByTestId, mockNavigation } = renderCreateTimerScreen();
 
     const backBtn = getByTestId("header-back-button");
     const style = StyleSheet.flatten(backBtn.props.style);
@@ -456,26 +373,27 @@ describe("CreateTimerScreen", () => {
   });
 
   it("handles deferred new interval lifecycle: discard on delete, discard on 0 duration, and save with default placeholders", async () => {
-    const mockNavigation: any = {
-      setOptions: jest.fn(),
-      navigate: jest.fn(),
-      goBack: jest.fn(),
-    };
-
-    const { getByText, getByPlaceholderText, getByTestId, queryByText } = render(
-      <AlertProvider>
-        <CreateTimerScreen navigation={mockNavigation} route={{} as any} />
-      </AlertProvider>
-    );
+    const { getByText, getByPlaceholderText, getByTestId, queryByText } =
+      renderCreateTimerScreen();
 
     // 1. Add interval and discard using delete button
+    expect(getByTestId("timer-total-time-badge").props.accessibilityLabel).toBe(
+      "Total Time: 2m 15s"
+    );
     fireEvent.press(getByText("Add Interval"));
     expect(getByText("Edit Interval")).toBeTruthy();
     expect(getByPlaceholderText("Interval 3")).toBeTruthy();
+    // Draft interval does not change Total Time while uncommitted
+    expect(getByTestId("timer-total-time-badge").props.accessibilityLabel).toBe(
+      "Total Time: 2m 15s"
+    );
     fireEvent.press(getByTestId("icon-trash-outline"));
     await waitFor(() => {
       expect(queryByText("Edit Interval")).toBeNull();
       expect(queryByText("Interval 3")).toBeNull();
+      expect(getByTestId("timer-total-time-badge").props.accessibilityLabel).toBe(
+        "Total Time: 2m 15s"
+      );
     });
 
     // 2. Add interval, set duration to 0 and tap Done checkmark -> discarded
@@ -487,13 +405,23 @@ describe("CreateTimerScreen", () => {
     await waitFor(() => {
       expect(queryByText("Edit Interval")).toBeNull();
       expect(queryByText("Interval 3")).toBeNull();
+      expect(getByTestId("timer-total-time-badge").props.accessibilityLabel).toBe(
+        "Total Time: 2m 15s"
+      );
     });
 
     // 3. Add interval, tap Done checkmark with untouched defaults -> added as Interval 3 (30s)
     fireEvent.press(getByText("Add Interval"));
+    expect(getByTestId("timer-total-time-badge").props.accessibilityLabel).toBe(
+      "Total Time: 2m 15s"
+    );
     fireEvent.press(getByTestId("edit-interval-done-btn"));
     await waitFor(() => {
       expect(getByText("Interval 3")).toBeTruthy();
+      expect(getByTestId("timer-total-time-badge").props.accessibilityLabel).toBe(
+        "Total Time: 3m 45s"
+      );
+      expect(getByText("3m 45s")).toBeTruthy();
     });
 
     // 4. Edit existing Interval 3, clear name, and tap Done checkmark -> falls back to Interval 3
@@ -503,6 +431,75 @@ describe("CreateTimerScreen", () => {
     fireEvent.press(getByTestId("edit-interval-done-btn"));
     await waitFor(() => {
       expect(getByText("Interval 3")).toBeTruthy();
+    });
+  });
+
+  it("updates Total Time badge and accessibilityLabel when incrementing and decrementing rounds", () => {
+    const { getByTestId, getByText } = renderCreateTimerScreen();
+
+    const badge = getByTestId("timer-total-time-badge");
+    expect(badge.props.accessibilityLabel).toBe("Total Time: 2m 15s");
+    expect(getByText("2m 15s")).toBeTruthy();
+
+    // Increment rounds: 3 -> 4 (4 * 45s = 180s = 3m)
+    fireEvent.press(getByTestId("icon-add"));
+    expect(getByTestId("timer-total-time-badge").props.accessibilityLabel).toBe(
+      "Total Time: 3m"
+    );
+    expect(getByText("3m")).toBeTruthy();
+
+    // Decrement rounds: 4 -> 3 -> 2 -> 1 (1 * 45s = 45s)
+    const minusRoundBtn = getByTestId("icon-remove");
+    fireEvent.press(minusRoundBtn);
+    expect(getByTestId("timer-total-time-badge").props.accessibilityLabel).toBe(
+      "Total Time: 2m 15s"
+    );
+    fireEvent.press(minusRoundBtn);
+    expect(getByTestId("timer-total-time-badge").props.accessibilityLabel).toBe(
+      "Total Time: 1m 30s"
+    );
+    fireEvent.press(minusRoundBtn);
+    expect(getByTestId("timer-total-time-badge").props.accessibilityLabel).toBe(
+      "Total Time: 45s"
+    );
+    // Clamped at minimum 1 round
+    fireEvent.press(minusRoundBtn);
+    expect(getByTestId("timer-total-time-badge").props.accessibilityLabel).toBe(
+      "Total Time: 45s"
+    );
+  });
+
+  it("updates Total Time badge when editing, duplicating, and deleting an interval", async () => {
+    const { getByTestId, getByText, getByDisplayValue } =
+      renderCreateTimerScreen();
+
+    // Default: 3 rounds * (30s + 15s) = 2m 15s
+    expect(getByTestId("timer-total-time-badge").props.accessibilityLabel).toBe(
+      "Total Time: 2m 15s"
+    );
+
+    // Edit Low Interval duration from 15s to 30s -> 3 * (30s + 30s) = 3m
+    fireEvent.press(getByText("Low Interval"));
+    const lowDurationInput = getByDisplayValue("00:00:15");
+    fireEvent.changeText(lowDurationInput, "000030");
+    expect(getByTestId("timer-total-time-badge").props.accessibilityLabel).toBe(
+      "Total Time: 3m"
+    );
+
+    // Duplicate Low Interval (30s) -> 3 * (30s + 30s + 30s) = 4m 30s
+    fireEvent.press(getByTestId("icon-copy-outline"));
+    expect(getByTestId("timer-total-time-badge").props.accessibilityLabel).toBe(
+      "Total Time: 4m 30s"
+    );
+    expect(getByText("4m 30s")).toBeTruthy();
+
+    // Delete the duplicated interval -> 3 * (30s + 30s) = 3m
+    fireEvent.press(getByTestId("icon-trash-outline"));
+    await waitFor(() => {
+      expect(getByTestId("timer-total-time-badge").props.accessibilityLabel).toBe(
+        "Total Time: 3m"
+      );
+      expect(getByText("3m")).toBeTruthy();
     });
   });
 });

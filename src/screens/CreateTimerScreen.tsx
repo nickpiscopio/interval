@@ -106,6 +106,10 @@ export default function CreateTimerScreen({
   const isSaved = Boolean(editTimer && editTimer.createdAt && !isImportMode);
   const fallbackTitle = isSaved ? t("createTimer.titleEdit") : t("createTimer.titleCreate");
   const headerTitle = timerName.trim().length > 0 ? timerName.trim() : fallbackTitle;
+  const totalTimeSeconds =
+    rounds *
+    intervals.reduce((sum, interval) => sum + Math.max(0, interval.duration), 0);
+  const formattedTotalTime = formatSeconds(totalTimeSeconds);
 
   // Action: Open Edit Modal for Interval
   function handleSelectInterval(interval: Interval) {
@@ -534,7 +538,17 @@ export default function CreateTimerScreen({
       {/* Bottom Docked Timer Details Card */}
       <View testID="bottom-docked-container" style={[styles.bottomContainer, { paddingBottom: Math.max(insets.bottom, Spacing.md) }]}>
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>{t("createTimer.titleDetails")}</Text>
+          <View style={styles.cardHeaderRow}>
+            <Text style={styles.cardTitle}>{t("createTimer.titleDetails")}</Text>
+            <View
+              testID="timer-total-time-badge"
+              accessibilityLabel={`${t("common.totalTime")}: ${formattedTotalTime}`}
+              style={styles.totalTimeBadge}
+            >
+              <Ionicons name="time-outline" size={12} color="#1D4ED8" />
+              <Text style={styles.totalTimeBadgeText}>{formattedTotalTime}</Text>
+            </View>
+          </View>
 
           <View style={styles.editorInputRow}>
             <View style={styles.inputGroup}>
@@ -756,12 +770,31 @@ const styles = StyleSheet.create({
     padding: Spacing.md,
     ...SHADOWS.card,
   },
+  cardHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: Spacing.sm,
+  },
   cardTitle: {
     fontSize: FontSize.sm,
     lineHeight: FontSize.lineHeight.sm,
     fontFamily: "Poppins-Bold",
     color: Colors.textScale.heading,
-    marginBottom: Spacing.sm,
+  },
+  totalTimeBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: Colors.surface.tintActive,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: RADIUS.sm,
+    gap: 4,
+  },
+  totalTimeBadgeText: {
+    fontSize: 11,
+    fontWeight: "600",
+    color: "#1D4ED8",
   },
   editorInputRow: {
     flexDirection: "row",
