@@ -16,6 +16,8 @@ import Spacing, { RADIUS, TOUCH_TARGET, SHADOWS } from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
 import { t } from "../i18n";
 import { BottomSheetFrame } from "./BottomSheetFrame";
+import * as Application from 'expo-application';
+
 
 export interface LegalDisclaimerModalProps {
   visible: boolean;
@@ -29,7 +31,7 @@ export interface LegalDisclaimerModalProps {
 export function LegalDisclaimerModal({
   visible,
   mode = "gate",
-  appVersion = "1.0.0",
+  appVersion = Application.nativeApplicationVersion ?? "1.0.0",
   acceptedDate,
   onAccept,
   onClose,

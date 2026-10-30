@@ -1,4 +1,4 @@
-package com.anonymous.interval
+package com.plyonest.interval
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

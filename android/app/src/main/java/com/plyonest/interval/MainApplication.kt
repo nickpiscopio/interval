@@ -1,4 +1,4 @@
-package com.anonymous.interval
+package com.plyonest.interval
 
 import android.app.Application
 import android.content.res.Configuration
