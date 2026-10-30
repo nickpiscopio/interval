@@ -2,7 +2,15 @@ apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
 
+import groovy.json.JsonSlurper
+
 def projectRoot = rootDir.getAbsoluteFile().getParentFile().getAbsolutePath()
+
+def appJsonFile = new File(rootProject.rootDir.parentFile, 'app.json')
+def appJson = new JsonSlurper().parseText(appJsonFile.text)
+
+def expoConfig = appJson.expo
+def androidConfig = expoConfig.android ?: [:]
 
 /**
  * This is the configuration block to customize your React Native Android app.
@@ -89,11 +97,11 @@ android {
 
     namespace 'com.plyonest.interval'
     defaultConfig {
-        applicationId 'com.plyonest.interval'
+        applicationId androidConfig.package ?: "com.plyonest.interval"
+        versionCode androidConfig.versionCode ? androidConfig.versionCode.toInteger() : 1
+        versionName expoConfig.version ?: "1.0.0"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        // Do not hardcode 'version' or 'versionCode' here. 
-        // The Expo Gradle plugin automatically injects version and versionCode from app.json
         buildConfigField "String", "REACT_NATIVE_RELEASE_LEVEL", "\"${findProperty('reactNativeReleaseLevel') ?: 'stable'}\""
     }
     signingConfigs {

@@ -7,7 +7,7 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "deploy-android": "eas build --platform android --profile production --auto-submit",
-    "deploy-android-local": "eas build --platform android --profile production --local --output=\"dist/builds/build.aab\"",
+    "deploy-android-local": "node scripts/build-android-local.js",
     "eject": "expo eject",
     "test": "jest --watchAll=false",
     "test:watch": "jest --watchAll",
