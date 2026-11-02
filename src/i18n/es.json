@@ -1597,9 +1597,8 @@
     }
   },
   "legal": {
-    "title": "Acuerdo Legal y Descargo Médico",
+    "title": "Aviso Legal y Médico",
     "subtitle": "Por favor lee atentamente antes de usar Interval",
-    "badgeWarning": "AVISO IMPORTANTE DE SALUD Y SEGURIDAD",
     "assumptionOfRiskTitle": "1. Participación Voluntaria y Asunción de Riesgo",
     "assumptionOfRiskBody": "Reconoces que estás utilizando Interval de manera totalmente voluntaria y bajo tu propio riesgo. De ninguna manera nadie te está obligando o forzando a realizar ninguna actividad física o entrenamiento.",
     "recommendationsTitle": "2. Recomendaciones de Ejercicio y Fisioterapia",

@@ -289,4 +289,24 @@ describe("CompletionScreen", () => {
       expect(queryByText("Share Badge")).toBeNull();
     });
   });
+
+  it("pins header and footer while scrolling only the unlocked achievement cards list", async () => {
+    const { getByTestId } = render(
+      <CompletionScreen
+        navigation={{} as any}
+        route={{ params: { timer: mockTimer } } as any}
+      />
+    );
+
+    await waitFor(() => {
+      expect(getByTestId("unlocked-badges-scroll")).toBeTruthy();
+    });
+
+    const scrollView = getByTestId("unlocked-badges-scroll");
+    const scrollStyle = StyleSheet.flatten(scrollView.props.style);
+    expect(scrollStyle.flex).toBe(1);
+
+    const contentStyle = StyleSheet.flatten(scrollView.props.contentContainerStyle);
+    expect(contentStyle.paddingBottom).toBeGreaterThanOrEqual(100);
+  });
 });

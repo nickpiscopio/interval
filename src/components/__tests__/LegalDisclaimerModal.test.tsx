@@ -1,13 +1,14 @@
 import React from "react";
+import { StyleSheet } from "react-native";
 import { render, fireEvent } from "@testing-library/react-native";
 import { LegalDisclaimerModal } from "../LegalDisclaimerModal";
-import { TOUCH_TARGET } from "../../constants/Spacing";
+import Spacing, { TOUCH_TARGET } from "../../constants/Spacing";
 
 describe("LegalDisclaimerModal Component", () => {
-  it("renders in gate mode full-screen and triggers onAccept when agree button is pressed", () => {
+  it("renders in gate mode full-screen without warning badge and triggers onAccept when agree button is pressed", () => {
     const onAccept = jest.fn();
 
-    const { getByText, getByTestId, queryByTestId } = render(
+    const { getByText, getByTestId, queryByTestId, queryByText } = render(
       <LegalDisclaimerModal
         visible={true}
         mode="gate"
@@ -15,8 +16,8 @@ describe("LegalDisclaimerModal Component", () => {
       />
     );
 
-    expect(getByText("IMPORTANT SAFETY & HEALTH NOTICE")).toBeTruthy();
-    expect(getByText("Legal Agreement & Medical Disclaimer")).toBeTruthy();
+    expect(queryByText("IMPORTANT SAFETY & HEALTH NOTICE")).toBeNull();
+    expect(getByText("Legal & Medical Disclaimer")).toBeTruthy();
     expect(getByText("1. Voluntary Participation & Assumption of Risk")).toBeTruthy();
     expect(getByText("2. Workout & Physical Therapy Recommendations")).toBeTruthy();
     expect(getByText("3. Mandatory Physician Consultation")).toBeTruthy();
@@ -34,10 +35,10 @@ describe("LegalDisclaimerModal Component", () => {
     expect(onAccept).toHaveBeenCalled();
   });
 
-  it("renders in review mode via BottomSheetFrame with transparent close button, 4-tier header hierarchy, and triggers onClose", () => {
+  it("renders in review mode via BottomSheetFrame with shortened title, no warning badge, Spacing.sm below agreed badge, and triggers onClose", () => {
     const onClose = jest.fn();
 
-    const { getByText, getByTestId } = render(
+    const { getByText, getByTestId, queryByText } = render(
       <LegalDisclaimerModal
         visible={true}
         mode="review"
@@ -50,18 +51,20 @@ describe("LegalDisclaimerModal Component", () => {
     // Rendered inside BottomSheetFrame
     expect(getByTestId("bottom-sheet-content")).toBeTruthy();
 
-    // 4-tier header hierarchy elements
-    const title = getByText("Legal Agreement & Medical Disclaimer");
+    // Header hierarchy elements
+    const title = getByText("Legal & Medical Disclaimer");
     const version = getByText("Interval v2.4.0");
-    const warningBadge = getByText("IMPORTANT SAFETY & HEALTH NOTICE");
     const agreedBadge = getByText("Agreed on Aug 27, 2026");
     const subtitle = getByText(/Please read carefully before using Interval/);
 
     expect(title).toBeTruthy();
     expect(version).toBeTruthy();
-    expect(warningBadge).toBeTruthy();
+    expect(queryByText("IMPORTANT SAFETY & HEALTH NOTICE")).toBeNull();
     expect(agreedBadge).toBeTruthy();
     expect(subtitle).toBeTruthy();
+
+    const badgesRowStyle = StyleSheet.flatten(getByTestId("legal-badges-row").props.style);
+    expect(badgesRowStyle.marginBottom).toBe(Spacing.sm);
 
     // Top X close button styling: transparent background and 44x44 touch dimensions
     const topCloseBtn = getByTestId("legal-modal-close-btn");

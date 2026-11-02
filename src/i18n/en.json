@@ -1597,9 +1597,8 @@
     }
   },
   "legal": {
-    "title": "Legal Agreement & Medical Disclaimer",
+    "title": "Legal & Medical Disclaimer",
     "subtitle": "Please read carefully before using Interval",
-    "badgeWarning": "IMPORTANT SAFETY & HEALTH NOTICE",
     "assumptionOfRiskTitle": "1. Voluntary Participation & Assumption of Risk",
     "assumptionOfRiskBody": "You acknowledge that you are using Interval solely on a voluntary basis and at your own risk. In no way, shape, or form is anyone forcing, coercing, or requiring you to perform any physical activity or workout.",
     "recommendationsTitle": "2. Workout & Physical Therapy Recommendations",

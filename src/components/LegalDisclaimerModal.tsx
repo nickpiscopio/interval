@@ -136,21 +136,11 @@ export function LegalDisclaimerModal({
             </View>
 
             {/* Row 2: App version text caption */}
-            <Text style={styles.versionCaption}>
+            <Text style={[styles.versionCaption, styles.versionCaptionNoBadge]}>
               {t("legal.appVersionLabel", { version: appVersion })}
             </Text>
 
-            {/* Row 3: Flex row containing warning badge */}
-            <View style={styles.badgesRow}>
-              <View style={styles.warningBadge}>
-                <Ionicons name="shield-checkmark" size={14} color="#DC2626" />
-                <Text style={styles.warningBadgeText}>
-                  {t("legal.badgeWarning")}
-                </Text>
-              </View>
-            </View>
-
-            {/* Row 4: Subtitle notice paragraph */}
+            {/* Row 3: Subtitle notice paragraph */}
             <Text style={styles.subtitle}>{t("legal.subtitle")}</Text>
           </View>
 
@@ -208,28 +198,26 @@ const LEGAL_SHEET_SNAP_POINTS = ["90%"];
         </View>
 
         {/* Row 2: App version text caption */}
-        <Text style={styles.versionCaption}>
+        <Text
+          style={[
+            styles.versionCaption,
+            !acceptedDate && styles.versionCaptionNoBadge,
+          ]}
+        >
           {t("legal.appVersionLabel", { version: appVersion })}
         </Text>
 
-        {/* Row 3: Flex row containing warning badge and accepted-date badge */}
-        <View style={styles.badgesRow}>
-          <View style={styles.warningBadge}>
-            <Ionicons name="shield-checkmark" size={14} color="#DC2626" />
-            <Text style={styles.warningBadgeText}>
-              {t("legal.badgeWarning")}
-            </Text>
-          </View>
-
-          {acceptedDate && (
-            <View style={styles.agreedBadge}>
+        {/* Row 3: Flex row containing accepted-date badge */}
+        {acceptedDate && (
+          <View testID="legal-badges-row" style={styles.badgesRow}>
+            <View testID="legal-agreed-badge" style={styles.agreedBadge}>
               <Ionicons name="checkmark-circle" size={14} color="#059669" />
               <Text style={styles.agreedBadgeText}>
                 {t("legal.agreedOnDate", { date: acceptedDate })}
               </Text>
             </View>
-          )}
-        </View>
+          </View>
+        )}
 
         {/* Row 4: Subtitle notice paragraph */}
         <Text style={styles.subtitle}>{t("legal.subtitle")}</Text>
@@ -292,29 +280,15 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginBottom: Spacing.xs,
   },
+  versionCaptionNoBadge: {
+    marginBottom: Spacing.sm,
+  },
   badgesRow: {
     flexDirection: "row",
     alignItems: "center",
     flexWrap: "wrap",
     gap: 8,
-    marginBottom: Spacing.xs,
-  },
-  warningBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#FEF2F2",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: RADIUS.full,
-    gap: 5,
-    borderWidth: 1,
-    borderColor: "#FEE2E2",
-  },
-  warningBadgeText: {
-    fontSize: 11,
-    fontWeight: "700",
-    color: "#DC2626",
-    letterSpacing: 0.5,
+    marginBottom: Spacing.sm,
   },
   agreedBadge: {
     flexDirection: "row",

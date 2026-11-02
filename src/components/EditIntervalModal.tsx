@@ -82,7 +82,9 @@ export function EditIntervalModal({
 }: EditIntervalModalProps) {
   const insets = useSafeAreaInsets();
   const [viewMode, setViewMode] = useState<"edit" | "library">("edit");
-  const [nameInputText, setNameInputText] = useState<string>(interval?.name ?? "");
+  const [nameInputDefault, setNameInputDefault] = useState<string>(interval?.name ?? "");
+  const [nameInputKey, setNameInputKey] = useState<number>(0);
+  const nameInputRef = useRef<string>(interval?.name ?? "");
   const [durationInputText, setDurationInputText] = useState<string>("00:00:30");
   const previewPlayerRef = useRef<AudioPlayer | null>(null);
   const hasClosedRef = useRef<boolean>(false);
@@ -150,7 +152,9 @@ export function EditIntervalModal({
   useEffect(() => {
     if (visible && interval) {
       hasClosedRef.current = false;
-      setNameInputText(interval.name);
+      nameInputRef.current = interval.name;
+      setNameInputDefault(interval.name);
+      setNameInputKey((k) => k + 1);
     }
   }, [interval?.id, visible]);
 
@@ -171,7 +175,7 @@ export function EditIntervalModal({
   }
 
   function handleNameChange(name: string) {
-    setNameInputText(name);
+    nameInputRef.current = name;
     onUpdate({ name });
   }
 
@@ -217,6 +221,7 @@ export function EditIntervalModal({
   }
 
   function handleOpenLibrary() {
+    setNameInputDefault(nameInputRef.current);
     onOpenExercisePicker?.();
     setViewMode("library");
   }
@@ -230,7 +235,9 @@ export function EditIntervalModal({
       abs: "#8338EC",
       total: "#E63946",
     };
-    setNameInputText(exercise.name);
+    nameInputRef.current = exercise.name;
+    setNameInputDefault(exercise.name);
+    setNameInputKey((k) => k + 1);
     if (onSelectExercise) {
       onSelectExercise(exercise);
     } else {
@@ -309,9 +316,10 @@ export function EditIntervalModal({
                 </TouchableOpacity>
               </View>
               <BottomSheetTextInput
+                key={`interval-name-${interval.id}-${nameInputKey}`}
                 testID="edit-interval-name-input"
                 style={styles.editorTextInput}
-                value={nameInputText}
+                defaultValue={nameInputDefault}
                 onChangeText={handleNameChange}
                 returnKeyType="done"
                 blurOnSubmit={true}

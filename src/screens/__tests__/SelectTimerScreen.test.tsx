@@ -261,13 +261,12 @@ describe("SelectTimerScreen", () => {
     await AsyncStorage.removeItem("@legal_disclaimer_accepted");
     await AsyncStorage.removeItem("@legal_disclaimer_accepted_date");
 
-    const { getByTestId, getByText, queryByTestId } = renderWithAlert(
+    const { getByTestId, getByText } = renderWithAlert(
       <SelectTimerScreen navigation={{} as any} route={{} as any} />
     );
 
     await waitFor(() => {
-      expect(getByText("IMPORTANT SAFETY & HEALTH NOTICE")).toBeTruthy();
-      expect(getByText("Legal Agreement & Medical Disclaimer")).toBeTruthy();
+      expect(getByText("Legal & Medical Disclaimer")).toBeTruthy();
     }, { timeout: 3500 });
 
     const agreeBtn = getByTestId("legal-agree-button");
@@ -296,7 +295,7 @@ describe("SelectTimerScreen", () => {
     const infoBtn = getByTestId("legal-info-header-btn");
     fireEvent.press(infoBtn);
 
-    expect(getByText("Legal Agreement & Medical Disclaimer")).toBeTruthy();
+    expect(getByText("Legal & Medical Disclaimer")).toBeTruthy();
     expect(getByText("Agreed on Aug 27, 2026")).toBeTruthy();
     expect(getByTestId("legal-modal-close-btn")).toBeTruthy();
 

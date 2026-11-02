@@ -1597,9 +1597,8 @@
     }
   },
   "legal": {
-    "title": "Accord Légal et Avertissement Médical",
+    "title": "Avis Légal et Médical",
     "subtitle": "Veuillez lire attentivement avant d'utiliser Interval",
-    "badgeWarning": "AVIS IMPORTANT DE SANTÉ ET SÉCURITÉ",
     "assumptionOfRiskTitle": "1. Participation Volontaire et Prise de Risque",
     "assumptionOfRiskBody": "Vous reconnaissez que vous utilisez Interval de manière strictement volontaire et à vos propres risques. En aucun cas personne ne vous oblige ou ne vous contraint à effectuer une activité physique ou un entraînement.",
     "recommendationsTitle": "2. Recommandations d'Entraînement et Kinésithérapie",

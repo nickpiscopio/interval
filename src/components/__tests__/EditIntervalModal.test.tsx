@@ -538,6 +538,42 @@ describe("EditIntervalModal sheet spacing & layout refinement", () => {
 
     dismissSpy.mockRestore();
   });
+
+  it("uses uncontrolled defaultValue for interval name input so mid-string backspace removes strictly one character", () => {
+    const onUpdate = jest.fn();
+    const { getByTestId, rerender } = render(
+      <EditIntervalModal
+        visible={true}
+        interval={{ id: "int-1", name: "High Interval", duration: 30, color: "#3B82F6" }}
+        onClose={jest.fn()}
+        onUpdate={onUpdate}
+        onDelete={jest.fn()}
+        onDuplicate={jest.fn()}
+      />
+    );
+
+    const nameInput = getByTestId("edit-interval-name-input");
+    expect(nameInput.props.defaultValue).toBe("High Interval");
+    expect(nameInput.props.value).toBeUndefined();
+
+    // Simulate single-character backspace in the middle of the string ("High Interval" -> "Hig Interval")
+    fireEvent.changeText(nameInput, "Hig Interval");
+    expect(onUpdate).toHaveBeenCalledWith({ name: "Hig Interval" });
+    expect(getByTestId("edit-interval-name-input").props.value).toBeUndefined();
+
+    // Switching to another interval resets defaultValue cleanly
+    rerender(
+      <EditIntervalModal
+        visible={true}
+        interval={{ id: "int-2", name: "Low Interval", duration: 15, color: "#1ACC6C" }}
+        onClose={jest.fn()}
+        onUpdate={onUpdate}
+        onDelete={jest.fn()}
+        onDuplicate={jest.fn()}
+      />
+    );
+    expect(getByTestId("edit-interval-name-input").props.defaultValue).toBe("Low Interval");
+  });
 });
 
 

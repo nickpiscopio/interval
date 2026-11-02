@@ -582,7 +582,7 @@ const styles = StyleSheet.create({
   resultsHeader: {
     paddingHorizontal: Spacing.md,
     marginTop: Spacing.md,
-    marginBottom: Spacing.sm,
+    marginBottom: 0,
   },
   resultsCountText: {
     fontSize: FontSize.xs,

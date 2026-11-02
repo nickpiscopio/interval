@@ -208,7 +208,7 @@ describe("ExerciseLibraryView Component", () => {
     expect(onBack).toHaveBeenCalled();
   });
 
-  it("applies 16px top margin and 8px bottom margin to the results count header", () => {
+  it("applies 16px top margin and 0px bottom margin to the results count header", () => {
     const { getByTestId } = render(
       <ExerciseLibraryView
         onStartQuickRoutine={jest.fn()}
@@ -219,6 +219,6 @@ describe("ExerciseLibraryView Component", () => {
     const resultsHeader = getByTestId("exercise-results-header");
     const headerStyle = StyleSheet.flatten(resultsHeader.props.style);
     expect(headerStyle.marginTop).toBe(Spacing.md);
-    expect(headerStyle.marginBottom).toBe(Spacing.sm);
+    expect(headerStyle.marginBottom).toBe(0);
   });
 });

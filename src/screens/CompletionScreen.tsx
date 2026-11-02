@@ -246,101 +246,102 @@ export default function CompletionScreen({
         <Ionicons name="close" size={24} color={Colors.textScale.primary} />
       </TouchableOpacity>
 
-      <ScrollView
-        contentContainerStyle={[
-          styles.scrollContent,
-          { paddingBottom: (actionsHeight || 100) + Spacing.md },
-        ]}
-        showsVerticalScrollIndicator={false}
+      {/* Pinned Top Celebration Banner */}
+      <LinearGradient
+        colors={["#FFFBEB", "#FEF3C7"]}
+        style={styles.celebrationBg}
       >
-        <LinearGradient
-          colors={["#FFFBEB", "#FEF3C7"]}
-          style={styles.celebrationBg}
-        >
-          <View style={styles.trophyContainer}>
-            <View style={styles.trophyBubble}>
-              <Ionicons name="trophy" size={44} color="#F59E0B" />
-            </View>
-          </View>
-
-          <Text style={styles.title}>{t("completion.title")}</Text>
-          <Text style={styles.subtitle}>{motivationalMessage}</Text>
-        </LinearGradient>
-
-        {/* Workout Stats Details */}
-        <View style={styles.statsCard}>
-          <Text style={styles.workoutTitle}>{timer.name}</Text>
-
-          <View style={styles.statsRow}>
-            <View style={styles.statBox}>
-              <Text style={styles.statLabel}>{t("completion.totalTime")}</Text>
-              <Text style={styles.statValue}>{formatTime(totalSeconds)}</Text>
-            </View>
-            <View style={styles.statDivider} />
-            <View style={styles.statBox}>
-              <Text style={styles.statLabel}>{t("common.rounds")}</Text>
-              <Text style={styles.statValue}>{timer.rounds} {t("common.rounds")}</Text>
-            </View>
-            {userStats && userStats.currentStreak > 0 && (
-              <>
-                <View style={styles.statDivider} />
-                <View style={styles.statBox}>
-                  <Text style={styles.statLabel}>{t("awards.currentStreak")}</Text>
-                  <Text style={[styles.statValue, { color: "#D97706" }]}>
-                    🔥 {userStats.currentStreak}d
-                  </Text>
-                </View>
-              </>
-            )}
-          </View>
-
-          <View style={styles.infoRow}>
-            <Ionicons name="fitness-outline" size={18} color="#4B5563" />
-            <Text style={styles.infoText}>
-              {t("completion.intervalsCompleted")}: {timer.intervals.length * timer.rounds}
-            </Text>
+        <View style={styles.trophyContainer}>
+          <View style={styles.trophyBubble}>
+            <Ionicons name="trophy" size={44} color="#F59E0B" />
           </View>
         </View>
 
-        {/* Newly Unlocked Badges Section or Centered Trophy Button */}
-        {newlyUnlockedBadges.length > 0 ? (
-          <View style={styles.unlockedSection}>
-            <View testID="unlocked-section-header" style={styles.unlockedSectionHeader}>
-              <View style={styles.unlockedSectionTitleRow}>
-                <Ionicons name="sparkles" size={18} color="#F59E0B" />
-                <Text style={styles.unlockedSectionTitle}>{unlockedTitle}</Text>
-              </View>
-              {renderTrophyButton()}
-            </View>
-            <View style={styles.badgeCardsRow}>
-              {newlyUnlockedBadges.map((badge) => (
-                <TouchableOpacity
-                  key={badge.id}
-                  style={styles.unlockedBadgeCard}
-                  activeOpacity={0.85}
-                  onPress={() => setActiveModalBadge(badge)}
-                >
-                  <LinearGradient
-                    colors={badge.gradientColors}
-                    style={styles.unlockedBadgeBubble}
-                  >
-                    <Text style={styles.unlockedBadgeEmoji}>{badge.emoji}</Text>
-                  </LinearGradient>
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.unlockedBadgeName}>{badge.name}</Text>
-                    <Text style={styles.unlockedBadgeTagline}>{badge.tagline}</Text>
-                  </View>
-                  <Ionicons name="chevron-forward" size={18} color="#9CA3AF" />
-                </TouchableOpacity>
-              ))}
-            </View>
+        <Text style={styles.title}>{t("completion.title")}</Text>
+        <Text style={styles.subtitle}>{motivationalMessage}</Text>
+      </LinearGradient>
+
+      {/* Pinned Workout Stats Details */}
+      <View style={styles.statsCard}>
+        <Text style={styles.workoutTitle}>{timer.name}</Text>
+
+        <View style={styles.statsRow}>
+          <View style={styles.statBox}>
+            <Text style={styles.statLabel}>{t("completion.totalTime")}</Text>
+            <Text style={styles.statValue}>{formatTime(totalSeconds)}</Text>
           </View>
-        ) : (
-          <View testID="centered-trophy-row" style={styles.centeredTrophyRow}>
+          <View style={styles.statDivider} />
+          <View style={styles.statBox}>
+            <Text style={styles.statLabel}>{t("common.rounds")}</Text>
+            <Text style={styles.statValue}>{timer.rounds} {t("common.rounds")}</Text>
+          </View>
+          {userStats && userStats.currentStreak > 0 && (
+            <>
+              <View style={styles.statDivider} />
+              <View style={styles.statBox}>
+                <Text style={styles.statLabel}>{t("awards.currentStreak")}</Text>
+                <Text style={[styles.statValue, { color: "#D97706" }]}>
+                  🔥 {userStats.currentStreak}d
+                </Text>
+              </View>
+            </>
+          )}
+        </View>
+
+        <View style={styles.infoRow}>
+          <Ionicons name="fitness-outline" size={18} color="#4B5563" />
+          <Text style={styles.infoText}>
+            {t("completion.intervalsCompleted")}: {timer.intervals.length * timer.rounds}
+          </Text>
+        </View>
+      </View>
+
+      {/* Newly Unlocked Badges Section or Centered Trophy Button */}
+      {newlyUnlockedBadges.length > 0 ? (
+        <View style={styles.unlockedSection}>
+          <View testID="unlocked-section-header" style={styles.unlockedSectionHeader}>
+            <View style={styles.unlockedSectionTitleRow}>
+              <Ionicons name="sparkles" size={18} color="#F59E0B" />
+              <Text style={styles.unlockedSectionTitle}>{unlockedTitle}</Text>
+            </View>
             {renderTrophyButton()}
           </View>
-        )}
-      </ScrollView>
+          <ScrollView
+            testID="unlocked-badges-scroll"
+            style={styles.unlockedBadgesScroll}
+            contentContainerStyle={[
+              styles.badgeCardsRow,
+              { paddingBottom: (actionsHeight || 100) + Spacing.md },
+            ]}
+            showsVerticalScrollIndicator={false}
+          >
+            {newlyUnlockedBadges.map((badge) => (
+              <TouchableOpacity
+                key={badge.id}
+                style={styles.unlockedBadgeCard}
+                activeOpacity={0.85}
+                onPress={() => setActiveModalBadge(badge)}
+              >
+                <LinearGradient
+                  colors={badge.gradientColors}
+                  style={styles.unlockedBadgeBubble}
+                >
+                  <Text style={styles.unlockedBadgeEmoji}>{badge.emoji}</Text>
+                </LinearGradient>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.unlockedBadgeName}>{badge.name}</Text>
+                  <Text style={styles.unlockedBadgeTagline}>{badge.tagline}</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={18} color="#9CA3AF" />
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+      ) : (
+        <View testID="centered-trophy-row" style={styles.centeredTrophyRow}>
+          {renderTrophyButton()}
+        </View>
+      )}
 
       {/* Condensed Rounded Blue Bottom Action Pill */}
       <View
@@ -584,14 +585,18 @@ const styles = StyleSheet.create({
     marginTop: Spacing.md,
   },
   unlockedSection: {
+    flex: 1,
     marginTop: Spacing.lg,
-    marginHorizontal: Spacing.md,
   },
   unlockedSectionHeader: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    paddingHorizontal: Spacing.md,
     marginBottom: Spacing.sm,
+  },
+  unlockedBadgesScroll: {
+    flex: 1,
   },
   unlockedSectionTitleRow: {
     flexDirection: "row",
@@ -614,6 +619,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#FFFFFF",
     borderRadius: Spacing.radius.md,
+    marginHorizontal: Spacing.md,
     padding: Spacing.sm,
     borderWidth: 1,
     borderColor: "#FDE68A",
