@@ -22,6 +22,17 @@ describe("badges Constants", () => {
     expect(ids).toContain("bulletproof_joints");
     expect(ids).toContain("posture_perfectionist");
     expect(ids).toContain("iron_alignment");
+    expect(ids).toContain("two_a_day_streak_2");
+    expect(ids).toContain("two_a_day_streak_3");
+    expect(ids).toContain("three_a_day_streak_2");
+    expect(ids).toContain("three_a_day_streak_3");
+
+    const twoStreak2 = BADGE_CATALOG.find((b) => b.id === "two_a_day_streak_2");
+    const twoStreak3 = BADGE_CATALOG.find((b) => b.id === "two_a_day_streak_3");
+    expect(twoStreak2?.description).toContain("2 workouts spaced at least 1 hour apart");
+    expect(twoStreak2?.description).not.toContain("2+");
+    expect(twoStreak3?.description).toContain("2 workouts spaced at least 1 hour apart");
+    expect(twoStreak3?.description).not.toContain("2+");
   });
 
   it("retrieves localized badge with description and tagline", () => {

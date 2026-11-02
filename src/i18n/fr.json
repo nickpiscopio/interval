@@ -140,6 +140,10 @@
     "intervalsCompleted": "Intervalles Complétés",
     "roundsFinished": "Tours Terminés",
     "newBadgeUnlocked": "Nouveau Trophée Débloqué !",
+    "newAchievementUnlocked": "Nouveau Succès Débloqué",
+    "newAchievementsUnlocked": "Nouveaux Succès Débloqués",
+    "restartWorkout": "Recommencer l'Entraînement",
+    "rateApp": "Noter l'Application",
     "doneButton": "Retour aux Minuteurs",
     "shareWorkout": "Partager l'Entraînement",
     "shareBadge": "Partager le Trophée",
@@ -203,6 +207,8 @@
     "inviteBannerSubtitle": "Partagez vos minuteurs ou invitez votre partenaire d'entraînement pour débloquer des badges exclusifs !",
     "inviteButton": "Inviter des Amis",
     "unlockedCount": "%{unlocked} sur %{total} Débloqués",
+    "unlockedSection": "Débloqués",
+    "lockedSection": "Verrouillés",
     "locked": "Verrouillé",
     "unlockedOn": "Débloqué le %{date}",
     "howToUnlock": "Comment Débloquer",
@@ -1463,6 +1469,46 @@
       "name": "Créateur d'Élite",
       "tagline": "Maître architecte !",
       "description": "Vous avez créé et complété votre propre minuteur sur mesure."
+    },
+    "quick_double": {
+      "name": "Doublé Express",
+      "tagline": "De retour sur le ring !",
+      "description": "A démarré et terminé un 2e entraînement dans les 5 minutes suivant la fin du précédent."
+    },
+    "quick_triple": {
+      "name": "Triplé Explosif",
+      "tagline": "Trois séances d'affilée !",
+      "description": "A démarré et terminé un 3e entraînement consécutif dans les 5 minutes suivant la fin du deuxième."
+    },
+    "two_a_day": {
+      "name": "Deux par Jour",
+      "tagline": "Double dose d'énergie !",
+      "description": "A terminé 2 entraînements le même jour espacés d'au moins 1 heure."
+    },
+    "three_a_day": {
+      "name": "Trois par Jour",
+      "tagline": "Matin, midi et soir !",
+      "description": "A terminé 3 entraînements le même jour avec chaque séance espacée d'au moins 1 heure."
+    },
+    "two_a_day_streak_2": {
+      "name": "Duo Double Séance",
+      "tagline": "Deux jours de doublés !",
+      "description": "A réalisé un Deux par Jour (2 entraînements espacés d'au moins 1 heure) pendant 2 jours consécutifs."
+    },
+    "two_a_day_streak_3": {
+      "name": "Dynastie Double Séance",
+      "tagline": "3 jours de doubles séances !",
+      "description": "A réalisé un Deux par Jour (2 entraînements espacés d'au moins 1 heure) pendant 3 jours consécutifs."
+    },
+    "three_a_day_streak_2": {
+      "name": "Duo Triple Séance",
+      "tagline": "Deux jours de triplés !",
+      "description": "A réalisé un Trois par Jour (3 entraînements espacés d'au moins 1 heure) pendant 2 jours consécutifs."
+    },
+    "three_a_day_streak_3": {
+      "name": "Dynastie Triple Séance",
+      "tagline": "3 jours de triples séances !",
+      "description": "A réalisé un Trois par Jour (3 entraînements espacés d'au moins 1 heure) pendant 3 jours consécutifs."
     },
     "megaphone_maestro": {
       "name": "Maestro du Mégaphone",

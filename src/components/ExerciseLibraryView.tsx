@@ -311,7 +311,7 @@ export function ExerciseLibraryView({
       </View>
 
       {/* Results Header Count */}
-      <View style={styles.resultsHeader}>
+      <View testID="exercise-results-header" style={styles.resultsHeader}>
         <Text style={styles.resultsCountText}>
           {t("exercises.resultsCount", { count: filteredExercises.length })}
         </Text>
@@ -581,7 +581,8 @@ const styles = StyleSheet.create({
   },
   resultsHeader: {
     paddingHorizontal: Spacing.md,
-    marginBottom: 6,
+    marginTop: Spacing.md,
+    marginBottom: Spacing.sm,
   },
   resultsCountText: {
     fontSize: FontSize.xs,

@@ -140,6 +140,10 @@
     "intervalsCompleted": "Intervalos Completados",
     "roundsFinished": "Rondas Finalizadas",
     "newBadgeUnlocked": "¡Nueva Insignia Desbloqueada!",
+    "newAchievementUnlocked": "Nuevo Logro Desbloqueado",
+    "newAchievementsUnlocked": "Nuevos Logros Desbloqueados",
+    "restartWorkout": "Reiniciar Entrenamiento",
+    "rateApp": "Calificar la App",
     "doneButton": "Volver a Temporizadores",
     "shareWorkout": "Compartir Entrenamiento",
     "shareBadge": "Compartir Insignia",
@@ -203,6 +207,8 @@
     "inviteBannerSubtitle": "¡Comparte temporizadores o invita a tus compañeros de entrenamiento para desbloquear insignias virales exclusivas!",
     "inviteButton": "Invitar Amigos",
     "unlockedCount": "%{unlocked} de %{total} Desbloqueadas",
+    "unlockedSection": "Desbloqueados",
+    "lockedSection": "Bloqueados",
     "locked": "Bloqueada",
     "unlockedOn": "Desbloqueada el %{date}",
     "howToUnlock": "Cómo Desbloquear",
@@ -1463,6 +1469,46 @@
       "name": "Creador Personalizado",
       "tagline": "¡Maestro arquitecto!",
       "description": "Diseñaste y completaste tu propio temporizador de intervalos."
+    },
+    "quick_double": {
+      "name": "Doble Turno Rápido",
+      "tagline": "¡De vuelta al ruedo!",
+      "description": "Iniciaste y completaste un 2.º entrenamiento en los 5 minutos posteriores a terminar el anterior."
+    },
+    "quick_triple": {
+      "name": "Triplete Imparable",
+      "tagline": "¡Tres seguidos sin pausa!",
+      "description": "Iniciaste y completaste un 3.er entrenamiento consecutivo en los 5 minutos posteriores a terminar el segundo."
+    },
+    "two_a_day": {
+      "name": "Doble Sesión Diaria",
+      "tagline": "¡Dedicación por partida doble!",
+      "description": "Completaste 2 entrenamientos en el mismo día con al menos 1 hora de diferencia."
+    },
+    "three_a_day": {
+      "name": "Triple Sesión Diaria",
+      "tagline": "¡Mañana, tarde y noche!",
+      "description": "Completaste 3 entrenamientos en el mismo día con cada sesión separada por al menos 1 hora."
+    },
+    "two_a_day_streak_2": {
+      "name": "Dúo de Doble Sesión",
+      "tagline": "¡Dos días de doble entrenamiento!",
+      "description": "Completaste una Doble Sesión Diaria (2 entrenamientos separados por al menos 1 hora) durante 2 días consecutivos."
+    },
+    "two_a_day_streak_3": {
+      "name": "Dinastía de Doble Sesión",
+      "tagline": "¡3 días de sesiones dobles!",
+      "description": "Completaste una Doble Sesión Diaria (2 entrenamientos separados por al menos 1 hora) durante 3 días consecutivos."
+    },
+    "three_a_day_streak_2": {
+      "name": "Dúo de Triple Sesión",
+      "tagline": "¡Dos días de triple entrenamiento!",
+      "description": "Completaste una Triple Sesión Diaria (3 entrenamientos separados por al menos 1 hora) durante 2 días consecutivos."
+    },
+    "three_a_day_streak_3": {
+      "name": "Dinastía de Triple Sesión",
+      "tagline": "¡3 días de sesiones triples!",
+      "description": "Completaste una Triple Sesión Diaria (3 entrenamientos separados por al menos 1 hora) durante 3 días consecutivos."
     },
     "megaphone_maestro": {
       "name": "Maestro del Megáfono",

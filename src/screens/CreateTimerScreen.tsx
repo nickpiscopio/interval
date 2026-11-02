@@ -80,6 +80,9 @@ export default function CreateTimerScreen({
   const [editingInterval, setEditingInterval] = useState<Interval | null>(null);
   const [isAddingNewInterval, setIsAddingNewInterval] = useState<boolean>(false);
   const [showEditIntervalModal, setShowEditIntervalModal] = useState<boolean>(false);
+  const editingIntervalRef = useRef<Interval | null>(null);
+  const isAddingNewIntervalRef = useRef<boolean>(false);
+  const isClosingModalRef = useRef<boolean>(false);
   const [isScrolled, setIsScrolled] = useState<boolean>(false);
   const [headerHeight, setHeaderHeight] = useState<number>(0);
 
@@ -113,6 +116,9 @@ export default function CreateTimerScreen({
 
   // Action: Open Edit Modal for Interval
   function handleSelectInterval(interval: Interval) {
+    isClosingModalRef.current = false;
+    isAddingNewIntervalRef.current = false;
+    editingIntervalRef.current = interval;
     setIsAddingNewInterval(false);
     setEditingInterval(interval);
     setShowEditIntervalModal(true);
@@ -126,6 +132,9 @@ export default function CreateTimerScreen({
       duration: -1,
       color: COLOR_PALETTE[intervals.length % COLOR_PALETTE.length]
     };
+    isClosingModalRef.current = false;
+    isAddingNewIntervalRef.current = true;
+    editingIntervalRef.current = newInterval;
     setIsAddingNewInterval(true);
     setEditingInterval(newInterval);
     setShowEditIntervalModal(true);
@@ -133,14 +142,29 @@ export default function CreateTimerScreen({
 
   // Action: Update Interval Properties
   function updateInterval(fields: Partial<Interval>) {
-    if (!editingInterval) return;
-    const updatedInterval = { ...editingInterval, ...fields };
-    setEditingInterval(updatedInterval);
-    if (!isAddingNewInterval) {
+    const current = editingIntervalRef.current || editingInterval;
+    if (!current) return;
+    const updatedInterval = { ...current, ...fields };
+    editingIntervalRef.current = updatedInterval;
+    const isNameOnlyUpdate = Object.keys(fields).length === 1 && "name" in fields;
+    if (!isNameOnlyUpdate) {
+      setEditingInterval(updatedInterval);
+    }
+    if (!isAddingNewIntervalRef.current && !isNameOnlyUpdate) {
       setIntervals((prev) =>
-        prev.map((int) => (int.id === editingInterval.id ? updatedInterval : int))
+        prev.map((int) => (int.id === current.id ? updatedInterval : int))
       );
     }
+  }
+
+  function resolveIntervalDefaults(interval: Interval, addingNew: boolean) {
+    const seqNum = addingNew
+      ? intervals.length + 1
+      : Math.max(1, intervals.findIndex((int) => int.id === interval.id) + 1);
+    const defaultName = t("createTimer.defaultIntervalName", { number: seqNum });
+    const resolvedName = interval.name.trim() || defaultName;
+    const resolvedDuration = interval.duration < 0 ? 30 : interval.duration;
+    return { resolvedName, resolvedDuration };
   }
 
   // Action: Pick Exercise from Library
@@ -153,52 +177,66 @@ export default function CreateTimerScreen({
       abs: "#8338EC",
       total: "#E63946",
     };
+    const current = editingIntervalRef.current || editingInterval;
     updateInterval({
       name: exercise.name,
       exerciseId: exercise.id,
-      color: categoryColors[exercise.category] || editingInterval?.color || "#1ACC6C",
+      color: categoryColors[exercise.category] || current?.color || "#1ACC6C",
     });
   }
 
   // Action: Close / Save Interval Modal
   function handleCloseIntervalModal() {
-    if (!editingInterval) {
+    if (isClosingModalRef.current) {
+      return;
+    }
+    isClosingModalRef.current = true;
+
+    const currentEditing = editingIntervalRef.current || editingInterval;
+    const addingNew = isAddingNewIntervalRef.current;
+
+    if (!currentEditing) {
+      editingIntervalRef.current = null;
+      isAddingNewIntervalRef.current = false;
       setShowEditIntervalModal(false);
       setIsAddingNewInterval(false);
       return;
     }
 
-    const seqNum = isAddingNewInterval
-      ? intervals.length + 1
-      : Math.max(1, intervals.findIndex((int) => int.id === editingInterval.id) + 1);
+    const { resolvedName, resolvedDuration } = resolveIntervalDefaults(
+      currentEditing,
+      addingNew
+    );
 
-    const defaultName = t("createTimer.defaultIntervalName", { number: seqNum });
-    const resolvedName = editingInterval.name.trim() || defaultName;
-    const resolvedDuration = editingInterval.duration < 0 ? 30 : editingInterval.duration;
-
-    if (isAddingNewInterval) {
+    if (addingNew) {
       if (resolvedDuration <= 0) {
+        editingIntervalRef.current = null;
+        isAddingNewIntervalRef.current = false;
         setShowEditIntervalModal(false);
         setEditingInterval(null);
         setIsAddingNewInterval(false);
         return;
       }
       const finalInterval: Interval = {
-        ...editingInterval,
+        ...currentEditing,
         name: resolvedName,
         duration: resolvedDuration,
       };
-      setIntervals((prev) => [...prev, finalInterval]);
+      setIntervals((prev) =>
+        prev.some((int) => int.id === finalInterval.id)
+          ? prev.map((int) => (int.id === finalInterval.id ? finalInterval : int))
+          : [...prev, finalInterval]
+      );
       setTimeout(() => {
         listRef.current?.scrollToEnd({ animated: true });
       }, 50);
     } else {
       setIntervals((prev) =>
         prev.map((int) =>
-          int.id === editingInterval.id
+          int.id === currentEditing.id
             ? {
                 ...int,
-                ...editingInterval,
+                ...currentEditing,
                 name: resolvedName,
                 duration: resolvedDuration > 0 ? resolvedDuration : int.duration,
               }
@@ -207,6 +245,8 @@ export default function CreateTimerScreen({
       );
     }
 
+    editingIntervalRef.current = null;
+    isAddingNewIntervalRef.current = false;
     setShowEditIntervalModal(false);
     setEditingInterval(null);
     setIsAddingNewInterval(false);
@@ -214,15 +254,14 @@ export default function CreateTimerScreen({
 
   // Action: Duplicate Interval
   function duplicateSelectedInterval() {
-    if (!editingInterval) return;
+    const currentEditing = editingIntervalRef.current || editingInterval;
+    if (!currentEditing) return;
 
-    const seqNum = isAddingNewInterval
-      ? intervals.length + 1
-      : Math.max(1, intervals.findIndex((int) => int.id === editingInterval.id) + 1);
-
-    const defaultName = t("createTimer.defaultIntervalName", { number: seqNum });
-    const resolvedName = editingInterval.name.trim() || defaultName;
-    const resolvedDuration = editingInterval.duration < 0 ? 30 : editingInterval.duration;
+    const addingNew = isAddingNewIntervalRef.current;
+    const { resolvedName, resolvedDuration } = resolveIntervalDefaults(
+      currentEditing,
+      addingNew
+    );
 
     if (resolvedDuration <= 0) {
       showAlert({
@@ -234,9 +273,9 @@ export default function CreateTimerScreen({
       return;
     }
 
-    if (isAddingNewInterval) {
+    if (addingNew) {
       const committedInterval: Interval = {
-        ...editingInterval,
+        ...currentEditing,
         name: resolvedName,
         duration: resolvedDuration,
       };
@@ -244,11 +283,13 @@ export default function CreateTimerScreen({
         id: generateIntervalId(),
         name: `${resolvedName} ${t("createTimer.copySuffix")}`,
         duration: resolvedDuration,
-        color: editingInterval.color,
-        exerciseId: editingInterval.exerciseId,
-        sound: editingInterval.sound,
+        color: currentEditing.color,
+        exerciseId: currentEditing.exerciseId,
+        sound: currentEditing.sound,
       };
       setIntervals((prev) => [...prev, committedInterval, duplicated]);
+      editingIntervalRef.current = duplicated;
+      isAddingNewIntervalRef.current = false;
       setEditingInterval(duplicated);
       setIsAddingNewInterval(false);
       setTimeout(() => {
@@ -257,24 +298,25 @@ export default function CreateTimerScreen({
       return;
     }
 
-    const index = intervals.findIndex((int) => int.id === editingInterval.id);
+    const index = intervals.findIndex((int) => int.id === currentEditing.id);
     if (index === -1) return;
     const duplicated: Interval = {
       id: generateIntervalId(),
       name: `${resolvedName} ${t("createTimer.copySuffix")}`,
       duration: resolvedDuration,
-      color: editingInterval.color,
-      exerciseId: editingInterval.exerciseId,
-      sound: editingInterval.sound,
+      color: currentEditing.color,
+      exerciseId: currentEditing.exerciseId,
+      sound: currentEditing.sound,
     };
     const updated = [...intervals];
     updated[index] = {
-      ...editingInterval,
+      ...currentEditing,
       name: resolvedName,
       duration: resolvedDuration,
     };
     updated.splice(index + 1, 0, duplicated);
     setIntervals(updated);
+    editingIntervalRef.current = duplicated;
     setEditingInterval(duplicated);
     setTimeout(() => {
       try {
@@ -287,7 +329,10 @@ export default function CreateTimerScreen({
 
   // Action: Delete Selected Interval
   function deleteSelectedInterval() {
-    if (isAddingNewInterval) {
+    if (isAddingNewIntervalRef.current) {
+      isClosingModalRef.current = true;
+      editingIntervalRef.current = null;
+      isAddingNewIntervalRef.current = false;
       setShowEditIntervalModal(false);
       setEditingInterval(null);
       setIsAddingNewInterval(false);
@@ -302,9 +347,12 @@ export default function CreateTimerScreen({
       });
       return;
     }
-    if (!editingInterval) return;
-    const updated = intervals.filter((int) => int.id !== editingInterval.id);
+    const currentEditing = editingIntervalRef.current || editingInterval;
+    if (!currentEditing) return;
+    const updated = intervals.filter((int) => int.id !== currentEditing.id);
     setIntervals(updated);
+    isClosingModalRef.current = true;
+    editingIntervalRef.current = null;
     setShowEditIntervalModal(false);
     setEditingInterval(null);
   }

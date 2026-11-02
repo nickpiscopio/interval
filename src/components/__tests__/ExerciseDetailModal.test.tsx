@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet } from "react-native";
-import { render, fireEvent, waitFor } from "@testing-library/react-native";
+import { render, fireEvent, waitFor, within } from "@testing-library/react-native";
 import { ExerciseDetailModal } from "../ExerciseDetailModal";
 import { Exercise } from "../../model/Exercise";
 import Spacing from "../../constants/Spacing";
@@ -150,5 +150,31 @@ describe("ExerciseDetailModal Component", () => {
 
     // Circular badge numbers are removed
     expect(queryByText("1")).toBeNull();
+  });
+
+  it("constrains the bottom sheet to 90% snap point with sticky header and scrollable body + action buttons", () => {
+    const { getByTestId, UNSAFE_getByProps } = render(
+      <ExerciseDetailModal
+        visible={true}
+        exercise={mockExercise}
+        mode="library"
+        onClose={jest.fn()}
+      />
+    );
+
+    const modal = getByTestId("bottom-sheet-modal");
+    expect(modal.props.sheetProps.snapPoints).toEqual(["90%"]);
+
+    const sheetContainer = getByTestId("exercise-detail-sheet-container");
+    expect(StyleSheet.flatten(sheetContainer.props.style).flex).toBe(1);
+
+    const scrollView = getByTestId("exercise-detail-scroll");
+    expect(StyleSheet.flatten(scrollView.props.style).flex).toBe(1);
+
+    // Header is outside scrollView (sticky at top of sheetContainer), while footerActions is inside scrollView
+    expect(within(scrollView).queryByTestId("exercise-detail-header")).toBeNull();
+    expect(within(scrollView).getByText("1. Stand with back flat against a wall.")).toBeTruthy();
+    expect(within(scrollView).getByText("Start Quick Routine")).toBeTruthy();
+    expect(within(scrollView).getByText("Create Custom Workout")).toBeTruthy();
   });
 });

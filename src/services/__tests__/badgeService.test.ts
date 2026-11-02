@@ -274,4 +274,155 @@ describe("badgeService", () => {
     expect(result10.stats.totalCorrectiveWorkouts).toBe(10);
     expect(result10.newlyUnlocked.some((b) => b.id === "iron_alignment")).toBe(true);
   });
+
+  describe("rapid-repeat (5-minute window) and daily multi-workout (1-hour spacing) achievements", () => {
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it("unlocks 2-in-a-row (quick_double) and 3-in-a-row (quick_triple) when started within 5 minutes of previous completion", async () => {
+      jest.useFakeTimers();
+      // Workout 1 finishes at 10:00:00 (duration 60s)
+      jest.setSystemTime(new Date("2026-11-02T10:00:00Z"));
+      const r1 = await recordWorkoutCompletion(mockTimer, 60);
+      expect(r1.stats.consecutiveQuickRepeatCount).toBe(1);
+      expect(r1.newlyUnlocked.some((b) => b.id === "quick_double")).toBe(false);
+
+      // Workout 2 starts 4 minutes later at 10:04:00 and lasts 90s -> finishes at 10:05:30
+      jest.setSystemTime(new Date("2026-11-02T10:05:30Z"));
+      const r2 = await recordWorkoutCompletion(mockTimer, 90);
+      expect(r2.stats.consecutiveQuickRepeatCount).toBe(2);
+      expect(r2.newlyUnlocked.some((b) => b.id === "quick_double")).toBe(true);
+      expect(r2.newlyUnlocked.some((b) => b.id === "quick_triple")).toBe(false);
+
+      // Workout 3 starts exactly 5 minutes after 10:05:30 -> at 10:10:30, lasts 60s -> finishes at 10:11:30
+      jest.setSystemTime(new Date("2026-11-02T10:11:30Z"));
+      const r3 = await recordWorkoutCompletion(mockTimer, 60);
+      expect(r3.stats.consecutiveQuickRepeatCount).toBe(3);
+      expect(r3.newlyUnlocked.some((b) => b.id === "quick_triple")).toBe(true);
+    });
+
+    it("resets consecutiveQuickRepeatCount when gap between previous completion and next start exceeds 5 minutes", async () => {
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date("2026-11-02T10:00:00Z"));
+      await recordWorkoutCompletion(mockTimer, 60);
+
+      // Next workout starts 5 minutes and 1 second later at 10:05:01, lasts 60s -> finishes at 10:06:01
+      jest.setSystemTime(new Date("2026-11-02T10:06:01Z"));
+      const r2 = await recordWorkoutCompletion(mockTimer, 60);
+      expect(r2.stats.consecutiveQuickRepeatCount).toBe(1);
+      expect(r2.newlyUnlocked.some((b) => b.id === "quick_double")).toBe(false);
+    });
+
+    it("unlocks Two-a-Day and Three-a-Day only when same-day workouts are spaced at least 1 hour apart", async () => {
+      jest.useFakeTimers();
+      // First workout at 08:00:00
+      jest.setSystemTime(new Date("2026-11-02T08:00:00"));
+      const r1 = await recordWorkoutCompletion(mockTimer, 300);
+      expect(r1.stats.todaySpacedWorkoutTimestamps?.length).toBe(1);
+      expect(r1.newlyUnlocked.some((b) => b.id === "two_a_day")).toBe(false);
+
+      // Quick repeat 30 mins later at 08:30:00 -> should NOT count toward 1-hour spaced workouts
+      jest.setSystemTime(new Date("2026-11-02T08:30:00"));
+      const rQuick = await recordWorkoutCompletion(mockTimer, 300);
+      expect(rQuick.stats.todaySpacedWorkoutTimestamps?.length).toBe(1);
+      expect(rQuick.newlyUnlocked.some((b) => b.id === "two_a_day")).toBe(false);
+
+      // Second spaced workout at 09:00:00 (1 hour after 08:00:00) -> unlocks Two-a-Day
+      jest.setSystemTime(new Date("2026-11-02T09:00:00"));
+      const r2 = await recordWorkoutCompletion(mockTimer, 300);
+      expect(r2.stats.todaySpacedWorkoutTimestamps?.length).toBe(2);
+      expect(r2.newlyUnlocked.some((b) => b.id === "two_a_day")).toBe(true);
+      expect(r2.newlyUnlocked.some((b) => b.id === "three_a_day")).toBe(false);
+
+      // Third spaced workout at 10:30:00 (1.5 hours after 09:00:00) -> unlocks Three-a-Day
+      jest.setSystemTime(new Date("2026-11-02T10:30:00"));
+      const r3 = await recordWorkoutCompletion(mockTimer, 300);
+      expect(r3.stats.todaySpacedWorkoutTimestamps?.length).toBe(3);
+      expect(r3.newlyUnlocked.some((b) => b.id === "three_a_day")).toBe(true);
+    });
+
+    it("unlocks 2-day and 3-day consecutive Two-a-Day streak achievements and resets if a day is missed", async () => {
+      jest.useFakeTimers();
+
+      // Day 1 (Nov 2): Two-a-Day
+      jest.setSystemTime(new Date("2026-11-02T08:00:00"));
+      await recordWorkoutCompletion(mockTimer, 300);
+      jest.setSystemTime(new Date("2026-11-02T12:00:00"));
+      const day1 = await recordWorkoutCompletion(mockTimer, 300);
+      expect(day1.stats.consecutiveTwoADayDays).toBe(1);
+      expect(day1.newlyUnlocked.some((b) => b.id === "two_a_day_streak_2")).toBe(false);
+
+      // Day 2 (Nov 3): Two-a-Day -> unlocks 2-day Two-a-Day streak
+      jest.setSystemTime(new Date("2026-11-03T09:00:00"));
+      await recordWorkoutCompletion(mockTimer, 300);
+      jest.setSystemTime(new Date("2026-11-03T18:00:00"));
+      const day2 = await recordWorkoutCompletion(mockTimer, 300);
+      expect(day2.stats.consecutiveTwoADayDays).toBe(2);
+      expect(day2.newlyUnlocked.some((b) => b.id === "two_a_day_streak_2")).toBe(true);
+      expect(day2.newlyUnlocked.some((b) => b.id === "two_a_day_streak_3")).toBe(false);
+
+      // Day 3 (Nov 4): Two-a-Day -> unlocks 3-day Two-a-Day streak
+      jest.setSystemTime(new Date("2026-11-04T07:00:00"));
+      await recordWorkoutCompletion(mockTimer, 300);
+      jest.setSystemTime(new Date("2026-11-04T19:00:00"));
+      const day3 = await recordWorkoutCompletion(mockTimer, 300);
+      expect(day3.stats.consecutiveTwoADayDays).toBe(3);
+      expect(day3.newlyUnlocked.some((b) => b.id === "two_a_day_streak_3")).toBe(true);
+
+      // Skip Nov 5, then do a Two-a-Day on Nov 6 -> resets consecutiveTwoADayDays to 1
+      jest.setSystemTime(new Date("2026-11-06T08:00:00"));
+      await recordWorkoutCompletion(mockTimer, 300);
+      jest.setSystemTime(new Date("2026-11-06T12:00:00"));
+      const dayAfterGap = await recordWorkoutCompletion(mockTimer, 300);
+      expect(dayAfterGap.stats.consecutiveTwoADayDays).toBe(1);
+    });
+
+    it("unlocks 2-day and 3-day consecutive Three-a-Day streak achievements and resets if a day is missed", async () => {
+      jest.useFakeTimers();
+
+      // Day 1 (Nov 2): Three-a-Day (3 workouts spaced >= 1 hour apart)
+      jest.setSystemTime(new Date("2026-11-02T08:00:00"));
+      await recordWorkoutCompletion(mockTimer, 300);
+      jest.setSystemTime(new Date("2026-11-02T12:00:00"));
+      await recordWorkoutCompletion(mockTimer, 300);
+      jest.setSystemTime(new Date("2026-11-02T18:00:00"));
+      const day1 = await recordWorkoutCompletion(mockTimer, 300);
+      expect(day1.stats.consecutiveThreeADayDays).toBe(1);
+      expect(day1.newlyUnlocked.some((b) => b.id === "three_a_day_streak_2")).toBe(false);
+
+      // Day 2 (Nov 3): Three-a-Day -> unlocks 2-day Three-a-Day streak (Triple-Day Duo)
+      jest.setSystemTime(new Date("2026-11-03T08:00:00"));
+      await recordWorkoutCompletion(mockTimer, 300);
+      jest.setSystemTime(new Date("2026-11-03T13:00:00"));
+      const day2Workout2 = await recordWorkoutCompletion(mockTimer, 300);
+      expect(day2Workout2.newlyUnlocked.some((b) => b.id === "two_a_day_streak_2")).toBe(true);
+      expect(day2Workout2.newlyUnlocked.some((b) => b.id === "three_a_day_streak_2")).toBe(false);
+
+      jest.setSystemTime(new Date("2026-11-03T19:00:00"));
+      const day2Workout3 = await recordWorkoutCompletion(mockTimer, 300);
+      expect(day2Workout3.stats.consecutiveThreeADayDays).toBe(2);
+      expect(day2Workout3.newlyUnlocked.some((b) => b.id === "three_a_day_streak_2")).toBe(true);
+      expect(day2Workout3.newlyUnlocked.some((b) => b.id === "three_a_day_streak_3")).toBe(false);
+
+      // Day 3 (Nov 4): Three-a-Day -> unlocks 3-day Three-a-Day streak (Three-a-Day Dynasty)
+      jest.setSystemTime(new Date("2026-11-04T07:00:00"));
+      await recordWorkoutCompletion(mockTimer, 300);
+      jest.setSystemTime(new Date("2026-11-04T12:00:00"));
+      await recordWorkoutCompletion(mockTimer, 300);
+      jest.setSystemTime(new Date("2026-11-04T20:00:00"));
+      const day3 = await recordWorkoutCompletion(mockTimer, 300);
+      expect(day3.stats.consecutiveThreeADayDays).toBe(3);
+      expect(day3.newlyUnlocked.some((b) => b.id === "three_a_day_streak_3")).toBe(true);
+
+      // Skip Nov 5, then do a Three-a-Day on Nov 6 -> resets consecutiveThreeADayDays to 1
+      jest.setSystemTime(new Date("2026-11-06T08:00:00"));
+      await recordWorkoutCompletion(mockTimer, 300);
+      jest.setSystemTime(new Date("2026-11-06T12:00:00"));
+      await recordWorkoutCompletion(mockTimer, 300);
+      jest.setSystemTime(new Date("2026-11-06T18:00:00"));
+      const dayAfterGap = await recordWorkoutCompletion(mockTimer, 300);
+      expect(dayAfterGap.stats.consecutiveThreeADayDays).toBe(1);
+    });
+  });
 });

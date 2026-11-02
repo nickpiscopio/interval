@@ -30,4 +30,12 @@ export interface UserStats {
   exploredBodyParts: string[];
   inspectedExerciseIds: string[];
   unlockedBadgeIds: string[];
+  lastWorkoutCompletionTimestamp?: number;
+  consecutiveQuickRepeatCount?: number;
+  todayDate?: string;
+  todaySpacedWorkoutTimestamps?: number[];
+  lastTwoADayDate?: string;
+  consecutiveTwoADayDays?: number;
+  lastThreeADayDate?: string;
+  consecutiveThreeADayDays?: number;
 }

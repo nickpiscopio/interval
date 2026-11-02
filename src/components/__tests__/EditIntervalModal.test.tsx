@@ -130,7 +130,7 @@ describe("EditIntervalModal", () => {
 });
 
 describe("EditIntervalModal sound picker", () => {
-  const { createAudioPlayer } = require("expo-audio");
+  const { createAudioPlayer, setAudioModeAsync } = require("expo-audio");
   const base = { id: "int-1", name: "Work", duration: 30, color: "#3B82F6" };
 
   function setup(interval: any, onUpdate = jest.fn()) {
@@ -148,7 +148,10 @@ describe("EditIntervalModal sound picker", () => {
     return { ...utils, onUpdate };
   }
 
-  beforeEach(() => createAudioPlayer.mockClear());
+  beforeEach(() => {
+    createAudioPlayer.mockClear();
+    setAudioModeAsync.mockClear();
+  });
 
   it("renders sound pills without speaker or checkmark icons and highlights selected with active tinting", () => {
     const { getByText, getByTestId, queryByTestId } = setup(base);
@@ -193,10 +196,14 @@ describe("EditIntervalModal sound picker", () => {
     expect(beepPill.borderColor).toBe(Colors.borderInput);
   });
 
-  it("selects a sound and previews it", () => {
+  it("selects a sound and previews it with mixWithOthers", () => {
     const { getByText, onUpdate } = setup(base);
     fireEvent.press(getByText("Triple Beep"));
     expect(onUpdate).toHaveBeenCalledWith({ sound: "beep_3" });
+    expect(setAudioModeAsync).toHaveBeenCalledWith({
+      playsInSilentMode: true,
+      interruptionMode: "mixWithOthers",
+    });
     expect(createAudioPlayer).toHaveBeenCalledTimes(1);
     expect(createAudioPlayer.mock.results[0].value.play).toHaveBeenCalled();
   });
@@ -506,6 +513,30 @@ describe("EditIntervalModal sheet spacing & layout refinement", () => {
     });
     expect(consumed).toBe(true);
     expect(getByTestId("edit-interval-header")).toBeTruthy();
+  });
+
+  it("dismisses keyboard on name input submitEditing without calling onClose and configures autoCorrect=false", () => {
+    const { Keyboard } = require("react-native");
+    const dismissSpy = jest.spyOn(Keyboard, "dismiss");
+    const onClose = jest.fn();
+    const { getByTestId } = renderSheet({ onClose });
+
+    const nameInput = getByTestId("edit-interval-name-input");
+    expect(nameInput.props.autoCorrect).toBe(false);
+    expect(nameInput.props.spellCheck).toBe(false);
+    expect(nameInput.props.blurOnSubmit).toBe(true);
+
+    fireEvent(nameInput, "submitEditing");
+    expect(dismissSpy).toHaveBeenCalled();
+    expect(onClose).not.toHaveBeenCalled();
+
+    // Tapping Done button and triggering sheet dismiss in the same close cycle invokes onClose strictly once
+    const onDismiss = getByTestId("bottom-sheet-modal").props.sheetProps.onDismiss;
+    fireEvent.press(getByTestId("edit-interval-done-btn"));
+    onDismiss?.();
+    expect(onClose).toHaveBeenCalledTimes(1);
+
+    dismissSpy.mockRestore();
   });
 });
 

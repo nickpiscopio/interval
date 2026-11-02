@@ -1,6 +1,6 @@
 import React from "react";
 import { StyleSheet } from "react-native";
-import { render, fireEvent, waitFor } from "@testing-library/react-native";
+import { render, fireEvent, waitFor, act } from "@testing-library/react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CreateTimerScreen from "../CreateTimerScreen";
 import { AlertProvider } from "../../context/AlertContext";
@@ -500,6 +500,65 @@ describe("CreateTimerScreen", () => {
         "Total Time: 3m"
       );
       expect(getByText("3m")).toBeTruthy();
+    });
+  });
+
+  it("creates strictly one interval when dismissing keyboard with submitEditing on name input and then tapping upper-right checkmark (even if sheet onDismiss also fires)", async () => {
+    const { getByText, getAllByText, getByTestId, queryByText } =
+      renderCreateTimerScreen();
+
+    // Open Add Interval sheet
+    fireEvent.press(getByText("Add Interval"));
+    const nameInput = getByTestId("edit-interval-name-input");
+
+    // User types a name and taps the keyboard checkmark (submitEditing)
+    fireEvent.changeText(nameInput, "Sprint");
+    fireEvent(nameInput, "submitEditing");
+
+    // Sheet should still be open after keyboard submit
+    expect(getByTestId("edit-interval-header")).toBeTruthy();
+
+    // User taps upper-right checkmark button AND bottom sheet fires onDismiss during close transition
+    const onDismiss = getByTestId("bottom-sheet-modal").props.sheetProps.onDismiss;
+    fireEvent.press(getByTestId("edit-interval-done-btn"));
+    act(() => {
+      onDismiss?.();
+    });
+
+    await waitFor(() => {
+      expect(queryByText("Edit Interval")).toBeNull();
+    });
+
+    expect(getAllByText("Sprint")).toHaveLength(1);
+  });
+
+  it("supports mid-string backspace and character edits in the interval name input without duplicating characters", async () => {
+    const { getByText, getByTestId, queryByText } = renderCreateTimerScreen();
+
+    // Open High Interval ("High Interval")
+    fireEvent.press(getByText("High Interval"));
+    const nameInput = getByTestId("edit-interval-name-input");
+    expect(nameInput.props.value).toBe("High Interval");
+
+    // Simulate mid-string backspaces deleting "gh" from "High Interval" -> "Hi Interval" -> "H Interval"
+    fireEvent(nameInput, "selectionChange", {
+      nativeEvent: { selection: { start: 4, end: 4 } },
+    });
+    fireEvent.changeText(nameInput, "Hig Interval");
+    expect(getByTestId("edit-interval-name-input").props.value).toBe("Hig Interval");
+
+    fireEvent(nameInput, "selectionChange", {
+      nativeEvent: { selection: { start: 3, end: 3 } },
+    });
+    fireEvent.changeText(nameInput, "Hi Interval");
+    expect(getByTestId("edit-interval-name-input").props.value).toBe("Hi Interval");
+
+    // Save and verify the list item updated cleanly to "Hi Interval"
+    fireEvent.press(getByTestId("edit-interval-done-btn"));
+    await waitFor(() => {
+      expect(queryByText("Edit Interval")).toBeNull();
+      expect(getByText("Hi Interval")).toBeTruthy();
+      expect(queryByText("High Interval")).toBeNull();
     });
   });
 });

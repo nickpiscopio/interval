@@ -5,13 +5,14 @@ import {
   Text,
   TouchableOpacity,
   BackHandler,
+  Keyboard,
 } from "react-native";
 import {
   BottomSheetScrollView,
   BottomSheetTextInput,
 } from "@gorhom/bottom-sheet";
 import { Ionicons } from "@expo/vector-icons";
-import { createAudioPlayer, AudioPlayer } from "expo-audio";
+import { createAudioPlayer, AudioPlayer, setAudioModeAsync } from "expo-audio";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Interval } from "../model/Interval";
@@ -81,8 +82,10 @@ export function EditIntervalModal({
 }: EditIntervalModalProps) {
   const insets = useSafeAreaInsets();
   const [viewMode, setViewMode] = useState<"edit" | "library">("edit");
+  const [nameInputText, setNameInputText] = useState<string>(interval?.name ?? "");
   const [durationInputText, setDurationInputText] = useState<string>("00:00:30");
   const previewPlayerRef = useRef<AudioPlayer | null>(null);
+  const hasClosedRef = useRef<boolean>(false);
 
   function releasePreview() {
     if (previewPlayerRef.current) {
@@ -132,6 +135,10 @@ export function EditIntervalModal({
     const source = resolveSoundSource(id);
     if (!source) return;
     try {
+      setAudioModeAsync({
+        playsInSilentMode: true,
+        interruptionMode: "mixWithOthers",
+      }).catch(() => {});
       const player = createAudioPlayer(source);
       previewPlayerRef.current = player;
       player.play();
@@ -139,6 +146,13 @@ export function EditIntervalModal({
       console.warn("Failed to preview sound:", e);
     }
   }
+
+  useEffect(() => {
+    if (visible && interval) {
+      hasClosedRef.current = false;
+      setNameInputText(interval.name);
+    }
+  }, [interval?.id, visible]);
 
   useEffect(() => {
     if (interval) {
@@ -154,6 +168,19 @@ export function EditIntervalModal({
 
   if (!visible || !interval) {
     return null;
+  }
+
+  function handleNameChange(name: string) {
+    setNameInputText(name);
+    onUpdate({ name });
+  }
+
+  function handleCloseSheet() {
+    if (hasClosedRef.current) {
+      return;
+    }
+    hasClosedRef.current = true;
+    onClose();
   }
 
   function handleDurationChange(text: string) {
@@ -182,7 +209,7 @@ export function EditIntervalModal({
 
   function handleDone() {
     handleDurationBlur();
-    onClose();
+    handleCloseSheet();
   }
 
   function handleDelete() {
@@ -203,6 +230,7 @@ export function EditIntervalModal({
       abs: "#8338EC",
       total: "#E63946",
     };
+    setNameInputText(exercise.name);
     if (onSelectExercise) {
       onSelectExercise(exercise);
     } else {
@@ -218,7 +246,7 @@ export function EditIntervalModal({
   return (
     <BottomSheetFrame
       visible={visible}
-      onClose={onClose}
+      onClose={handleCloseSheet}
       snapPoints={viewMode === "library" ? ["90%"] : undefined}
       noPadding={viewMode === "library"}
     >
@@ -283,8 +311,13 @@ export function EditIntervalModal({
               <BottomSheetTextInput
                 testID="edit-interval-name-input"
                 style={styles.editorTextInput}
-                value={interval.name}
-                onChangeText={(name) => onUpdate({ name })}
+                value={nameInputText}
+                onChangeText={handleNameChange}
+                returnKeyType="done"
+                blurOnSubmit={true}
+                autoCorrect={false}
+                spellCheck={false}
+                onSubmitEditing={() => Keyboard.dismiss()}
                 placeholder={
                   sequenceNumber
                     ? t("createTimer.defaultIntervalName", { number: sequenceNumber })

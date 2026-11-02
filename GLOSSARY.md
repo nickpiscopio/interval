@@ -87,3 +87,7 @@ _Avoid_: Opaque Dark Overlays, Unresponsive Backdrop Taps, Status Bar Clipping
 **Screen Wake Lock**:
 The display preservation mechanism that keeps the device screen illuminated and prevents the operating system from dimming or sleeping while a Timer is actively running, guaranteeing uninterrupted countdown progression and interval audio cues.
 _Avoid_: Always-On Display, Screen Sleeplessness, Screen Saver Disable
+
+**Multi-Session Daily Streaks (Two-a-Day & Three-a-Day)**:
+Distinct daily and multi-day achievement progressions for completing 2 workouts (Two-a-Day) or 3 workouts (Three-a-Day) on the same calendar day with each counted session spaced at least 1 hour apart, tracked independently across 2-day and 3-day consecutive streaks.
+_Avoid_: Combined 2+ Multi-Day Streak, Unspaced Back-to-Back Daily Count

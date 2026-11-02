@@ -82,8 +82,8 @@ export function ExerciseDetailModal({
   const badgeColor = categoryColorMap[exercise.category] || Colors.primary;
 
   return (
-    <BottomSheetFrame visible={visible} onClose={onClose}>
-      <View style={styles.sheetContainer}>
+    <BottomSheetFrame visible={visible} onClose={onClose} snapPoints={["90%"]}>
+      <View testID="exercise-detail-sheet-container" style={styles.sheetContainer}>
         {/* Detail Header: Back & Title + Tags */}
         <View testID="exercise-detail-header" style={styles.detailHeader}>
           <TouchableOpacity
@@ -124,6 +124,7 @@ export function ExerciseDetailModal({
         </View>
 
         <BottomSheetScrollView
+          testID="exercise-detail-scroll"
           style={styles.scroll}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
@@ -189,48 +190,48 @@ export function ExerciseDetailModal({
               ))}
             </View>
           )}
+
+          {/* Action Buttons Footer */}
+          <View testID="exercise-detail-footer-actions" style={styles.footerActions}>
+            {mode === "library" ? (
+              <View style={styles.libraryActionsRow}>
+                <TouchableOpacity
+                  style={styles.quickStartButton}
+                  activeOpacity={0.85}
+                  onPress={handleStartQuickRoutine}
+                >
+                  <Ionicons name="play" size={18} color={Colors.white} />
+                  <Text style={styles.quickStartButtonText}>
+                    {t("exercises.startQuickRoutine")}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.createCustomButton}
+                  activeOpacity={0.85}
+                  onPress={handleCreateCustomTimer}
+                >
+                  <Ionicons name="add-circle-outline" size={18} color={Colors.primary} />
+                  <Text style={styles.createCustomButtonText}>
+                    {t("exercises.createCustomWorkout")}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <TouchableOpacity
+                testID="exercise-detail-add-to-timer-btn"
+                style={styles.selectButton}
+                activeOpacity={0.85}
+                onPress={handleSelect}
+              >
+                <Ionicons name="checkmark-circle" size={20} color={Colors.white} />
+                <Text style={styles.selectButtonText}>
+                  {t("exercises.addToTimer")}
+                </Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </BottomSheetScrollView>
-
-        {/* Action Buttons Footer */}
-        <View style={styles.footerActions}>
-          {mode === "library" ? (
-            <View style={styles.libraryActionsRow}>
-              <TouchableOpacity
-                style={styles.quickStartButton}
-                activeOpacity={0.85}
-                onPress={handleStartQuickRoutine}
-              >
-                <Ionicons name="play" size={18} color="#FFFFFF" />
-                <Text style={styles.quickStartButtonText}>
-                  {t("exercises.startQuickRoutine")}
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={styles.createCustomButton}
-                activeOpacity={0.85}
-                onPress={handleCreateCustomTimer}
-              >
-                <Ionicons name="add-circle-outline" size={18} color={Colors.primary} />
-                <Text style={styles.createCustomButtonText}>
-                  {t("exercises.createCustomWorkout")}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <TouchableOpacity
-              testID="exercise-detail-add-to-timer-btn"
-              style={styles.selectButton}
-              activeOpacity={0.85}
-              onPress={handleSelect}
-            >
-              <Ionicons name="checkmark-circle" size={20} color="#FFFFFF" />
-              <Text style={styles.selectButtonText}>
-                {t("exercises.addToTimer")}
-              </Text>
-            </TouchableOpacity>
-          )}
-        </View>
       </View>
     </BottomSheetFrame>
   );
@@ -238,10 +239,10 @@ export function ExerciseDetailModal({
 
 const styles = StyleSheet.create({
   sheetContainer: {
-    flexShrink: 1,
+    flex: 1,
   },
   scroll: {
-    flexShrink: 1,
+    flex: 1,
   },
   detailHeader: {
     flexDirection: "row",

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, Animated, Easing } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { createAudioPlayer, AudioPlayer } from "expo-audio";
+import { createAudioPlayer, AudioPlayer, setAudioModeAsync } from "expo-audio";
 import { Ionicons } from "@expo/vector-icons";
 import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
 
@@ -72,6 +72,10 @@ export default function TimerScreen({
     if (!source) return;
 
     try {
+      setAudioModeAsync({
+        playsInSilentMode: true,
+        interruptionMode: "mixWithOthers",
+      }).catch(() => {});
       const player = createAudioPlayer(source);
       activePlayerRef.current = player;
       player.play();

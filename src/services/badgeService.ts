@@ -36,8 +36,8 @@ function getFormattedDate(d = new Date()): string {
   return `${year}-${month}-${day}`;
 }
 
-function getYesterdayFormattedDate(): string {
-  const d = new Date();
+function getYesterdayFormattedDate(refDate = new Date()): string {
+  const d = new Date(refDate);
   d.setDate(d.getDate() - 1);
   return getFormattedDate(d);
 }
@@ -86,10 +86,57 @@ export async function recordWorkoutCompletion(
   const stats = await getUserStats();
   const timestamps = await getBadgeTimestamps();
   const now = new Date();
+  const completionTimestamp = now.getTime();
+  const startTimestamp = completionTimestamp - Math.max(0, workoutSeconds) * 1000;
   const today = getFormattedDate(now);
-  const yesterday = getYesterdayFormattedDate();
+  const yesterday = getYesterdayFormattedDate(now);
   const dayOfWeek = now.getDay(); // 0 = Sun, 6 = Sat
   const hour = now.getHours();
+
+  // Rapid-repeat (5-minute window) tracking
+  const FIVE_MINUTES_MS = 5 * 60 * 1000;
+  let consecutiveQuickRepeatCount = 1;
+  if (
+    stats.lastWorkoutCompletionTimestamp !== undefined &&
+    startTimestamp - stats.lastWorkoutCompletionTimestamp >= 0 &&
+    startTimestamp - stats.lastWorkoutCompletionTimestamp <= FIVE_MINUTES_MS
+  ) {
+    consecutiveQuickRepeatCount = (stats.consecutiveQuickRepeatCount || 1) + 1;
+  }
+
+  // Same-day 1-hour spaced workout & multi-day Two-a-Day streak tracking
+  const ONE_HOUR_MS = 60 * 60 * 1000;
+  const todaySpacedWorkoutTimestamps =
+    stats.todayDate === today ? [...(stats.todaySpacedWorkoutTimestamps || [])] : [];
+  if (
+    todaySpacedWorkoutTimestamps.length === 0 ||
+    completionTimestamp - todaySpacedWorkoutTimestamps[todaySpacedWorkoutTimestamps.length - 1] >=
+      ONE_HOUR_MS
+  ) {
+    todaySpacedWorkoutTimestamps.push(completionTimestamp);
+  }
+
+  let lastTwoADayDate = stats.lastTwoADayDate || "";
+  let consecutiveTwoADayDays = stats.consecutiveTwoADayDays || 0;
+  if (todaySpacedWorkoutTimestamps.length >= 2 && lastTwoADayDate !== today) {
+    if (lastTwoADayDate === yesterday) {
+      consecutiveTwoADayDays += 1;
+    } else {
+      consecutiveTwoADayDays = 1;
+    }
+    lastTwoADayDate = today;
+  }
+
+  let lastThreeADayDate = stats.lastThreeADayDate || "";
+  let consecutiveThreeADayDays = stats.consecutiveThreeADayDays || 0;
+  if (todaySpacedWorkoutTimestamps.length >= 3 && lastThreeADayDate !== today) {
+    if (lastThreeADayDate === yesterday) {
+      consecutiveThreeADayDays += 1;
+    } else {
+      consecutiveThreeADayDays = 1;
+    }
+    lastThreeADayDate = today;
+  }
 
   // Streak calculations
   let currentStreak = stats.currentStreak;
@@ -181,6 +228,14 @@ export async function recordWorkoutCompletion(
   checkAndUnlock("iron_lungs", timer.rounds >= 5);
   checkAndUnlock("custom_creator", !timer.isAiGenerated);
   checkAndUnlock("imported_gains", importedSharedWorkouts >= 1);
+  checkAndUnlock("quick_double", consecutiveQuickRepeatCount >= 2);
+  checkAndUnlock("quick_triple", consecutiveQuickRepeatCount >= 3);
+  checkAndUnlock("two_a_day", todaySpacedWorkoutTimestamps.length >= 2);
+  checkAndUnlock("three_a_day", todaySpacedWorkoutTimestamps.length >= 3);
+  checkAndUnlock("two_a_day_streak_2", consecutiveTwoADayDays >= 2);
+  checkAndUnlock("two_a_day_streak_3", consecutiveTwoADayDays >= 3);
+  checkAndUnlock("three_a_day_streak_2", consecutiveThreeADayDays >= 2);
+  checkAndUnlock("three_a_day_streak_3", consecutiveThreeADayDays >= 3);
 
   // Discovery Badges
   checkAndUnlock("curious_explorer", totalSearches >= 1 || exploredBodyParts.length >= 1);
@@ -211,6 +266,14 @@ export async function recordWorkoutCompletion(
     exploredBodyParts,
     inspectedExerciseIds,
     unlockedBadgeIds: Array.from(currentUnlocked),
+    lastWorkoutCompletionTimestamp: completionTimestamp,
+    consecutiveQuickRepeatCount,
+    todayDate: today,
+    todaySpacedWorkoutTimestamps,
+    lastTwoADayDate,
+    consecutiveTwoADayDays,
+    lastThreeADayDate,
+    consecutiveThreeADayDays,
   };
 
   await saveUserStats(updatedStats);

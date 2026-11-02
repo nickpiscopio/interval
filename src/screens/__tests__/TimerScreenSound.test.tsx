@@ -1,6 +1,6 @@
 import React from "react";
 import { render, fireEvent, act } from "@testing-library/react-native";
-import { createAudioPlayer } from "expo-audio";
+import { createAudioPlayer, setAudioModeAsync } from "expo-audio";
 import TimerScreen from "../TimerScreen";
 import { AlertProvider } from "../../context/AlertContext";
 import { Timer } from "../../model/Timer";
@@ -54,6 +54,7 @@ describe("TimerScreen interval sounds", () => {
   beforeEach(() => {
     jest.useFakeTimers();
     (createAudioPlayer as jest.Mock).mockClear();
+    (setAudioModeAsync as jest.Mock).mockClear();
   });
   afterEach(() => jest.useRealTimers());
 
@@ -212,5 +213,16 @@ describe("TimerScreen interval sounds", () => {
     expect(navigation.popToTop).toHaveBeenCalled();
     expect(beep3Player.pause).toHaveBeenCalled();
     expect(beep3Player.release).toHaveBeenCalled();
+  });
+
+  it("configures audio session to mixWithOthers when playing interval sounds", async () => {
+    renderTimer([
+      { id: "a", name: "A", duration: 1, color: "#fff", sound: "beep_3" },
+    ]);
+    await flush();
+    expect(setAudioModeAsync).toHaveBeenCalledWith({
+      playsInSilentMode: true,
+      interruptionMode: "mixWithOthers",
+    });
   });
 });

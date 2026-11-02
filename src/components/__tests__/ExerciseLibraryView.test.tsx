@@ -207,4 +207,18 @@ describe("ExerciseLibraryView Component", () => {
     fireEvent.press(getByTestId("exercise-picker-back-btn"));
     expect(onBack).toHaveBeenCalled();
   });
+
+  it("applies 16px top margin and 8px bottom margin to the results count header", () => {
+    const { getByTestId } = render(
+      <ExerciseLibraryView
+        onStartQuickRoutine={jest.fn()}
+        onCreateCustomTimer={jest.fn()}
+      />
+    );
+
+    const resultsHeader = getByTestId("exercise-results-header");
+    const headerStyle = StyleSheet.flatten(resultsHeader.props.style);
+    expect(headerStyle.marginTop).toBe(Spacing.md);
+    expect(headerStyle.marginBottom).toBe(Spacing.sm);
+  });
 });

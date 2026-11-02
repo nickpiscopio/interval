@@ -140,6 +140,10 @@
     "intervalsCompleted": "Intervals Completed",
     "roundsFinished": "Rounds Finished",
     "newBadgeUnlocked": "New Award Unlocked!",
+    "newAchievementUnlocked": "New Achievement Unlocked",
+    "newAchievementsUnlocked": "New Achievements Unlocked",
+    "restartWorkout": "Restart Workout",
+    "rateApp": "Rate the App",
     "doneButton": "Back to Timers",
     "shareWorkout": "Share Workout",
     "shareBadge": "Share Badge",
@@ -203,6 +207,8 @@
     "inviteBannerSubtitle": "Share custom timers or invite your workout buddy to unlock exclusive viral sharing badges!",
     "inviteButton": "Invite Friends",
     "unlockedCount": "%{unlocked} of %{total} Unlocked",
+    "unlockedSection": "Unlocked",
+    "lockedSection": "Locked",
     "locked": "Locked",
     "unlockedOn": "Unlocked on %{date}",
     "howToUnlock": "How to Unlock",
@@ -1463,6 +1469,46 @@
       "name": "Custom Creator",
       "tagline": "Master architect!",
       "description": "Built and finished your own custom crafted interval timer."
+    },
+    "quick_double": {
+      "name": "Double Dip",
+      "tagline": "Back in the ring!",
+      "description": "Started and completed a 2nd workout within 5 minutes of finishing the last one."
+    },
+    "quick_triple": {
+      "name": "Hat-Trick Hustle",
+      "tagline": "Triple back-to-back fire!",
+      "description": "Started and completed a 3rd consecutive workout within 5 minutes of finishing the second."
+    },
+    "two_a_day": {
+      "name": "Two-a-Day",
+      "tagline": "Double session dedication!",
+      "description": "Completed 2 workouts on the same day spaced at least 1 hour apart."
+    },
+    "three_a_day": {
+      "name": "Three-a-Day",
+      "tagline": "Morning, noon, and night!",
+      "description": "Completed 3 workouts on the same day with each session spaced at least 1 hour apart."
+    },
+    "two_a_day_streak_2": {
+      "name": "Double-Day Duo",
+      "tagline": "Back-to-back Two-a-Days!",
+      "description": "Completed a Two-a-Day (2 workouts spaced at least 1 hour apart) on 2 consecutive days."
+    },
+    "two_a_day_streak_3": {
+      "name": "Two-a-Day Dynasty",
+      "tagline": "3 days of double sessions!",
+      "description": "Completed a Two-a-Day (2 workouts spaced at least 1 hour apart) on 3 consecutive days."
+    },
+    "three_a_day_streak_2": {
+      "name": "Triple-Day Duo",
+      "tagline": "Back-to-back Three-a-Days!",
+      "description": "Completed a Three-a-Day (3 workouts spaced at least 1 hour apart) on 2 consecutive days."
+    },
+    "three_a_day_streak_3": {
+      "name": "Three-a-Day Dynasty",
+      "tagline": "3 days of triple sessions!",
+      "description": "Completed a Three-a-Day (3 workouts spaced at least 1 hour apart) on 3 consecutive days."
     },
     "megaphone_maestro": {
       "name": "Megaphone Maestro",

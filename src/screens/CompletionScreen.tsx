@@ -8,13 +8,15 @@ import {
   Modal,
   ScrollView,
   Pressable,
+  Platform,
+  Linking,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "expo-haptics";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { createAudioPlayer } from "expo-audio";
+import { createAudioPlayer, setAudioModeAsync } from "expo-audio";
 
 import { RootStackScreenProps } from "../types";
 import { encodeBase64 } from "../utils/base64";
@@ -27,6 +29,9 @@ import { t } from "../i18n";
 import Spacing, { RADIUS, TOUCH_TARGET, SHADOWS } from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
 import Colors from "../constants/Colors";
+
+const APP_STORE_LINK = "https://apps.apple.com/app/interval-hiit-timer/id12345678";
+const PLAY_STORE_LINK = "https://play.google.com/store/apps/details?id=com.plyonest.interval";
 
 export default function CompletionScreen({
   route,
@@ -56,6 +61,10 @@ export default function CompletionScreen({
     const source = resolveSoundSource("beep_3");
     if (source) {
       try {
+        setAudioModeAsync({
+          playsInSilentMode: true,
+          interruptionMode: "mixWithOthers",
+        }).catch(() => {});
         player = createAudioPlayer(source);
         player.play();
       } catch (error) {
@@ -111,9 +120,6 @@ export default function CompletionScreen({
 
       const base64Data = encodeBase64(JSON.stringify(sharePayload));
       const deepLink = `interval://import?data=${base64Data}`;
-      
-      const appStoreLink = "https://apps.apple.com/app/interval-hiit-timer/id12345678";
-      const playStoreLink = "https://play.google.com/store/apps/details?id=com.plyonest.interval";
 
       const streakText = userStats && userStats.currentStreak > 0
         ? t("completion.shareStreakText", { streak: userStats.currentStreak })
@@ -128,8 +134,8 @@ export default function CompletionScreen({
         duration: formatTime(totalSeconds),
         streakText,
         badgeText,
-        appStoreLink,
-        playStoreLink,
+        appStoreLink: APP_STORE_LINK,
+        playStoreLink: PLAY_STORE_LINK,
         deepLink,
       });
 
@@ -153,18 +159,24 @@ export default function CompletionScreen({
     }
   }
 
+  async function handleRateApp() {
+    try {
+      const storeUrl = Platform.OS === "ios" ? APP_STORE_LINK : PLAY_STORE_LINK;
+      await Linking.openURL(storeUrl);
+    } catch (error) {
+      console.warn("Error opening store link:", error);
+    }
+  }
+
   async function handleShareBadge(badge: Badge) {
     try {
-      const appStoreLink = "https://apps.apple.com/app/interval-hiit-timer/id12345678";
-      const playStoreLink = "https://play.google.com/store/apps/details?id=com.plyonest.interval";
-      
       const streakText = userStats && userStats.currentStreak > 0 ? ` (🔥 ${userStats.currentStreak}-Day Streak!)` : "";
       const message = t("completion.shareBadgeMessage", {
         name: badge.name,
         streakText,
         description: badge.description,
-        appStoreLink,
-        playStoreLink,
+        appStoreLink: APP_STORE_LINK,
+        playStoreLink: PLAY_STORE_LINK,
       });
 
       const result = await Share.share({
@@ -194,14 +206,50 @@ export default function CompletionScreen({
     });
   }, [totalSeconds, timer.rounds]);
 
+  const unlockedTitle =
+    newlyUnlockedBadges.length === 1
+      ? t("completion.newAchievementUnlocked")
+      : t("completion.newAchievementsUnlocked");
+
+  const shareIconName =
+    Platform.OS === "ios" ? "share-outline" : "share-social-outline";
+
+  function renderTrophyButton() {
+    return (
+      <TouchableOpacity
+        testID="btn-completion-achievements"
+        accessibilityLabel={t("awards.title")}
+        style={styles.trophyIconWrap}
+        activeOpacity={0.8}
+        onPress={() => navigation.navigate("Awards")}
+      >
+        <Ionicons name="trophy" size={22} color="#F59E0B" />
+      </TouchableOpacity>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <StatusBar style="dark" />
-      
+
+      {/* Upper-Right Close Button */}
+      <TouchableOpacity
+        testID="btn-close-completion"
+        accessibilityLabel={t("common.close")}
+        style={[
+          styles.closeHeaderButton,
+          { top: Math.max(insets.top, Spacing.md) + Spacing.xs },
+        ]}
+        activeOpacity={0.7}
+        onPress={() => navigation.popToTop()}
+      >
+        <Ionicons name="close" size={24} color={Colors.textScale.primary} />
+      </TouchableOpacity>
+
       <ScrollView
         contentContainerStyle={[
           styles.scrollContent,
-          { paddingBottom: (actionsHeight || 180) + Spacing.md },
+          { paddingBottom: (actionsHeight || 100) + Spacing.md },
         ]}
         showsVerticalScrollIndicator={false}
       >
@@ -222,7 +270,7 @@ export default function CompletionScreen({
         {/* Workout Stats Details */}
         <View style={styles.statsCard}>
           <Text style={styles.workoutTitle}>{timer.name}</Text>
-          
+
           <View style={styles.statsRow}>
             <View style={styles.statBox}>
               <Text style={styles.statLabel}>{t("completion.totalTime")}</Text>
@@ -254,12 +302,15 @@ export default function CompletionScreen({
           </View>
         </View>
 
-        {/* Newly Unlocked Badges Section */}
-        {newlyUnlockedBadges.length > 0 && (
+        {/* Newly Unlocked Badges Section or Centered Trophy Button */}
+        {newlyUnlockedBadges.length > 0 ? (
           <View style={styles.unlockedSection}>
-            <View style={styles.unlockedSectionHeader}>
-              <Ionicons name="sparkles" size={18} color="#F59E0B" />
-              <Text style={styles.unlockedSectionTitle}>{t("completion.newBadgeUnlocked")}</Text>
+            <View testID="unlocked-section-header" style={styles.unlockedSectionHeader}>
+              <View style={styles.unlockedSectionTitleRow}>
+                <Ionicons name="sparkles" size={18} color="#F59E0B" />
+                <Text style={styles.unlockedSectionTitle}>{unlockedTitle}</Text>
+              </View>
+              {renderTrophyButton()}
             </View>
             <View style={styles.badgeCardsRow}>
               {newlyUnlockedBadges.map((badge) => (
@@ -284,10 +335,14 @@ export default function CompletionScreen({
               ))}
             </View>
           </View>
+        ) : (
+          <View testID="centered-trophy-row" style={styles.centeredTrophyRow}>
+            {renderTrophyButton()}
+          </View>
         )}
       </ScrollView>
 
-      {/* Floating Bottom Action Buttons */}
+      {/* Condensed Rounded Blue Bottom Action Pill */}
       <View
         style={[
           styles.actionsContainer,
@@ -295,36 +350,41 @@ export default function CompletionScreen({
         ]}
         onLayout={(e) => setActionsHeight(e.nativeEvent.layout.height)}
       >
-        <TouchableOpacity
-          style={styles.shareButtonContainer}
-          activeOpacity={0.9}
-          onPress={handleShare}
-        >
-          <LinearGradient
-            colors={["#3B82F6", "#1D4ED8"]}
-            style={styles.shareButton}
+        <View testID="completion-action-bar" style={styles.actionPillCard}>
+          <TouchableOpacity
+            testID="btn-restart-workout"
+            accessibilityLabel={t("completion.restartWorkout")}
+            style={styles.actionIconButton}
+            activeOpacity={0.8}
+            onPress={() => navigation.replace("Timer", { timer })}
           >
-            <Ionicons name="share-social" size={20} color={Colors.white} style={styles.icon} />
-            <Text style={styles.shareButtonText}>{t("completion.shareWorkout")}</Text>
-          </LinearGradient>
-        </TouchableOpacity>
+            <MaterialIcons name="replay" size={24} color={Colors.white} />
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.trophyRoomButton}
-          activeOpacity={0.85}
-          onPress={() => navigation.navigate("Awards")}
-        >
-          <Ionicons name="trophy-outline" size={18} color="#D97706" style={styles.icon} />
-          <Text style={styles.trophyRoomButtonText}>{t("awards.title")}</Text>
-        </TouchableOpacity>
+          <View style={styles.actionPillDivider} />
 
-        <TouchableOpacity
-          style={styles.doneButton}
-          activeOpacity={0.8}
-          onPress={() => navigation.popToTop()}
-        >
-          <Text style={styles.doneButtonText}>{t("completion.doneButton")}</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            testID="btn-share-workout"
+            accessibilityLabel={t("completion.shareWorkout")}
+            style={styles.actionIconButton}
+            activeOpacity={0.8}
+            onPress={handleShare}
+          >
+            <Ionicons name={shareIconName} size={24} color={Colors.white} />
+          </TouchableOpacity>
+
+          <View style={styles.actionPillDivider} />
+
+          <TouchableOpacity
+            testID="btn-rate-app"
+            accessibilityLabel={t("completion.rateApp")}
+            style={styles.actionIconButton}
+            activeOpacity={0.8}
+            onPress={handleRateApp}
+          >
+            <MaterialIcons name="rate-review" size={24} color={Colors.white} />
+          </TouchableOpacity>
+        </View>
       </View>
 
       {/* Celebratory Award Unlock Popup Modal */}
@@ -347,7 +407,9 @@ export default function CompletionScreen({
             >
               <View style={styles.modalBadgeHeaderPill}>
                 <Ionicons name="sparkles" size={14} color="#D97706" />
-                <Text style={styles.modalBadgeHeaderText}>{t("completion.newBadgeUnlocked").toUpperCase()}</Text>
+                <Text style={styles.modalBadgeHeaderText}>
+                  {t("completion.newAchievementUnlocked").toUpperCase()}
+                </Text>
               </View>
 
               <LinearGradient
@@ -394,6 +456,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.surface.screen,
+  },
+  closeHeaderButton: {
+    position: "absolute",
+    right: Spacing.md,
+    width: TOUCH_TARGET.icon,
+    height: TOUCH_TARGET.icon,
+    borderRadius: RADIUS.full,
+    backgroundColor: "rgba(255, 255, 255, 0.75)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 10,
   },
   scrollContent: {
     paddingBottom: Spacing["2xl"],
@@ -495,15 +568,37 @@ const styles = StyleSheet.create({
     color: "#4B5563",
     flexShrink: 1,
   },
+  trophyIconWrap: {
+    width: TOUCH_TARGET.icon,
+    height: TOUCH_TARGET.icon,
+    borderRadius: RADIUS.full,
+    backgroundColor: "#FEF3C7",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "#FDE68A",
+  },
+  centeredTrophyRow: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: Spacing.md,
+  },
   unlockedSection: {
     marginTop: Spacing.lg,
-    marginHorizontal: Spacing.lg,
+    marginHorizontal: Spacing.md,
   },
   unlockedSectionHeader: {
     flexDirection: "row",
     alignItems: "center",
-    gap: Spacing.xs,
+    justifyContent: "space-between",
     marginBottom: Spacing.sm,
+  },
+  unlockedSectionTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: Spacing.xs,
+    flex: 1,
+    marginRight: Spacing.sm,
   },
   unlockedSectionTitle: {
     fontSize: FontSize.sm,
@@ -523,11 +618,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#FDE68A",
     gap: Spacing.md,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 2,
+    ...SHADOWS.card,
   },
   unlockedBadgeBubble: {
     width: 44,
@@ -556,68 +647,31 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: Colors.surface.screen,
+    backgroundColor: "transparent",
     paddingHorizontal: Spacing.screen,
     paddingTop: Spacing.xs,
-    gap: Spacing.xs,
   },
-  shareButtonContainer: {
-    minHeight: TOUCH_TARGET.cta,
-    borderRadius: RADIUS.md,
-    overflow: "hidden",
-    ...SHADOWS.card,
-  },
-  shareButton: {
-    width: "100%",
-    minHeight: TOUCH_TARGET.cta,
-    paddingVertical: Spacing.md,
-    paddingHorizontal: Spacing.lg,
+  actionPillCard: {
     flexDirection: "row",
-    justifyContent: "center",
     alignItems: "center",
-    gap: Spacing.sm,
-  },
-  shareButtonText: {
-    fontSize: FontSize.sm,
-    lineHeight: FontSize.lineHeight.sm,
-    fontFamily: "Poppins-Bold",
-    color: Colors.white,
-    textAlign: "center",
-  },
-  trophyRoomButton: {
-    minHeight: TOUCH_TARGET.cta,
-    paddingVertical: Spacing.md,
-    paddingHorizontal: Spacing.lg,
+    justifyContent: "space-around",
+    backgroundColor: Colors.primary,
     borderRadius: RADIUS.md,
-    backgroundColor: "#FEF3C7",
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: Spacing.sm,
-  },
-  trophyRoomButtonText: {
-    fontSize: FontSize.sm,
-    lineHeight: FontSize.lineHeight.sm,
-    fontFamily: "Poppins-Bold",
-    color: "#D97706",
-    textAlign: "center",
-  },
-  doneButton: {
-    minHeight: TOUCH_TARGET.min,
     paddingVertical: Spacing.xs,
     paddingHorizontal: Spacing.md,
-    justifyContent: "center",
+    minHeight: TOUCH_TARGET.cta,
+    ...SHADOWS.floating,
+  },
+  actionIconButton: {
+    flex: 1,
+    height: TOUCH_TARGET.icon,
     alignItems: "center",
+    justifyContent: "center",
   },
-  doneButtonText: {
-    fontSize: FontSize.sm,
-    lineHeight: FontSize.lineHeight.sm,
-    fontFamily: "Poppins-Bold",
-    color: Colors.textScale.secondary,
-    textAlign: "center",
-  },
-  icon: {
-    marginRight: Spacing.xs,
+  actionPillDivider: {
+    width: 1,
+    height: Spacing.lg,
+    backgroundColor: "rgba(255, 255, 255, 0.25)",
   },
   modalOverlay: {
     flex: 1,
@@ -726,4 +780,3 @@ const styles = StyleSheet.create({
     color: Colors.textScale.primary,
   },
 });
-

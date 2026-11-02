@@ -19,7 +19,7 @@ import { RootStackScreenProps } from "../types";
 import { Badge, UserStats } from "../model/Badge";
 import { getAllBadgesWithStatus, getUserStats, recordShare } from "../services/badgeService";
 import { getLocalizedBadge } from "../constants/badges";
-import { t } from "../i18n";
+import { t, getLocale } from "../i18n";
 import Spacing, { RADIUS, TOUCH_TARGET, SHADOWS } from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
 import Colors from "../constants/Colors";
@@ -120,7 +120,56 @@ export default function AwardsScreen({ navigation }: RootStackScreenProps<"Award
     return `${mins}m`;
   }
 
-  const unlockedCount = badges.filter((b) => b.unlockedAt).length;
+  function formatUnlockDate(timestamp: number): string {
+    const locale = getLocale() || "en-US";
+    return new Date(timestamp).toLocaleDateString(locale, {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  }
+
+  const unlockedBadges = badges
+    .filter((b) => Boolean(b.unlockedAt))
+    .sort((a, b) => (b.unlockedAt || 0) - (a.unlockedAt || 0));
+  const lockedBadges = badges.filter((b) => !b.unlockedAt);
+  const unlockedCount = unlockedBadges.length;
+
+  function renderBadgeCard(badge: Badge) {
+    const isUnlocked = Boolean(badge.unlockedAt);
+    return (
+      <TouchableOpacity
+        key={badge.id}
+        style={[styles.badgeCard, !isUnlocked && styles.badgeCardLocked]}
+        activeOpacity={0.85}
+        onPress={() => handleSelectBadge(badge)}
+      >
+        {isUnlocked ? (
+          <LinearGradient
+            colors={badge.gradientColors}
+            style={styles.badgeIconBubble}
+          >
+            <Text style={styles.badgeEmoji}>{badge.emoji}</Text>
+          </LinearGradient>
+        ) : (
+          <View style={styles.badgeIconLocked}>
+            <Ionicons name="lock-closed" size={28} color={Colors.textScale.muted} />
+          </View>
+        )}
+
+        <Text style={[styles.badgeName, !isUnlocked && styles.badgeNameLocked]} numberOfLines={2}>
+          {badge.name}
+        </Text>
+
+        {isUnlocked && badge.unlockedAt && (
+          <View style={styles.unlockedTag}>
+            <Ionicons name="checkmark-circle" size={14} color={Colors.accentDark} />
+            <Text style={styles.unlockedTagText}>{formatUnlockDate(badge.unlockedAt)}</Text>
+          </View>
+        )}
+      </TouchableOpacity>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -223,50 +272,23 @@ export default function AwardsScreen({ navigation }: RootStackScreenProps<"Award
 
         {/* Badges Collection Grid */}
         <View style={styles.gridSection}>
-          <Text style={styles.sectionTitle}>{t("awards.title")}</Text>
-          <Text style={styles.sectionSubtitle}>{t("awards.unlockedCount", { unlocked: unlockedCount, total: badges.length })}</Text>
+          {unlockedBadges.length > 0 && (
+            <View testID="unlocked-badges-section" style={styles.badgeSubsection}>
+              <Text style={styles.sectionTitle}>{t("awards.unlockedSection")}</Text>
+              <View style={styles.badgeGrid}>
+                {unlockedBadges.map(renderBadgeCard)}
+              </View>
+            </View>
+          )}
 
-          <View style={styles.badgeGrid}>
-            {badges.map((badge) => {
-              const isUnlocked = Boolean(badge.unlockedAt);
-              return (
-                <TouchableOpacity
-                  key={badge.id}
-                  style={[styles.badgeCard, !isUnlocked && styles.badgeCardLocked]}
-                  activeOpacity={0.85}
-                  onPress={() => handleSelectBadge(badge)}
-                >
-                  {isUnlocked ? (
-                    <LinearGradient
-                      colors={badge.gradientColors}
-                      style={styles.badgeIconBubble}
-                    >
-                      <Text style={styles.badgeEmoji}>{badge.emoji}</Text>
-                    </LinearGradient>
-                  ) : (
-                    <View style={styles.badgeIconLocked}>
-                      <Ionicons name="lock-closed" size={28} color="#9CA3AF" />
-                    </View>
-                  )}
-
-                  <Text style={[styles.badgeName, !isUnlocked && styles.badgeNameLocked]} numberOfLines={2}>
-                    {badge.name}
-                  </Text>
-
-                  {isUnlocked ? (
-                    <View style={styles.unlockedTag}>
-                      <Ionicons name="checkmark-circle" size={14} color="#10B981" />
-                      <Text style={styles.unlockedTagText}>{t("common.done")}</Text>
-                    </View>
-                  ) : (
-                    <Text style={styles.lockedHintText} numberOfLines={1}>
-                      {t("awards.locked")}
-                    </Text>
-                  )}
-                </TouchableOpacity>
-              );
-            })}
-          </View>
+          {lockedBadges.length > 0 && (
+            <View testID="locked-badges-section" style={styles.badgeSubsection}>
+              <Text style={styles.sectionTitle}>{t("awards.lockedSection")}</Text>
+              <View style={styles.badgeGrid}>
+                {lockedBadges.map(renderBadgeCard)}
+              </View>
+            </View>
+          )}
         </View>
       </ScrollView>
 
@@ -476,18 +498,15 @@ const styles = StyleSheet.create({
   gridSection: {
     marginTop: Spacing.xs,
   },
+  badgeSubsection: {
+    marginBottom: Spacing.lg,
+  },
   sectionTitle: {
     fontSize: FontSize.md,
     lineHeight: FontSize.lineHeight.md,
     fontFamily: "Poppins-Bold",
     color: Colors.textScale.primary,
-  },
-  sectionSubtitle: {
-    fontSize: FontSize.xs,
-    lineHeight: FontSize.lineHeight.xs,
-    fontFamily: "Poppins-Regular",
-    color: Colors.textScale.secondary,
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.sm,
   },
   badgeGrid: {
     flexDirection: "row",
