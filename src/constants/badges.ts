@@ -463,6 +463,48 @@ export const BADGE_CATALOG: Badge[] = [
     category: "corrective",
     gradientColors: ["#6366F1", "#312E81"],
   },
+
+  // --- Timer Variety ---
+  {
+    id: "variety_5",
+    name: "Routine Sampler",
+    emoji: "🎲",
+    iconName: "dice",
+    tagline: "Mixing up the playlist!",
+    description: "Completed 5 different timers. Keeping your body guessing!",
+    category: "variety",
+    gradientColors: ["#14B8A6", "#0F766E"],
+  },
+  {
+    id: "variety_10",
+    name: "Workout Chameleon",
+    emoji: "🦎",
+    iconName: "color-palette",
+    tagline: "Adapt and conquer!",
+    description: "Completed 10 different timers. Built to adapt to any routine!",
+    category: "variety",
+    gradientColors: ["#22C55E", "#15803D"],
+  },
+  {
+    id: "variety_25",
+    name: "Timer Connoisseur",
+    emoji: "🎭",
+    iconName: "sparkles",
+    tagline: "Refined taste in sweat!",
+    description: "Completed 25 different timers. A true aficionado of training variety!",
+    category: "variety",
+    gradientColors: ["#A855F7", "#6B21A8"],
+  },
+  {
+    id: "variety_50",
+    name: "Master of Variety",
+    emoji: "💎",
+    iconName: "diamond",
+    tagline: "Endless routines mastered!",
+    description: "Completed 50 different timers. Unmatched range across every style of training!",
+    category: "variety",
+    gradientColors: ["#38BDF8", "#1D4ED8"],
+  },
 ];
 
 /**

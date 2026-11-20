@@ -26,6 +26,7 @@ export const DEFAULT_USER_STATS: UserStats = {
   totalSearches: 0,
   exploredBodyParts: [],
   inspectedExerciseIds: [],
+  completedTimerIds: [],
   unlockedBadgeIds: [],
 };
 
@@ -190,6 +191,11 @@ export async function recordWorkoutCompletion(
   const totalSearches = stats.totalSearches || 0;
   const exploredBodyParts = stats.exploredBodyParts || [];
   const inspectedExerciseIds = stats.inspectedExerciseIds || [];
+  const completedTimerSet = new Set(stats.completedTimerIds || []);
+  if (timer.id) {
+    completedTimerSet.add(timer.id);
+  }
+  const completedTimerIds = Array.from(completedTimerSet);
 
   const currentUnlocked = new Set(stats.unlockedBadgeIds || []);
   const newlyUnlocked: Badge[] = [];
@@ -248,6 +254,12 @@ export async function recordWorkoutCompletion(
   checkAndUnlock("posture_perfectionist", totalCorrectiveIntervals >= 15);
   checkAndUnlock("iron_alignment", totalCorrectiveWorkouts >= 10);
 
+  // Timer Variety Badges
+  checkAndUnlock("variety_5", completedTimerIds.length >= 5);
+  checkAndUnlock("variety_10", completedTimerIds.length >= 10);
+  checkAndUnlock("variety_25", completedTimerIds.length >= 25);
+  checkAndUnlock("variety_50", completedTimerIds.length >= 50);
+
   const updatedStats: UserStats = {
     ...stats,
     currentStreak,
@@ -265,6 +277,7 @@ export async function recordWorkoutCompletion(
     totalSearches,
     exploredBodyParts,
     inspectedExerciseIds,
+    completedTimerIds,
     unlockedBadgeIds: Array.from(currentUnlocked),
     lastWorkoutCompletionTimestamp: completionTimestamp,
     consecutiveQuickRepeatCount,

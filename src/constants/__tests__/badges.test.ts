@@ -11,6 +11,33 @@ describe("badges Constants", () => {
     expect(categories.has("corrective")).toBe(true);
     expect(categories.has("streak")).toBe(true);
     expect(categories.has("sharing")).toBe(true);
+    expect(categories.has("variety")).toBe(true);
+  });
+
+  it("contains timer variety badges with distinct metadata and 'different timers' descriptions", () => {
+    const expectedVarietyBadges = [
+      { id: "variety_5", name: "Routine Sampler", emoji: "🎲", count: "5" },
+      { id: "variety_10", name: "Workout Chameleon", emoji: "🦎", count: "10" },
+      { id: "variety_25", name: "Timer Connoisseur", emoji: "🎭", count: "25" },
+      { id: "variety_50", name: "Master of Variety", emoji: "💎", count: "50" },
+    ];
+
+    const varietyBadges = BADGE_CATALOG.filter((b) => b.category === "variety");
+    expect(varietyBadges).toHaveLength(expectedVarietyBadges.length);
+
+    const iconNames = new Set(varietyBadges.map((b) => b.iconName));
+    expect(iconNames.size).toBe(expectedVarietyBadges.length);
+
+    for (const expected of expectedVarietyBadges) {
+      const badge = BADGE_CATALOG.find((b) => b.id === expected.id);
+      expect(badge).toBeDefined();
+      expect(badge?.category).toBe("variety");
+      expect(badge?.name).toBe(expected.name);
+      expect(badge?.emoji).toBe(expected.emoji);
+      expect(badge?.tagline).toBeTruthy();
+      expect(badge?.description).toContain(`${expected.count} different timers`);
+      expect(badge?.gradientColors).toHaveLength(2);
+    }
   });
 
   it("contains discovery and corrective badges", () => {

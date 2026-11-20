@@ -1594,6 +1594,26 @@
       "name": "Alignement de Fer",
       "tagline": "Maître de la santé fonctionnelle !",
       "description": "A terminé 10 routines complètes d'exercices correctifs ou de kinésithérapie."
+    },
+    "variety_5": {
+      "name": "Explorateur de Routines",
+      "tagline": "On varie les plaisirs !",
+      "description": "A terminé 5 minuteurs différents. De quoi surprendre votre corps !"
+    },
+    "variety_10": {
+      "name": "Caméléon du Sport",
+      "tagline": "S'adapter et conquérir !",
+      "description": "A terminé 10 minuteurs différents. Prêt à s'adapter à n'importe quelle routine !"
+    },
+    "variety_25": {
+      "name": "Connaisseur de Minuteurs",
+      "tagline": "Un goût raffiné pour l'effort !",
+      "description": "A terminé 25 minuteurs différents. Un véritable amateur de variété sportive !"
+    },
+    "variety_50": {
+      "name": "Maître de la Variété",
+      "tagline": "Des routines infinies maîtrisées !",
+      "description": "A terminé 50 minuteurs différents. Une polyvalence inégalée dans chaque style d'entraînement !"
     }
   },
   "legal": {

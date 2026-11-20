@@ -425,4 +425,155 @@ describe("badgeService", () => {
       expect(dayAfterGap.stats.consecutiveThreeADayDays).toBe(1);
     });
   });
+
+  describe("Timer Variety Badges", () => {
+    const makeTimer = (id: string, overrides: Partial<Timer> = {}): Timer => ({
+      ...mockTimer,
+      id,
+      name: `Timer ${id}`,
+      ...overrides,
+    });
+
+    it("records unique timer IDs in completedTimerIds and deduplicates repeated completions", async () => {
+      const initialStats = await getUserStats();
+      expect(initialStats.completedTimerIds).toEqual([]);
+
+      const first = await recordWorkoutCompletion(makeTimer("timer-a"), 120);
+      expect(first.stats.completedTimerIds).toEqual(["timer-a"]);
+
+      // Repeating the same timer ID does not duplicate it
+      const repeat = await recordWorkoutCompletion(makeTimer("timer-a"), 120);
+      expect(repeat.stats.completedTimerIds).toEqual(["timer-a"]);
+
+      // Completing a second distinct timer appends its ID
+      const second = await recordWorkoutCompletion(makeTimer("timer-b"), 120);
+      expect(second.stats.completedTimerIds).toEqual(["timer-a", "timer-b"]);
+
+      // Persisted stats retain the deduplicated IDs
+      const persisted = await getUserStats();
+      expect(persisted.completedTimerIds).toEqual(["timer-a", "timer-b"]);
+    });
+
+    it("counts all Timer origins and deduplicates repeated quick routines and temp_timer", async () => {
+      // 1. Bundled default timer
+      await recordWorkoutCompletion(makeTimer("default_hiit"), 120);
+      // 2. Custom timer
+      await recordWorkoutCompletion(makeTimer("custom_12345", { createdAt: 1700000000000 }), 120);
+      // 3. AI-generated timer (isAiGenerated: true, with createdAt)
+      await recordWorkoutCompletion(
+        makeTimer("ai_generated_1", { isAiGenerated: true, createdAt: 1700000001000 }),
+        120
+      );
+      // 4. Imported shared timer (ai_* without createdAt)
+      const r4 = await recordWorkoutCompletion(makeTimer("ai_shared_999"), 120);
+      expect(r4.stats.completedTimerIds).toHaveLength(4);
+      expect(r4.newlyUnlocked.some((b) => b.id === "variety_5")).toBe(false);
+
+      // 5. Deterministic Quick Routine -> reaches 5 distinct timers and unlocks variety_5
+      const r5 = await recordWorkoutCompletion(makeTimer("quick_tibialis_raises"), 120);
+      expect(r5.stats.completedTimerIds).toHaveLength(5);
+      expect(r5.newlyUnlocked.some((b) => b.id === "variety_5")).toBe(true);
+
+      // Repeating the same Quick Routine does not increment the count
+      const r5Repeat = await recordWorkoutCompletion(makeTimer("quick_tibialis_raises"), 120);
+      expect(r5Repeat.stats.completedTimerIds).toHaveLength(5);
+      expect(r5Repeat.newlyUnlocked.some((b) => b.id === "variety_5")).toBe(false);
+
+      // 6. Unsaved temporary timer ("temp_timer") counts once
+      const rTemp1 = await recordWorkoutCompletion(makeTimer("temp_timer"), 120);
+      expect(rTemp1.stats.completedTimerIds).toHaveLength(6);
+      expect(rTemp1.stats.completedTimerIds).toContain("temp_timer");
+
+      // Repeating "temp_timer" (even with different names/intervals) still counts only once
+      const rTemp2 = await recordWorkoutCompletion(
+        makeTimer("temp_timer", { name: "Different Ad-Hoc Routine" }),
+        120
+      );
+      expect(rTemp2.stats.completedTimerIds).toHaveLength(6);
+    });
+
+    it("unlocks variety_5, variety_10, variety_25, and variety_50 at exact thresholds without duplicate unlocks", async () => {
+      const thresholds: Array<{ count: number; badgeId: string }> = [
+        { count: 5, badgeId: "variety_5" },
+        { count: 10, badgeId: "variety_10" },
+        { count: 25, badgeId: "variety_25" },
+        { count: 50, badgeId: "variety_50" },
+      ];
+
+      let completed = 0;
+      for (const { count, badgeId } of thresholds) {
+        // Advance up to count - 1
+        while (completed < count - 1) {
+          completed += 1;
+          const res = await recordWorkoutCompletion(makeTimer(`timer_${completed}`), 60);
+          expect(res.newlyUnlocked.some((b) => b.id === badgeId)).toBe(false);
+        }
+
+        // Exact threshold completion unlocks the badge
+        completed += 1;
+        const unlockRes = await recordWorkoutCompletion(makeTimer(`timer_${completed}`), 60);
+        expect(unlockRes.stats.completedTimerIds).toHaveLength(count);
+        expect(unlockRes.newlyUnlocked.some((b) => b.id === badgeId)).toBe(true);
+
+        // Repeating an existing timer or completing another new timer does NOT re-unlock the same badge
+        const repeatRes = await recordWorkoutCompletion(makeTimer(`timer_${completed}`), 60);
+        expect(repeatRes.newlyUnlocked.some((b) => b.id === badgeId)).toBe(false);
+
+        completed += 1;
+        const nextRes = await recordWorkoutCompletion(makeTimer(`timer_${completed}`), 60);
+        expect(nextRes.newlyUnlocked.some((b) => b.id === badgeId)).toBe(false);
+      }
+    });
+
+    it("loads legacy persisted stats without completedTimerIds cleanly and tracks from zero", async () => {
+      // Simulate legacy persisted stats written before completedTimerIds existed
+      const { completedTimerIds: _omitted, ...legacyStats } = DEFAULT_USER_STATS;
+      await AsyncStorage.setItem(
+        "@interval_user_stats",
+        JSON.stringify({
+          ...legacyStats,
+          totalWorkouts: 12,
+          unlockedBadgeIds: ["first_step_hero"],
+        })
+      );
+
+      const loaded = await getUserStats();
+      expect(loaded.completedTimerIds).toEqual([]);
+      expect(loaded.totalWorkouts).toBe(12);
+
+      const result = await recordWorkoutCompletion(makeTimer("legacy_followup_1"), 120);
+      expect(result.stats.completedTimerIds).toEqual(["legacy_followup_1"]);
+      expect(result.stats.totalWorkouts).toBe(13);
+    });
+
+    it("preserves permanent lifetime timer credit and reflects unlocked variety badges in getAllBadgesWithStatus", async () => {
+      for (let i = 1; i <= 5; i++) {
+        await recordWorkoutCompletion(makeTimer(`permanent_timer_${i}`), 60);
+      }
+
+      // Even after completing other timers (and regardless of whether earlier timers are later deleted from storage),
+      // lifetime credit for previously completed timer IDs is retained.
+      await recordWorkoutCompletion(makeTimer("permanent_timer_6"), 60);
+      const stats = await getUserStats();
+      expect(stats.completedTimerIds).toEqual([
+        "permanent_timer_1",
+        "permanent_timer_2",
+        "permanent_timer_3",
+        "permanent_timer_4",
+        "permanent_timer_5",
+        "permanent_timer_6",
+      ]);
+
+      const allBadges = await getAllBadgesWithStatus();
+      const variety5 = allBadges.find((b) => b.id === "variety_5");
+      const variety10 = allBadges.find((b) => b.id === "variety_10");
+      const variety25 = allBadges.find((b) => b.id === "variety_25");
+      const variety50 = allBadges.find((b) => b.id === "variety_50");
+
+      expect(variety5?.unlockedAt).toBeTruthy();
+      expect(variety10?.unlockedAt).toBeUndefined();
+      expect(variety25?.unlockedAt).toBeUndefined();
+      expect(variety50?.unlockedAt).toBeUndefined();
+    });
+  });
 });

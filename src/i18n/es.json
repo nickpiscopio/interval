@@ -1594,6 +1594,26 @@
       "name": "Alineación de Hierro",
       "tagline": "¡Maestro de la salud funcional!",
       "description": "Completaste 10 rutinas completas de ejercicios correctivos o fisioterapia."
+    },
+    "variety_5": {
+      "name": "Probador de Rutinas",
+      "tagline": "¡Mezclando la lista!",
+      "description": "Completaste 5 temporizadores diferentes. ¡Manteniendo a tu cuerpo sorprendido!"
+    },
+    "variety_10": {
+      "name": "Camaleón del Entrenamiento",
+      "tagline": "¡Adáptate y conquista!",
+      "description": "Completaste 10 temporizadores diferentes. ¡Listo para adaptarte a cualquier rutina!"
+    },
+    "variety_25": {
+      "name": "Conocedor de Temporizadores",
+      "tagline": "¡Gusto refinado por el esfuerzo!",
+      "description": "Completaste 25 temporizadores diferentes. ¡Un verdadero aficionado a la variedad!"
+    },
+    "variety_50": {
+      "name": "Maestro de la Variedad",
+      "tagline": "¡Rutinas infinitas dominadas!",
+      "description": "Completaste 50 temporizadores diferentes. ¡Versatilidad incomparable en cada estilo de entrenamiento!"
     }
   },
   "legal": {

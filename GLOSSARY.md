@@ -95,3 +95,7 @@ _Avoid_: Combined 2+ Multi-Day Streak, Unspaced Back-to-Back Daily Count
 **Interval Timeline**:
 The docked scrollable list of all flattened Intervals across every Round shown during an active Timer run, allowing the user to see past, current, and upcoming Intervals and tap any row to jump to or restart it.
 _Avoid_: Section List, Step List, Playlist
+
+**Timer Variety Badges**:
+Gamified achievement awards in the `variety` category unlocked by completing 5, 10, 25, or 50 distinct Timers across any origin with permanent lifetime credit.
+_Avoid_: Workout Variety Trophies, Preset Diversity Badges

@@ -227,11 +227,25 @@ describe("SelectTimerScreen", () => {
         "Timer",
         expect.objectContaining({
           timer: expect.objectContaining({
+            id: "quick_tibialis_raises",
             name: "Tibialis Raises",
             rounds: 3,
           }),
         })
       );
+    }, { timeout: 3500 });
+
+    // Repeat Quick Routine for the same exercise to verify deterministic ID
+    fireEvent.press(tibialisCard);
+    fireEvent.press(getByText("Start Quick Routine"));
+
+    await waitFor(() => {
+      const timerCalls = mockNavigation.navigate.mock.calls.filter(
+        ([route]: [string]) => route === "Timer"
+      );
+      expect(timerCalls).toHaveLength(2);
+      expect(timerCalls[0][1].timer.id).toBe("quick_tibialis_raises");
+      expect(timerCalls[1][1].timer.id).toBe("quick_tibialis_raises");
     }, { timeout: 3500 });
 
     // Open another exercise and Create Custom Timer

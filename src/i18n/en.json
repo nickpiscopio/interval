@@ -1594,6 +1594,26 @@
       "name": "Iron Alignment",
       "tagline": "Master of functional health!",
       "description": "Completed 10 full corrective or physical therapy workout routines."
+    },
+    "variety_5": {
+      "name": "Routine Sampler",
+      "tagline": "Mixing up the playlist!",
+      "description": "Completed 5 different timers. Keeping your body guessing!"
+    },
+    "variety_10": {
+      "name": "Workout Chameleon",
+      "tagline": "Adapt and conquer!",
+      "description": "Completed 10 different timers. Built to adapt to any routine!"
+    },
+    "variety_25": {
+      "name": "Timer Connoisseur",
+      "tagline": "Refined taste in sweat!",
+      "description": "Completed 25 different timers. A true aficionado of training variety!"
+    },
+    "variety_50": {
+      "name": "Master of Variety",
+      "tagline": "Endless routines mastered!",
+      "description": "Completed 50 different timers. Unmatched range across every style of training!"
     }
   },
   "legal": {

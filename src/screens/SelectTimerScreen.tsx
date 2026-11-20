@@ -197,7 +197,7 @@ export default function SelectTimerScreen({
   function handleStartQuickRoutine(exercise: Exercise) {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     const quickTimer: Timer = {
-      id: `quick_${Date.now()}`,
+      id: `quick_${exercise.id}`,
       name: exercise.name,
       rounds: 3,
       intervals: [
