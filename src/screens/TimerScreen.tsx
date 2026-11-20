@@ -9,9 +9,11 @@ import { RootStackScreenProps } from "../types";
 import { Interval } from "../model/Interval";
 import { t } from "../i18n";
 import { useAlert } from "../context/AlertContext";
+import Colors from "../constants/Colors";
 import Spacing from "../constants/Spacing";
 import { resolveSoundId, resolveSoundSource } from "../constants/Sounds";
 import FontSize from "../constants/FontSize";
+import IntervalTimeline from "../components/IntervalTimeline";
 
 const KEEP_AWAKE_TAG = "timer-running";
 
@@ -95,6 +97,31 @@ export default function TimerScreen({
     }).start();
   }
 
+  function jumpToInterval(targetIndex: number): void {
+    const intervalsList = flatIntervalsRef.current;
+    if (targetIndex < 0 || targetIndex >= intervalsList.length) return;
+
+    const targetInterval = intervalsList[targetIndex];
+    const targetDurationMs = (targetInterval.duration || 0) * 1000;
+
+    currentIndexRef.current = targetIndex;
+    durationLeftRef.current = targetDurationMs;
+    totalDurationRef.current = targetDurationMs;
+
+    setCurrentIntervalIndex(targetIndex);
+    setDurationLeft(targetInterval.duration || 0);
+    setTotalDuration(targetDurationMs);
+
+    progressAnim.stopAnimation();
+    progressAnim.setValue(1);
+    stopAndReleaseSound();
+
+    if (!isPausedRef.current) {
+      startProgressAnim(targetDurationMs, 1);
+      playIntervalSound(targetInterval);
+    }
+  }
+
   // Initialize flat list of intervals
   useEffect(() => {
     const list: Interval[] = [];
@@ -110,19 +137,12 @@ export default function TimerScreen({
     }
     flatIntervalsRef.current = list;
     setFlatIntervals(list);
-    
-    if (list.length > 0) {
-      setCurrentIntervalIndex(0);
-      currentIndexRef.current = 0;
-      setDurationLeft(list[0].duration);
-      durationLeftRef.current = list[0].duration * 1000;
-      totalDurationRef.current = list[0].duration * 1000;
-      setTotalDuration(list[0].duration * 1000);
-      startProgressAnim(list[0].duration * 1000, 1);
-      playIntervalSound(list[0]);
-    }
 
     isPausedRef.current = false;
+    if (list.length > 0) {
+      jumpToInterval(0);
+    }
+
     activateScreenLock();
     startCountDown();
 
@@ -157,16 +177,7 @@ export default function TimerScreen({
           deactivateScreenLock();
           navigation.replace("Completion", { timer });
         } else {
-          currentIndexRef.current = nextIdx;
-          setCurrentIntervalIndex(nextIdx);
-          const nextInt = intervalsList[nextIdx];
-          const nextDurationMs = (nextInt.duration || 0) * 1000;
-          durationLeftRef.current = nextDurationMs;
-          totalDurationRef.current = nextDurationMs;
-          setDurationLeft(nextInt.duration || 0);
-          setTotalDuration(nextDurationMs);
-          startProgressAnim(nextDurationMs, 1);
-          playIntervalSound(nextInt);
+          jumpToInterval(nextIdx);
         }
       }
     }, tickMs);
@@ -176,12 +187,6 @@ export default function TimerScreen({
   const currentRound = currentInterval
     ? Math.floor(currentIntervalIndex / timer.intervals.length) + 1
     : 1;
-
-  // Next up info
-  let nextInterval: Interval | undefined;
-  if (currentIntervalIndex + 1 < flatIntervals.length) {
-    nextInterval = flatIntervals[currentIntervalIndex + 1];
-  }
 
   function togglePlayPause() {
     const nextPaused = !isPaused;
@@ -250,63 +255,76 @@ export default function TimerScreen({
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: currentInterval.color }]}>
+    <View
+      testID="timer-screen-container"
+      style={[styles.container, { backgroundColor: currentInterval.color }]}
+    >
       <StatusBar style="light" />
 
-      {/* Fluid continuous 60fps progress background bar */}
-      <Animated.View
-        style={[
-          styles.timerBar,
-          {
-            height: progressAnim.interpolate({
-              inputRange: [0, 1],
-              outputRange: ["0%", "100%"],
-            }),
-          },
-        ]}
-      />
+      {/* Upper Hero Region — 60fps liquid-drain progress bar stays confined here */}
+      <View style={styles.upperRegion}>
+        <Animated.View
+          style={[
+            styles.timerBar,
+            {
+              height: progressAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: ["0%", "100%"],
+              }),
+            },
+          ]}
+        />
 
-      {/* Header Panel */}
-      <View style={styles.header}>
-        <Text style={styles.workoutName}>{timer.name}</Text>
-        <TouchableOpacity style={styles.closeButton} onPress={askToCloseWorkout}>
-          <Ionicons name="close" size={24} color="#FFFFFF" />
-        </TouchableOpacity>
-      </View>
+        {/* Header Panel */}
+        <View style={styles.header}>
+          <Text style={styles.workoutName}>{timer.name}</Text>
+          <TouchableOpacity style={styles.closeButton} onPress={askToCloseWorkout}>
+            <Ionicons name="close" size={24} color={Colors.textScale.inverse} />
+          </TouchableOpacity>
+        </View>
 
-      {/* Timer Details Panel - Hero Centered */}
-      <View style={styles.detailsContainer}>
-        <Text style={styles.intervalName}>{currentInterval.name}</Text>
-        <Text style={styles.countdown}>{durationLeft}s</Text>
-        
-        <View style={styles.metaRow}>
-          <Text style={styles.metaText}>{t("timer.roundOf", { current: currentRound, total: timer.rounds })}</Text>
-          <Text style={styles.metaDivider}>•</Text>
-          <Text style={styles.metaText}>
-            Interval {currentIntervalIndex + 1}/{flatIntervals.length}
+        {/* Timer Details Panel - Hero Centered */}
+        <View style={styles.detailsContainer}>
+          <Text testID="hero-interval-name" style={styles.intervalName}>
+            {currentInterval.name}
+          </Text>
+          <Text testID="hero-countdown" style={styles.countdown}>
+            {`${durationLeft}s`}
           </Text>
         </View>
 
-        {nextInterval && (
-          <View style={styles.nextUpCard}>
-            <Text style={styles.nextUpLabel}>{t("timer.nextUp")}</Text>
-            <Text style={styles.nextUpValue}>
-              {nextInterval.name} ({nextInterval.duration}s)
+        {/* Compact Bottom Control Bar */}
+        <View style={styles.controlsBar}>
+          <View style={styles.metaContainer}>
+            <Text style={styles.metaText}>
+              {t("timer.roundOf", { current: currentRound, total: timer.rounds })}
+            </Text>
+            <Text style={styles.metaSubtext}>
+              {`Interval ${currentIntervalIndex + 1}/${flatIntervals.length}`}
             </Text>
           </View>
-        )}
+
+          <TouchableOpacity
+            style={styles.controlBtn}
+            onPress={togglePlayPause}
+            activeOpacity={0.8}
+          >
+            <Ionicons
+              name={isPaused ? "play" : "pause"}
+              size={28}
+              color={currentInterval.color}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
 
-      {/* Bottom Controls */}
-      <View style={styles.controlsContainer}>
-        <TouchableOpacity style={styles.controlBtn} onPress={togglePlayPause} activeOpacity={0.8}>
-          <Ionicons
-            name={isPaused ? "play" : "pause"}
-            size={28}
-            color={currentInterval.color}
-          />
-        </TouchableOpacity>
-      </View>
+      {/* Docked Scrollable Interval Timeline */}
+      <IntervalTimeline
+        intervals={flatIntervals}
+        currentIntervalIndex={currentIntervalIndex}
+        activeColor={currentInterval.color}
+        onSelectInterval={jumpToInterval}
+      />
     </View>
   );
 }
@@ -314,14 +332,18 @@ export default function TimerScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  upperRegion: {
+    flex: 1,
     justifyContent: "space-between",
     paddingTop: 50,
+    overflow: "hidden",
   },
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#F9FAFB",
+    backgroundColor: Colors.surface.screen,
   },
   timerBar: {
     position: "absolute",
@@ -341,8 +363,8 @@ const styles = StyleSheet.create({
   workoutName: {
     fontSize: FontSize.md,
     lineHeight: FontSize.lineHeight.md,
-    fontFamily: "Poppins-Bold",
-    color: "#FFFFFF",
+    fontFamily: FontSize.fontFamily.bold,
+    color: Colors.textScale.inverse,
     opacity: 0.9,
     flex: 1,
   },
@@ -365,80 +387,52 @@ const styles = StyleSheet.create({
   intervalName: {
     fontSize: FontSize["2xl"],
     lineHeight: FontSize.lineHeight["2xl"],
-    fontFamily: "Poppins-Bold",
-    color: "#FFFFFF",
+    fontFamily: FontSize.fontFamily.bold,
+    color: Colors.textScale.inverse,
     textAlign: "center",
   },
   countdown: {
     fontSize: 96,
     lineHeight: 104,
-    fontFamily: "Poppins-Bold",
-    color: "#FFFFFF",
-    marginVertical: Spacing.md,
+    fontFamily: FontSize.fontFamily.bold,
+    color: Colors.textScale.inverse,
+    marginTop: Spacing.sm,
     textAlign: "center",
   },
-  metaRow: {
+  controlsBar: {
     flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    gap: Spacing.sm,
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.md,
+    zIndex: 10,
+  },
+  metaContainer: {
+    flex: 1,
+    marginRight: Spacing.md,
     opacity: 0.9,
   },
   metaText: {
     fontSize: FontSize.sm,
     lineHeight: FontSize.lineHeight.sm,
-    fontFamily: "Poppins-Medium",
-    color: "#FFFFFF",
+    fontFamily: FontSize.fontFamily.bold,
+    color: Colors.textScale.inverse,
   },
-  metaDivider: {
-    fontSize: FontSize.sm,
-    color: "#FFFFFF",
-  },
-  nextUpCard: {
-    backgroundColor: "rgba(255, 255, 255, 0.15)",
-    borderRadius: Spacing.radius.sm,
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.md,
-    marginTop: Spacing.lg,
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "rgba(255, 255, 255, 0.25)",
-  },
-  nextUpLabel: {
+  metaSubtext: {
     fontSize: FontSize.xs,
     lineHeight: FontSize.lineHeight.xs,
-    fontFamily: "Poppins-Bold",
-    color: "#FFFFFF",
-    opacity: 0.7,
-    letterSpacing: 1,
-  },
-  nextUpValue: {
-    fontSize: FontSize.sm,
-    lineHeight: FontSize.lineHeight.sm,
-    fontFamily: "Poppins-Bold",
-    color: "#FFFFFF",
+    fontFamily: FontSize.fontFamily.medium,
+    color: Colors.textScale.inverse,
+    opacity: 0.85,
     marginTop: Spacing.xs / 2,
-    textAlign: "center",
-  },
-  controlsContainer: {
-    minHeight: 112,
-    paddingVertical: Spacing.md,
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 10,
   },
   controlBtn: {
-    width: 64,
-    minHeight: 64,
-    borderRadius: 32,
-    backgroundColor: "#FFFFFF",
+    width: Spacing.touchTarget.cta,
+    minHeight: Spacing.touchTarget.cta,
+    borderRadius: Spacing.radius.full,
+    backgroundColor: Colors.white,
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.15,
-    shadowRadius: 10,
-    elevation: 4,
+    ...Spacing.shadows.floating,
   },
 });

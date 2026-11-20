@@ -10,7 +10,7 @@ _Avoid_: Workout, Preset
 
 **Interval**:
 A designated time segment of a Timer, which has a specific duration, background color, Interval Sound, and optional exercise reference.
-_Avoid_: Step, Phase, Block
+_Avoid_: Step, Phase, Block, Section
 
 **Interval Sound**:
 The audio cue an Interval plays when it begins or when the timer resumes, chosen from a fixed list of bundled sounds or "None" for silence. Plays strictly once as a crisp, non-looping cue upon interval entry and timer resume using a clean one-shot audio player without rewinding buffer collisions, releases all native player resources on stop, completion, exit, or unmount without lingering instances, and previews strictly once per distinct selection change in the Interval Edit Bottom Sheet with duplicate taps suppressed.
@@ -91,3 +91,7 @@ _Avoid_: Always-On Display, Screen Sleeplessness, Screen Saver Disable
 **Multi-Session Daily Streaks (Two-a-Day & Three-a-Day)**:
 Distinct daily and multi-day achievement progressions for completing 2 workouts (Two-a-Day) or 3 workouts (Three-a-Day) on the same calendar day with each counted session spaced at least 1 hour apart, tracked independently across 2-day and 3-day consecutive streaks.
 _Avoid_: Combined 2+ Multi-Day Streak, Unspaced Back-to-Back Daily Count
+
+**Interval Timeline**:
+The docked scrollable list of all flattened Intervals across every Round shown during an active Timer run, allowing the user to see past, current, and upcoming Intervals and tap any row to jump to or restart it.
+_Avoid_: Section List, Step List, Playlist

@@ -225,4 +225,71 @@ describe("TimerScreen interval sounds", () => {
       interruptionMode: "mixWithOthers",
     });
   });
+
+  it("stops and releases previous player before playing target sound when jumping to a past interval while running", async () => {
+    const { getByTestId } = renderTimer([
+      { id: "a", name: "A", duration: 1, color: "#10B981", sound: "beep_3" },
+      { id: "b", name: "B", duration: 2, color: "#6B7280", sound: "beep" },
+    ]);
+    await flush();
+
+    // Advance into interval B
+    act(() => {
+      jest.advanceTimersByTime(1100);
+    });
+    await flush();
+
+    const beepPlayer = getPlayer(BEEP);
+    expect(playsFor(BEEP_3)).toBe(1);
+    expect(playsFor(BEEP)).toBe(1);
+
+    // Tap past interval A while running
+    fireEvent.press(getByTestId("interval-timeline-row-0"));
+    await flush();
+
+    expect(beepPlayer.pause).toHaveBeenCalled();
+    expect(beepPlayer.release).toHaveBeenCalled();
+    expect(playsFor(BEEP_3)).toBe(2);
+  });
+
+  it("replays the active interval sound cleanly when tapping the active interval while running", async () => {
+    const { getByTestId } = renderTimer([
+      { id: "a", name: "A", duration: 5, color: "#10B981", sound: "beep_3" },
+    ]);
+    await flush();
+
+    const firstPlayer = getPlayer(BEEP_3);
+    expect(playsFor(BEEP_3)).toBe(1);
+
+    fireEvent.press(getByTestId("interval-timeline-row-0"));
+    await flush();
+
+    expect(firstPlayer.pause).toHaveBeenCalled();
+    expect(firstPlayer.release).toHaveBeenCalled();
+    expect(playsFor(BEEP_3)).toBe(2);
+  });
+
+  it("stays silent when jumping while paused and plays the newly selected interval sound on Play", async () => {
+    const { getByTestId, getByText } = renderTimer([
+      { id: "a", name: "A", duration: 5, color: "#10B981", sound: "beep_3" },
+      { id: "b", name: "B", duration: 5, color: "#6B7280", sound: "beep" },
+    ]);
+    await flush();
+    expect(playsFor(BEEP_3)).toBe(1);
+    expect(playsFor(BEEP)).toBe(0);
+
+    // Pause
+    fireEvent.press(getByText("pause"));
+    await flush();
+
+    // Jump to interval B while paused -> stays silent
+    fireEvent.press(getByTestId("interval-timeline-row-1"));
+    await flush();
+    expect(playsFor(BEEP)).toBe(0);
+
+    // Press Play -> plays interval B's sound
+    fireEvent.press(getByText("play"));
+    await flush();
+    expect(playsFor(BEEP)).toBe(1);
+  });
 });
