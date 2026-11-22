@@ -1,9 +1,19 @@
 import React, { useEffect, useState, useRef } from "react";
-import { StyleSheet, View, Text, TouchableOpacity, Animated, Easing } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  Animated,
+  Easing,
+  useWindowDimensions,
+} from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { createAudioPlayer, AudioPlayer, setAudioModeAsync } from "expo-audio";
 import { Ionicons } from "@expo/vector-icons";
 import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
+import * as ScreenOrientation from "expo-screen-orientation";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { RootStackScreenProps } from "../types";
 import { Interval } from "../model/Interval";
@@ -14,8 +24,10 @@ import Spacing from "../constants/Spacing";
 import { resolveSoundId, resolveSoundSource } from "../constants/Sounds";
 import FontSize from "../constants/FontSize";
 import IntervalTimeline from "../components/IntervalTimeline";
+import { useTimerVoiceControl } from "../hooks/useTimerVoiceControl";
 
 const KEEP_AWAKE_TAG = "timer-running";
+const COMPLETION_INTEGRITY_THRESHOLD = 0.85;
 
 export default function TimerScreen({
   route,
@@ -23,6 +35,9 @@ export default function TimerScreen({
 }: RootStackScreenProps<"Timer">) {
   const { showAlert } = useAlert();
   const { timer } = route.params;
+  const { width, height } = useWindowDimensions();
+  const isLandscape = width > height;
+  const insets = useSafeAreaInsets();
 
   // Sound Ref
   const activePlayerRef = useRef<AudioPlayer | null>(null);
@@ -44,6 +59,8 @@ export default function TimerScreen({
   const currentIndexRef = useRef(0);
   const durationLeftRef = useRef(0);
   const isPausedRef = useRef(false);
+  const creditedMsRef = useRef<number[]>([]);
+  const stopVoiceControlRef = useRef<() => void>(() => {});
 
   const currentInterval = flatIntervals[currentIntervalIndex];
 
@@ -54,6 +71,18 @@ export default function TimerScreen({
   function deactivateScreenLock(): void {
     deactivateKeepAwake(KEEP_AWAKE_TAG);
   }
+
+  function lockPortraitOrientation(): void {
+    ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP).catch(() => {});
+  }
+
+  // Unlock orientation while active Timer runner is mounted; re-lock to portrait on unmount
+  useEffect(() => {
+    ScreenOrientation.unlockAsync().catch(() => {});
+    return () => {
+      lockPortraitOrientation();
+    };
+  }, []);
 
   function stopAndReleaseSound(): void {
     if (activePlayerRef.current) {
@@ -136,6 +165,7 @@ export default function TimerScreen({
       });
     }
     flatIntervalsRef.current = list;
+    creditedMsRef.current = list.map(() => 0);
     setFlatIntervals(list);
 
     isPausedRef.current = false;
@@ -161,6 +191,17 @@ export default function TimerScreen({
     timerIdRef.current = setInterval(() => {
       if (isPausedRef.current) return;
 
+      const idx = currentIndexRef.current;
+      const intervalsList = flatIntervalsRef.current;
+      const activeInterval = intervalsList[idx];
+      if (activeInterval && activeInterval.duration > 0) {
+        const maxMs = activeInterval.duration * 1000;
+        creditedMsRef.current[idx] = Math.min(
+          maxMs,
+          (creditedMsRef.current[idx] || 0) + tickMs
+        );
+      }
+
       durationLeftRef.current -= tickMs;
       const secLeft = Math.ceil(durationLeftRef.current / 1000);
       setDurationLeft((prevSec) => (prevSec !== secLeft ? Math.max(0, secLeft) : prevSec));
@@ -168,14 +209,44 @@ export default function TimerScreen({
       if (durationLeftRef.current <= 0) {
         // Move to next interval
         const nextIdx = currentIndexRef.current + 1;
-        const intervalsList = flatIntervalsRef.current;
         if (nextIdx >= intervalsList.length) {
           // Workout finished!
           clearInterval(timerIdRef.current);
           progressAnim.stopAnimation();
           stopAndReleaseSound();
           deactivateScreenLock();
-          navigation.replace("Completion", { timer });
+          lockPortraitOrientation();
+          stopVoiceControlRef.current();
+
+          const totalTimeSeconds = intervalsList.reduce(
+            (sum, int) => sum + (int.duration || 0),
+            0
+          );
+          const totalCreditedMs = creditedMsRef.current.reduce(
+            (sum, ms) => sum + ms,
+            0
+          );
+          const performedSeconds = Math.min(
+            totalTimeSeconds,
+            Math.round(totalCreditedMs / 1000)
+          );
+          const completedIntervals = intervalsList.filter(
+            (int, i) =>
+              int.duration > 0 &&
+              (creditedMsRef.current[i] || 0) >=
+                int.duration * 1000 * COMPLETION_INTEGRITY_THRESHOLD
+          ).length;
+          const qualifiesForCredit =
+            totalTimeSeconds > 0 &&
+            totalCreditedMs / (totalTimeSeconds * 1000) >=
+              COMPLETION_INTEGRITY_THRESHOLD;
+
+          navigation.replace("Completion", {
+            timer,
+            performedSeconds,
+            completedIntervals,
+            qualifiesForCredit,
+          });
         } else {
           jumpToInterval(nextIdx);
         }
@@ -188,29 +259,64 @@ export default function TimerScreen({
     ? Math.floor(currentIntervalIndex / timer.intervals.length) + 1
     : 1;
 
-  function togglePlayPause() {
-    const nextPaused = !isPaused;
-    setIsPaused(nextPaused);
-    isPausedRef.current = nextPaused;
-    if (nextPaused) {
-      progressAnim.stopAnimation();
-      deactivateScreenLock();
-      stopAndReleaseSound();
-    } else {
-      activateScreenLock();
+  function pauseTimer() {
+    setIsPaused(true);
+    isPausedRef.current = true;
+    progressAnim.stopAnimation();
+    deactivateScreenLock();
+    stopAndReleaseSound();
+  }
+
+  function resumeTimer(shouldPlaySound: boolean) {
+    setIsPaused(false);
+    isPausedRef.current = false;
+    activateScreenLock();
+    if (shouldPlaySound) {
       playIntervalSound(flatIntervalsRef.current[currentIndexRef.current]);
-      const fraction = totalDurationRef.current > 0 ? durationLeftRef.current / totalDurationRef.current : 1;
-      startProgressAnim(durationLeftRef.current, fraction);
+    }
+    const fraction =
+      totalDurationRef.current > 0
+        ? durationLeftRef.current / totalDurationRef.current
+        : 1;
+    startProgressAnim(durationLeftRef.current, fraction);
+  }
+
+  function pauseForModal(): boolean {
+    const wasPaused = isPausedRef.current;
+    pauseTimer();
+    return wasPaused;
+  }
+
+  function restoreAfterModal(wasPaused: boolean) {
+    if (wasPaused) {
+      setIsPaused(true);
+      isPausedRef.current = true;
+    } else {
+      resumeTimer(false);
+    }
+  }
+
+  const voiceControl = useTimerVoiceControl({
+    isPausedRef,
+    onVoicePlay: () => resumeTimer(true),
+    onVoicePause: pauseTimer,
+    pauseForModal,
+    restoreAfterModal,
+    showAlert,
+  });
+  stopVoiceControlRef.current = voiceControl.stopVoiceControlForExit;
+
+  function togglePlayPause() {
+    if (isPausedRef.current) {
+      resumeTimer(true);
+    } else {
+      pauseTimer();
     }
   }
 
   function askToCloseWorkout() {
-    const wasPaused = isPausedRef.current;
-    isPausedRef.current = true;
-    setIsPaused(true);
-    progressAnim.stopAnimation();
-    deactivateScreenLock();
-    stopAndReleaseSound();
+    const wasPaused = pauseForModal();
+    voiceControl.pauseRecognitionForAlert();
 
     showAlert({
       title: t("timer.exitTitle"),
@@ -221,13 +327,8 @@ export default function TimerScreen({
           text: t("timer.exitCancel"),
           style: "cancel",
           onPress: () => {
-            setIsPaused(wasPaused);
-            isPausedRef.current = wasPaused;
-            if (!wasPaused) {
-              activateScreenLock();
-              const fraction = totalDurationRef.current > 0 ? durationLeftRef.current / totalDurationRef.current : 1;
-              startProgressAnim(durationLeftRef.current, fraction);
-            }
+            restoreAfterModal(wasPaused);
+            voiceControl.resumeRecognitionAfterAlert();
           },
         },
         {
@@ -238,6 +339,8 @@ export default function TimerScreen({
             progressAnim.stopAnimation();
             stopAndReleaseSound();
             deactivateScreenLock();
+            lockPortraitOrientation();
+            voiceControl.stopVoiceControlForExit();
             navigation.popToTop();
           },
         },
@@ -257,44 +360,112 @@ export default function TimerScreen({
   return (
     <View
       testID="timer-screen-container"
-      style={[styles.container, { backgroundColor: currentInterval.color }]}
+      style={[
+        styles.container,
+        isLandscape && styles.containerLandscape,
+        { backgroundColor: currentInterval.color },
+      ]}
     >
       <StatusBar style="light" />
 
-      {/* Upper Hero Region — 60fps liquid-drain progress bar stays confined here */}
-      <View style={styles.upperRegion}>
-        <Animated.View
-          style={[
-            styles.timerBar,
-            {
-              height: progressAnim.interpolate({
-                inputRange: [0, 1],
-                outputRange: ["0%", "100%"],
-              }),
-            },
-          ]}
-        />
+      {/* Full-bleed 60fps liquid-drain progress bar across entire viewport */}
+      <Animated.View
+        testID="timer-progress-bar"
+        pointerEvents="none"
+        style={[
+          styles.timerBar,
+          {
+            height: progressAnim.interpolate({
+              inputRange: [0, 1],
+              outputRange: ["0%", "100%"],
+            }),
+          },
+        ]}
+      />
 
+      {/* Upper Hero Region (Portrait) / Left 55% Pane (Landscape) */}
+      <View
+        testID="timer-upper-region"
+        style={[
+          styles.upperRegion,
+          isLandscape
+            ? [
+                styles.upperRegionLandscape,
+                {
+                  paddingTop: Math.max(insets.top, Spacing.sm),
+                  paddingLeft: Math.max(insets.left, Spacing.lg),
+                  paddingBottom: Math.max(insets.bottom, Spacing.md),
+                },
+              ]
+            : {
+                paddingTop: Math.max(insets.top, Spacing["3xl"]),
+              },
+        ]}
+      >
         {/* Header Panel */}
-        <View style={styles.header}>
-          <Text style={styles.workoutName}>{timer.name}</Text>
-          <TouchableOpacity style={styles.closeButton} onPress={askToCloseWorkout}>
-            <Ionicons name="close" size={24} color={Colors.textScale.inverse} />
+        <View style={[styles.header, isLandscape && styles.landscapeInnerPadding]}>
+          <TouchableOpacity
+            testID="timer-back-button"
+            accessibilityRole="button"
+            style={styles.backButton}
+            onPress={askToCloseWorkout}
+          >
+            <Ionicons name="arrow-back" size={24} color={Colors.textScale.inverse} />
           </TouchableOpacity>
+          <Text style={styles.workoutName} numberOfLines={1}>
+            {timer.name}
+          </Text>
+          <View testID="timer-header-right-slot" style={styles.headerRightSlot}>
+            {voiceControl.isAvailable ? (
+              <TouchableOpacity
+                testID="timer-voice-toggle"
+                accessibilityRole="button"
+                accessibilityLabel={
+                  voiceControl.isEnabled
+                    ? t("timer.voiceControlDisableLabel")
+                    : t("timer.voiceControlEnableLabel")
+                }
+                accessibilityState={{ selected: voiceControl.isEnabled }}
+                style={[
+                  styles.voiceToggleButton,
+                  voiceControl.isListening && styles.voiceToggleButtonActive,
+                ]}
+                onPress={voiceControl.toggleVoiceControl}
+              >
+                <Ionicons
+                  name={voiceControl.isEnabled ? "mic" : "mic-off"}
+                  size={22}
+                  color={
+                    voiceControl.isListening
+                      ? currentInterval.color
+                      : Colors.textScale.inverse
+                  }
+                />
+              </TouchableOpacity>
+            ) : null}
+          </View>
         </View>
 
         {/* Timer Details Panel - Hero Centered */}
-        <View style={styles.detailsContainer}>
-          <Text testID="hero-interval-name" style={styles.intervalName}>
+        <View style={[styles.detailsContainer, isLandscape && styles.landscapeInnerPadding]}>
+          <Text
+            testID="hero-interval-name"
+            style={styles.intervalName}
+            numberOfLines={isLandscape ? 2 : undefined}
+            adjustsFontSizeToFit={isLandscape}
+          >
             {currentInterval.name}
           </Text>
-          <Text testID="hero-countdown" style={styles.countdown}>
+          <Text
+            testID="hero-countdown"
+            style={[styles.countdown, isLandscape && styles.countdownLandscape]}
+          >
             {`${durationLeft}s`}
           </Text>
         </View>
 
         {/* Compact Bottom Control Bar */}
-        <View style={styles.controlsBar}>
+        <View style={[styles.controlsBar, isLandscape && styles.controlsBarLandscape]}>
           <View style={styles.metaContainer}>
             <Text style={styles.metaText}>
               {t("timer.roundOf", { current: currentRound, total: timer.rounds })}
@@ -305,6 +476,7 @@ export default function TimerScreen({
           </View>
 
           <TouchableOpacity
+            testID="timer-play-pause-button"
             style={styles.controlBtn}
             onPress={togglePlayPause}
             activeOpacity={0.8}
@@ -324,6 +496,7 @@ export default function TimerScreen({
         currentIntervalIndex={currentIntervalIndex}
         activeColor={currentInterval.color}
         onSelectInterval={jumpToInterval}
+        isLandscape={isLandscape}
       />
     </View>
   );
@@ -333,11 +506,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  containerLandscape: {
+    flexDirection: "row",
+  },
   upperRegion: {
     flex: 1,
     justifyContent: "space-between",
-    paddingTop: 50,
-    overflow: "hidden",
+  },
+  upperRegionLandscape: {
+    flex: 0,
+    width: "55%",
+    height: "100%",
+  },
+  landscapeInnerPadding: {
+    paddingLeft: 0,
   },
   loadingContainer: {
     flex: 1,
@@ -348,17 +530,24 @@ const styles = StyleSheet.create({
   timerBar: {
     position: "absolute",
     left: 0,
+    right: 0,
     bottom: 0,
     width: "100%",
     backgroundColor: "rgba(0, 0, 0, 0.25)",
   },
   header: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: Spacing.lg,
     minHeight: Spacing.touchTarget.min,
     zIndex: 10,
+  },
+  backButton: {
+    width: Spacing.touchTarget.icon,
+    height: Spacing.touchTarget.icon,
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: -10,
   },
   workoutName: {
     fontSize: FontSize.md,
@@ -367,15 +556,23 @@ const styles = StyleSheet.create({
     color: Colors.textScale.inverse,
     opacity: 0.9,
     flex: 1,
+    marginLeft: Spacing.xs,
   },
-  closeButton: {
-    width: Spacing.touchTarget.min,
-    minHeight: Spacing.touchTarget.min,
-    borderRadius: Spacing.touchTarget.min / 2,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
+  headerRightSlot: {
+    width: Spacing.touchTarget.icon,
+    height: Spacing.touchTarget.icon,
     justifyContent: "center",
     alignItems: "center",
-    marginLeft: Spacing.sm,
+  },
+  voiceToggleButton: {
+    width: Spacing.touchTarget.icon,
+    height: Spacing.touchTarget.icon,
+    borderRadius: Spacing.radius.full,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  voiceToggleButtonActive: {
+    backgroundColor: Colors.white,
   },
   detailsContainer: {
     flex: 1,
@@ -392,12 +589,16 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   countdown: {
-    fontSize: 96,
-    lineHeight: 104,
+    fontSize: FontSize.countdown,
+    lineHeight: FontSize.lineHeight.countdown,
     fontFamily: FontSize.fontFamily.bold,
     color: Colors.textScale.inverse,
     marginTop: Spacing.sm,
     textAlign: "center",
+  },
+  countdownLandscape: {
+    fontSize: FontSize.countdownLandscape,
+    lineHeight: FontSize.lineHeight.countdownLandscape,
   },
   controlsBar: {
     flexDirection: "row",
@@ -406,6 +607,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
     paddingBottom: Spacing.md,
     zIndex: 10,
+  },
+  controlsBarLandscape: {
+    paddingLeft: 0,
+    paddingBottom: 0,
   },
   metaContainer: {
     flex: 1,
@@ -429,7 +634,7 @@ const styles = StyleSheet.create({
   controlBtn: {
     width: Spacing.touchTarget.cta,
     minHeight: Spacing.touchTarget.cta,
-    borderRadius: Spacing.radius.full,
+    borderRadius: Spacing.radius.md,
     backgroundColor: Colors.white,
     justifyContent: "center",
     alignItems: "center",

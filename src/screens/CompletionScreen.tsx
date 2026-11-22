@@ -20,7 +20,7 @@ import { createAudioPlayer, setAudioModeAsync } from "expo-audio";
 
 import { RootStackScreenProps } from "../types";
 import { encodeBase64 } from "../utils/base64";
-import { recordWorkoutCompletion, recordShare } from "../services/badgeService";
+import { recordWorkoutCompletion, recordShare, getUserStats } from "../services/badgeService";
 import { getMotivationalCompletionMessage } from "../services/motivationalMessageService";
 import { Badge, UserStats } from "../model/Badge";
 import { getLocalizedBadge } from "../constants/badges";
@@ -38,15 +38,22 @@ export default function CompletionScreen({
   navigation,
 }: RootStackScreenProps<"Completion">) {
   const insets = useSafeAreaInsets();
-  const { timer } = route.params;
+  const {
+    timer,
+    performedSeconds,
+    completedIntervals,
+    qualifiesForCredit = true,
+  } = route.params;
 
   const [newlyUnlockedBadges, setNewlyUnlockedBadges] = useState<Badge[]>([]);
   const [activeModalBadge, setActiveModalBadge] = useState<Badge | null>(null);
   const [userStats, setUserStats] = useState<UserStats | null>(null);
   const [actionsHeight, setActionsHeight] = useState<number>(0);
 
-  // Calculate total seconds worked
+  // Calculate total configured and performed seconds/intervals
   const totalSeconds = timer.intervals.reduce((sum, int) => sum + int.duration, 0) * timer.rounds;
+  const displaySeconds = performedSeconds ?? totalSeconds;
+  const displayCompletedIntervals = completedIntervals ?? timer.intervals.length * timer.rounds;
 
   // Format seconds to mm:ss
   function formatTime(seconds: number): string {
@@ -82,11 +89,17 @@ export default function CompletionScreen({
     };
   }, []);
 
-  // Record workout completion and check for new badges
+  // Record workout completion and check for new badges (only when >= 85% threshold met)
   useEffect(() => {
     async function processCompletion() {
       try {
-        const { newlyUnlocked, stats } = await recordWorkoutCompletion(timer, totalSeconds);
+        if (!qualifiesForCredit) {
+          const stats = await getUserStats();
+          setUserStats(stats);
+          return;
+        }
+
+        const { newlyUnlocked, stats } = await recordWorkoutCompletion(timer, displaySeconds);
         setUserStats(stats);
 
         if (newlyUnlocked.length > 0) {
@@ -131,7 +144,7 @@ export default function CompletionScreen({
       const shareMessage = t("completion.shareMessage", {
         name: timer.name,
         rounds: timer.rounds,
-        duration: formatTime(totalSeconds),
+        duration: formatTime(displaySeconds),
         streakText,
         badgeText,
         appStoreLink: APP_STORE_LINK,
@@ -201,10 +214,10 @@ export default function CompletionScreen({
 
   const motivationalMessage = useMemo(() => {
     return getMotivationalCompletionMessage({
-      durationSeconds: totalSeconds,
+      durationSeconds: displaySeconds,
       rounds: timer.rounds,
     });
-  }, [totalSeconds, timer.rounds]);
+  }, [displaySeconds, timer.rounds]);
 
   const unlockedTitle =
     newlyUnlockedBadges.length === 1
@@ -268,7 +281,7 @@ export default function CompletionScreen({
         <View style={styles.statsRow}>
           <View style={styles.statBox}>
             <Text style={styles.statLabel}>{t("completion.totalTime")}</Text>
-            <Text style={styles.statValue}>{formatTime(totalSeconds)}</Text>
+            <Text style={styles.statValue}>{formatTime(displaySeconds)}</Text>
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statBox}>
@@ -291,7 +304,7 @@ export default function CompletionScreen({
         <View style={styles.infoRow}>
           <Ionicons name="fitness-outline" size={18} color="#4B5563" />
           <Text style={styles.infoText}>
-            {t("completion.intervalsCompleted")}: {timer.intervals.length * timer.rounds}
+            {t("completion.intervalsCompleted")}: {displayCompletedIntervals}
           </Text>
         </View>
       </View>

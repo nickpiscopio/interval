@@ -15,6 +15,7 @@ interface IntervalTimelineProps {
   currentIntervalIndex: number;
   activeColor: string;
   onSelectInterval: (index: number) => void;
+  isLandscape?: boolean;
 }
 
 export default function IntervalTimeline({
@@ -22,17 +23,21 @@ export default function IntervalTimeline({
   currentIntervalIndex,
   activeColor,
   onSelectInterval,
+  isLandscape = false,
 }: IntervalTimelineProps) {
   const insets = useSafeAreaInsets();
   const listRef = useRef<FlatList<Interval>>(null);
   const isUserScrollingRef = useRef(false);
+  const topPadding = isLandscape
+    ? Math.max(insets.top, INTERVAL_TIMELINE_TOP_PADDING)
+    : INTERVAL_TIMELINE_TOP_PADDING;
 
   function scrollToActiveIndex(index: number): void {
     const targetIndex = Math.max(0, index - 1);
     const targetOffset =
       targetIndex === 0
         ? 0
-        : INTERVAL_TIMELINE_TOP_PADDING + targetIndex * INTERVAL_TIMELINE_ROW_HEIGHT;
+        : topPadding + targetIndex * INTERVAL_TIMELINE_ROW_HEIGHT;
     listRef.current?.scrollToOffset({ offset: targetOffset, animated: true });
   }
 
@@ -40,7 +45,7 @@ export default function IntervalTimeline({
     if (!isUserScrollingRef.current && intervals.length > 0) {
       scrollToActiveIndex(currentIntervalIndex);
     }
-  }, [currentIntervalIndex, intervals.length]);
+  }, [currentIntervalIndex, intervals.length, topPadding]);
 
   if (intervals.length === 0) {
     return null;
@@ -55,7 +60,10 @@ export default function IntervalTimeline({
   }
 
   return (
-    <View style={styles.container}>
+    <View
+      testID="interval-timeline-container"
+      style={[styles.container, isLandscape && styles.containerLandscape]}
+    >
       <FlatList
         ref={listRef}
         testID="interval-timeline"
@@ -63,7 +71,7 @@ export default function IntervalTimeline({
         keyExtractor={(item, index) => `${item.id}-${index}`}
         getItemLayout={(_, index) => ({
           length: INTERVAL_TIMELINE_ROW_HEIGHT,
-          offset: INTERVAL_TIMELINE_TOP_PADDING + INTERVAL_TIMELINE_ROW_HEIGHT * index,
+          offset: topPadding + INTERVAL_TIMELINE_ROW_HEIGHT * index,
           index,
         })}
         onScrollBeginDrag={() => {
@@ -84,7 +92,11 @@ export default function IntervalTimeline({
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
           styles.listContent,
-          { paddingBottom: Math.max(insets.bottom, Spacing.md) },
+          {
+            paddingTop: topPadding,
+            paddingBottom: Math.max(insets.bottom, Spacing.md),
+            paddingRight: isLandscape ? Math.max(insets.right, Spacing.md) : Spacing.md,
+          },
         ]}
         renderItem={({ item, index }) => {
           const isPast = index < currentIntervalIndex;
@@ -130,6 +142,13 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface.timeline,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: Colors.surface.timelineBorder,
+  },
+  containerLandscape: {
+    height: "100%",
+    width: "45%",
+    borderTopWidth: 0,
+    borderLeftWidth: StyleSheet.hairlineWidth,
+    borderLeftColor: Colors.surface.timelineBorder,
   },
   listContent: {
     paddingHorizontal: Spacing.md,

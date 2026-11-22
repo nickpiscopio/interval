@@ -1,4 +1,5 @@
 import { generateWorkout } from "../timerGenerator";
+import { INTERVAL_COLOR_PALETTE } from "../../model/Interval";
 
 describe("timerGenerator", () => {
   it("generates a workout for weight_loss goal and total area", () => {
@@ -70,5 +71,19 @@ describe("timerGenerator", () => {
       experience: "advanced",
     });
     expect(lowerTimer.name).toContain("Lower Body");
+  });
+
+  it("assigns only approved palette colors across all generated areas and rest intervals", () => {
+    const areas = ["total", "abs", "lower", "cardio", "upper", "surprise"] as const;
+    for (const area of areas) {
+      const timer = generateWorkout({
+        goal: "tone",
+        area,
+        experience: "intermediate",
+      });
+      for (const interval of timer.intervals) {
+        expect(INTERVAL_COLOR_PALETTE).toContain(interval.color);
+      }
+    }
   });
 });

@@ -131,7 +131,15 @@
     "exitConfirm": "Salir",
     "exitCancel": "Continuar",
     "prep": "Prepárate",
-    "rest": "Descanso"
+    "rest": "Descanso",
+    "voiceControlEnableLabel": "Activar control por voz",
+    "voiceControlDisableLabel": "Desactivar control por voz (escuchando)",
+    "voiceExplainerTitle": "Control por Voz Manos Libres",
+    "voiceExplainerMessage": "Controla tu temporizador sin usar las manos con reconocimiento de voz en el dispositivo.\n\nIniciar / Reanudar:\n\"Iniciar temporizador\", \"Iniciar entrenamiento\", \"Reanudar temporizador\", \"Reanudar entrenamiento\", \"Reproducir temporizador\", \"Reproducir entrenamiento\"\n\nPausar:\n\"Pausar temporizador\", \"Pausar entrenamiento\", \"Pausa temporizador\", \"Pausa entrenamiento\"",
+    "voiceExplainerEnable": "Activar",
+    "voicePermissionDeniedTitle": "Permiso de Micrófono Necesario",
+    "voicePermissionDeniedMessage": "Permite el acceso al micrófono y al reconocimiento de voz en la Configuración de tu dispositivo para usar el control por voz.",
+    "voiceOpenSettings": "Abrir Configuración"
   },
   "completion": {
     "title": "¡Entrenamiento Completado! ⚡️",

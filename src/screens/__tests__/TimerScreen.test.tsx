@@ -1,7 +1,8 @@
 import React from "react";
-import { Animated, FlatList } from "react-native";
+import { Animated, FlatList, StyleSheet } from "react-native";
 import { render, fireEvent, act, within } from "@testing-library/react-native";
 import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
+import * as ScreenOrientation from "expo-screen-orientation";
 import TimerScreen from "../TimerScreen";
 import {
   INTERVAL_TIMELINE_ROW_HEIGHT,
@@ -9,6 +10,13 @@ import {
 } from "../../components/IntervalTimeline";
 import { AlertProvider } from "../../context/AlertContext";
 import { Timer } from "../../model/Timer";
+import Spacing from "../../constants/Spacing";
+import Colors from "../../constants/Colors";
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const ReactNative = require("react-native");
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const SafeAreaContext = require("react-native-safe-area-context");
 
 describe("TimerScreen", () => {
   const mockTimer: Timer = {
@@ -63,7 +71,7 @@ describe("TimerScreen", () => {
     expect(getByText("pause")).toBeTruthy();
   });
 
-  it("shows exit confirmation alert when close button is pressed", () => {
+  it("shows exit confirmation alert when back button is pressed and restores prior pause state on cancel", () => {
     const mockNavigation: any = {
       navigate: jest.fn(),
       goBack: jest.fn(),
@@ -71,7 +79,7 @@ describe("TimerScreen", () => {
       popToTop: jest.fn(),
     };
 
-    const { getByText } = render(
+    const { getByText, getByTestId, queryByText } = render(
       <AlertProvider>
         <TimerScreen
           navigation={mockNavigation}
@@ -80,18 +88,36 @@ describe("TimerScreen", () => {
       </AlertProvider>
     );
 
-    const closeBtn = getByText("close");
-    fireEvent.press(closeBtn);
+    expect(queryByText("close")).toBeNull();
 
+    const backBtn = getByTestId("timer-back-button");
+    expect(within(backBtn).getByText("arrow-back")).toBeTruthy();
+
+    const backStyle = StyleSheet.flatten(backBtn.props.style);
+    expect(backStyle.width).toBe(Spacing.touchTarget.icon);
+    expect(backStyle.height).toBe(Spacing.touchTarget.icon);
+    expect(backStyle.marginLeft).toBe(-10);
+
+    // Pressing back pauses the timer and shows exit confirmation
+    fireEvent.press(backBtn);
+    expect(getByText("play")).toBeTruthy();
     expect(getByText("Leave Workout?")).toBeTruthy();
 
+    // Canceling restores running state
     const cancelBtn = getByText("Keep Going");
     fireEvent.press(cancelBtn);
-
+    expect(getByText("pause")).toBeTruthy();
     expect(mockNavigation.popToTop).not.toHaveBeenCalled();
 
-    // Now press close again and confirm leave
-    fireEvent.press(closeBtn);
+    // Pause manually, then open back alert and cancel -> stays paused
+    fireEvent.press(getByText("pause"));
+    expect(getByText("play")).toBeTruthy();
+    fireEvent.press(backBtn);
+    fireEvent.press(getByText("Keep Going"));
+    expect(getByText("play")).toBeTruthy();
+
+    // Now press back again and confirm leave
+    fireEvent.press(backBtn);
     const leaveBtn = getByText("Leave");
     fireEvent.press(leaveBtn);
 
@@ -142,6 +168,9 @@ describe("TimerScreen", () => {
 
     expect(mockNavigation.replace).toHaveBeenCalledWith("Completion", {
       timer: mockTimer,
+      performedSeconds: 6,
+      completedIntervals: 4,
+      qualifiesForCredit: true,
     });
     expect(deactivateKeepAwake).toHaveBeenCalledWith("timer-running");
   });
@@ -154,7 +183,7 @@ describe("TimerScreen", () => {
       popToTop: jest.fn(),
     };
 
-    const { getByText, unmount } = render(
+    const { getByText, getByTestId, unmount } = render(
       <AlertProvider>
         <TimerScreen
           navigation={mockNavigation}
@@ -176,9 +205,9 @@ describe("TimerScreen", () => {
     fireEvent.press(playIcon);
     expect(activateKeepAwakeAsync).toHaveBeenCalledTimes(2);
 
-    // Open close dialog -> should deactivate keep awake
-    const closeBtn = getByText("close");
-    fireEvent.press(closeBtn);
+    // Open back dialog -> should deactivate keep awake
+    const backBtn = getByTestId("timer-back-button");
+    fireEvent.press(backBtn);
     expect(deactivateKeepAwake).toHaveBeenCalledWith("timer-running");
 
     // Dismiss close dialog with 'Keep Going' -> should re-activate
@@ -333,13 +362,75 @@ describe("TimerScreen", () => {
     expect(getByText("Round 2 of 2")).toBeTruthy();
     expect(getByText("Interval 4/4")).toBeTruthy();
 
-    // Let final interval finish -> navigates to Completion with original timer
+    // Let final interval finish -> navigates to Completion with actual performed credit (< 85%)
     act(() => {
       jest.advanceTimersByTime(1100);
     });
 
     expect(mockNavigation.replace).toHaveBeenCalledWith("Completion", {
       timer: mockTimer,
+      performedSeconds: 1,
+      completedIntervals: 1,
+      qualifiesForCredit: false,
+    });
+  });
+
+  it("qualifies for credit when at least 85% of total time is performed after skipping a brief interval", () => {
+    const briefWarmupTimer: Timer = {
+      id: "brief-1",
+      name: "Warmup & Work",
+      rounds: 1,
+      intervals: [
+        { id: "i1", name: "Warmup", duration: 1, color: "#3B82F6" },
+        { id: "i2", name: "Main Set", duration: 9, color: "#10B981" },
+      ],
+    };
+
+    const { getByTestId, mockNavigation } = renderTimerScreen(briefWarmupTimer);
+
+    // Skip the 1s warmup and run the full 9s main set (9 / 10 = 90% >= 85%)
+    fireEvent.press(getByTestId("interval-timeline-row-1"));
+
+    act(() => {
+      jest.advanceTimersByTime(9100);
+    });
+
+    expect(mockNavigation.replace).toHaveBeenCalledWith("Completion", {
+      timer: briefWarmupTimer,
+      performedSeconds: 9,
+      completedIntervals: 1,
+      qualifiesForCredit: true,
+    });
+  });
+
+  it("caps each interval's credit at its own duration so replaying interval 1 cannot game the 85% threshold", () => {
+    const { getByTestId, mockNavigation } = renderTimerScreen(mockTimer);
+
+    // Run interval 0 (2s) almost to completion, restart it twice (accumulating 5.4s of wall time on interval 0 alone)
+    act(() => {
+      jest.advanceTimersByTime(1800);
+    });
+    fireEvent.press(getByTestId("interval-timeline-row-0"));
+    act(() => {
+      jest.advanceTimersByTime(1800);
+    });
+    fireEvent.press(getByTestId("interval-timeline-row-0"));
+    act(() => {
+      jest.advanceTimersByTime(1800);
+    });
+
+    // Skip straight to final interval (index 3: 1s) and finish it
+    // Interval 0 is capped at 2s + interval 3 is 1s = 3s / 6s (50% < 85%)
+    fireEvent.press(getByTestId("interval-timeline-row-3"));
+    act(() => {
+      jest.advanceTimersByTime(1100);
+    });
+
+    expect(mockNavigation.replace).toHaveBeenCalledWith("Completion", {
+      timer: mockTimer,
+      performedSeconds: 3,
+      completedIntervals: 2,
+      qualifiesForCredit: false,
     });
   });
 
@@ -454,6 +545,128 @@ describe("TimerScreen", () => {
       });
     } finally {
       scrollSpy.mockRestore();
+    }
+  });
+
+  it("unlocks screen orientation on mount and re-locks to PORTRAIT_UP on unmount, exit confirmation, and completion", () => {
+    // 1. Mount & unmount
+    const { unmount } = renderTimerScreen();
+    expect(ScreenOrientation.unlockAsync).toHaveBeenCalledTimes(1);
+
+    unmount();
+    expect(ScreenOrientation.lockAsync).toHaveBeenCalledWith(
+      ScreenOrientation.OrientationLock.PORTRAIT_UP
+    );
+
+    // 2. Exit confirmation
+    jest.clearAllMocks();
+    const exitRun = renderTimerScreen();
+    expect(ScreenOrientation.unlockAsync).toHaveBeenCalledTimes(1);
+    fireEvent.press(exitRun.getByTestId("timer-back-button"));
+    expect(ScreenOrientation.lockAsync).not.toHaveBeenCalled();
+    fireEvent.press(exitRun.getByText("Leave"));
+    expect(ScreenOrientation.lockAsync).toHaveBeenCalledWith(
+      ScreenOrientation.OrientationLock.PORTRAIT_UP
+    );
+    exitRun.unmount();
+
+    // 3. Workout completion
+    jest.clearAllMocks();
+    const completeRun = renderTimerScreen();
+    act(() => {
+      jest.advanceTimersByTime(10000);
+    });
+    expect(ScreenOrientation.lockAsync).toHaveBeenCalledWith(
+      ScreenOrientation.OrientationLock.PORTRAIT_UP
+    );
+    completeRun.unmount();
+  });
+
+  it("renders full-bleed progress bar as a direct child of the root container and rounded-square Play/Pause button", () => {
+    const { getByTestId } = renderTimerScreen();
+
+    const root = getByTestId("timer-screen-container");
+    const progressBar = getByTestId("timer-progress-bar");
+
+    // Direct child of root container (not trapped inside upperRegion)
+    const directChildTestIds = root.children
+      .map((child: any) => child?.props?.testID)
+      .filter(Boolean);
+    expect(directChildTestIds).toContain("timer-progress-bar");
+    expect(progressBar.props.pointerEvents).toBe("none");
+
+    const barStyle = StyleSheet.flatten(progressBar.props.style);
+    expect(barStyle.position).toBe("absolute");
+    expect(barStyle.left).toBe(0);
+    expect(barStyle.right).toBe(0);
+    expect(barStyle.bottom).toBe(0);
+    expect(barStyle.width).toBe("100%");
+
+    // Rounded-square Play/Pause button (56x56, RADIUS.md = 16)
+    const playPauseStyle = StyleSheet.flatten(
+      getByTestId("timer-play-pause-button").props.style
+    );
+    expect(playPauseStyle.width).toBe(Spacing.touchTarget.cta);
+    expect(playPauseStyle.minHeight).toBe(Spacing.touchTarget.cta);
+    expect(playPauseStyle.borderRadius).toBe(Spacing.radius.md);
+  });
+
+  it("renders 55%/45% horizontal split, scaled 72px countdown, 2-line auto-fitting name, left-bordered timeline, and safe-area padding in landscape", () => {
+    const dimSpy = jest.spyOn(ReactNative, "useWindowDimensions").mockReturnValue({
+      width: 844,
+      height: 390,
+      scale: 3,
+      fontScale: 1,
+    });
+    const insetsSpy = jest.spyOn(SafeAreaContext, "useSafeAreaInsets").mockReturnValue({
+      top: 12,
+      bottom: 21,
+      left: 47,
+      right: 47,
+    });
+
+    try {
+      const { getByTestId } = renderTimerScreen();
+
+      // Root container switches to horizontal row
+      const rootStyle = StyleSheet.flatten(
+        getByTestId("timer-screen-container").props.style
+      );
+      expect(rootStyle.flexDirection).toBe("row");
+
+      // Left pane ~55% with safe-area padding
+      const upperStyle = StyleSheet.flatten(
+        getByTestId("timer-upper-region").props.style
+      );
+      expect(upperStyle.width).toBe("55%");
+      expect(upperStyle.paddingTop).toBe(12);
+      expect(upperStyle.paddingLeft).toBe(47);
+      expect(upperStyle.paddingBottom).toBe(21);
+
+      // Scaled 72px countdown (lineHeight 80)
+      const countdownStyle = StyleSheet.flatten(
+        getByTestId("hero-countdown").props.style
+      );
+      expect(countdownStyle.fontSize).toBe(72);
+      expect(countdownStyle.lineHeight).toBe(80);
+
+      // 2-line auto-fitting interval name
+      const intervalName = getByTestId("hero-interval-name");
+      expect(intervalName.props.numberOfLines).toBe(2);
+      expect(intervalName.props.adjustsFontSizeToFit).toBe(true);
+
+      // Right pane 45% full-height left-bordered IntervalTimeline
+      const timelineStyle = StyleSheet.flatten(
+        getByTestId("interval-timeline-container").props.style
+      );
+      expect(timelineStyle.width).toBe("45%");
+      expect(timelineStyle.height).toBe("100%");
+      expect(timelineStyle.borderLeftWidth).toBe(StyleSheet.hairlineWidth);
+      expect(timelineStyle.borderLeftColor).toBe(Colors.surface.timelineBorder);
+      expect(timelineStyle.borderTopWidth).toBe(0);
+    } finally {
+      dimSpy.mockRestore();
+      insetsSpy.mockRestore();
     }
   });
 });

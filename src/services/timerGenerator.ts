@@ -1,6 +1,6 @@
 import { EXERCISE_CATALOG, getLocalizedExercise } from "../constants/exerciseCatalog";
 import { Timer } from "../model/Timer";
-import { Interval, generateIntervalId } from "../model/Interval";
+import { INTERVAL_COLORS, Interval, generateIntervalId } from "../model/Interval";
 import { Exercise } from "../model/Exercise";
 import { t } from "../i18n";
 
@@ -81,11 +81,11 @@ export function generateWorkout(params: GeneratorParams): Timer {
   // 3. Construct intervals list
   const intervals: Interval[] = [];
   const colorMap: Record<string, string> = {
-    cardio: "#1ACC6C", // Emerald
-    total: "#E63946",  // Red
-    upper: "#3B82F6",  // Blue
-    lower: "#F59E0B",  // Amber
-    abs: "#8338EC"     // Purple
+    cardio: INTERVAL_COLORS.green,
+    total: INTERVAL_COLORS.red,
+    upper: INTERVAL_COLORS.blue,
+    lower: INTERVAL_COLORS.yellow,
+    abs: INTERVAL_COLORS.purple,
   };
 
   selectedExercises.forEach((rawEx, idx) => {
@@ -94,7 +94,7 @@ export function generateWorkout(params: GeneratorParams): Timer {
       id: generateIntervalId(),
       name: ex.name,
       duration: activeDuration,
-      color: colorMap[rawEx.category] || "#1ACC6C",
+      color: colorMap[rawEx.category] || INTERVAL_COLORS.green,
       exerciseId: rawEx.id
     });
 
@@ -104,7 +104,7 @@ export function generateWorkout(params: GeneratorParams): Timer {
         id: generateIntervalId(),
         name: t("timerGenerator.rest", { defaultValue: "Rest" }),
         duration: restDuration,
-        color: "#4B5563"
+        color: INTERVAL_COLORS.blue
       });
     }
   });

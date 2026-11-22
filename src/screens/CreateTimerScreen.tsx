@@ -20,7 +20,12 @@ import DraggableFlatList, {
 
 import { RootStackScreenProps } from "../types";
 import { Timer } from "../model/Timer";
-import { Interval, generateIntervalId, normalizeInterval } from "../model/Interval";
+import {
+  Interval,
+  INTERVAL_COLOR_PALETTE,
+  generateIntervalId,
+  normalizeInterval,
+} from "../model/Interval";
 import { Exercise } from "../model/Exercise";
 import { EditIntervalModal } from "../components/EditIntervalModal";
 import { t } from "../i18n";
@@ -30,15 +35,6 @@ import FontSize from "../constants/FontSize";
 import Colors from "../constants/Colors";
 
 const STORAGE_KEY = "@hiit_timers";
-const COLOR_PALETTE = [
-  "#1ACC6C", // Green
-  "#10B981", // Emerald
-  "#3B82F6", // Blue
-  "#8338EC", // Purple
-  "#E63946", // Red
-  "#F95738", // Orange
-  "#F9C74F"  // Yellow
-];
 
 function formatSeconds(totalSec: number): string {
   const safeSec = Math.max(0, Math.floor(isNaN(totalSec) ? 0 : totalSec));
@@ -130,7 +126,7 @@ export default function CreateTimerScreen({
       id: generateIntervalId(),
       name: "",
       duration: -1,
-      color: COLOR_PALETTE[intervals.length % COLOR_PALETTE.length]
+      color: INTERVAL_COLOR_PALETTE[intervals.length % INTERVAL_COLOR_PALETTE.length]
     };
     isClosingModalRef.current = false;
     isAddingNewIntervalRef.current = true;

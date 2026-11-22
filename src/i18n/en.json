@@ -131,7 +131,15 @@
     "exitConfirm": "Leave",
     "exitCancel": "Keep Going",
     "prep": "Get Ready",
-    "rest": "Rest"
+    "rest": "Rest",
+    "voiceControlEnableLabel": "Enable voice control",
+    "voiceControlDisableLabel": "Disable voice control (listening)",
+    "voiceExplainerTitle": "Hands-Free Voice Control",
+    "voiceExplainerMessage": "Control your timer hands-free using on-device voice recognition.\n\nPlay / Resume:\n\"Play timer\", \"Play workout\", \"Resume timer\", \"Resume workout\"\n\nPause:\n\"Pause timer\", \"Pause workout\"",
+    "voiceExplainerEnable": "Enable",
+    "voicePermissionDeniedTitle": "Microphone Permission Needed",
+    "voicePermissionDeniedMessage": "Allow microphone and speech recognition access in your device Settings to use hands-free voice control.",
+    "voiceOpenSettings": "Open Settings"
   },
   "completion": {
     "title": "Workout Complete! ⚡️",

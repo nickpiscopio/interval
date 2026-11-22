@@ -17,7 +17,12 @@ export type RootStackParamList = {
   CreateTimer: { timer?: Timer } | undefined;
   Timer: { timer: Timer };
   GenerateTimer: undefined;
-  Completion: { timer: Timer };
+  Completion: {
+    timer: Timer;
+    performedSeconds?: number;
+    completedIntervals?: number;
+    qualifiesForCredit?: boolean;
+  };
   Awards: undefined;
   Modal: undefined;
   NotFound: undefined;

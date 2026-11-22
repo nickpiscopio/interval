@@ -55,7 +55,14 @@
       "expo-status-bar",
       "expo-video",
       "expo-web-browser",
-      "expo-audio"
+      "expo-audio",
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone for hands-free voice control during workouts.",
+          "speechRecognitionPermission": "Allow $(PRODUCT_NAME) to recognize Play and Pause voice commands on your device."
+        }
+      ]
     ],
     "runtimeVersion": {
       "policy": "sdkVersion"

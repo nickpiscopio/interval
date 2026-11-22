@@ -5,7 +5,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createAudioPlayer, setAudioModeAsync } from "expo-audio";
 import CompletionScreen from "../CompletionScreen";
 import { Timer } from "../../model/Timer";
-import { saveUserStats, DEFAULT_USER_STATS } from "../../services/badgeService";
+import * as badgeService from "../../services/badgeService";
+import { saveUserStats, getUserStats, DEFAULT_USER_STATS } from "../../services/badgeService";
 import { BADGE_CATALOG } from "../../constants/badges";
 import Colors from "../../constants/Colors";
 
@@ -308,5 +309,128 @@ describe("CompletionScreen", () => {
 
     const contentStyle = StyleSheet.flatten(scrollView.props.contentContainerStyle);
     expect(contentStyle.paddingBottom).toBeGreaterThanOrEqual(100);
+  });
+
+  it("records workout completion with actual performedSeconds and displays actual performed stats when qualified (>= 85%)", async () => {
+    const recordSpy = jest.spyOn(badgeService, "recordWorkoutCompletion");
+    const shareSpy = jest.spyOn(Share, "share").mockResolvedValueOnce({
+      action: Share.dismissedAction,
+    });
+
+    try {
+      const { getByText, getByTestId, queryByText } = render(
+        <CompletionScreen
+          navigation={{} as any}
+          route={{
+            params: {
+              timer: mockTimer,
+              performedSeconds: 80,
+              completedIntervals: 3,
+              qualifiesForCredit: true,
+            },
+          } as any}
+        />
+      );
+
+      await waitFor(() => {
+        expect(recordSpy).toHaveBeenCalledWith(mockTimer, 80);
+      });
+
+      // Displays actual performed time (1:20 instead of configured 1:30) and actual completed intervals (3 instead of 4)
+      expect(getByText("1:20")).toBeTruthy();
+      expect(queryByText("1:30")).toBeNull();
+      expect(getByText("Intervals Completed: 3")).toBeTruthy();
+
+      const stats = await getUserStats();
+      expect(stats.totalWorkouts).toBe(1);
+      expect(stats.totalSeconds).toBe(80);
+
+      // Share text uses actual performed time (1:20)
+      fireEvent.press(getByTestId("btn-share-workout"));
+      await waitFor(() => {
+        expect(shareSpy).toHaveBeenCalledWith(
+          expect.objectContaining({
+            message: expect.stringContaining("1:20"),
+          })
+        );
+      });
+    } finally {
+      recordSpy.mockRestore();
+      shareSpy.mockRestore();
+    }
+  });
+
+  it("silently skips recordWorkoutCompletion, reads unmodified existing stats, and shows actual performed time/intervals when unqualified (< 85%)", async () => {
+    await saveUserStats({
+      ...DEFAULT_USER_STATS,
+      totalWorkouts: 4,
+      totalSeconds: 600,
+      currentStreak: 3,
+      longestStreak: 5,
+      lastWorkoutDate: "2026-11-21",
+      unlockedBadgeIds: ["first_step_hero"],
+    });
+
+    const recordSpy = jest.spyOn(badgeService, "recordWorkoutCompletion");
+    const getStatsSpy = jest.spyOn(badgeService, "getUserStats");
+    const shareSpy = jest.spyOn(Share, "share").mockResolvedValueOnce({
+      action: Share.dismissedAction,
+    });
+
+    try {
+      const { getByText, getByTestId, queryByText, queryByTestId } = render(
+        <CompletionScreen
+          navigation={{} as any}
+          route={{
+            params: {
+              timer: mockTimer,
+              performedSeconds: 15,
+              completedIntervals: 1,
+              qualifiesForCredit: false,
+            },
+          } as any}
+        />
+      );
+
+      await waitFor(() => {
+        expect(getStatsSpy).toHaveBeenCalled();
+        expect(getByText("🔥 3d")).toBeTruthy();
+      });
+
+      // Must NOT record workout completion or unlock any badges
+      expect(recordSpy).not.toHaveBeenCalled();
+      expect(queryByTestId("unlocked-section-header")).toBeNull();
+      expect(getByTestId("centered-trophy-row")).toBeTruthy();
+
+      // Displays normal celebration, actual performed time (0:15), and actual completed intervals (1)
+      expect(getByText("Workout Complete! ⚡️")).toBeTruthy();
+      expect(getByText("0:15")).toBeTruthy();
+      expect(queryByText("1:30")).toBeNull();
+      expect(getByText("Intervals Completed: 1")).toBeTruthy();
+
+      // Normal completion audio still plays
+      expect(createAudioPlayer).toHaveBeenCalled();
+
+      // Persisted user stats remain completely unmodified
+      const statsAfter = await getUserStats();
+      expect(statsAfter.totalWorkouts).toBe(4);
+      expect(statsAfter.totalSeconds).toBe(600);
+      expect(statsAfter.currentStreak).toBe(3);
+      expect(statsAfter.unlockedBadgeIds).toEqual(["first_step_hero"]);
+
+      // Share text uses actual performed time (0:15)
+      fireEvent.press(getByTestId("btn-share-workout"));
+      await waitFor(() => {
+        expect(shareSpy).toHaveBeenCalledWith(
+          expect.objectContaining({
+            message: expect.stringContaining("0:15"),
+          })
+        );
+      });
+    } finally {
+      recordSpy.mockRestore();
+      getStatsSpy.mockRestore();
+      shareSpy.mockRestore();
+    }
   });
 });

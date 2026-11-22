@@ -201,13 +201,13 @@ describe("TimerScreen interval sounds", () => {
   });
 
   it("pauses and releases active player upon leaving the workout via exit alert", async () => {
-    const { getByText, navigation } = renderTimer([
+    const { getByText, getByTestId, navigation } = renderTimer([
       { id: "a", name: "A", duration: 5, color: "#fff", sound: "beep_3" },
     ]);
     await flush();
     const beep3Player = getPlayer(BEEP_3);
 
-    fireEvent.press(getByText("close"));
+    fireEvent.press(getByTestId("timer-back-button"));
     fireEvent.press(getByText("Leave"));
 
     expect(navigation.popToTop).toHaveBeenCalled();

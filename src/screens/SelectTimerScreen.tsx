@@ -20,7 +20,7 @@ import DraggableFlatList, {
 
 import { RootStackScreenProps } from "../types";
 import { Timer } from "../model/Timer";
-import { normalizeInterval } from "../model/Interval";
+import { INTERVAL_COLORS, normalizeInterval } from "../model/Interval";
 import { Exercise } from "../model/Exercise";
 import { DEFAULT_AI_TIMERS } from "../constants/defaultTimers";
 import { encodeBase64 } from "../utils/base64";
@@ -205,20 +205,20 @@ export default function SelectTimerScreen({
           id: "prep",
           name: t("timer.prep", { defaultValue: "Get Ready" }),
           duration: 10,
-          color: "#6B7280",
+          color: INTERVAL_COLORS.blue,
         },
         {
           id: "work",
           name: exercise.name,
           duration: 40,
-          color: exercise.category === "corrective" ? "#059669" : "#3B82F6",
+          color: exercise.category === "corrective" ? INTERVAL_COLORS.emerald : INTERVAL_COLORS.blue,
           exerciseId: exercise.id,
         },
         {
           id: "rest",
           name: t("timer.rest", { defaultValue: "Rest" }),
           duration: 15,
-          color: "#4B5563",
+          color: INTERVAL_COLORS.blue,
         },
       ],
       createdAt: Date.now(),
@@ -237,14 +237,14 @@ export default function SelectTimerScreen({
           id: "work_1",
           name: exercise.name,
           duration: 30,
-          color: exercise.category === "corrective" ? "#059669" : "#3B82F6",
+          color: exercise.category === "corrective" ? INTERVAL_COLORS.emerald : INTERVAL_COLORS.blue,
           exerciseId: exercise.id,
         },
         {
           id: "rest_1",
           name: t("timer.rest", { defaultValue: "Rest" }),
           duration: 15,
-          color: "#4B5563",
+          color: INTERVAL_COLORS.blue,
         },
       ],
       createdAt: Date.now(),
@@ -402,7 +402,7 @@ export default function SelectTimerScreen({
                   hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                   onPress={() => navigation.navigate("Timer", { timer: item })}
                 >
-                  <Ionicons name="play" size={18} color="#FFFFFF" />
+                  <Ionicons name="play" size={20} color="#FFFFFF" />
                 </TouchableOpacity>
               )}
             </View>
@@ -959,8 +959,8 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   cardPlayButton: {
-    width: 36,
-    height: 36,
+    width: TOUCH_TARGET.icon,
+    height: TOUCH_TARGET.icon,
     borderRadius: RADIUS.sm,
     backgroundColor: Colors.primary,
     alignItems: "center",

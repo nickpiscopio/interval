@@ -99,3 +99,15 @@ _Avoid_: Section List, Step List, Playlist
 **Timer Variety Badges**:
 Gamified achievement awards in the `variety` category unlocked by completing 5, 10, 25, or 50 distinct Timers across any origin with permanent lifetime credit.
 _Avoid_: Workout Variety Trophies, Preset Diversity Badges
+
+**Voice Control**:
+An opt-in, hands-free control mode on the active Timer runner that listens for localized multi-word Play/Resume and Pause hot phrases using native speech recognition (preferring on-device processing when supported), requiring explicit user onboarding before enabling and persisting the user's preference across sessions.
+_Avoid_: Voice Assistant, Wake Word, Always-On Mic, Single-Word Voice Commands
+
+**Completion Integrity Threshold**:
+The minimum proportion (85%) of a Timer's Total Time that a user must actively perform across its Intervals—with each Interval credited up to its own configured duration—for a finished run to record workout stats, streaks, and badges.
+_Avoid_: Anti-Cheat Lockout, Completion Penalty, Skip Disqualification
+
+**Approved Interval Color Palette**:
+The single shared set of seven approved colors available for Intervals across default, custom, quick-start, AI-generated, and imported Timers, matching the color options in the Interval Edit Bottom Sheet with legacy off-palette colors normalized automatically.
+_Avoid_: Custom Color Picker, Freeform Hex Colors, Unconstrained Interval Colors

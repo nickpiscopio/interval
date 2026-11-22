@@ -298,3 +298,100 @@ jest.mock("expo-keep-awake", () => ({
   deactivateKeepAwake: jest.fn(),
   useKeepAwake: jest.fn(),
 }));
+
+// Mock Expo Screen Orientation
+jest.mock("expo-screen-orientation", () => ({
+  unlockAsync: jest.fn().mockResolvedValue(undefined),
+  lockAsync: jest.fn().mockResolvedValue(undefined),
+  OrientationLock: {
+    DEFAULT: 0,
+    ALL: 1,
+    PORTRAIT: 2,
+    PORTRAIT_UP: 3,
+    PORTRAIT_DOWN: 4,
+    LANDSCAPE: 5,
+    LANDSCAPE_LEFT: 6,
+    LANDSCAPE_RIGHT: 7,
+    OTHER: 8,
+    UNKNOWN: 9,
+  },
+}));
+
+// Mock Expo Speech Recognition
+jest.mock("expo-speech-recognition", () => {
+  const React = require("react");
+  const listeners = new Map();
+
+  const defaultPermissionResult = {
+    granted: true,
+    status: "granted",
+    canAskAgain: true,
+    expires: "never",
+  };
+
+  const ExpoSpeechRecognitionModule = {
+    isRecognitionAvailable: jest.fn(() => true),
+    supportsOnDeviceRecognition: jest.fn(() => true),
+    requestPermissionsAsync: jest.fn(() => Promise.resolve(defaultPermissionResult)),
+    getPermissionsAsync: jest.fn(() => Promise.resolve(defaultPermissionResult)),
+    start: jest.fn(),
+    stop: jest.fn(),
+    abort: jest.fn(),
+  };
+
+  const useSpeechRecognitionEvent = (eventName, listener) => {
+    const listenerRef = React.useRef(listener);
+    listenerRef.current = listener;
+
+    React.useEffect(() => {
+      if (!listeners.has(eventName)) {
+        listeners.set(eventName, new Set());
+      }
+      const wrapped = (event) => {
+        if (listenerRef.current) {
+          listenerRef.current(event);
+        }
+      };
+      listeners.get(eventName).add(wrapped);
+      return () => {
+        const set = listeners.get(eventName);
+        if (set) {
+          set.delete(wrapped);
+          if (set.size === 0) {
+            listeners.delete(eventName);
+          }
+        }
+      };
+    }, [eventName]);
+  };
+
+  const __emitSpeechRecognitionEvent = (eventName, payload) => {
+    const set = listeners.get(eventName);
+    if (!set) return;
+    for (const fn of Array.from(set)) {
+      fn(payload);
+    }
+  };
+
+  const __resetSpeechRecognitionMock = () => {
+    listeners.clear();
+    ExpoSpeechRecognitionModule.isRecognitionAvailable.mockReset().mockImplementation(() => true);
+    ExpoSpeechRecognitionModule.supportsOnDeviceRecognition.mockReset().mockImplementation(() => true);
+    ExpoSpeechRecognitionModule.requestPermissionsAsync
+      .mockReset()
+      .mockImplementation(() => Promise.resolve(defaultPermissionResult));
+    ExpoSpeechRecognitionModule.getPermissionsAsync
+      .mockReset()
+      .mockImplementation(() => Promise.resolve(defaultPermissionResult));
+    ExpoSpeechRecognitionModule.start.mockReset();
+    ExpoSpeechRecognitionModule.stop.mockReset();
+    ExpoSpeechRecognitionModule.abort.mockReset();
+  };
+
+  return {
+    ExpoSpeechRecognitionModule,
+    useSpeechRecognitionEvent,
+    __emitSpeechRecognitionEvent,
+    __resetSpeechRecognitionMock,
+  };
+});

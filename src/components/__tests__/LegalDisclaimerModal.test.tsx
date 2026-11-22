@@ -83,4 +83,59 @@ describe("LegalDisclaimerModal Component", () => {
     fireEvent.press(topCloseBtn);
     expect(onClose).toHaveBeenCalledTimes(1);
   });
+
+  it("uses edge-to-edge scroll layout with card horizontal margins in gate mode", () => {
+    const { getByTestId, getAllByTestId } = render(
+      <LegalDisclaimerModal visible={true} mode="gate" />
+    );
+
+    const scrollView = getByTestId("legal-scroll-view");
+    const contentStyle = StyleSheet.flatten(scrollView.props.contentContainerStyle);
+    expect(contentStyle.paddingHorizontal ?? 0).toBe(0);
+    expect(contentStyle.paddingLeft ?? 0).toBe(0);
+    expect(contentStyle.paddingRight ?? 0).toBe(0);
+
+    const cards = getAllByTestId("legal-card");
+    expect(cards).toHaveLength(4);
+    for (const card of cards) {
+      const cardStyle = StyleSheet.flatten(card.props.style);
+      expect(cardStyle.marginHorizontal).toBe(Spacing.md);
+    }
+  });
+
+  it("uses noPadding BottomSheetFrame, padded sheet header, and edge-to-edge card margins in review mode", () => {
+    const { getByTestId, getAllByTestId } = render(
+      <LegalDisclaimerModal
+        visible={true}
+        mode="review"
+        appVersion="2.4.0"
+        acceptedDate="Aug 27, 2026"
+      />
+    );
+
+    const sheetContentStyle = StyleSheet.flatten(
+      getByTestId("bottom-sheet-content").props.style
+    );
+    expect(sheetContentStyle.paddingHorizontal).toBe(0);
+    expect(sheetContentStyle.paddingTop).toBe(0);
+
+    const sheetHeaderStyle = StyleSheet.flatten(
+      getByTestId("legal-sheet-header").props.style
+    );
+    expect(sheetHeaderStyle.paddingHorizontal).toBe(Spacing.md);
+    expect(sheetHeaderStyle.paddingTop).toBe(Spacing.md);
+
+    const scrollView = getByTestId("legal-scroll-view");
+    const contentStyle = StyleSheet.flatten(scrollView.props.contentContainerStyle);
+    expect(contentStyle.paddingHorizontal ?? 0).toBe(0);
+    expect(contentStyle.paddingLeft ?? 0).toBe(0);
+    expect(contentStyle.paddingRight ?? 0).toBe(0);
+
+    const cards = getAllByTestId("legal-card");
+    expect(cards).toHaveLength(4);
+    for (const card of cards) {
+      const cardStyle = StyleSheet.flatten(card.props.style);
+      expect(cardStyle.marginHorizontal).toBe(Spacing.md);
+    }
+  });
 });

@@ -15,7 +15,11 @@ import { Ionicons } from "@expo/vector-icons";
 import { createAudioPlayer, AudioPlayer, setAudioModeAsync } from "expo-audio";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { Interval } from "../model/Interval";
+import {
+  Interval,
+  INTERVAL_COLOR_PALETTE,
+  normalizeIntervalColor,
+} from "../model/Interval";
 import { Exercise } from "../model/Exercise";
 import { Spacer } from "./Spacer";
 import { BottomSheetFrame } from "./BottomSheetFrame";
@@ -30,16 +34,6 @@ import {
 import Spacing, { RADIUS, TOUCH_TARGET } from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
 import Colors from "../constants/Colors";
-
-const COLOR_PALETTE = [
-  "#1ACC6C", // Green
-  "#10B981", // Emerald
-  "#3B82F6", // Blue
-  "#8338EC", // Purple
-  "#E63946", // Red
-  "#F95738", // Orange
-  "#F9C74F"  // Yellow
-];
 
 function formatHHMMSS(totalSeconds: number): string {
   const safeSec = Math.max(0, Math.floor(isNaN(totalSeconds) ? 0 : totalSeconds));
@@ -361,8 +355,8 @@ export function EditIntervalModal({
             {t("createTimer.intervalColor")}
           </Text>
           <View testID="edit-interval-color-palette" style={styles.colorPalette}>
-            {COLOR_PALETTE.map((color) => {
-              const isSelected = (interval.color || "#1ACC6C") === color;
+            {INTERVAL_COLOR_PALETTE.map((color) => {
+              const isSelected = normalizeIntervalColor(interval.color) === color;
               return (
                 <TouchableOpacity
                   key={color}

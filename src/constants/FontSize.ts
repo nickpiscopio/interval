@@ -15,6 +15,8 @@ export const FONT_SIZE = {
   "3xl": 32,
   "4xl": 40,
   "5xl": 48,
+  countdownLandscape: 72,
+  countdown: 96,
 } as const;
 
 export const LINE_HEIGHT = {
@@ -27,6 +29,8 @@ export const LINE_HEIGHT = {
   "3xl": 40,
   "4xl": 48,
   "5xl": 56,
+  countdownLandscape: 80,
+  countdown: 104,
 } as const;
 
 export default {

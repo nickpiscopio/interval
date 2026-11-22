@@ -5,7 +5,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import SelectTimerScreen from "../SelectTimerScreen";
 import { AlertProvider } from "../../context/AlertContext";
 import { DEFAULT_AI_TIMERS } from "../../constants/defaultTimers";
-import { RADIUS } from "../../constants/Spacing";
+import { RADIUS, TOUCH_TARGET } from "../../constants/Spacing";
+import { INTERVAL_COLOR_PALETTE } from "../../model/Interval";
 
 function renderWithAlert(ui: React.ReactElement) {
   return render(<AlertProvider>{ui}</AlertProvider>);
@@ -87,11 +88,14 @@ describe("SelectTimerScreen", () => {
     const playBtn = getByTestId(`btn-play-timer-${DEFAULT_AI_TIMERS[0].id}`);
     expect(playBtn.props.style).toEqual(
       expect.objectContaining({
+        width: TOUCH_TARGET.icon,
+        height: TOUCH_TARGET.icon,
         borderRadius: RADIUS.sm,
       })
     );
 
     const playButtons = getAllByText("play");
+    expect(playButtons[0].props.size).toBe(20);
     fireEvent.press(playButtons[0]);
 
     expect(mockNavigation.navigate).toHaveBeenCalledWith(
@@ -246,6 +250,14 @@ describe("SelectTimerScreen", () => {
       expect(timerCalls).toHaveLength(2);
       expect(timerCalls[0][1].timer.id).toBe("quick_tibialis_raises");
       expect(timerCalls[1][1].timer.id).toBe("quick_tibialis_raises");
+      for (const interval of timerCalls[0][1].timer.intervals) {
+        expect(INTERVAL_COLOR_PALETTE).toContain(interval.color);
+      }
+      expect(timerCalls[0][1].timer.intervals.map((i: any) => i.color)).toEqual([
+        "#3B82F6",
+        "#10B981",
+        "#3B82F6",
+      ]);
     }, { timeout: 3500 });
 
     // Open another exercise and Create Custom Timer
@@ -262,6 +274,16 @@ describe("SelectTimerScreen", () => {
           }),
         })
       );
+      const createCalls = mockNavigation.navigate.mock.calls.filter(
+        ([route]: [string]) => route === "CreateTimer"
+      );
+      for (const interval of createCalls[0][1].timer.intervals) {
+        expect(INTERVAL_COLOR_PALETTE).toContain(interval.color);
+      }
+      expect(createCalls[0][1].timer.intervals.map((i: any) => i.color)).toEqual([
+        "#10B981",
+        "#3B82F6",
+      ]);
     }, { timeout: 3500 });
 
     // Switch back to Workouts tab

@@ -56,7 +56,7 @@ export function LegalDisclaimerModal({
     return (
       <>
         {/* Section 1: Assumption of Risk */}
-        <View style={styles.card}>
+        <View testID="legal-card" style={styles.card}>
           <View style={styles.cardHeaderRow}>
             <View style={[styles.iconWrap, { backgroundColor: "#FEF2F2" }]}>
               <Ionicons name="hand-left" size={18} color="#DC2626" />
@@ -71,7 +71,7 @@ export function LegalDisclaimerModal({
         </View>
 
         {/* Section 2: AI & PT Recommendations */}
-        <View style={styles.card}>
+        <View testID="legal-card" style={styles.card}>
           <View style={styles.cardHeaderRow}>
             <View style={[styles.iconWrap, { backgroundColor: "#EFF6FF" }]}>
               <Ionicons name="sparkles" size={18} color="#2563EB" />
@@ -86,7 +86,7 @@ export function LegalDisclaimerModal({
         </View>
 
         {/* Section 3: Physician Consultation */}
-        <View style={[styles.card, styles.highlightCard]}>
+        <View testID="legal-card" style={[styles.card, styles.highlightCard]}>
           <View style={styles.cardHeaderRow}>
             <View style={[styles.iconWrap, { backgroundColor: "#ECFDF5" }]}>
               <Ionicons name="medkit" size={18} color="#059669" />
@@ -101,7 +101,7 @@ export function LegalDisclaimerModal({
         </View>
 
         {/* Section 4: Limitation of Liability */}
-        <View style={styles.card}>
+        <View testID="legal-card" style={styles.card}>
           <View style={styles.cardHeaderRow}>
             <View style={[styles.iconWrap, { backgroundColor: "#FFFBEB" }]}>
               <Ionicons name="alert-circle" size={18} color="#D97706" />
@@ -146,6 +146,7 @@ export function LegalDisclaimerModal({
 
           {/* Scrollable Legal Sections */}
           <ScrollView
+            testID="legal-scroll-view"
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.scrollContent}
           >
@@ -181,9 +182,10 @@ const LEGAL_SHEET_SNAP_POINTS = ["90%"];
       visible={visible}
       onClose={handleClose}
       snapPoints={LEGAL_SHEET_SNAP_POINTS}
+      noPadding
     >
       {/* Header Bar */}
-      <View style={styles.sheetHeader}>
+      <View testID="legal-sheet-header" style={styles.sheetHeader}>
         {/* Row 1: Flex row with Title on the left and transparent Close Button on the right */}
         <View style={styles.headerRow1}>
           <Text style={styles.title}>{t("legal.title")}</Text>
@@ -225,6 +227,7 @@ const LEGAL_SHEET_SNAP_POINTS = ["90%"];
 
       {/* Scrollable Legal Sections */}
       <BottomSheetScrollView
+        testID="legal-scroll-view"
         style={styles.sheetScroll}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.sheetScrollContent}
@@ -248,6 +251,8 @@ const styles = StyleSheet.create({
     borderBottomColor: Colors.borderDefault,
   },
   sheetHeader: {
+    paddingHorizontal: Spacing.md,
+    paddingTop: Spacing.md,
     paddingBottom: Spacing.sm,
     borderBottomWidth: 1,
     borderBottomColor: Colors.borderDefault,
@@ -312,7 +317,6 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   scrollContent: {
-    paddingHorizontal: Spacing.md,
     paddingTop: Spacing.md,
     paddingBottom: Spacing.xl,
     gap: 12,
@@ -329,6 +333,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface.card,
     borderRadius: RADIUS.md,
     padding: Spacing.md,
+    marginHorizontal: Spacing.md,
     ...SHADOWS.card,
   },
   highlightCard: {
