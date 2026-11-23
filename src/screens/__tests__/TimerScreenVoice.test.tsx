@@ -11,8 +11,6 @@ import { setLocale } from "../../i18n";
 import {
   VOICE_CONTROL_COOLDOWN_MS,
   VOICE_CONTROL_ENABLED_KEY,
-  VOICE_CONTROL_EXPLAINER_VERSION,
-  VOICE_CONTROL_EXPLAINER_VERSION_KEY,
 } from "../../services/voiceControl";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -93,10 +91,6 @@ describe("TimerScreen Voice Control", () => {
 
     ExpoSpeechRecognitionModule.isRecognitionAvailable.mockReturnValue(true);
     ExpoSpeechRecognitionModule.supportsOnDeviceRecognition.mockReturnValue(false);
-    await AsyncStorage.setItem(
-      VOICE_CONTROL_EXPLAINER_VERSION_KEY,
-      VOICE_CONTROL_EXPLAINER_VERSION
-    );
 
     const { getByTestId, getByText, queryByTestId } = renderTimerScreen();
     await flushMicrotasks();
@@ -106,6 +100,9 @@ describe("TimerScreen Voice Control", () => {
 
     await act(async () => {
       fireEvent.press(toggle);
+    });
+    await act(async () => {
+      fireEvent.press(getByText("Enable"));
     });
     await flushMicrotasks();
 
@@ -224,17 +221,45 @@ describe("TimerScreen Voice Control", () => {
     expect(getByText("play")).toBeTruthy();
   });
 
-  it("re-displays explainer when stored explainer version is outdated", async () => {
-    await AsyncStorage.setItem(VOICE_CONTROL_EXPLAINER_VERSION_KEY, "0");
-
+  it("shows hot-phrase alert on every explicit toggle from OFF to ON, pausing timer and restoring prior state", async () => {
     const { getByTestId, getByText } = renderTimerScreen();
     await flushMicrotasks();
 
+    // First toggle ON -> shows alert, pauses timer
     await act(async () => {
       fireEvent.press(getByTestId("timer-voice-toggle"));
     });
-
     expect(getByText("Hands-Free Voice Control")).toBeTruthy();
+    expect(getByText("play")).toBeTruthy();
+
+    // Confirm Enable -> starts listening & resumes timer
+    await act(async () => {
+      fireEvent.press(getByText("Enable"));
+    });
+    await flushMicrotasks();
+    expect(within(getByTestId("timer-voice-toggle")).getByText("mic")).toBeTruthy();
+    expect(getByText("pause")).toBeTruthy();
+
+    // Toggle OFF -> stops immediately without alert
+    await act(async () => {
+      fireEvent.press(getByTestId("timer-voice-toggle"));
+    });
+    await flushMicrotasks();
+    expect(within(getByTestId("timer-voice-toggle")).getByText("mic-off")).toBeTruthy();
+
+    // Second toggle ON -> shows hot-phrase alert again and pauses timer
+    await act(async () => {
+      fireEvent.press(getByTestId("timer-voice-toggle"));
+    });
+    expect(getByText("Hands-Free Voice Control")).toBeTruthy();
+    expect(getByText("play")).toBeTruthy();
+
+    // Cancel -> restores running state and stays OFF
+    await act(async () => {
+      fireEvent.press(getByText("Cancel"));
+    });
+    expect(getByText("pause")).toBeTruthy();
+    expect(within(getByTestId("timer-voice-toggle")).getByText("mic-off")).toBeTruthy();
   });
 
   it("enables voice control after confirming explainer and granting permissions, and persists state", async () => {
@@ -266,9 +291,6 @@ describe("TimerScreen Voice Control", () => {
 
     // Persisted preferences
     expect(await AsyncStorage.getItem(VOICE_CONTROL_ENABLED_KEY)).toBe("true");
-    expect(await AsyncStorage.getItem(VOICE_CONTROL_EXPLAINER_VERSION_KEY)).toBe(
-      VOICE_CONTROL_EXPLAINER_VERSION
-    );
 
     // Timer resumed after explainer confirmation
     expect(getByText("pause")).toBeTruthy();
@@ -285,10 +307,6 @@ describe("TimerScreen Voice Control", () => {
   });
 
   it("keeps toggle OFF and offers Open Settings alert when OS permissions are denied", async () => {
-    await AsyncStorage.setItem(
-      VOICE_CONTROL_EXPLAINER_VERSION_KEY,
-      VOICE_CONTROL_EXPLAINER_VERSION
-    );
     ExpoSpeechRecognitionModule.requestPermissionsAsync.mockResolvedValue({
       granted: false,
       status: "denied",
@@ -305,6 +323,9 @@ describe("TimerScreen Voice Control", () => {
     await act(async () => {
       fireEvent.press(getByTestId("timer-voice-toggle"));
     });
+    await act(async () => {
+      fireEvent.press(getByText("Enable"));
+    });
     await flushMicrotasks();
 
     expect(ExpoSpeechRecognitionModule.start).not.toHaveBeenCalled();
@@ -316,30 +337,25 @@ describe("TimerScreen Voice Control", () => {
       fireEvent.press(getByText("Open Settings"));
     });
     expect(openSettingsSpy).toHaveBeenCalledTimes(1);
+    expect(getByText("pause")).toBeTruthy();
     openSettingsSpy.mockRestore();
   });
 
-  it("auto-starts listening on mount when persisted ON across sessions", async () => {
+  it("auto-starts listening silently on mount without showing alert when persisted ON across sessions", async () => {
     await AsyncStorage.setItem(VOICE_CONTROL_ENABLED_KEY, "true");
-    await AsyncStorage.setItem(
-      VOICE_CONTROL_EXPLAINER_VERSION_KEY,
-      VOICE_CONTROL_EXPLAINER_VERSION
-    );
 
-    const { getByTestId } = renderTimerScreen();
+    const { getByTestId, queryByText, queryByTestId } = renderTimerScreen();
     await flushMicrotasks();
 
     expect(ExpoSpeechRecognitionModule.getPermissionsAsync).toHaveBeenCalledTimes(1);
     expect(ExpoSpeechRecognitionModule.start).toHaveBeenCalledTimes(1);
     expect(within(getByTestId("timer-voice-toggle")).getByText("mic")).toBeTruthy();
+    expect(queryByText("Hands-Free Voice Control")).toBeNull();
+    expect(queryByTestId("custom-alert-backdrop")).toBeNull();
   });
 
   it("handles Play/Resume & Pause phrases, stays active while paused, enforces idempotency, cooldown, and ignores single words", async () => {
     await AsyncStorage.setItem(VOICE_CONTROL_ENABLED_KEY, "true");
-    await AsyncStorage.setItem(
-      VOICE_CONTROL_EXPLAINER_VERSION_KEY,
-      VOICE_CONTROL_EXPLAINER_VERSION
-    );
 
     const { getByText } = renderTimerScreen();
     await flushMicrotasks();
@@ -395,10 +411,6 @@ describe("TimerScreen Voice Control", () => {
 
   it("does not re-trigger an already-consumed phrase in a continuous transcript after manual Play", async () => {
     await AsyncStorage.setItem(VOICE_CONTROL_ENABLED_KEY, "true");
-    await AsyncStorage.setItem(
-      VOICE_CONTROL_EXPLAINER_VERSION_KEY,
-      VOICE_CONTROL_EXPLAINER_VERSION
-    );
 
     const { getByTestId, getByText } = renderTimerScreen();
     await flushMicrotasks();
@@ -432,10 +444,6 @@ describe("TimerScreen Voice Control", () => {
   it("supports localized Spanish and French phrases with English fallback", async () => {
     setLocale("es");
     await AsyncStorage.setItem(VOICE_CONTROL_ENABLED_KEY, "true");
-    await AsyncStorage.setItem(
-      VOICE_CONTROL_EXPLAINER_VERSION_KEY,
-      VOICE_CONTROL_EXPLAINER_VERSION
-    );
 
     const { getByText } = renderTimerScreen();
     await flushMicrotasks();
@@ -472,10 +480,6 @@ describe("TimerScreen Voice Control", () => {
       });
 
     await AsyncStorage.setItem(VOICE_CONTROL_ENABLED_KEY, "true");
-    await AsyncStorage.setItem(
-      VOICE_CONTROL_EXPLAINER_VERSION_KEY,
-      VOICE_CONTROL_EXPLAINER_VERSION
-    );
 
     const { getByTestId, getByText, unmount } = renderTimerScreen();
     await flushMicrotasks();
@@ -526,10 +530,6 @@ describe("TimerScreen Voice Control", () => {
 
   it("stops recognition when the workout finishes and navigates to Completion", async () => {
     await AsyncStorage.setItem(VOICE_CONTROL_ENABLED_KEY, "true");
-    await AsyncStorage.setItem(
-      VOICE_CONTROL_EXPLAINER_VERSION_KEY,
-      VOICE_CONTROL_EXPLAINER_VERSION
-    );
 
     renderTimerScreen();
     await flushMicrotasks();
@@ -553,10 +553,6 @@ describe("TimerScreen Voice Control", () => {
 
   it("disables voice control if OS permission is revoked on mount or emits not-allowed error", async () => {
     await AsyncStorage.setItem(VOICE_CONTROL_ENABLED_KEY, "true");
-    await AsyncStorage.setItem(
-      VOICE_CONTROL_EXPLAINER_VERSION_KEY,
-      VOICE_CONTROL_EXPLAINER_VERSION
-    );
     ExpoSpeechRecognitionModule.getPermissionsAsync.mockResolvedValueOnce({
       granted: false,
       status: "denied",

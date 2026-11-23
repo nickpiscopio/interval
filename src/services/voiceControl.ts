@@ -1,9 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const VOICE_CONTROL_ENABLED_KEY = "@interval_voice_control_enabled";
-export const VOICE_CONTROL_EXPLAINER_VERSION_KEY =
-  "@interval_voice_control_explainer_version";
-export const VOICE_CONTROL_EXPLAINER_VERSION = "1";
 export const VOICE_CONTROL_COOLDOWN_MS = 500;
 
 export type VoiceCommand = "play" | "pause";
@@ -160,24 +157,6 @@ export async function setVoiceControlEnabled(enabled: boolean): Promise<void> {
       VOICE_CONTROL_ENABLED_KEY,
       enabled ? "true" : "false"
     );
-  } catch {
-    // Ignore storage write errors
-  }
-}
-
-export async function getVoiceControlExplainerVersion(): Promise<string | null> {
-  try {
-    return await AsyncStorage.getItem(VOICE_CONTROL_EXPLAINER_VERSION_KEY);
-  } catch {
-    return null;
-  }
-}
-
-export async function setVoiceControlExplainerVersion(
-  version: string
-): Promise<void> {
-  try {
-    await AsyncStorage.setItem(VOICE_CONTROL_EXPLAINER_VERSION_KEY, version);
   } catch {
     // Ignore storage write errors
   }

@@ -1,6 +1,6 @@
 import React from "react";
 import { render, fireEvent, waitFor } from "@testing-library/react-native";
-import { Share, StyleSheet } from "react-native";
+import { Share, StyleSheet, Modal } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AwardsScreen from "../AwardsScreen";
 import { saveUserStats, saveBadgeTimestamps, DEFAULT_USER_STATS } from "../../services/badgeService";
@@ -150,7 +150,7 @@ describe("AwardsScreen", () => {
   });
 
   it("dismisses badge modal when tapping outside on modal-overlay and omits How to Unlock tag for locked badges", async () => {
-    const { getByText, getAllByText, getByTestId, queryByText } = render(
+    const { getByText, getAllByText, getByTestId, queryByText, UNSAFE_getByType } = render(
       <AwardsScreen navigation={{} as any} route={{} as any} />
     );
 
@@ -164,6 +164,11 @@ describe("AwardsScreen", () => {
     await waitFor(() => {
       expect(getAllByText("Rehab Rookie").length).toBe(2);
     });
+
+    // Modal spans behind both status bar and navigation bar
+    const modal = UNSAFE_getByType(Modal);
+    expect(modal.props.statusBarTranslucent).toBe(true);
+    expect(modal.props.navigationBarTranslucent).toBe(true);
 
     // "How to Unlock" tag should NOT be displayed
     expect(queryByText("How to Unlock")).toBeNull();

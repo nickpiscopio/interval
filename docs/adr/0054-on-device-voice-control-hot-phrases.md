@@ -4,12 +4,12 @@ We decided to add opt-in, hands-free **Voice Control** for Play/Resume and Pause
 
 ## Key Decisions
 
-1. **Opt-In Activation, Availability & Versioned Onboarding**:
+1. **Opt-In Activation, Availability & Hot-Phrase Reminder Alert**:
    - **Voice Control** defaults to OFF so users are never unexpectedly prompted for microphone permissions when starting a **Timer**.
    - An upper-right microphone toggle in the active Timer runner header exposes ON/OFF state with a clear active-listening indicator, and hides itself silently when `isRecognitionAvailable()` is `false` (or the native module is unavailable).
    - When `supportsOnDeviceRecognition()` is `true`, recognition requests `requiresOnDeviceRecognition: true`; otherwise it falls back to standard OS speech recognition so simulators, older Android versions, web browsers with Web Speech API, and devices without downloaded offline models remain supported.
-   - The first time a user toggles **Voice Control** ON (or after a future release bumps the stored explainer version constant), the Timer pauses and presents `CustomAlertModal` explaining what **Voice Control** does and listing the localized hot phrases. OS microphone and speech recognition permissions are requested only after the user explicitly confirms; canceling restores the prior play/pause state.
-   - Toggling OFF stops recognition immediately with no confirmation dialog. Both the enabled preference and acknowledged explainer version persist in `AsyncStorage`. If OS permissions are denied, the toggle remains OFF and an alert offers an "Open Settings" shortcut.
+   - Every time a user explicitly taps the mic toggle to turn **Voice Control** from OFF to ON, the Timer pauses and presents `CustomAlertModal` explaining what **Voice Control** does and listing the localized hot phrases so users never have to memorize the exact commands. OS microphone and speech recognition permissions are requested only after the user explicitly confirms; both confirming and canceling restore the prior play/pause state.
+   - Toggling OFF stops recognition immediately with no confirmation dialog. The enabled preference persists in `AsyncStorage` so launching a subsequent **Timer** when **Voice Control** was already left ON auto-resumes recognition silently on mount without re-showing the alert. If OS permissions are denied, the toggle remains OFF and an alert offers an "Open Settings" shortcut.
 
 2. **Strict Multi-Word Localized Hot Phrases**:
    - Transcripts are matched case-insensitively with normalized whitespace and full phrase boundaries against localized multi-word commands across English (`en`), Spanish (`es`), and French (`fr`), with English phrases always accepted as fallback:
@@ -36,4 +36,4 @@ We decided to add opt-in, hands-free **Voice Control** for Play/Resume and Pause
 
 - Introduces a native module and Expo config plugin (`expo-speech-recognition`) with iOS `NSMicrophoneUsageDescription` and `NSSpeechRecognitionUsageDescription` declarations (Android already declares `RECORD_AUDIO`), requiring a native dev-client/prebuild rebuild rather than Expo Go.
 - Unsupported devices hide the microphone toggle cleanly with no impact on core Timer execution.
-- Bumping the explainer version constant in future releases automatically re-displays the onboarding summary once whenever supported hot phrases change.
+- Always showing the localized hot-phrase alert on explicit toggle-ON keeps supported phrases immediately discoverable without maintaining explainer-version persistence state, while silent auto-resume on mount preserves hands-free repeat workouts.

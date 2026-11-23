@@ -11,6 +11,7 @@ A strict quality bar was required:
 2. Complete localization coverage ensuring zero missing keys and 100% dictionary parity across English, Spanish, and French.
 3. Automated test commands runnable all at once.
 4. Definition of Done (DoD) enforcement skill and rule requiring tests before completing tasks.
+5. Release upgrade safety verification against the previous released version to catch breaking persisted storage changes and native install/upgrade incompatibilities.
 
 ## Decision
 1. **Testing Infrastructure**:
@@ -26,10 +27,15 @@ A strict quality bar was required:
      - `src/screens/` (`SelectTimerScreen`, `CreateTimerScreen`, `TimerScreen`, `CompletionScreen`, `AwardsScreen`, `GenerateTimerScreen`, `NotFoundScreen`)
      - `src/navigation/` (`Navigation`)
 3. **Definition of Done Customizations**:
-   - Created skill `.agents/skills/test-and-verify/SKILL.md` to run the full test suite with `npm run test:coverage` and verify DoD compliance.
-   - Created rule `.agents/rules/definition-of-done.md` establishing mandatory test creation and >= 90% coverage threshold verification on all code changes.
+   - Created skill `.agents/skills/test-and-verify/SKILL.md` to run the full test suite with `npm run test:coverage` and verify the 5-step DoD checklist (`[Step x/5] <Step Title>`).
+   - Created rule `.agents/rules/definition-of-done.md` establishing mandatory test creation, >= 90% coverage threshold verification, 100% localization parity, zero failing tests, and a 5th mandatory **Upgrade & Migration Check** on all code changes.
+   - **Step 5 — Upgrade & Migration Check**:
+     - **Comparison Baseline**: Compare against the latest release git tag if present; if no tags exist, fall back to the most recent commit that bumped the release version or build number in app configuration (`app.json`) or native build settings (`android/app/build.gradle`, iOS `Info.plist` / project settings). Releases should be tagged in git going forward to keep this baseline deterministic.
+     - **Persisted Storage & Schemas**: Check changes to persisted `AsyncStorage` keys and model schemas, mandating an idempotent migration script and an automated upgrade test simulating the previous released version's storage shape whenever breaking changes occur.
+     - **Native Install/Upgrade Compatibility**: Check version codes, build numbers, permissions, and native configuration to ensure store upgrades install cleanly over prior builds.
 
 ## Consequences
 - 100% automated regression protection across UI, business logic, and localization.
 - Fast local verification (`npm run test:coverage` runs 26 suites, 97 tests in < 3s).
 - Guaranteed multilingual completeness for new features.
+- Upgrade safety for existing users: breaking `AsyncStorage` schema changes require idempotent migrations and automated upgrade tests, and native install/upgrade incompatibilities are caught before release.

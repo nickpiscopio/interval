@@ -26,14 +26,11 @@ try {
 import { getLocale, t } from "../i18n";
 import {
   VOICE_CONTROL_COOLDOWN_MS,
-  VOICE_CONTROL_EXPLAINER_VERSION,
   findLatestVoiceCommand,
   getSpeechRecognitionLocale,
   getVoiceControlEnabled,
-  getVoiceControlExplainerVersion,
   normalizeVoiceTranscript,
   setVoiceControlEnabled,
-  setVoiceControlExplainerVersion,
 } from "../services/voiceControl";
 
 export interface UseTimerVoiceControlParams {
@@ -99,8 +96,6 @@ export function useTimerVoiceControl({
   const isAlertOpenRef = useRef(false);
   const isTogglingRef = useRef(false);
   const appStateRef = useRef<string | null | undefined>(AppState.currentState);
-  const explainerVersionRef = useRef<string | null>(null);
-  const hasLoadedStorageRef = useRef(false);
   const lastCommandTimestampRef = useRef(0);
   const consumedTranscriptIndexRef = useRef(0);
   const consumedTranscriptPrefixRef = useRef("");
@@ -168,7 +163,7 @@ export function useTimerVoiceControl({
     }
   }, [resetConsumedTranscript]);
 
-  // Load persisted voice preference & explainer acknowledgment on mount
+  // Load persisted voice preference on mount
   useEffect(() => {
     isMountedRef.current = true;
     if (!isAvailable) {
@@ -179,14 +174,8 @@ export function useTimerVoiceControl({
 
     let cancelled = false;
     (async () => {
-      const [savedEnabled, savedVersion] = await Promise.all([
-        getVoiceControlEnabled(),
-        getVoiceControlExplainerVersion(),
-      ]);
+      const savedEnabled = await getVoiceControlEnabled();
       if (cancelled || !isMountedRef.current || isExitedRef.current) return;
-
-      explainerVersionRef.current = savedVersion;
-      hasLoadedStorageRef.current = true;
 
       if (savedEnabled && ExpoSpeechRecognitionModule) {
         try {
@@ -316,13 +305,8 @@ export function useTimerVoiceControl({
   });
 
   const completeEnable = useCallback(
-    async (fromExplainer: boolean, wasPaused: boolean) => {
+    async (wasPaused: boolean) => {
       try {
-        if (fromExplainer) {
-          explainerVersionRef.current = VOICE_CONTROL_EXPLAINER_VERSION;
-          await setVoiceControlExplainerVersion(VOICE_CONTROL_EXPLAINER_VERSION);
-        }
-
         if (!ExpoSpeechRecognitionModule) return;
         const perm = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
         if (!isMountedRef.current || isExitedRef.current) return;
@@ -331,9 +315,7 @@ export function useTimerVoiceControl({
           isEnabledRef.current = true;
           setIsEnabled(true);
           await setVoiceControlEnabled(true);
-          if (fromExplainer) {
-            callbacksRef.current.restoreAfterModal(wasPaused);
-          }
+          callbacksRef.current.restoreAfterModal(wasPaused);
           startRecognition();
         } else {
           isEnabledRef.current = false;
@@ -342,9 +324,7 @@ export function useTimerVoiceControl({
           isAlertOpenRef.current = true;
           const dismissPermissionAlert = () => {
             isAlertOpenRef.current = false;
-            if (fromExplainer) {
-              callbacksRef.current.restoreAfterModal(wasPaused);
-            }
+            callbacksRef.current.restoreAfterModal(wasPaused);
           };
           callbacksRef.current.showAlert({
             title: t("timer.voicePermissionDeniedTitle"),
@@ -386,43 +366,33 @@ export function useTimerVoiceControl({
     }
 
     isTogglingRef.current = true;
-    if (!hasLoadedStorageRef.current) {
-      explainerVersionRef.current = await getVoiceControlExplainerVersion();
-      hasLoadedStorageRef.current = true;
-    }
-
-    if (explainerVersionRef.current !== VOICE_CONTROL_EXPLAINER_VERSION) {
-      const wasPaused = callbacksRef.current.pauseForModal();
-      isAlertOpenRef.current = true;
-      stopRecognition();
-      callbacksRef.current.showAlert({
-        title: t("timer.voiceExplainerTitle"),
-        message: t("timer.voiceExplainerMessage"),
-        icon: "info",
-        buttons: [
-          {
-            text: t("common.cancel"),
-            style: "cancel",
-            onPress: () => {
-              isAlertOpenRef.current = false;
-              isTogglingRef.current = false;
-              callbacksRef.current.restoreAfterModal(wasPaused);
-            },
+    const wasPaused = callbacksRef.current.pauseForModal();
+    isAlertOpenRef.current = true;
+    stopRecognition();
+    callbacksRef.current.showAlert({
+      title: t("timer.voiceExplainerTitle"),
+      message: t("timer.voiceExplainerMessage"),
+      icon: "info",
+      buttons: [
+        {
+          text: t("common.cancel"),
+          style: "cancel",
+          onPress: () => {
+            isAlertOpenRef.current = false;
+            isTogglingRef.current = false;
+            callbacksRef.current.restoreAfterModal(wasPaused);
           },
-          {
-            text: t("timer.voiceExplainerEnable"),
-            style: "default",
-            onPress: () => {
-              isAlertOpenRef.current = false;
-              void completeEnable(true, wasPaused);
-            },
+        },
+        {
+          text: t("timer.voiceExplainerEnable"),
+          style: "default",
+          onPress: () => {
+            isAlertOpenRef.current = false;
+            void completeEnable(wasPaused);
           },
-        ],
-      });
-      return;
-    }
-
-    await completeEnable(false, false);
+        },
+      ],
+    });
   }, [completeEnable, isAvailable, stopRecognition]);
 
   const pauseRecognitionForAlert = useCallback(() => {

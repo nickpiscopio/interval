@@ -138,4 +138,50 @@ describe("LegalDisclaimerModal Component", () => {
       expect(cardStyle.marginHorizontal).toBe(Spacing.md);
     }
   });
+
+  it("begins the review scroll viewport flush beneath the header divider with Spacing.md top scroll padding", () => {
+    const { getByTestId } = render(
+      <LegalDisclaimerModal
+        visible={true}
+        mode="review"
+        appVersion="2.4.0"
+        acceptedDate="Aug 27, 2026"
+      />
+    );
+
+    const sheetHeaderStyle = StyleSheet.flatten(
+      getByTestId("legal-sheet-header").props.style
+    );
+    expect(sheetHeaderStyle.marginBottom ?? 0).toBe(0);
+
+    const scrollView = getByTestId("legal-scroll-view");
+    const contentStyle = StyleSheet.flatten(scrollView.props.contentContainerStyle);
+    expect(contentStyle.paddingTop).toBe(Spacing.md);
+  });
+
+  it("top-aligns the review header row and optically aligns the close button in the upper-right corner", () => {
+    const { getByTestId } = render(
+      <LegalDisclaimerModal
+        visible={true}
+        mode="review"
+        appVersion="2.4.0"
+        acceptedDate="Aug 27, 2026"
+      />
+    );
+
+    const headerRowStyle = StyleSheet.flatten(
+      getByTestId("legal-header-row").props.style
+    );
+    expect(headerRowStyle.alignItems).toBe("flex-start");
+
+    const closeBtnStyle = StyleSheet.flatten(
+      getByTestId("legal-modal-close-btn").props.style
+    );
+    expect(closeBtnStyle.width).toBe(TOUCH_TARGET.icon);
+    expect(closeBtnStyle.height).toBe(TOUCH_TARGET.icon);
+    expect(closeBtnStyle.marginTop).toBeLessThan(0);
+    expect(closeBtnStyle.marginTop).toBeGreaterThanOrEqual(-Spacing.md);
+    expect(closeBtnStyle.marginRight).toBeLessThan(0);
+    expect(closeBtnStyle.marginRight).toBeGreaterThanOrEqual(-Spacing.md);
+  });
 });

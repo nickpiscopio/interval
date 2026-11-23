@@ -539,6 +539,7 @@ export default function CreateTimerScreen({
       {/* Interval Draggable List Area */}
       <View style={styles.listContainer}>
         <DraggableFlatList
+          testID="interval-list"
           ref={listRef}
           data={intervals}
           keyExtractor={(item) => item.id}
@@ -580,7 +581,11 @@ export default function CreateTimerScreen({
       </View>
 
       {/* Bottom Docked Timer Details Card */}
-      <View testID="bottom-docked-container" style={[styles.bottomContainer, { paddingBottom: Math.max(insets.bottom, Spacing.md) }]}>
+      <View
+        testID="bottom-docked-container"
+        pointerEvents="box-none"
+        style={[styles.bottomContainer, { paddingBottom: Math.max(insets.bottom, Spacing.md) }]}
+      >
         <View style={styles.card}>
           <View style={styles.cardHeaderRow}>
             <Text style={styles.cardTitle}>{t("createTimer.titleDetails")}</Text>
@@ -738,7 +743,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     padding: Spacing.md,
-    paddingBottom: Spacing.xl,
+    paddingBottom: Spacing.xl + RADIUS.md,
   },
   intervalListHeader: {
     flexDirection: "row",
@@ -804,7 +809,9 @@ const styles = StyleSheet.create({
     marginRight: Spacing.xs,
   },
   bottomContainer: {
-    backgroundColor: Colors.surface.screen,
+    backgroundColor: "transparent",
+    marginTop: -RADIUS.md,
+    zIndex: 1,
     paddingHorizontal: Spacing.md,
     paddingTop: 0,
   },

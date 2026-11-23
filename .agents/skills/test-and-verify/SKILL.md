@@ -32,8 +32,11 @@ npm run test:all
 ```
 
 ## Definition of Done (DoD) Checklist
-Before completing any user request or feature, announce each verification step to the user in the format: `[Step x/4] <Step Title>`:
+Before completing any user request or feature, announce each verification step to the user in the format: `[Step x/5] <Step Title>`:
 1. **Tests Added**: Unit and UI tests must be added or updated for new or modified functionality.
 2. **Coverage Verified**: Run `npm run test:coverage` and confirm all test suites pass with statements >= 90% and lines >= 90%.
 3. **Localization Checked**: Ensure all UI strings use `t(...)` keys and exist with 100% parity across `en.json`, `es.json`, and `fr.json`.
 4. **No Regressions**: Zero failing tests across the entire test suite.
+5. **Upgrade & Migration Check**: Compare changes against the previous released version — using the latest release git tag if present, falling back to the most recent commit that bumped the release version or build number in app configuration (`app.json`) or native build settings (`android/app/build.gradle`, iOS `Info.plist` / project settings). *(Recommendation: tag releases in git going forward for a deterministic baseline.)* Check both:
+   - **Persisted `AsyncStorage` Keys & Model Schemas**: Whenever breaking changes occur, verify an idempotent migration script and an automated upgrade test simulating the previous released version's storage shape are in place.
+   - **Native Install/Upgrade Compatibility**: Verify version codes, build numbers, permissions, and native configuration changes install and upgrade cleanly over prior builds.

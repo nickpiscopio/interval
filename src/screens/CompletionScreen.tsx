@@ -408,6 +408,7 @@ export default function CompletionScreen({
           transparent
           animationType="fade"
           statusBarTranslucent={true}
+          navigationBarTranslucent={true}
           onRequestClose={() => setActiveModalBadge(null)}
         >
           <Pressable

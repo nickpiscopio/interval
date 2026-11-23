@@ -299,6 +299,7 @@ export default function AwardsScreen({ navigation }: RootStackScreenProps<"Award
           transparent
           animationType="fade"
           statusBarTranslucent={true}
+          navigationBarTranslucent={true}
           onRequestClose={() => setSelectedBadge(null)}
         >
           <Pressable

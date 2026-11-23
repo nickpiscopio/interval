@@ -187,7 +187,7 @@ const LEGAL_SHEET_SNAP_POINTS = ["90%"];
       {/* Header Bar */}
       <View testID="legal-sheet-header" style={styles.sheetHeader}>
         {/* Row 1: Flex row with Title on the left and transparent Close Button on the right */}
-        <View style={styles.headerRow1}>
+        <View testID="legal-header-row" style={styles.headerRow1}>
           <Text style={styles.title}>{t("legal.title")}</Text>
           <TouchableOpacity
             testID="legal-modal-close-btn"
@@ -256,11 +256,10 @@ const styles = StyleSheet.create({
     paddingBottom: Spacing.sm,
     borderBottomWidth: 1,
     borderBottomColor: Colors.borderDefault,
-    marginBottom: Spacing.sm,
   },
   headerRow1: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     justifyContent: "space-between",
     marginBottom: Spacing.xs,
   },
@@ -278,6 +277,8 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
     alignItems: "center",
     justifyContent: "center",
+    marginTop: -Spacing.sm,
+    marginRight: -Spacing.sm,
   },
   versionCaption: {
     fontSize: FontSize.xs,
@@ -325,7 +326,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   sheetScrollContent: {
-    paddingTop: Spacing.xs,
+    paddingTop: Spacing.md,
     paddingBottom: Spacing.xl,
     gap: 12,
   },

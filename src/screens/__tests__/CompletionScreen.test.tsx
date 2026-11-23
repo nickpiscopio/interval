@@ -1,6 +1,6 @@
 import React from "react";
 import { render, fireEvent, waitFor } from "@testing-library/react-native";
-import { Share, StyleSheet, Platform, Linking } from "react-native";
+import { Share, StyleSheet, Platform, Linking, Modal } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createAudioPlayer, setAudioModeAsync } from "expo-audio";
 import CompletionScreen from "../CompletionScreen";
@@ -255,7 +255,7 @@ describe("CompletionScreen", () => {
       activityType: "com.apple.UIKit.activity.PostToTwitter",
     });
 
-    const { getByText, getAllByText, getByTestId, queryByText } = render(
+    const { getByText, getAllByText, getByTestId, queryByText, UNSAFE_getByType } = render(
       <CompletionScreen
         navigation={{} as any}
         route={{ params: { timer: mockTimer } } as any}
@@ -273,6 +273,11 @@ describe("CompletionScreen", () => {
     await waitFor(() => {
       expect(getByText("Share Badge")).toBeTruthy();
     });
+
+    // Modal spans behind both status bar and navigation bar
+    const modal = UNSAFE_getByType(Modal);
+    expect(modal.props.statusBarTranslucent).toBe(true);
+    expect(modal.props.navigationBarTranslucent).toBe(true);
 
     // Overlay backdrop has unified opacity
     const overlay = getByTestId("modal-overlay");

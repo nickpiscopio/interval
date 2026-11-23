@@ -75,6 +75,7 @@ describe("TimerScreen", () => {
     const mockNavigation: any = {
       navigate: jest.fn(),
       goBack: jest.fn(),
+      canGoBack: jest.fn(() => true),
       replace: jest.fn(),
       popToTop: jest.fn(),
     };
@@ -107,6 +108,7 @@ describe("TimerScreen", () => {
     const cancelBtn = getByText("Keep Going");
     fireEvent.press(cancelBtn);
     expect(getByText("pause")).toBeTruthy();
+    expect(mockNavigation.goBack).not.toHaveBeenCalled();
     expect(mockNavigation.popToTop).not.toHaveBeenCalled();
 
     // Pause manually, then open back alert and cancel -> stays paused
@@ -116,12 +118,40 @@ describe("TimerScreen", () => {
     fireEvent.press(getByText("Keep Going"));
     expect(getByText("play")).toBeTruthy();
 
-    // Now press back again and confirm leave
+    // Now press back again and confirm leave -> navigates back one screen when a prior route exists
     fireEvent.press(backBtn);
     const leaveBtn = getByText("Leave");
     fireEvent.press(leaveBtn);
 
-    expect(mockNavigation.popToTop).toHaveBeenCalled();
+    expect(mockNavigation.canGoBack).toHaveBeenCalledTimes(1);
+    expect(mockNavigation.goBack).toHaveBeenCalledTimes(1);
+    expect(mockNavigation.popToTop).not.toHaveBeenCalled();
+  });
+
+  it("falls back to popToTop on exit confirmation when navigation cannot go back", () => {
+    const mockNavigation: any = {
+      navigate: jest.fn(),
+      goBack: jest.fn(),
+      canGoBack: jest.fn(() => false),
+      replace: jest.fn(),
+      popToTop: jest.fn(),
+    };
+
+    const { getByText, getByTestId } = render(
+      <AlertProvider>
+        <TimerScreen
+          navigation={mockNavigation}
+          route={{ params: { timer: mockTimer } } as any}
+        />
+      </AlertProvider>
+    );
+
+    fireEvent.press(getByTestId("timer-back-button"));
+    fireEvent.press(getByText("Leave"));
+
+    expect(mockNavigation.canGoBack).toHaveBeenCalledTimes(1);
+    expect(mockNavigation.popToTop).toHaveBeenCalledTimes(1);
+    expect(mockNavigation.goBack).not.toHaveBeenCalled();
   });
 
   it("renders preparing fallback when timer has empty intervals", () => {
@@ -224,6 +254,7 @@ describe("TimerScreen", () => {
     const mockNavigation: any = {
       navigate: jest.fn(),
       goBack: jest.fn(),
+      canGoBack: jest.fn(() => true),
       replace: jest.fn(),
       popToTop: jest.fn(),
     };

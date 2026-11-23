@@ -101,7 +101,7 @@ Gamified achievement awards in the `variety` category unlocked by completing 5, 
 _Avoid_: Workout Variety Trophies, Preset Diversity Badges
 
 **Voice Control**:
-An opt-in, hands-free control mode on the active Timer runner that listens for localized multi-word Play/Resume and Pause hot phrases using native speech recognition (preferring on-device processing when supported), requiring explicit user onboarding before enabling and persisting the user's preference across sessions.
+An opt-in, hands-free control mode on the active Timer runner that listens for localized multi-word Play/Resume and Pause hot phrases using native speech recognition (preferring on-device processing when supported), showing the localized hot-phrase reminder alert every time the user explicitly toggles it ON while persisting the enabled preference so subsequent Timers auto-resume silently on mount.
 _Avoid_: Voice Assistant, Wake Word, Always-On Mic, Single-Word Voice Commands
 
 **Completion Integrity Threshold**:

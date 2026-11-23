@@ -341,7 +341,11 @@ export default function TimerScreen({
             deactivateScreenLock();
             lockPortraitOrientation();
             voiceControl.stopVoiceControlForExit();
-            navigation.popToTop();
+            if (navigation.canGoBack?.()) {
+              navigation.goBack();
+            } else {
+              navigation.popToTop();
+            }
           },
         },
       ],

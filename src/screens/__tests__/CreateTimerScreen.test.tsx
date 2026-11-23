@@ -562,4 +562,28 @@ describe("CreateTimerScreen", () => {
       expect(queryByText("High Interval")).toBeNull();
     });
   });
+
+  it("overlaps the docked Timer Details container transparently over the Interval list with box-none pointer events", () => {
+    const { getByTestId } = renderCreateTimerScreen();
+
+    const bottomContainer = getByTestId("bottom-docked-container");
+    const bottomContainerStyle = StyleSheet.flatten(bottomContainer.props.style);
+
+    expect(bottomContainer.props.pointerEvents).toBe("box-none");
+    expect(bottomContainerStyle.backgroundColor).toBe("transparent");
+    expect(bottomContainerStyle.marginTop).toBe(-16);
+    expect(bottomContainerStyle.zIndex).toBeGreaterThan(0);
+    expect(bottomContainerStyle.paddingTop).toBe(0);
+  });
+
+  it("adds compensating bottom padding to the Interval list so the last Interval clears the overlapped Timer Details card", () => {
+    const { getByTestId } = renderCreateTimerScreen();
+
+    const intervalList = getByTestId("interval-list");
+    const contentContainerStyle = StyleSheet.flatten(
+      intervalList.props.contentContainerStyle
+    );
+
+    expect(contentContainerStyle.paddingBottom).toBe(48);
+  });
 });

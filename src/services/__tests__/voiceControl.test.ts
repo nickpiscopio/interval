@@ -1,16 +1,12 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   VOICE_CONTROL_ENABLED_KEY,
-  VOICE_CONTROL_EXPLAINER_VERSION,
-  VOICE_CONTROL_EXPLAINER_VERSION_KEY,
   VOICE_CONTROL_COOLDOWN_MS,
   findLatestVoiceCommand,
   getSpeechRecognitionLocale,
   matchVoiceCommand,
   getVoiceControlEnabled,
   setVoiceControlEnabled,
-  getVoiceControlExplainerVersion,
-  setVoiceControlExplainerVersion,
 } from "../voiceControl";
 
 describe("voiceControl service", () => {
@@ -20,11 +16,9 @@ describe("voiceControl service", () => {
   });
 
   describe("constants", () => {
-    it("exports expected version and cooldown constants", () => {
-      expect(VOICE_CONTROL_EXPLAINER_VERSION).toBe("1");
+    it("exports expected storage key and cooldown constants", () => {
       expect(VOICE_CONTROL_COOLDOWN_MS).toBe(500);
       expect(VOICE_CONTROL_ENABLED_KEY).toBeTruthy();
-      expect(VOICE_CONTROL_EXPLAINER_VERSION_KEY).toBeTruthy();
     });
   });
 
@@ -150,29 +144,12 @@ describe("voiceControl service", () => {
       expect(AsyncStorage.setItem).toHaveBeenCalledWith(VOICE_CONTROL_ENABLED_KEY, "false");
     });
 
-    it("reads and persists explainer version", async () => {
-      expect(await getVoiceControlExplainerVersion()).toBeNull();
-
-      await setVoiceControlExplainerVersion("1");
-      expect(await getVoiceControlExplainerVersion()).toBe("1");
-      expect(AsyncStorage.setItem).toHaveBeenCalledWith(
-        VOICE_CONTROL_EXPLAINER_VERSION_KEY,
-        "1"
-      );
-    });
-
     it("handles AsyncStorage errors gracefully", async () => {
       (AsyncStorage.getItem as jest.Mock).mockRejectedValueOnce(new Error("read fail"));
       expect(await getVoiceControlEnabled()).toBe(false);
 
-      (AsyncStorage.getItem as jest.Mock).mockRejectedValueOnce(new Error("read fail"));
-      expect(await getVoiceControlExplainerVersion()).toBeNull();
-
       (AsyncStorage.setItem as jest.Mock).mockRejectedValueOnce(new Error("write fail"));
       await expect(setVoiceControlEnabled(true)).resolves.toBeUndefined();
-
-      (AsyncStorage.setItem as jest.Mock).mockRejectedValueOnce(new Error("write fail"));
-      await expect(setVoiceControlExplainerVersion("1")).resolves.toBeUndefined();
     });
   });
 });
