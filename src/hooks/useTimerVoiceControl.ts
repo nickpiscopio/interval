@@ -62,6 +62,17 @@ function isForegroundAppState(state: string | null | undefined): boolean {
   return state !== "background" && state !== "inactive";
 }
 
+function checkSpeechCapability(
+  check: (mod: typeof ExpoSpeechRecognitionModuleType) => boolean
+): boolean {
+  if (!ExpoSpeechRecognitionModule) return false;
+  try {
+    return Boolean(check(ExpoSpeechRecognitionModule));
+  } catch {
+    return false;
+  }
+}
+
 export function useTimerVoiceControl({
   isPausedRef,
   onVoicePlay,
@@ -70,17 +81,13 @@ export function useTimerVoiceControl({
   restoreAfterModal,
   showAlert,
 }: UseTimerVoiceControlParams): UseTimerVoiceControlResult {
-  const [isAvailable] = useState<boolean>(() => {
-    if (!ExpoSpeechRecognitionModule) return false;
-    try {
-      return (
-        Boolean(ExpoSpeechRecognitionModule.isRecognitionAvailable()) &&
-        Boolean(ExpoSpeechRecognitionModule.supportsOnDeviceRecognition())
-      );
-    } catch {
-      return false;
-    }
-  });
+  const [isAvailable] = useState<boolean>(() =>
+    checkSpeechCapability((mod) => mod.isRecognitionAvailable())
+  );
+
+  const [supportsOnDevice] = useState<boolean>(() =>
+    checkSpeechCapability((mod) => mod.supportsOnDeviceRecognition())
+  );
 
   const [isEnabled, setIsEnabled] = useState(false);
   const [isListening, setIsListening] = useState(false);
@@ -137,7 +144,7 @@ export function useTimerVoiceControl({
         lang: getSpeechRecognitionLocale(getLocale()),
         interimResults: true,
         continuous: true,
-        requiresOnDeviceRecognition: true,
+        requiresOnDeviceRecognition: supportsOnDevice,
       });
       isRecognizingRef.current = true;
       setIsListening(true);
@@ -145,7 +152,7 @@ export function useTimerVoiceControl({
       isRecognizingRef.current = false;
       setIsListening(false);
     }
-  }, [canRecognize]);
+  }, [canRecognize, supportsOnDevice]);
 
   const stopRecognition = useCallback(() => {
     const wasRecognizing = isRecognizingRef.current;

@@ -135,7 +135,7 @@
     "voiceControlEnableLabel": "Activer la commande vocale",
     "voiceControlDisableLabel": "Désactiver la commande vocale (à l'écoute)",
     "voiceExplainerTitle": "Commande Vocale Mains Libres",
-    "voiceExplainerMessage": "Contrôlez votre minuteur en mains libres grâce à la reconnaissance vocale sur l'appareil.\n\nDémarrer / Reprendre :\n\"Démarrer minuteur\", \"Démarrer entraînement\", \"Reprendre minuteur\", \"Reprendre entraînement\", \"Lancer minuteur\", \"Lancer entraînement\"\n\nPause :\n\"Pause minuteur\", \"Pause entraînement\", \"Mettre en pause minuteur\", \"Mettre en pause entraînement\"",
+    "voiceExplainerMessage": "Contrôlez votre minuteur en mains libres grâce à la reconnaissance vocale de votre appareil.\n\nDémarrer / Reprendre :\n\"Démarrer minuteur\", \"Démarrer entraînement\", \"Reprendre minuteur\", \"Reprendre entraînement\", \"Lancer minuteur\", \"Lancer entraînement\"\n\nPause :\n\"Pause minuteur\", \"Pause entraînement\", \"Mettre en pause minuteur\", \"Mettre en pause entraînement\"",
     "voiceExplainerEnable": "Activer",
     "voicePermissionDeniedTitle": "Autorisation du Microphone Requise",
     "voicePermissionDeniedMessage": "Autorisez l'accès au microphone et à la reconnaissance vocale dans les Réglages de votre appareil pour utiliser la commande vocale.",

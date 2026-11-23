@@ -48,7 +48,7 @@
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Allow $(PRODUCT_NAME) to access your microphone for hands-free voice control during workouts.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
-	<string>Allow $(PRODUCT_NAME) to recognize Play and Pause voice commands on your device.</string>
+	<string>Allow $(PRODUCT_NAME) to recognize Play and Pause voice commands during workouts.</string>
 	<key>RCTMetroPort</key>
 	<string>$(RCT_METRO_PORT)</string>
 	<key>RCTNewArchEnabled</key>

@@ -82,13 +82,91 @@ describe("TimerScreen Voice Control", () => {
     expect(ExpoSpeechRecognitionModule.start).not.toHaveBeenCalled();
   });
 
-  it("hides the mic toggle when speech recognition is available but on-device recognition is unsupported", () => {
+  it("shows the mic toggle and falls back to standard recognition when on-device recognition is unsupported", async () => {
+    let appStateHandler: ((state: any) => void) | undefined;
+    const addEventListenerSpy = jest
+      .spyOn(AppState, "addEventListener")
+      .mockImplementation((_type, handler) => {
+        appStateHandler = handler as any;
+        return { remove: jest.fn() } as any;
+      });
+
     ExpoSpeechRecognitionModule.isRecognitionAvailable.mockReturnValue(true);
     ExpoSpeechRecognitionModule.supportsOnDeviceRecognition.mockReturnValue(false);
+    await AsyncStorage.setItem(
+      VOICE_CONTROL_EXPLAINER_VERSION_KEY,
+      VOICE_CONTROL_EXPLAINER_VERSION
+    );
 
-    const { queryByTestId } = renderTimerScreen();
-    expect(queryByTestId("timer-voice-toggle")).toBeNull();
-    expect(ExpoSpeechRecognitionModule.start).not.toHaveBeenCalled();
+    const { getByTestId, getByText, queryByTestId } = renderTimerScreen();
+    await flushMicrotasks();
+
+    const toggle = getByTestId("timer-voice-toggle");
+    expect(toggle).toBeTruthy();
+
+    await act(async () => {
+      fireEvent.press(toggle);
+    });
+    await flushMicrotasks();
+
+    const expectedFallbackStartOptions = {
+      lang: "en-US",
+      interimResults: true,
+      continuous: true,
+      requiresOnDeviceRecognition: false,
+    };
+    expect(ExpoSpeechRecognitionModule.start).toHaveBeenCalledWith(expectedFallbackStartOptions);
+    expect(StyleSheet.flatten(getByTestId("timer-voice-toggle").props.style).backgroundColor).toBe(
+      Colors.white
+    );
+
+    // Transient network error in fallback mode degrades silently without interrupting Timer or disabling preference
+    act(() => {
+      __emitSpeechRecognitionEvent("error", { error: "network" });
+    });
+    await flushMicrotasks();
+
+    expect(within(getByTestId("timer-voice-toggle")).getByText("mic")).toBeTruthy();
+    expect(
+      StyleSheet.flatten(getByTestId("timer-voice-toggle").props.style).backgroundColor
+    ).toBeUndefined();
+    expect(await AsyncStorage.getItem(VOICE_CONTROL_ENABLED_KEY)).toBe("true");
+    expect(getByText("pause")).toBeTruthy();
+    expect(queryByTestId("custom-alert-backdrop")).toBeNull();
+
+    // Returning to active foreground retries recognition automatically
+    act(() => {
+      appStateHandler?.("background");
+    });
+    act(() => {
+      appStateHandler?.("active");
+    });
+    expect(ExpoSpeechRecognitionModule.start).toHaveBeenCalledTimes(2);
+    expect(ExpoSpeechRecognitionModule.start).toHaveBeenLastCalledWith(
+      expectedFallbackStartOptions
+    );
+
+    addEventListenerSpy.mockRestore();
+  });
+
+  it("renders updated localized onboarding explainer copy in Spanish and French", async () => {
+    setLocale("es");
+    const esScreen = renderTimerScreen();
+    await flushMicrotasks();
+    await act(async () => {
+      fireEvent.press(esScreen.getByTestId("timer-voice-toggle"));
+    });
+    expect(esScreen.getByText(/reconocimiento de voz de tu dispositivo/)).toBeTruthy();
+    esScreen.unmount();
+
+    setLocale("fr");
+    const frScreen = renderTimerScreen();
+    await flushMicrotasks();
+    await act(async () => {
+      fireEvent.press(frScreen.getByTestId("timer-voice-toggle"));
+    });
+    expect(frScreen.getByText(/reconnaissance vocale de votre appareil/)).toBeTruthy();
+    frScreen.unmount();
   });
 
   it("defaults to OFF with 44x44 touch target and mic-off icon", async () => {
@@ -119,6 +197,7 @@ describe("TimerScreen Voice Control", () => {
 
     expect(getByText("play")).toBeTruthy();
     expect(getByText("Hands-Free Voice Control")).toBeTruthy();
+    expect(getByText(/your device's speech recognition/)).toBeTruthy();
     expect(getByText(/Play timer/)).toBeTruthy();
     expect(getByText(/Pause workout/)).toBeTruthy();
     expect(ExpoSpeechRecognitionModule.requestPermissionsAsync).not.toHaveBeenCalled();

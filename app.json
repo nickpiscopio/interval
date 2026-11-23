@@ -60,7 +60,7 @@
         "expo-speech-recognition",
         {
           "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone for hands-free voice control during workouts.",
-          "speechRecognitionPermission": "Allow $(PRODUCT_NAME) to recognize Play and Pause voice commands on your device."
+          "speechRecognitionPermission": "Allow $(PRODUCT_NAME) to recognize Play and Pause voice commands during workouts."
         }
       ]
     ],
