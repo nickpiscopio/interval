@@ -2,7 +2,7 @@
   "expo": {
     "name": "Interval",
     "slug": "interval",
-    "version": "2026.11.23",
+    "version": "2026.11.23.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "interval",
@@ -21,7 +21,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.plyonest.interval",
-      "buildNumber": "39"
+      "buildNumber": "40"
     },
     "android": {
       "adaptiveIcon": {
@@ -29,7 +29,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.plyonest.interval",
-      "versionCode": 39,
+      "versionCode": 40,
       "permissions": [
         "android.permission.RECORD_AUDIO",
         "android.permission.MODIFY_AUDIO_SETTINGS",
