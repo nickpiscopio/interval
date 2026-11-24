@@ -7,9 +7,10 @@ import {
   Animated,
   Easing,
   useWindowDimensions,
+  AppState,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { createAudioPlayer, AudioPlayer, setAudioModeAsync } from "expo-audio";
+import { createAudioPlayer, AudioPlayer, AudioSource, setAudioModeAsync } from "expo-audio";
 import { Ionicons } from "@expo/vector-icons";
 import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
 import * as ScreenOrientation from "expo-screen-orientation";
@@ -21,7 +22,7 @@ import { t } from "../i18n";
 import { useAlert } from "../context/AlertContext";
 import Colors from "../constants/Colors";
 import Spacing from "../constants/Spacing";
-import { resolveSoundId, resolveSoundSource } from "../constants/Sounds";
+import { PAUSE_SOUND_SOURCE, resolveSoundId, resolveSoundSource } from "../constants/Sounds";
 import FontSize from "../constants/FontSize";
 import IntervalTimeline from "../components/IntervalTimeline";
 import { useTimerVoiceControl } from "../hooks/useTimerVoiceControl";
@@ -33,7 +34,7 @@ export default function TimerScreen({
   route,
   navigation,
 }: RootStackScreenProps<"Timer">) {
-  const { showAlert } = useAlert();
+  const { showAlert, hideAlert } = useAlert();
   const { timer } = route.params;
   const { width, height } = useWindowDimensions();
   const isLandscape = width > height;
@@ -61,6 +62,12 @@ export default function TimerScreen({
   const isPausedRef = useRef(false);
   const creditedMsRef = useRef<number[]>([]);
   const stopVoiceControlRef = useRef<() => void>(() => {});
+  const activeAlertRef = useRef<"none" | "paused" | "blocking">("none");
+  const isVoiceEnabledRef = useRef(false);
+  const appStateHandlersRef = useRef({
+    onLeaveActive: () => {},
+    onReturnActive: () => {},
+  });
 
   const currentInterval = flatIntervals[currentIntervalIndex];
 
@@ -84,6 +91,27 @@ export default function TimerScreen({
     };
   }, []);
 
+  // Auto-pause when leaving active foreground (sleep/background) and show Paused alert on return
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (nextState) => {
+      if (nextState === "background" || nextState === "inactive") {
+        appStateHandlersRef.current.onLeaveActive();
+      } else if (nextState === "active") {
+        appStateHandlersRef.current.onReturnActive();
+      }
+    });
+    return () => {
+      subscription?.remove?.();
+    };
+  }, []);
+
+  function dismissPausedAlertIfOpen(): void {
+    if (activeAlertRef.current === "paused") {
+      activeAlertRef.current = "none";
+      hideAlert();
+    }
+  }
+
   function stopAndReleaseSound(): void {
     if (activePlayerRef.current) {
       try {
@@ -96,9 +124,7 @@ export default function TimerScreen({
     }
   }
 
-  function playIntervalSound(interval?: Interval): void {
-    const soundId = resolveSoundId(interval?.sound);
-    const source = resolveSoundSource(soundId);
+  function playAudioSource(source: AudioSource | null, label: string): void {
     stopAndReleaseSound();
     if (!source) return;
 
@@ -111,8 +137,18 @@ export default function TimerScreen({
       activePlayerRef.current = player;
       player.play();
     } catch (e) {
-      console.warn("Failed to play interval sound:", e);
+      console.warn(`Failed to play ${label}:`, e);
     }
+  }
+
+  function playIntervalSound(interval?: Interval): void {
+    const soundId = resolveSoundId(interval?.sound);
+    const source = resolveSoundSource(soundId);
+    playAudioSource(source, "interval sound");
+  }
+
+  function playPauseSound(): void {
+    playAudioSource(PAUSE_SOUND_SOURCE, "pause sound");
   }
 
   function startProgressAnim(durationMs: number, fromFraction = 1) {
@@ -181,6 +217,7 @@ export default function TimerScreen({
       progressAnim.stopAnimation();
       stopAndReleaseSound();
       deactivateScreenLock();
+      dismissPausedAlertIfOpen();
     };
   }, [timer]);
 
@@ -259,21 +296,60 @@ export default function TimerScreen({
     ? Math.floor(currentIntervalIndex / timer.intervals.length) + 1
     : 1;
 
+  function showPausedAlert() {
+    if (activeAlertRef.current !== "none") return;
+    activeAlertRef.current = "paused";
+    const message = isVoiceEnabledRef.current
+      ? t("timer.pausedMessageWithVoice")
+      : t("timer.pausedMessage");
+    showAlert({
+      title: t("timer.pausedTitle"),
+      message,
+      icon: "pause",
+      showCloseButton: true,
+      cancelable: true,
+      onDismiss: () => {
+        if (activeAlertRef.current === "paused") {
+          activeAlertRef.current = "none";
+        }
+      },
+      buttons: [
+        {
+          text: t("timer.pausedResume"),
+          style: "default",
+          onPress: () => {
+            activeAlertRef.current = "none";
+            resumeTimer();
+          },
+        },
+      ],
+    });
+  }
+
   function pauseTimer() {
+    const wasRunning = !isPausedRef.current;
     setIsPaused(true);
     isPausedRef.current = true;
     progressAnim.stopAnimation();
     deactivateScreenLock();
-    stopAndReleaseSound();
+    if (wasRunning) {
+      playPauseSound();
+    } else {
+      stopAndReleaseSound();
+    }
   }
 
-  function resumeTimer(shouldPlaySound: boolean) {
+  function pauseAndShowAlert() {
+    pauseTimer();
+    showPausedAlert();
+  }
+
+  function resumeTimer() {
+    dismissPausedAlertIfOpen();
     setIsPaused(false);
     isPausedRef.current = false;
     activateScreenLock();
-    if (shouldPlaySound) {
-      playIntervalSound(flatIntervalsRef.current[currentIndexRef.current]);
-    }
+    playIntervalSound(flatIntervalsRef.current[currentIndexRef.current]);
     const fraction =
       totalDurationRef.current > 0
         ? durationLeftRef.current / totalDurationRef.current
@@ -283,34 +359,50 @@ export default function TimerScreen({
 
   function pauseForModal(): boolean {
     const wasPaused = isPausedRef.current;
+    activeAlertRef.current = "blocking";
     pauseTimer();
     return wasPaused;
   }
 
   function restoreAfterModal(wasPaused: boolean) {
+    activeAlertRef.current = "none";
     if (wasPaused) {
       setIsPaused(true);
       isPausedRef.current = true;
     } else {
-      resumeTimer(false);
+      resumeTimer();
     }
   }
 
+  appStateHandlersRef.current = {
+    onLeaveActive: () => {
+      if (!isPausedRef.current) {
+        pauseTimer();
+      }
+    },
+    onReturnActive: () => {
+      if (isPausedRef.current && activeAlertRef.current === "none") {
+        showPausedAlert();
+      }
+    },
+  };
+
   const voiceControl = useTimerVoiceControl({
     isPausedRef,
-    onVoicePlay: () => resumeTimer(true),
-    onVoicePause: pauseTimer,
+    onVoicePlay: resumeTimer,
+    onVoicePause: pauseAndShowAlert,
     pauseForModal,
     restoreAfterModal,
     showAlert,
   });
+  isVoiceEnabledRef.current = voiceControl.isEnabled;
   stopVoiceControlRef.current = voiceControl.stopVoiceControlForExit;
 
   function togglePlayPause() {
     if (isPausedRef.current) {
-      resumeTimer(true);
+      resumeTimer();
     } else {
-      pauseTimer();
+      pauseAndShowAlert();
     }
   }
 

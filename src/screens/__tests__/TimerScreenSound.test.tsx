@@ -8,11 +8,13 @@ import { Timer } from "../../model/Timer";
 // jest-expo maps every asset to the same stub, so give each sound a distinct source.
 const BEEP = "beep-source";
 const BEEP_3 = "beep3-source";
+const PAUSE = "pause-source";
 jest.mock("../../constants/Sounds", () => {
   const actual = jest.requireActual("../../constants/Sounds");
   const sources: Record<string, string> = { beep: "beep-source", beep_3: "beep3-source" };
   return {
     ...actual,
+    PAUSE_SOUND_SOURCE: "pause-source",
     resolveSoundSource: (id?: string) =>
       id === "none" ? null : sources[id as string] ?? sources.beep,
   };
@@ -131,9 +133,12 @@ describe("TimerScreen interval sounds", () => {
     await flush();
 
     const mock = createAudioPlayer as jest.Mock;
-    const secondPlayer = mock.mock.results[1].value;
-    expect(secondPlayer.seekTo).not.toHaveBeenCalled();
-    expect(secondPlayer.play).toHaveBeenCalledTimes(1);
+    const pausePlayer = mock.mock.results[1].value;
+    const resumePlayer = mock.mock.results[2].value;
+    expect(pausePlayer.seekTo).not.toHaveBeenCalled();
+    expect(pausePlayer.play).toHaveBeenCalledTimes(1);
+    expect(resumePlayer.seekTo).not.toHaveBeenCalled();
+    expect(resumePlayer.play).toHaveBeenCalledTimes(1);
   });
 
   it("plays the current interval's sound on resume", async () => {
@@ -145,17 +150,26 @@ describe("TimerScreen interval sounds", () => {
     fireEvent.press(getByText("play"));
     await flush();
     expect(playsFor(BEEP_3)).toBe(2);
+    expect(playsFor(PAUSE)).toBe(1);
   });
 
-  it("plays nothing for a none interval", async () => {
+  it("plays no interval sound for a none interval, while still playing Timer Pause Audio on pause", async () => {
     const { getByText } = renderTimer([
       { id: "a", name: "A", duration: 5, color: "#fff", sound: "none" },
     ]);
     await flush();
+    expect(createAudioPlayer).not.toHaveBeenCalled();
+
     fireEvent.press(getByText("pause"));
+    await flush();
+    expect(playsFor(PAUSE)).toBe(1);
+    expect(playsFor(BEEP)).toBe(0);
+
     fireEvent.press(getByText("play"));
     await flush();
-    expect(createAudioPlayer).not.toHaveBeenCalled();
+    expect(playsFor(PAUSE)).toBe(1);
+    expect(playsFor(BEEP)).toBe(0);
+    expect(createAudioPlayer).toHaveBeenCalledTimes(1);
   });
 
   it("plays the beep for unknown and absent sounds", async () => {
@@ -291,5 +305,66 @@ describe("TimerScreen interval sounds", () => {
     fireEvent.press(getByText("play"));
     await flush();
     expect(playsFor(BEEP)).toBe(1);
+  });
+
+  it("plays Timer Pause Audio once on modal auto-pause and plays interval sound when canceling exit modal", async () => {
+    const { getByTestId, getByText } = renderTimer([
+      { id: "a", name: "A", duration: 5, color: "#10B981", sound: "beep_3" },
+    ]);
+    await flush();
+    expect(playsFor(BEEP_3)).toBe(1);
+    expect(playsFor(PAUSE)).toBe(0);
+
+    // Open exit alert while running -> pauses and plays pause sound
+    fireEvent.press(getByTestId("timer-back-button"));
+    await flush();
+    expect(playsFor(PAUSE)).toBe(1);
+
+    // Cancel exit alert -> resumes and plays interval sound
+    fireEvent.press(getByText("Keep Going"));
+    await flush();
+    expect(playsFor(BEEP_3)).toBe(2);
+  });
+
+  it("does not replay Timer Pause Audio when opening a modal while already paused", async () => {
+    const { getByTestId, getByText } = renderTimer([
+      { id: "a", name: "A", duration: 5, color: "#10B981", sound: "beep_3" },
+    ]);
+    await flush();
+
+    // Pause explicitly -> plays pause sound once
+    fireEvent.press(getByText("pause"));
+    await flush();
+    expect(playsFor(PAUSE)).toBe(1);
+
+    // Open exit alert while already paused -> must NOT replay pause sound
+    fireEvent.press(getByTestId("timer-back-button"));
+    await flush();
+    expect(playsFor(PAUSE)).toBe(1);
+  });
+
+  it("stops and releases Timer Pause Audio player on resume and unmount", async () => {
+    const { getByText, unmount } = renderTimer([
+      { id: "a", name: "A", duration: 5, color: "#10B981", sound: "beep_3" },
+    ]);
+    await flush();
+
+    fireEvent.press(getByText("pause"));
+    await flush();
+    const firstPausePlayer = getPlayer(PAUSE);
+    expect(firstPausePlayer.play).toHaveBeenCalledTimes(1);
+
+    fireEvent.press(getByText("play"));
+    await flush();
+    expect(firstPausePlayer.pause).toHaveBeenCalled();
+    expect(firstPausePlayer.release).toHaveBeenCalled();
+
+    fireEvent.press(getByText("pause"));
+    await flush();
+    const mock = createAudioPlayer as jest.Mock;
+    const secondPausePlayer = mock.mock.results[mock.mock.results.length - 1].value;
+    unmount();
+    expect(secondPausePlayer.pause).toHaveBeenCalled();
+    expect(secondPausePlayer.release).toHaveBeenCalled();
   });
 });

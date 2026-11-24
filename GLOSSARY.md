@@ -80,6 +80,10 @@ _Avoid_: Sluggish Release Springs, Abrupt Shadow Popping
 An automatic audio celebration cue (`beep_3` triple beep) that triggers when the final interval finishes and the Workout Completed screen is presented, reinforcing routine conclusion.
 _Avoid_: Mid-Timer Completion Sound, Silent Completion Screen
 
+**Timer Pause Audio**:
+The non-configurable runner audio cue played once whenever an active Timer transitions from running to paused, regardless of the current Interval's Interval Sound setting.
+_Avoid_: Pause Alarm, Interval Pause Sound, Silent Pause
+
 **Badge & Award Modal Overlay**:
 A standardized celebration and inspection dialog featuring a unified translucent backdrop (`Colors.surface.overlay`), full-screen safe area coverage (`statusBarTranslucent={true}`), and tap-to-dismiss backdrop pressability.
 _Avoid_: Opaque Dark Overlays, Unresponsive Backdrop Taps, Status Bar Clipping

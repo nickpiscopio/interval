@@ -139,7 +139,11 @@
     "voiceExplainerEnable": "Activar",
     "voicePermissionDeniedTitle": "Permiso de Micrófono Necesario",
     "voicePermissionDeniedMessage": "Permite el acceso al micrófono y al reconocimiento de voz en la Configuración de tu dispositivo para usar el control por voz.",
-    "voiceOpenSettings": "Abrir Configuración"
+    "voiceOpenSettings": "Abrir Configuración",
+    "pausedTitle": "Temporizador en Pausa",
+    "pausedMessage": "Toca Reanudar para continuar tu entrenamiento.",
+    "pausedMessageWithVoice": "Toca Reanudar o di \"Iniciar temporizador\" o \"Reanudar temporizador\" para continuar tu entrenamiento.",
+    "pausedResume": "Reanudar"
   },
   "completion": {
     "title": "¡Entrenamiento Completado! ⚡️",

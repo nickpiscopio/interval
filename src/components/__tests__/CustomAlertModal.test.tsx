@@ -327,4 +327,62 @@ describe("CustomAlertModal Component", () => {
     );
     expect(queryByTestId("custom-alert-message-scroll")).toBeNull();
   });
+
+  it("renders pause icon variant with pause-circle-outline", () => {
+    const { getByTestId, getByText } = render(
+      <CustomAlertModal
+        visible={true}
+        options={{
+          title: "Timer Paused",
+          message: "Tap Resume to continue.",
+          icon: "pause",
+        }}
+        onDismiss={jest.fn()}
+      />
+    );
+
+    expect(getByText("Timer Paused")).toBeTruthy();
+    expect(getByTestId("icon-pause-circle-outline")).toBeTruthy();
+  });
+
+  it("hides upper-right close button by default and renders an accessible 44x44 X button when showCloseButton is true", () => {
+    const onDismiss = jest.fn();
+    const onOptionDismiss = jest.fn();
+    const { queryByTestId, getByTestId, rerender } = render(
+      <CustomAlertModal
+        visible={true}
+        options={{
+          title: "Standard Alert",
+          buttons: [{ text: "OK", style: "default" }],
+        }}
+        onDismiss={onDismiss}
+      />
+    );
+
+    expect(queryByTestId("custom-alert-close-button")).toBeNull();
+
+    rerender(
+      <CustomAlertModal
+        visible={true}
+        options={{
+          title: "Timer Paused",
+          icon: "pause",
+          showCloseButton: true,
+          onDismiss: onOptionDismiss,
+          buttons: [{ text: "Resume", style: "default" }],
+        }}
+        onDismiss={onDismiss}
+      />
+    );
+
+    const closeBtn = getByTestId("custom-alert-close-button");
+    const closeStyle = StyleSheet.flatten(closeBtn.props.style);
+    expect(closeStyle.width).toBeGreaterThanOrEqual(Spacing.touchTarget.min);
+    expect(closeStyle.height).toBeGreaterThanOrEqual(Spacing.touchTarget.min);
+    expect(getByTestId("icon-close")).toBeTruthy();
+
+    fireEvent.press(closeBtn);
+    expect(onOptionDismiss).toHaveBeenCalledTimes(1);
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
 });

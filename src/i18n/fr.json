@@ -139,7 +139,11 @@
     "voiceExplainerEnable": "Activer",
     "voicePermissionDeniedTitle": "Autorisation du Microphone Requise",
     "voicePermissionDeniedMessage": "Autorisez l'accès au microphone et à la reconnaissance vocale dans les Réglages de votre appareil pour utiliser la commande vocale.",
-    "voiceOpenSettings": "Ouvrir les Réglages"
+    "voiceOpenSettings": "Ouvrir les Réglages",
+    "pausedTitle": "Minuteur en Pause",
+    "pausedMessage": "Appuyez sur Reprendre pour continuer votre entraînement.",
+    "pausedMessageWithVoice": "Appuyez sur Reprendre ou dites \"Démarrer minuteur\" ou \"Reprendre minuteur\" pour continuer votre entraînement.",
+    "pausedResume": "Reprendre"
   },
   "completion": {
     "title": "Entraînement Terminé ! ⚡️",

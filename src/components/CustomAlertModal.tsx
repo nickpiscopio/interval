@@ -17,6 +17,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Spacing, { RADIUS, TOUCH_TARGET, SHADOWS } from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
 import Colors from "../constants/Colors";
+import { t } from "../i18n";
 
 export interface AlertButton {
   text: string;
@@ -27,9 +28,11 @@ export interface AlertButton {
 export interface AlertOptions {
   title: string;
   message?: string;
-  icon?: "warning" | "error" | "trash" | "info" | "success" | "help";
+  icon?: "warning" | "error" | "trash" | "info" | "success" | "help" | "pause";
   buttons?: AlertButton[];
   cancelable?: boolean;
+  showCloseButton?: boolean;
+  onDismiss?: () => void;
 }
 
 interface CustomAlertModalProps {
@@ -86,6 +89,8 @@ export function CustomAlertModal({
     icon = "info",
     buttons = [{ text: "OK", style: "default" }],
     cancelable = true,
+    showCloseButton = false,
+    onDismiss: onOptionDismiss,
   } = options;
 
   // Derive icon configuration
@@ -121,6 +126,12 @@ export function CustomAlertModal({
           color: "#3B82F6",
           bgColor: "#DBEAFE",
         };
+      case "pause":
+        return {
+          name: "pause-circle-outline" as const,
+          color: Colors.primary,
+          bgColor: Colors.surface.tintActive,
+        };
       case "info":
       default:
         return {
@@ -133,13 +144,20 @@ export function CustomAlertModal({
 
   const iconConfig = getIconConfig();
 
-  function handleBackdropPress() {
-    if (!cancelable) return;
+  function handleClosePress() {
     const cancelBtn = buttons.find((b) => b.style === "cancel");
     if (cancelBtn && cancelBtn.onPress) {
       cancelBtn.onPress();
     }
+    if (onOptionDismiss) {
+      onOptionDismiss();
+    }
     onDismiss();
+  }
+
+  function handleBackdropPress() {
+    if (!cancelable) return;
+    handleClosePress();
   }
 
   function handleButtonPress(btn: AlertButton) {
@@ -204,6 +222,20 @@ export function CustomAlertModal({
               },
             ]}
           >
+            {/* Optional Upper-Right Close Button */}
+            {showCloseButton ? (
+              <TouchableOpacity
+                testID="custom-alert-close-button"
+                accessibilityRole="button"
+                accessibilityLabel={t("common.close")}
+                style={styles.closeButton}
+                activeOpacity={0.7}
+                onPress={handleClosePress}
+              >
+                <Ionicons name="close" size={24} color={Colors.textScale.secondary} />
+              </TouchableOpacity>
+            ) : null}
+
             {/* Pinned Header: Contextual Icon Bubble & Title */}
             <View testID="custom-alert-header" style={styles.header}>
               <View style={[styles.iconContainer, { backgroundColor: iconConfig.bgColor }]}>
@@ -285,6 +317,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   alertCard: {
+    position: "relative",
     maxWidth: MAX_ALERT_WIDTH,
     backgroundColor: Colors.surface.card,
     borderRadius: RADIUS.md,
@@ -293,6 +326,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
     alignItems: "center",
     ...SHADOWS.modal,
+  },
+  closeButton: {
+    position: "absolute",
+    top: Spacing.sm,
+    right: Spacing.sm,
+    width: TOUCH_TARGET.min,
+    height: TOUCH_TARGET.min,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1,
   },
   header: {
     width: "100%",

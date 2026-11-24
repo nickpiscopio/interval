@@ -2,6 +2,8 @@ import React from "react";
 import { AppState, Linking, StyleSheet } from "react-native";
 import { render, fireEvent, act, within } from "@testing-library/react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { createAudioPlayer } from "expo-audio";
+import { deactivateKeepAwake } from "expo-keep-awake";
 import TimerScreen from "../TimerScreen";
 import { AlertProvider } from "../../context/AlertContext";
 import { Timer } from "../../model/Timer";
@@ -583,5 +585,176 @@ describe("TimerScreen Voice Control", () => {
       within(second.getByTestId("timer-voice-toggle")).getByText("mic-off")
     ).toBeTruthy();
     expect(await AsyncStorage.getItem(VOICE_CONTROL_ENABLED_KEY)).toBe("false");
+  });
+
+  it("shows Paused alert with tap-only copy when Voice Control is off, supports X dismissal while staying paused, and resumes with audio on Resume button", async () => {
+    const { getByTestId, getByText, queryByText } = renderTimerScreen();
+    await flushMicrotasks();
+
+    const initialCalls = (createAudioPlayer as jest.Mock).mock.calls.length;
+
+    // Press pause button -> plays pause sound and shows Paused alert (tap-only copy)
+    fireEvent.press(getByTestId("timer-play-pause-button"));
+    await flushMicrotasks();
+
+    expect((createAudioPlayer as jest.Mock).mock.calls.length).toBe(initialCalls + 1);
+    expect(getByText("Timer Paused")).toBeTruthy();
+    expect(getByText("Tap Resume to continue your workout.")).toBeTruthy();
+    expect(getByTestId("icon-pause-circle-outline")).toBeTruthy();
+    expect(getByTestId("custom-alert-close-button")).toBeTruthy();
+
+    // Dismiss via upper-right X -> alert closes, timer stays paused, no extra sound
+    fireEvent.press(getByTestId("custom-alert-close-button"));
+    await flushMicrotasks();
+
+    expect(queryByText("Timer Paused")).toBeNull();
+    expect(within(getByTestId("timer-play-pause-button")).getByText("play")).toBeTruthy();
+    expect((createAudioPlayer as jest.Mock).mock.calls.length).toBe(initialCalls + 1);
+
+    // Resume via play button, pause again, dismiss via backdrop while staying paused
+    fireEvent.press(getByTestId("timer-play-pause-button"));
+    await flushMicrotasks();
+    expect(within(getByTestId("timer-play-pause-button")).getByText("pause")).toBeTruthy();
+
+    fireEvent.press(getByTestId("timer-play-pause-button"));
+    await flushMicrotasks();
+    expect(getByText("Timer Paused")).toBeTruthy();
+
+    fireEvent.press(getByTestId("custom-alert-backdrop"));
+    await flushMicrotasks();
+    expect(queryByText("Timer Paused")).toBeNull();
+    expect(within(getByTestId("timer-play-pause-button")).getByText("play")).toBeTruthy();
+
+    // Resume via play button, then pause again and resume via alert Resume button
+    fireEvent.press(getByTestId("timer-play-pause-button"));
+    await flushMicrotasks();
+    fireEvent.press(getByTestId("timer-play-pause-button"));
+    await flushMicrotasks();
+    expect(getByText("Timer Paused")).toBeTruthy();
+
+    const beforeResumeCalls = (createAudioPlayer as jest.Mock).mock.calls.length;
+    fireEvent.press(getByText("Resume"));
+    await flushMicrotasks();
+
+    expect(queryByText("Timer Paused")).toBeNull();
+    expect(within(getByTestId("timer-play-pause-button")).getByText("pause")).toBeTruthy();
+    expect((createAudioPlayer as jest.Mock).mock.calls.length).toBe(beforeResumeCalls + 1);
+  });
+
+  it("shows Paused alert with voice resume hint on verbal pause, keeps Voice Control listening, and auto-dismisses on verbal resume", async () => {
+    await AsyncStorage.setItem(VOICE_CONTROL_ENABLED_KEY, "true");
+    const { getByTestId, getByText, queryByText } = renderTimerScreen();
+    await flushMicrotasks();
+
+    expect(ExpoSpeechRecognitionModule.start).toHaveBeenCalledTimes(1);
+    const beforeVoicePauseCalls = (createAudioPlayer as jest.Mock).mock.calls.length;
+
+    // Verbal pause -> plays pause sound, shows Paused alert with voice hint, keeps listening
+    act(() => {
+      __emitSpeechRecognitionEvent("result", {
+        results: [{ transcript: "Pause timer" }],
+      });
+    });
+    await flushMicrotasks();
+
+    expect((createAudioPlayer as jest.Mock).mock.calls.length).toBe(beforeVoicePauseCalls + 1);
+    expect(getByText("Timer Paused")).toBeTruthy();
+    expect(
+      getByText('Tap Resume or say "Play timer" or "Resume timer" to continue your workout.')
+    ).toBeTruthy();
+    expect(ExpoSpeechRecognitionModule.abort).not.toHaveBeenCalled();
+
+    // Advance past voice cooldown and verbally resume -> auto-dismisses Paused alert and resumes
+    act(() => {
+      jest.advanceTimersByTime(VOICE_CONTROL_COOLDOWN_MS + 100);
+    });
+    const beforeVoiceResumeCalls = (createAudioPlayer as jest.Mock).mock.calls.length;
+    act(() => {
+      __emitSpeechRecognitionEvent("result", {
+        results: [{ transcript: "Resume timer" }],
+      });
+    });
+    await flushMicrotasks();
+
+    expect(queryByText("Timer Paused")).toBeNull();
+    expect(within(getByTestId("timer-play-pause-button")).getByText("pause")).toBeTruthy();
+    expect((createAudioPlayer as jest.Mock).mock.calls.length).toBe(beforeVoiceResumeCalls + 1);
+  });
+
+  it("auto-pauses with pause audio when AppState leaves active and shows Paused alert on return without clobbering Exit alert", async () => {
+    const appStateHandlers: Array<(state: any) => void> = [];
+    const addEventListenerSpy = jest
+      .spyOn(AppState, "addEventListener")
+      .mockImplementation((_type, handler) => {
+        appStateHandlers.push(handler as any);
+        return { remove: jest.fn() } as any;
+      });
+    const emitAppState = (state: string) => {
+      appStateHandlers.forEach((h) => h(state));
+    };
+
+    const { getByTestId, getByText, queryByText } = renderTimerScreen();
+    await flushMicrotasks();
+
+    const initialCalls = (createAudioPlayer as jest.Mock).mock.calls.length;
+
+    // Device goes to sleep / background while running -> auto-pauses, releases wake lock, plays pause sound
+    act(() => {
+      emitAppState("inactive");
+    });
+    await flushMicrotasks();
+
+    expect(within(getByTestId("timer-play-pause-button")).getByText("play")).toBeTruthy();
+    expect(deactivateKeepAwake).toHaveBeenCalledWith("timer-running");
+    expect((createAudioPlayer as jest.Mock).mock.calls.length).toBe(initialCalls + 1);
+    expect(queryByText("Timer Paused")).toBeNull();
+
+    // Subsequent background transition while already paused -> does NOT replay pause sound
+    act(() => {
+      emitAppState("background");
+    });
+    await flushMicrotasks();
+    expect((createAudioPlayer as jest.Mock).mock.calls.length).toBe(initialCalls + 1);
+
+    // Return to active foreground while paused -> shows Paused alert
+    act(() => {
+      emitAppState("active");
+    });
+    await flushMicrotasks();
+    expect(getByText("Timer Paused")).toBeTruthy();
+
+    // Dismiss Paused alert, open Exit alert, background and return -> Exit alert must NOT be clobbered
+    fireEvent.press(getByTestId("custom-alert-close-button"));
+    await flushMicrotasks();
+    fireEvent.press(getByTestId("timer-back-button"));
+    await flushMicrotasks();
+    expect(getByText("Leave Workout?")).toBeTruthy();
+
+    act(() => {
+      emitAppState("background");
+      emitAppState("active");
+    });
+    await flushMicrotasks();
+    expect(getByText("Leave Workout?")).toBeTruthy();
+    expect(queryByText("Timer Paused")).toBeNull();
+
+    // Cancel Exit alert, open Voice Explainer alert, background and return -> Explainer must NOT be clobbered
+    fireEvent.press(getByText("Keep Going"));
+    await flushMicrotasks();
+    await act(async () => {
+      fireEvent.press(getByTestId("timer-voice-toggle"));
+    });
+    await flushMicrotasks();
+    expect(getByText("Hands-Free Voice Control")).toBeTruthy();
+
+    act(() => {
+      emitAppState("background");
+      emitAppState("active");
+    });
+    await flushMicrotasks();
+    expect(getByText("Hands-Free Voice Control")).toBeTruthy();
+    expect(queryByText("Timer Paused")).toBeNull();
+
+    addEventListenerSpy.mockRestore();
   });
 });

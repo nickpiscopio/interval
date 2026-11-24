@@ -4,6 +4,12 @@ import { AudioSource } from "expo-audio";
 export const NONE_SOUND_ID = "none";
 export const DEFAULT_SOUND_ID = "beep";
 
+/**
+ * Dedicated runner pause audio cue (Timer Pause Audio).
+ * Intentionally excluded from INTERVAL_SOUNDS so it cannot be selected as an Interval Sound.
+ */
+export const PAUSE_SOUND_SOURCE: AudioSource = require("../../assets/sounds/pause.mp3");
+
 export interface IntervalSound {
   /** Stable ID. Persisted and shared in links: never rename or reuse (ADR-0048). */
   id: string;

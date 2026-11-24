@@ -139,7 +139,11 @@
     "voiceExplainerEnable": "Enable",
     "voicePermissionDeniedTitle": "Microphone Permission Needed",
     "voicePermissionDeniedMessage": "Allow microphone and speech recognition access in your device Settings to use hands-free voice control.",
-    "voiceOpenSettings": "Open Settings"
+    "voiceOpenSettings": "Open Settings",
+    "pausedTitle": "Timer Paused",
+    "pausedMessage": "Tap Resume to continue your workout.",
+    "pausedMessageWithVoice": "Tap Resume or say \"Play timer\" or \"Resume timer\" to continue your workout.",
+    "pausedResume": "Resume"
   },
   "completion": {
     "title": "Workout Complete! ⚡️",

@@ -20,7 +20,8 @@ We decided to add opt-in, hands-free **Voice Control** for Play/Resume and Pause
 
 3. **Session Lifecycle & Recovery**:
    - Recognition remains active while the Timer is paused so a Play/Resume phrase can resume the workout hands-free.
-   - Recognition stops immediately while alert dialogs are open, when `AppState` moves to background/inactive, or on unmount/completion, and resumes automatically when returning to the active foreground if the toggle is ON.
+   - Recognition stops immediately while blocking alert dialogs (exit confirmation, Voice Control explainer, and permission alerts) are open, when `AppState` moves to background/inactive, or on unmount/completion, and resumes automatically when returning to the active foreground if the toggle is ON.
+   - **Paused Alert Exception**: Recognition intentionally remains active while the non-blocking **Paused** alert modal is displayed, and automatically dismisses the Paused alert when a Play/Resume hot phrase resumes the Timer so hands-free workouts can be resumed from across the room.
    - When the OS ends a continuous recognition session after prolonged silence or duration limits (e.g., iOS ~60s timeout), recognition automatically restarts while the toggle is ON and the screen is active.
    - In fallback mode (non-on-device), transient `"network"` errors clear the active listening indicator (`isListening = false`) silently without interrupting the active Timer or clearing the user's `isEnabled` preference, so recognition retries automatically on the next foreground or session.
 
