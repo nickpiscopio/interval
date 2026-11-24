@@ -92,8 +92,8 @@ android {
         applicationId 'com.plyonest.interval'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 40
-        versionName "2026.11.23.1"
+        versionCode 41
+        versionName "2026.11.24"
 
         buildConfigField "String", "REACT_NATIVE_RELEASE_LEVEL", "\"${findProperty('reactNativeReleaseLevel') ?: 'stable'}\""
     }
