@@ -574,6 +574,167 @@ describe("EditIntervalModal sheet spacing & layout refinement", () => {
     );
     expect(getByTestId("edit-interval-name-input").props.defaultValue).toBe("Low Interval");
   });
+
+  it("renders borderless Exercise Library sheet header with 16px spacing, Poppins-Bold title, and no back button hitSlop", () => {
+    const { getByText, getByTestId } = renderSheet();
+    fireEvent.press(getByText("Library"));
+
+    const header = styleOf(getByTestId("exercise-library-sheet-header"));
+    expect(header.borderBottomWidth).toBeUndefined();
+    expect(header.borderBottomColor).toBeUndefined();
+    expect(header.paddingTop).toBe(16);
+    expect(header.paddingHorizontal).toBe(16);
+    expect(header.paddingBottom ?? 0).toBe(0);
+    expect(header.marginBottom).toBe(16);
+
+    const searchBar = styleOf(getByTestId("exercise-search-bar"));
+    expect(searchBar.marginTop).toBe(0);
+
+    const title = styleOf(getByText("Exercise Library"));
+    expect(title.fontFamily).toBe("Poppins-Bold");
+
+    const backBtn = getByTestId("exercise-picker-back-btn");
+    expect(backBtn.props.hitSlop).toBeUndefined();
+  });
+
+  it("replaces Exercise Library in-place with ExerciseDetailView inside the single bottom sheet with 16px padding", () => {
+    const { getByText, getByTestId, queryByTestId, getAllByTestId } = renderSheet();
+    fireEvent.press(getByText("Library"));
+    expect(getAllByTestId("bottom-sheet-modal")).toHaveLength(1);
+
+    fireEvent.press(getByTestId("exercise-card-tibialis_raises"));
+
+    // Strictly one bottom sheet mounted (no stacked modal)
+    expect(getAllByTestId("bottom-sheet-modal")).toHaveLength(1);
+    expect(getByTestId("exercise-detail-header")).toBeTruthy();
+    expect(getByTestId("exercise-detail-title").props.children).toBe("Tibialis Raises");
+    expect(queryByTestId("exercise-library-sheet-header")).toBeNull();
+    expect(queryByTestId("exercise-search-bar")).toBeNull();
+
+    const detailContainer = styleOf(getByTestId("exercise-detail-sheet-container"));
+    expect(detailContainer.paddingTop).toBe(16);
+    expect(detailContainer.paddingHorizontal).toBe(16);
+  });
+
+  it("returns from Exercise Detail to Exercise Library via back button while preserving search, category, and body part filters", () => {
+    const { getByText, getAllByText, getByPlaceholderText, getByTestId, queryByText, queryByTestId } = renderSheet();
+    fireEvent.press(getByText("Library"));
+
+    // Apply category, body part, and search filters
+    fireEvent.press(getAllByText("Physical Therapy")[0]);
+    fireEvent.press(getAllByText("Ankle & Feet")[0]);
+    const searchInput = getByPlaceholderText("Search exercises...");
+    fireEvent.changeText(searchInput, "tibialis");
+    expect(getByText("Tibialis Raises")).toBeTruthy();
+    expect(queryByText("Push-Ups")).toBeNull();
+
+    // Drill down into Exercise Detail
+    fireEvent.press(getByTestId("exercise-card-tibialis_raises"));
+    expect(getByTestId("exercise-detail-header")).toBeTruthy();
+
+    // Press detail back button -> returns 1 step to Exercise Library with filters preserved
+    fireEvent.press(getByTestId("exercise-detail-back-btn"));
+    expect(queryByTestId("exercise-detail-header")).toBeNull();
+    expect(queryByTestId("edit-interval-header")).toBeNull();
+    expect(getByPlaceholderText("Search exercises...").props.value).toBe("tibialis");
+    expect(getByText("Tibialis Raises")).toBeTruthy();
+    expect(queryByText("Push-Ups")).toBeNull();
+
+    // Press library back button -> returns to Interval Edit form
+    fireEvent.press(getByTestId("exercise-picker-back-btn"));
+    expect(getByTestId("edit-interval-header")).toBeTruthy();
+  });
+
+  it("unwinds Android hardware back one level at a time from Exercise Detail to Exercise Library to Interval Edit", () => {
+    const listeners: Array<() => boolean> = [];
+    const spy = jest.spyOn(BackHandler, "addEventListener").mockImplementation((_event, handler) => {
+      const fn = handler as () => boolean;
+      listeners.push(fn);
+      return {
+        remove: () => {
+          const idx = listeners.lastIndexOf(fn);
+          if (idx !== -1) listeners.splice(idx, 1);
+        },
+      } as any;
+    });
+
+    const pressHardwareBack = () => {
+      let handled = false;
+      act(() => {
+        for (let i = listeners.length - 1; i >= 0; i--) {
+          if (listeners[i]()) {
+            handled = true;
+            break;
+          }
+        }
+      });
+      return handled;
+    };
+
+    try {
+      const { getByText, getByPlaceholderText, getByTestId, queryByTestId } = renderSheet();
+      fireEvent.press(getByText("Library"));
+      fireEvent.changeText(getByPlaceholderText("Search exercises..."), "tibialis");
+      fireEvent.press(getByTestId("exercise-card-tibialis_raises"));
+      expect(getByTestId("exercise-detail-header")).toBeTruthy();
+
+      // 1st hardware back: Detail -> Exercise Library (filters preserved)
+      expect(pressHardwareBack()).toBe(true);
+      expect(queryByTestId("exercise-detail-header")).toBeNull();
+      expect(queryByTestId("edit-interval-header")).toBeNull();
+      expect(getByTestId("exercise-library-sheet-header")).toBeTruthy();
+      expect(getByPlaceholderText("Search exercises...").props.value).toBe("tibialis");
+
+      // 2nd hardware back: Exercise Library -> Interval Edit form
+      expect(pressHardwareBack()).toBe(true);
+      expect(getByTestId("edit-interval-header")).toBeTruthy();
+      expect(queryByTestId("exercise-library-sheet-header")).toBeNull();
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
+  it("selects exercise via Add to Timer in in-sheet Exercise Detail and returns directly to Interval Edit form", () => {
+    const onSelectExercise = jest.fn();
+    const { getByText, getByTestId, queryByTestId } = renderSheet({ onSelectExercise });
+
+    fireEvent.press(getByText("Library"));
+    fireEvent.press(getByTestId("exercise-card-tibialis_raises"));
+    fireEvent.press(getByTestId("exercise-detail-add-to-timer-btn"));
+
+    expect(onSelectExercise).toHaveBeenCalledWith(
+      expect.objectContaining({ id: "tibialis_raises", name: "Tibialis Raises" })
+    );
+    expect(getByTestId("edit-interval-header")).toBeTruthy();
+    expect(queryByTestId("exercise-detail-header")).toBeNull();
+    expect(queryByTestId("exercise-library-sheet-header")).toBeNull();
+  });
+
+  it("reopens cleanly on Interval Edit form after dismissing the sheet while on Exercise Detail", () => {
+    const props = {
+      interval,
+      onClose: jest.fn(),
+      onUpdate: jest.fn(),
+      onDelete: jest.fn(),
+      onDuplicate: jest.fn(),
+      onOpenExercisePicker: jest.fn(),
+    };
+    const { getByText, getByTestId, queryByTestId, rerender } = render(
+      <EditIntervalModal visible={true} {...props} />
+    );
+
+    fireEvent.press(getByText("Library"));
+    fireEvent.press(getByTestId("exercise-card-tibialis_raises"));
+    expect(getByTestId("exercise-detail-header")).toBeTruthy();
+
+    // Dismiss sheet and reopen
+    rerender(<EditIntervalModal visible={false} {...props} />);
+    rerender(<EditIntervalModal visible={true} {...props} />);
+
+    expect(getByTestId("edit-interval-header")).toBeTruthy();
+    expect(queryByTestId("exercise-detail-header")).toBeNull();
+    expect(queryByTestId("exercise-library-sheet-header")).toBeNull();
+  });
 });
 
 

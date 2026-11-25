@@ -1,4 +1,5 @@
 import React from "react";
+import { StyleSheet } from "react-native";
 import { render, fireEvent, waitFor } from "@testing-library/react-native";
 import { ExercisePickerModal } from "../ExercisePickerModal";
 
@@ -112,5 +113,38 @@ describe("ExercisePickerModal Component", () => {
     fireEvent.changeText(searchInput, "xyznonexistent123");
 
     expect(getByText("No exercises found")).toBeTruthy();
+  });
+
+  it("renders Exercise Detail in-place within the single bottom sheet with 16px padding and closes on Add to Timer", async () => {
+    const onSelect = jest.fn();
+    const onClose = jest.fn();
+
+    const { getByText, getByTestId, queryByTestId, getAllByTestId } = render(
+      <ExercisePickerModal visible={true} onClose={onClose} onSelect={onSelect} />
+    );
+
+    expect(getAllByTestId("bottom-sheet-modal")).toHaveLength(1);
+
+    fireEvent.press(getByText("Tibialis Raises"));
+
+    // Still strictly a single bottom sheet mounted
+    expect(getAllByTestId("bottom-sheet-modal")).toHaveLength(1);
+    expect(getByTestId("exercise-detail-header")).toBeTruthy();
+    expect(queryByTestId("exercise-search-bar")).toBeNull();
+
+    const detailContainerStyle = StyleSheet.flatten(
+      getByTestId("exercise-detail-sheet-container").props.style
+    );
+    expect(detailContainerStyle.paddingTop).toBe(16);
+    expect(detailContainerStyle.paddingHorizontal).toBe(16);
+
+    fireEvent.press(getByTestId("exercise-detail-add-to-timer-btn"));
+
+    await waitFor(() => {
+      expect(onSelect).toHaveBeenCalledWith(
+        expect.objectContaining({ id: "tibialis_raises", name: "Tibialis Raises" })
+      );
+      expect(onClose).toHaveBeenCalled();
+    });
   });
 });
