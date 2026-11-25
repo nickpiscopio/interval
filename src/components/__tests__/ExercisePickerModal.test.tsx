@@ -3,13 +3,16 @@ import { render, fireEvent, waitFor } from "@testing-library/react-native";
 import { ExercisePickerModal } from "../ExercisePickerModal";
 
 describe("ExercisePickerModal Component", () => {
-  it("renders when visible and displays search bar and category tabs", () => {
-    const { getByPlaceholderText, getByText, getAllByText } = render(
+  it("renders when visible and displays search bar and self-describing filter pills without section labels", () => {
+    const { getByPlaceholderText, getByText, getAllByText, queryByText } = render(
       <ExercisePickerModal visible={true} onClose={jest.fn()} onSelect={jest.fn()} />
     );
 
     expect(getByPlaceholderText("Search exercises...")).toBeTruthy();
-    expect(getByText("All")).toBeTruthy();
+    expect(queryByText("Category")).toBeNull();
+    expect(queryByText("Body Part")).toBeNull();
+    expect(getByText("All Categories")).toBeTruthy();
+    expect(getByText("All Body Parts")).toBeTruthy();
     expect(getAllByText("Cardio").length).toBeGreaterThan(0);
     expect(getByText("Tibialis Raises")).toBeTruthy();
   });

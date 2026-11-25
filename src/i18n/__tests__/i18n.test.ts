@@ -41,6 +41,17 @@ describe("i18n Localization Test Suite", () => {
     expect(t("non_existent_key", { defaultValue: "Fallback" })).toBe("Fallback");
   });
 
+  it("uses self-describing All Categories copy and removes obsolete filter section label keys across EN, ES, and FR", () => {
+    expect(en.exercises.allCategories).toBe("All Categories");
+    expect(es.exercises.allCategories).toBe("Todas las Categorías");
+    expect(fr.exercises.allCategories).toBe("Toutes les Catégories");
+
+    for (const dict of [en, es, fr]) {
+      expect(dict.exercises.categoryLabel).toBeUndefined();
+      expect(dict.exercises.bodyPartLabel).toBeUndefined();
+    }
+  });
+
   it("ensures 100% key parity across EN, ES, and FR dictionaries", () => {
     const enKeys = new Set(flattenKeys(en));
     const esKeys = new Set(flattenKeys(es));

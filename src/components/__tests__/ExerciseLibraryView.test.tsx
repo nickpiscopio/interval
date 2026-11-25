@@ -1,46 +1,37 @@
 import React from "react";
-import { StyleSheet } from "react-native";
+import { FlatList, StyleSheet } from "react-native";
 import { render, fireEvent, waitFor } from "@testing-library/react-native";
 import { logEvent as firebaseLogEvent } from "@react-native-firebase/analytics";
 import { ExerciseLibraryView } from "../ExerciseLibraryView";
 import Spacing from "../../constants/Spacing";
-import FontSize from "../../constants/FontSize";
-import Colors from "../../constants/Colors";
 
 describe("ExerciseLibraryView Component", () => {
-  it("renders Category and Body Part input labels above carousels and top padding on list content", () => {
-    const { getByTestId, getByText } = render(
+  it("omits Category and Body Part labels and uses Spacing.sm vertical rhythm between search bar and filter carousels", () => {
+    const { queryByTestId, queryByText, getByTestId } = render(
       <ExerciseLibraryView
         onStartQuickRoutine={jest.fn()}
         onCreateCustomTimer={jest.fn()}
       />
     );
 
-    const categoryLabel = getByTestId("exercise-category-label");
-    expect(categoryLabel).toBeTruthy();
-    expect(categoryLabel.props.children).toBe("Category");
-    const catLabelStyle = StyleSheet.flatten(categoryLabel.props.style);
-    expect(catLabelStyle.fontSize).toBe(FontSize.xs);
-    expect(catLabelStyle.fontFamily).toBe("Poppins-Bold");
-    expect(catLabelStyle.color).toBe(Colors.textScale.secondary);
-    expect(catLabelStyle.paddingHorizontal).toBe(Spacing.md);
-    expect(catLabelStyle.marginBottom).toBe(Spacing.inputLabelGap);
+    expect(queryByTestId("exercise-category-label")).toBeNull();
+    expect(queryByText("Category")).toBeNull();
+    expect(queryByTestId("exercise-body-part-label")).toBeNull();
+    expect(queryByText("Body Part")).toBeNull();
 
-    const bodyPartLabel = getByTestId("exercise-body-part-label");
-    expect(bodyPartLabel).toBeTruthy();
-    expect(bodyPartLabel.props.children).toBe("Body Part");
-    const bpLabelStyle = StyleSheet.flatten(bodyPartLabel.props.style);
-    expect(bpLabelStyle.fontSize).toBe(FontSize.xs);
-    expect(bpLabelStyle.fontFamily).toBe("Poppins-Bold");
-    expect(bpLabelStyle.color).toBe(Colors.textScale.secondary);
-    expect(bpLabelStyle.paddingHorizontal).toBe(Spacing.md);
-    expect(bpLabelStyle.marginBottom).toBe(Spacing.inputLabelGap);
+    const searchBar = getByTestId("exercise-search-bar");
+    const searchStyle = StyleSheet.flatten(searchBar.props.style);
+    expect(searchStyle.marginBottom).toBe(Spacing.sm);
+
+    const categoriesWrapper = getByTestId("categories-filter-wrapper");
+    const categoriesWrapperStyle = StyleSheet.flatten(categoriesWrapper.props.style);
+    expect(categoriesWrapperStyle.marginBottom).toBe(Spacing.sm);
   });
   it("renders exercises and filters by category and body part", () => {
     const onQuickRoutine = jest.fn();
     const onCustomTimer = jest.fn();
 
-    const { getByText, getAllByText, getByPlaceholderText } = render(
+    const { getByText, getAllByText, getByPlaceholderText, queryByText } = render(
       <ExerciseLibraryView
         onStartQuickRoutine={onQuickRoutine}
         onCreateCustomTimer={onCustomTimer}
@@ -48,6 +39,16 @@ describe("ExerciseLibraryView Component", () => {
     );
 
     expect(getByPlaceholderText("Search exercises, body parts, or instructions...")).toBeTruthy();
+    expect(getByText("All Categories")).toBeTruthy();
+    expect(getByText("All Body Parts")).toBeTruthy();
+    expect(getByText("Tibialis Raises")).toBeTruthy();
+
+    // Filter by Cardio category (hides Physical Therapy exercises like Tibialis Raises)
+    fireEvent.press(getAllByText("Cardio")[0]);
+    expect(queryByText("Tibialis Raises")).toBeNull();
+
+    // Reset category filter with All Categories pill
+    fireEvent.press(getByText("All Categories"));
     expect(getByText("Tibialis Raises")).toBeTruthy();
 
     // Filter by Physical Therapy category (first element is the filter pill)
@@ -60,9 +61,10 @@ describe("ExerciseLibraryView Component", () => {
     fireEvent.press(anklePills[0]);
     expect(getByText("Tibialis Raises")).toBeTruthy();
 
-    // Filter by All Body Parts
+    // Reset body part filter with All Body Parts pill
     const allBodyPartsPill = getByText("All Body Parts");
     fireEvent.press(allBodyPartsPill);
+    expect(getByText("Tibialis Raises")).toBeTruthy();
   });
 
   it("searches across exercise name, description, and keywords", () => {
@@ -209,7 +211,7 @@ describe("ExerciseLibraryView Component", () => {
     expect(onBack).toHaveBeenCalled();
   });
 
-  it("applies 16px top margin and 0px bottom margin to the results count header", () => {
+  it("applies 16px top margin, 0px bottom margin, and Spacing.sm bottom padding to the results count header with 0 top padding on the list", () => {
     const { getByTestId } = render(
       <ExerciseLibraryView
         onStartQuickRoutine={jest.fn()}
@@ -221,6 +223,117 @@ describe("ExerciseLibraryView Component", () => {
     const headerStyle = StyleSheet.flatten(resultsHeader.props.style);
     expect(headerStyle.marginTop).toBe(Spacing.md);
     expect(headerStyle.marginBottom).toBe(0);
+    expect(headerStyle.paddingBottom).toBe(Spacing.sm);
+
+    const list = getByTestId("exercise-list");
+    const listContentStyle = StyleSheet.flatten(list.props.contentContainerStyle);
+    expect(listContentStyle.paddingTop).toBe(0);
+  });
+
+  it("renders a dynamic non-interactive 12px top scroll shadow only while the exercise list is scrolled", () => {
+    const { getByTestId, queryByTestId } = render(
+      <ExerciseLibraryView
+        onStartQuickRoutine={jest.fn()}
+        onCreateCustomTimer={jest.fn()}
+      />
+    );
+
+    const list = getByTestId("exercise-list");
+    expect(list.props.scrollEventThrottle).toBe(16);
+    expect(queryByTestId("exercise-list-scroll-shadow")).toBeNull();
+
+    // Scroll down past top -> shadow appears
+    fireEvent.scroll(list, {
+      nativeEvent: {
+        contentOffset: { x: 0, y: 24 },
+        contentSize: { width: 375, height: 1200 },
+        layoutMeasurement: { width: 375, height: 600 },
+      },
+    });
+
+    const shadow = getByTestId("exercise-list-scroll-shadow");
+    expect(shadow.props.pointerEvents).toBe("none");
+    expect(shadow.props.colors).toEqual([
+      "rgba(0, 0, 0, 0.15)",
+      "rgba(0, 0, 0, 0.05)",
+      "transparent",
+    ]);
+    const shadowStyle = StyleSheet.flatten(shadow.props.style);
+    expect(shadowStyle).toEqual(
+      expect.objectContaining({
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        height: 12,
+        zIndex: 9,
+      })
+    );
+
+    // Scroll back to top -> shadow disappears
+    fireEvent.scroll(list, {
+      nativeEvent: {
+        contentOffset: { x: 0, y: 0 },
+        contentSize: { width: 375, height: 1200 },
+        layoutMeasurement: { width: 375, height: 600 },
+      },
+    });
+
+    expect(queryByTestId("exercise-list-scroll-shadow")).toBeNull();
+  });
+
+  it("resets scroll position to top without animation and hides scroll shadow when category, body part, or search changes", () => {
+    const scrollToOffsetSpy = jest
+      .spyOn(FlatList.prototype, "scrollToOffset")
+      .mockImplementation(() => {});
+
+    try {
+      const { getByTestId, queryByTestId, getAllByText, getByText, getByPlaceholderText } = render(
+        <ExerciseLibraryView
+          onStartQuickRoutine={jest.fn()}
+          onCreateCustomTimer={jest.fn()}
+        />
+      );
+
+      const list = getByTestId("exercise-list");
+      const scrollDown = () => {
+        fireEvent.scroll(list, {
+          nativeEvent: {
+            contentOffset: { x: 0, y: 120 },
+            contentSize: { width: 375, height: 1200 },
+            layoutMeasurement: { width: 375, height: 600 },
+          },
+        });
+        expect(getByTestId("exercise-list-scroll-shadow")).toBeTruthy();
+      };
+
+      const expectScrollResetAfter = (action: () => void) => {
+        scrollDown();
+        scrollToOffsetSpy.mockClear();
+        action();
+        expect(queryByTestId("exercise-list-scroll-shadow")).toBeNull();
+        expect(scrollToOffsetSpy).toHaveBeenCalledWith({ offset: 0, animated: false });
+      };
+
+      const searchInput = getByPlaceholderText("Search exercises, body parts, or instructions...");
+
+      // 1. Changing category resets scroll and hides shadow
+      expectScrollResetAfter(() => fireEvent.press(getAllByText("Cardio")[0]));
+
+      // 2. Changing Body Part Focus resets scroll and hides shadow
+      expectScrollResetAfter(() => fireEvent.press(getAllByText("Ankle & Feet")[0]));
+
+      // 3. Resetting Body Part Focus to All Body Parts resets scroll and hides shadow
+      expectScrollResetAfter(() => fireEvent.press(getByText("All Body Parts")));
+
+      // 4. Typing a search query resets scroll and hides shadow
+      expectScrollResetAfter(() => fireEvent.changeText(searchInput, "sciatica"));
+
+      // 5. Clearing the search query resets scroll and hides shadow
+      expectScrollResetAfter(() => fireEvent.press(getByTestId("clear-search-btn")));
+    } finally {
+      scrollToOffsetSpy.mockRestore();
+    }
   });
 
   it("emits exercise_filtered and exercise_viewed telemetry events", () => {
