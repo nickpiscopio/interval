@@ -207,10 +207,7 @@ export function ExerciseLibraryView({
       </View>
 
       {/* Category Filter Pills */}
-      <Text testID="exercise-category-label" style={styles.filterSectionLabel}>
-        {t("exercises.categoryLabel")}
-      </Text>
-      <View style={styles.filterPillsWrapper}>
+      <View testID="categories-filter-wrapper" style={styles.filterPillsWrapper}>
         <ScrollView
           testID="categories-carousel"
           horizontal
@@ -263,9 +260,6 @@ export function ExerciseLibraryView({
       </View>
 
       {/* Body Part Filter Pills */}
-      <Text testID="exercise-body-part-label" style={styles.filterSectionLabel}>
-        {t("exercises.bodyPartLabel")}
-      </Text>
       <View style={styles.bodyPartPillsWrapper}>
         <ScrollView
           testID="body-parts-carousel"
@@ -510,7 +504,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface.card,
     marginHorizontal: Spacing.md,
     marginTop: Spacing.xs,
-    marginBottom: Spacing.xs,
+    marginBottom: Spacing.sm,
     paddingHorizontal: 12,
     minHeight: TOUCH_TARGET.icon,
     borderRadius: RADIUS.md,
@@ -527,15 +521,8 @@ const styles = StyleSheet.create({
     color: Colors.textScale.primary,
     paddingVertical: 8,
   },
-  filterSectionLabel: {
-    fontSize: FontSize.xs,
-    fontFamily: "Poppins-Bold",
-    color: Colors.textScale.secondary,
-    paddingHorizontal: Spacing.md,
-    marginBottom: Spacing.inputLabelGap,
-  },
   filterPillsWrapper: {
-    marginBottom: Spacing.xs,
+    marginBottom: Spacing.sm,
   },
   filterPillsRow: {
     paddingHorizontal: Spacing.md,

@@ -4,43 +4,34 @@ import { render, fireEvent, waitFor } from "@testing-library/react-native";
 import { logEvent as firebaseLogEvent } from "@react-native-firebase/analytics";
 import { ExerciseLibraryView } from "../ExerciseLibraryView";
 import Spacing from "../../constants/Spacing";
-import FontSize from "../../constants/FontSize";
-import Colors from "../../constants/Colors";
 
 describe("ExerciseLibraryView Component", () => {
-  it("renders Category and Body Part input labels above carousels and top padding on list content", () => {
-    const { getByTestId, getByText } = render(
+  it("omits Category and Body Part labels and uses Spacing.sm vertical rhythm between search bar and filter carousels", () => {
+    const { queryByTestId, queryByText, getByTestId } = render(
       <ExerciseLibraryView
         onStartQuickRoutine={jest.fn()}
         onCreateCustomTimer={jest.fn()}
       />
     );
 
-    const categoryLabel = getByTestId("exercise-category-label");
-    expect(categoryLabel).toBeTruthy();
-    expect(categoryLabel.props.children).toBe("Category");
-    const catLabelStyle = StyleSheet.flatten(categoryLabel.props.style);
-    expect(catLabelStyle.fontSize).toBe(FontSize.xs);
-    expect(catLabelStyle.fontFamily).toBe("Poppins-Bold");
-    expect(catLabelStyle.color).toBe(Colors.textScale.secondary);
-    expect(catLabelStyle.paddingHorizontal).toBe(Spacing.md);
-    expect(catLabelStyle.marginBottom).toBe(Spacing.inputLabelGap);
+    expect(queryByTestId("exercise-category-label")).toBeNull();
+    expect(queryByText("Category")).toBeNull();
+    expect(queryByTestId("exercise-body-part-label")).toBeNull();
+    expect(queryByText("Body Part")).toBeNull();
 
-    const bodyPartLabel = getByTestId("exercise-body-part-label");
-    expect(bodyPartLabel).toBeTruthy();
-    expect(bodyPartLabel.props.children).toBe("Body Part");
-    const bpLabelStyle = StyleSheet.flatten(bodyPartLabel.props.style);
-    expect(bpLabelStyle.fontSize).toBe(FontSize.xs);
-    expect(bpLabelStyle.fontFamily).toBe("Poppins-Bold");
-    expect(bpLabelStyle.color).toBe(Colors.textScale.secondary);
-    expect(bpLabelStyle.paddingHorizontal).toBe(Spacing.md);
-    expect(bpLabelStyle.marginBottom).toBe(Spacing.inputLabelGap);
+    const searchBar = getByTestId("exercise-search-bar");
+    const searchStyle = StyleSheet.flatten(searchBar.props.style);
+    expect(searchStyle.marginBottom).toBe(Spacing.sm);
+
+    const categoriesWrapper = getByTestId("categories-filter-wrapper");
+    const categoriesWrapperStyle = StyleSheet.flatten(categoriesWrapper.props.style);
+    expect(categoriesWrapperStyle.marginBottom).toBe(Spacing.sm);
   });
   it("renders exercises and filters by category and body part", () => {
     const onQuickRoutine = jest.fn();
     const onCustomTimer = jest.fn();
 
-    const { getByText, getAllByText, getByPlaceholderText } = render(
+    const { getByText, getAllByText, getByPlaceholderText, queryByText } = render(
       <ExerciseLibraryView
         onStartQuickRoutine={onQuickRoutine}
         onCreateCustomTimer={onCustomTimer}
@@ -48,6 +39,16 @@ describe("ExerciseLibraryView Component", () => {
     );
 
     expect(getByPlaceholderText("Search exercises, body parts, or instructions...")).toBeTruthy();
+    expect(getByText("All Categories")).toBeTruthy();
+    expect(getByText("All Body Parts")).toBeTruthy();
+    expect(getByText("Tibialis Raises")).toBeTruthy();
+
+    // Filter by Cardio category (hides Physical Therapy exercises like Tibialis Raises)
+    fireEvent.press(getAllByText("Cardio")[0]);
+    expect(queryByText("Tibialis Raises")).toBeNull();
+
+    // Reset category filter with All Categories pill
+    fireEvent.press(getByText("All Categories"));
     expect(getByText("Tibialis Raises")).toBeTruthy();
 
     // Filter by Physical Therapy category (first element is the filter pill)
@@ -60,9 +61,10 @@ describe("ExerciseLibraryView Component", () => {
     fireEvent.press(anklePills[0]);
     expect(getByText("Tibialis Raises")).toBeTruthy();
 
-    // Filter by All Body Parts
+    // Reset body part filter with All Body Parts pill
     const allBodyPartsPill = getByText("All Body Parts");
     fireEvent.press(allBodyPartsPill);
+    expect(getByText("Tibialis Raises")).toBeTruthy();
   });
 
   it("searches across exercise name, description, and keywords", () => {

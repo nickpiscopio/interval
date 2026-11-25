@@ -5,13 +5,16 @@ import { ExercisePickerView } from "../ExercisePickerView";
 import Spacing from "../../constants/Spacing";
 
 describe("ExercisePickerView", () => {
-  it("renders search bar, category chips, and catalog list", () => {
-    const { getByPlaceholderText, getByText } = render(
+  it("renders search bar, self-describing category and body part pills without section labels, and catalog list", () => {
+    const { getByPlaceholderText, getByText, queryByText } = render(
       <ExercisePickerView onSelect={jest.fn()} />
     );
 
     expect(getByPlaceholderText("Search exercises...")).toBeTruthy();
-    expect(getByText("All")).toBeTruthy();
+    expect(queryByText("Category")).toBeNull();
+    expect(queryByText("Body Part")).toBeNull();
+    expect(getByText("All Categories")).toBeTruthy();
+    expect(getByText("All Body Parts")).toBeTruthy();
     expect(getByText("Tibialis Raises")).toBeTruthy();
   });
 
