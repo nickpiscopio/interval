@@ -124,7 +124,7 @@ export function BottomSheetFrame({
       enablePanDownToClose={false}
       enableHandlePanningGesture={false}
       enableContentPanningGesture={false}
-      stackBehavior="push"
+      stackBehavior="replace"
       onDismiss={handleDismiss}
       backdropComponent={renderBackdrop}
       backgroundStyle={styles.background}
