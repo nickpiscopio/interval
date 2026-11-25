@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   FlatList,
+  BackHandler,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
@@ -23,6 +24,7 @@ import {
   getLocalizedBodyPartName,
 } from "../constants/exerciseCatalog";
 import { ExerciseDetailModal } from "./ExerciseDetailModal";
+import { ExerciseDetailView } from "./ExerciseDetailView";
 import { recordExerciseSearch, recordExerciseInspection } from "../services/badgeService";
 import { logEvent } from "../services/analyticsService";
 import { t } from "../i18n";
@@ -61,6 +63,16 @@ export function ExerciseLibraryView({
   const [isScrolled, setIsScrolled] = useState(false);
   const listRef = useRef<FlatList<Exercise>>(null);
   const isInitialMountRef = useRef(true);
+  const isSheetMode = Boolean(onBack || onClose);
+
+  useEffect(() => {
+    if (!isSheetMode || !selectedExercise) return;
+    const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
+      setSelectedExercise(null);
+      return true;
+    });
+    return () => subscription.remove();
+  }, [isSheetMode, selectedExercise]);
 
   useEffect(() => {
     if (isInitialMountRef.current) {
@@ -119,6 +131,9 @@ export function ExerciseLibraryView({
       category: exercise.category,
       has_video: Boolean(exercise.videoUrl),
     });
+    if (isSheetMode) {
+      setIsScrolled(false);
+    }
     setSelectedExercise(exercise);
   }
 
@@ -155,13 +170,30 @@ export function ExerciseLibraryView({
     total: "#0891B2",
   };
 
-  const isSheetMode = Boolean(onBack || onClose);
+  if (isSheetMode && selectedExercise) {
+    return (
+      <View style={[styles.container, styles.sheetContainer]}>
+        <ExerciseDetailView
+          exercise={selectedExercise}
+          mode={onSelect ? "picker" : "library"}
+          inSheetPadding={true}
+          onBack={() => setSelectedExercise(null)}
+          onSelectExercise={(ex) => {
+            setSelectedExercise(null);
+            onSelect?.(ex);
+          }}
+          onStartQuickRoutine={onStartQuickRoutine}
+          onCreateCustomTimer={onCreateCustomTimer}
+        />
+      </View>
+    );
+  }
 
   return (
     <View style={[styles.container, isSheetMode && styles.sheetContainer]}>
       {/* Optional In-Sheet Header with Back & Close */}
       {(onBack || onClose) && (
-        <View style={styles.sheetHeader}>
+        <View testID="exercise-library-sheet-header" style={styles.sheetHeader}>
           <View style={styles.sheetHeaderLeft}>
             {onBack && (
               <TouchableOpacity
@@ -169,7 +201,6 @@ export function ExerciseLibraryView({
                 accessibilityLabel={t("common.back")}
                 style={styles.backButton}
                 onPress={onBack}
-                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
               >
                 <Ionicons name="arrow-back" size={24} color={Colors.textScale.primary} />
               </TouchableOpacity>
@@ -192,7 +223,10 @@ export function ExerciseLibraryView({
       )}
 
       {/* Search Bar */}
-      <View testID="exercise-search-bar" style={styles.searchContainer}>
+      <View
+        testID="exercise-search-bar"
+        style={[styles.searchContainer, isSheetMode && styles.searchContainerSheet]}
+      >
         <Ionicons name="search" size={18} color="#9CA3AF" style={styles.searchIcon} />
         <TextInput
           style={styles.searchInput}
@@ -461,20 +495,22 @@ export function ExerciseLibraryView({
         />
       </View>
 
-      {/* Exercise Detail Sheet */}
-      <ExerciseDetailModal
-        visible={selectedExercise !== null}
-        exercise={selectedExercise}
-        mode={onSelect ? "picker" : "library"}
-        onClose={() => setSelectedExercise(null)}
-        onSelectExercise={(ex) => {
-          if (onSelect) {
-            onSelect(ex);
-          }
-        }}
-        onStartQuickRoutine={onStartQuickRoutine}
-        onCreateCustomTimer={onCreateCustomTimer}
-      />
+      {/* Exercise Detail Sheet (Tab mode only; sheet mode renders ExerciseDetailView in-place) */}
+      {!isSheetMode && (
+        <ExerciseDetailModal
+          visible={selectedExercise !== null}
+          exercise={selectedExercise}
+          mode={onSelect ? "picker" : "library"}
+          onClose={() => setSelectedExercise(null)}
+          onSelectExercise={(ex) => {
+            if (onSelect) {
+              onSelect(ex);
+            }
+          }}
+          onStartQuickRoutine={onStartQuickRoutine}
+          onCreateCustomTimer={onCreateCustomTimer}
+        />
+      )}
     </View>
   );
 }
@@ -492,11 +528,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: Spacing.md,
-    paddingTop: Spacing.xs,
-    paddingBottom: Spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.borderDefault,
-    marginBottom: Spacing.xs,
+    paddingTop: Spacing.md,
+    paddingBottom: 0,
+    marginBottom: Spacing.md,
   },
   sheetHeaderLeft: {
     flexDirection: "row",
@@ -517,7 +551,7 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: FontSize.lg,
-    fontWeight: "800",
+    fontFamily: "Poppins-Bold",
     color: Colors.textScale.primary,
   },
   closeButton: {
@@ -541,6 +575,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.borderDefault,
     ...SHADOWS.card,
+  },
+  searchContainerSheet: {
+    marginTop: 0,
   },
   searchIcon: {
     marginRight: 8,

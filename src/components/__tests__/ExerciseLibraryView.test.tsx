@@ -211,6 +211,51 @@ describe("ExerciseLibraryView Component", () => {
     expect(onBack).toHaveBeenCalled();
   });
 
+  it("renders borderless in-sheet header with 16px padding, 16px gap to search bar, Poppins-Bold title, and no back button hitSlop", () => {
+    const { getByTestId, getByText } = render(
+      <ExerciseLibraryView onBack={jest.fn()} onSelect={jest.fn()} />
+    );
+
+    const header = getByTestId("exercise-library-sheet-header");
+    const headerStyle = StyleSheet.flatten(header.props.style);
+    expect(headerStyle.borderBottomWidth).toBeUndefined();
+    expect(headerStyle.borderBottomColor).toBeUndefined();
+    expect(headerStyle.paddingTop).toBe(16);
+    expect(headerStyle.paddingHorizontal).toBe(16);
+    expect(headerStyle.paddingBottom ?? 0).toBe(0);
+    expect(headerStyle.marginBottom).toBe(16);
+
+    const searchBar = getByTestId("exercise-search-bar");
+    const searchStyle = StyleSheet.flatten(searchBar.props.style);
+    expect(searchStyle.marginTop).toBe(0);
+
+    const title = getByText("Exercise Library");
+    const titleStyle = StyleSheet.flatten(title.props.style);
+    expect(titleStyle.fontFamily).toBe("Poppins-Bold");
+
+    const backBtn = getByTestId("exercise-picker-back-btn");
+    expect(backBtn.props.hitSlop).toBeUndefined();
+  });
+
+  it("preserves tab-mode search bar top margin and opens standalone ExerciseDetailModal on card press", () => {
+    const { getByTestId, queryAllByTestId } = render(
+      <ExerciseLibraryView
+        onStartQuickRoutine={jest.fn()}
+        onCreateCustomTimer={jest.fn()}
+      />
+    );
+
+    const searchBar = getByTestId("exercise-search-bar");
+    const searchStyle = StyleSheet.flatten(searchBar.props.style);
+    expect(searchStyle.marginTop).toBe(Spacing.xs);
+
+    expect(queryAllByTestId("bottom-sheet-modal")).toHaveLength(0);
+
+    fireEvent.press(getByTestId("exercise-card-tibialis_raises"));
+    expect(queryAllByTestId("bottom-sheet-modal")).toHaveLength(1);
+    expect(getByTestId("exercise-detail-header")).toBeTruthy();
+  });
+
   it("applies 16px top margin, 0px bottom margin, and Spacing.sm bottom padding to the results count header with 0 top padding on the list", () => {
     const { getByTestId } = render(
       <ExerciseLibraryView
