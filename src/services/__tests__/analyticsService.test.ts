@@ -19,7 +19,7 @@ describe("analyticsService", () => {
     jest.clearAllMocks();
     (global as any).__DEV__ = false;
     (Platform as any).OS = "ios";
-    debugSpy = jest.spyOn(console, "debug").mockImplementation(() => {});
+    debugSpy = jest.spyOn(console, "debug").mockImplementation(() => { });
   });
 
   afterEach(() => {
@@ -161,7 +161,7 @@ describe("analyticsService", () => {
       });
 
       await expect(
-        logEvent("legal_disclaimer_accepted", { app_version: "2026.11.24" })
+        logEvent("legal_disclaimer_accepted", { app_version: "2026.11.25" })
       ).resolves.toBeUndefined();
     });
   });

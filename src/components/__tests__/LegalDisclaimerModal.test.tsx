@@ -196,7 +196,7 @@ describe("LegalDisclaimerModal Component", () => {
         <LegalDisclaimerModal
           visible={true}
           mode="gate"
-          appVersion="2026.11.24"
+          appVersion="2026.11.25"
           onAccept={jest.fn()}
         />
       );
@@ -206,7 +206,7 @@ describe("LegalDisclaimerModal Component", () => {
       expect(firebaseLogEvent).toHaveBeenCalledWith(
         expect.anything(),
         "legal_disclaimer_accepted",
-        { app_version: "2026.11.24" }
+        { app_version: "2026.11.25" }
       );
     } finally {
       (global as any).__DEV__ = originalDev;
