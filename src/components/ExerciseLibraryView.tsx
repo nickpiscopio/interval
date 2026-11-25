@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import {
   StyleSheet,
   View,
@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
+import { LinearGradient } from "expo-linear-gradient";
 import Colors from "../constants/Colors";
 import Spacing, { RADIUS, TOUCH_TARGET, SHADOWS } from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
@@ -57,6 +58,18 @@ export function ExerciseLibraryView({
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedBodyPart, setSelectedBodyPart] = useState<string>("all");
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const listRef = useRef<FlatList<Exercise>>(null);
+  const isInitialMountRef = useRef(true);
+
+  useEffect(() => {
+    if (isInitialMountRef.current) {
+      isInitialMountRef.current = false;
+      return;
+    }
+    listRef.current?.scrollToOffset({ offset: 0, animated: false });
+    setIsScrolled(false);
+  }, [searchQuery, selectedCategory, selectedBodyPart]);
 
   const localizedCatalog = useMemo(() => {
     return EXERCISE_CATALOG.map(getLocalizedExercise);
@@ -330,11 +343,27 @@ export function ExerciseLibraryView({
       </View>
 
       {/* Exercises List */}
-      <FlatList
-        data={filteredExercises}
-        keyExtractor={(item) => item.id}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={[styles.listContent, { paddingBottom: bottomPadding }]}
+      <View style={styles.listWrapper}>
+        {isScrolled && (
+          <LinearGradient
+            testID="exercise-list-scroll-shadow"
+            colors={["rgba(0, 0, 0, 0.15)", "rgba(0, 0, 0, 0.05)", "transparent"]}
+            style={styles.listShadowGradient}
+            pointerEvents="none"
+          />
+        )}
+        <FlatList
+          ref={listRef}
+          testID="exercise-list"
+          data={filteredExercises}
+          keyExtractor={(item) => item.id}
+          showsVerticalScrollIndicator={false}
+          scrollEventThrottle={16}
+          onScroll={(e) => {
+            const nextScrolled = e.nativeEvent.contentOffset.y > 0;
+            setIsScrolled((prev) => (prev !== nextScrolled ? nextScrolled : prev));
+          }}
+          contentContainerStyle={[styles.listContent, { paddingBottom: bottomPadding }]}
         renderItem={({ item }) => {
           const badgeColor = categoryColorMap[item.category] || Colors.primary;
           return (
@@ -429,7 +458,8 @@ export function ExerciseLibraryView({
             </Text>
           </View>
         }
-      />
+        />
+      </View>
 
       {/* Exercise Detail Sheet */}
       <ExerciseDetailModal
@@ -586,6 +616,7 @@ const styles = StyleSheet.create({
   },
   resultsHeader: {
     paddingHorizontal: Spacing.md,
+    paddingBottom: Spacing.sm,
     marginTop: Spacing.md,
     marginBottom: 0,
   },
@@ -596,8 +627,19 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     letterSpacing: 0.5,
   },
+  listWrapper: {
+    flex: 1,
+  },
+  listShadowGradient: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 12,
+    zIndex: 9,
+  },
   listContent: {
-    paddingTop: Spacing.sm,
+    paddingTop: 0,
     gap: 10,
   },
   exerciseCard: {

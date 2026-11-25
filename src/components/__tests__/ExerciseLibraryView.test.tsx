@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet } from "react-native";
+import { FlatList, StyleSheet } from "react-native";
 import { render, fireEvent, waitFor } from "@testing-library/react-native";
 import { logEvent as firebaseLogEvent } from "@react-native-firebase/analytics";
 import { ExerciseLibraryView } from "../ExerciseLibraryView";
@@ -211,7 +211,7 @@ describe("ExerciseLibraryView Component", () => {
     expect(onBack).toHaveBeenCalled();
   });
 
-  it("applies 16px top margin and 0px bottom margin to the results count header", () => {
+  it("applies 16px top margin, 0px bottom margin, and Spacing.sm bottom padding to the results count header with 0 top padding on the list", () => {
     const { getByTestId } = render(
       <ExerciseLibraryView
         onStartQuickRoutine={jest.fn()}
@@ -223,6 +223,128 @@ describe("ExerciseLibraryView Component", () => {
     const headerStyle = StyleSheet.flatten(resultsHeader.props.style);
     expect(headerStyle.marginTop).toBe(Spacing.md);
     expect(headerStyle.marginBottom).toBe(0);
+    expect(headerStyle.paddingBottom).toBe(Spacing.sm);
+
+    const list = getByTestId("exercise-list");
+    const listContentStyle = StyleSheet.flatten(list.props.contentContainerStyle);
+    expect(listContentStyle.paddingTop).toBe(0);
+  });
+
+  it("renders a dynamic non-interactive 12px top scroll shadow only while the exercise list is scrolled", () => {
+    const { getByTestId, queryByTestId } = render(
+      <ExerciseLibraryView
+        onStartQuickRoutine={jest.fn()}
+        onCreateCustomTimer={jest.fn()}
+      />
+    );
+
+    const list = getByTestId("exercise-list");
+    expect(list.props.scrollEventThrottle).toBe(16);
+    expect(queryByTestId("exercise-list-scroll-shadow")).toBeNull();
+
+    // Scroll down past top -> shadow appears
+    fireEvent.scroll(list, {
+      nativeEvent: {
+        contentOffset: { x: 0, y: 24 },
+        contentSize: { width: 375, height: 1200 },
+        layoutMeasurement: { width: 375, height: 600 },
+      },
+    });
+
+    const shadow = getByTestId("exercise-list-scroll-shadow");
+    expect(shadow.props.pointerEvents).toBe("none");
+    expect(shadow.props.colors).toEqual([
+      "rgba(0, 0, 0, 0.15)",
+      "rgba(0, 0, 0, 0.05)",
+      "transparent",
+    ]);
+    const shadowStyle = StyleSheet.flatten(shadow.props.style);
+    expect(shadowStyle).toEqual(
+      expect.objectContaining({
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        height: 12,
+        zIndex: 9,
+      })
+    );
+
+    // Scroll back to top -> shadow disappears
+    fireEvent.scroll(list, {
+      nativeEvent: {
+        contentOffset: { x: 0, y: 0 },
+        contentSize: { width: 375, height: 1200 },
+        layoutMeasurement: { width: 375, height: 600 },
+      },
+    });
+
+    expect(queryByTestId("exercise-list-scroll-shadow")).toBeNull();
+  });
+
+  it("resets scroll position to top without animation and hides scroll shadow when category, body part, or search changes", () => {
+    const scrollToOffsetSpy = jest
+      .spyOn(FlatList.prototype, "scrollToOffset")
+      .mockImplementation(() => {});
+
+    try {
+      const { getByTestId, queryByTestId, getAllByText, getByText, getByPlaceholderText } = render(
+        <ExerciseLibraryView
+          onStartQuickRoutine={jest.fn()}
+          onCreateCustomTimer={jest.fn()}
+        />
+      );
+
+      const list = getByTestId("exercise-list");
+      const scrollDown = () => {
+        fireEvent.scroll(list, {
+          nativeEvent: {
+            contentOffset: { x: 0, y: 120 },
+            contentSize: { width: 375, height: 1200 },
+            layoutMeasurement: { width: 375, height: 600 },
+          },
+        });
+        expect(getByTestId("exercise-list-scroll-shadow")).toBeTruthy();
+      };
+
+      // 1. Changing category resets scroll and hides shadow
+      scrollDown();
+      scrollToOffsetSpy.mockClear();
+      fireEvent.press(getAllByText("Cardio")[0]);
+      expect(queryByTestId("exercise-list-scroll-shadow")).toBeNull();
+      expect(scrollToOffsetSpy).toHaveBeenCalledWith({ offset: 0, animated: false });
+
+      // 2. Changing Body Part Focus resets scroll and hides shadow
+      scrollDown();
+      scrollToOffsetSpy.mockClear();
+      fireEvent.press(getAllByText("Ankle & Feet")[0]);
+      expect(queryByTestId("exercise-list-scroll-shadow")).toBeNull();
+      expect(scrollToOffsetSpy).toHaveBeenCalledWith({ offset: 0, animated: false });
+
+      // 3. Resetting Body Part Focus to All Body Parts resets scroll and hides shadow
+      scrollDown();
+      scrollToOffsetSpy.mockClear();
+      fireEvent.press(getByText("All Body Parts"));
+      expect(queryByTestId("exercise-list-scroll-shadow")).toBeNull();
+      expect(scrollToOffsetSpy).toHaveBeenCalledWith({ offset: 0, animated: false });
+
+      // 4. Typing a search query resets scroll and hides shadow
+      scrollDown();
+      scrollToOffsetSpy.mockClear();
+      const searchInput = getByPlaceholderText("Search exercises, body parts, or instructions...");
+      fireEvent.changeText(searchInput, "sciatica");
+      expect(queryByTestId("exercise-list-scroll-shadow")).toBeNull();
+      expect(scrollToOffsetSpy).toHaveBeenCalledWith({ offset: 0, animated: false });
+
+      // 5. Clearing the search query resets scroll and hides shadow
+      scrollDown();
+      scrollToOffsetSpy.mockClear();
+      fireEvent.press(getByTestId("clear-search-btn"));
+      expect(queryByTestId("exercise-list-scroll-shadow")).toBeNull();
+      expect(scrollToOffsetSpy).toHaveBeenCalledWith({ offset: 0, animated: false });
+    } finally {
+      scrollToOffsetSpy.mockRestore();
+    }
   });
 
   it("emits exercise_filtered and exercise_viewed telemetry events", () => {
