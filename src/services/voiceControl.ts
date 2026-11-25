@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { recordNonFatalError } from "./crashlyticsService";
 
 export const VOICE_CONTROL_ENABLED_KEY = "@interval_voice_control_enabled";
 export const VOICE_CONTROL_COOLDOWN_MS = 500;
@@ -146,7 +147,8 @@ export async function getVoiceControlEnabled(): Promise<boolean> {
   try {
     const value = await AsyncStorage.getItem(VOICE_CONTROL_ENABLED_KEY);
     return value === "true";
-  } catch {
+  } catch (e) {
+    recordNonFatalError(e, "storage.getVoiceControlEnabled");
     return false;
   }
 }
@@ -157,7 +159,7 @@ export async function setVoiceControlEnabled(enabled: boolean): Promise<void> {
       VOICE_CONTROL_ENABLED_KEY,
       enabled ? "true" : "false"
     );
-  } catch {
-    // Ignore storage write errors
+  } catch (e) {
+    recordNonFatalError(e, "storage.setVoiceControlEnabled");
   }
 }

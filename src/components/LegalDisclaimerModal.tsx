@@ -17,6 +17,7 @@ import FontSize from "../constants/FontSize";
 import { t } from "../i18n";
 import { BottomSheetFrame } from "./BottomSheetFrame";
 import * as Application from 'expo-application';
+import { logEvent } from "../services/analyticsService";
 
 
 export interface LegalDisclaimerModalProps {
@@ -38,6 +39,7 @@ export function LegalDisclaimerModal({
 }: LegalDisclaimerModalProps) {
   function handleAccept() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    void logEvent("legal_disclaimer_accepted", { app_version: appVersion });
     if (onAccept) {
       onAccept();
     }

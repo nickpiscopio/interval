@@ -3,6 +3,7 @@ import { render, fireEvent, waitFor } from "@testing-library/react-native";
 import { Share, StyleSheet, Platform, Linking, Modal } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createAudioPlayer, setAudioModeAsync } from "expo-audio";
+import { logEvent as firebaseLogEvent } from "@react-native-firebase/analytics";
 import CompletionScreen from "../CompletionScreen";
 import { Timer } from "../../model/Timer";
 import * as badgeService from "../../services/badgeService";
@@ -436,6 +437,142 @@ describe("CompletionScreen", () => {
       recordSpy.mockRestore();
       getStatsSpy.mockRestore();
       shareSpy.mockRestore();
+    }
+  });
+
+  it("emits completion, badge, share, restart, rate, and awards telemetry events", async () => {
+    const originalDev = (global as any).__DEV__;
+    (global as any).__DEV__ = false;
+
+    const shareSpy = jest
+      .spyOn(Share, "share")
+      .mockResolvedValueOnce({ action: Share.dismissedAction })
+      .mockResolvedValueOnce({
+        action: Share.sharedAction,
+        activityType: "com.apple.UIKit.activity.PostToTwitter",
+      })
+      .mockResolvedValueOnce({
+        action: Share.sharedAction,
+        activityType: "com.apple.UIKit.activity.PostToTwitter",
+      });
+    const openUrlSpy = jest.spyOn(Linking, "openURL").mockResolvedValue(true as any);
+
+    const mockNavigation: any = {
+      navigate: jest.fn(),
+      popToTop: jest.fn(),
+      replace: jest.fn(),
+    };
+
+    try {
+      const { getByTestId, getByText } = render(
+        <CompletionScreen
+          navigation={mockNavigation}
+          route={{
+            params: {
+              timer: mockTimer,
+              performedSeconds: 90,
+              completedIntervals: 4,
+              qualifiesForCredit: true,
+            },
+          } as any}
+        />
+      );
+
+      await waitFor(() => {
+        expect(getByText("New Achievements Unlocked")).toBeTruthy();
+      });
+
+      expect(firebaseLogEvent).toHaveBeenCalledWith(
+        expect.anything(),
+        "timer_completed",
+        {
+          is_ai_generated: false,
+          total_seconds: 90,
+          performed_seconds: 90,
+          qualifies_for_credit: true,
+        }
+      );
+
+      expect(firebaseLogEvent).toHaveBeenCalledWith(
+        expect.anything(),
+        "badge_unlocked",
+        expect.objectContaining({
+          badge_id: "first_step_hero",
+          category: expect.any(String),
+        })
+      );
+
+      // Share badge from modal (first call dismissed -> no badge_shared, second call shared -> badge_shared)
+      fireEvent.press(getByText("Share Badge"));
+      await waitFor(() => {
+        expect(shareSpy).toHaveBeenCalledTimes(1);
+      });
+      expect(firebaseLogEvent).not.toHaveBeenCalledWith(
+        expect.anything(),
+        "badge_shared",
+        expect.anything()
+      );
+
+      fireEvent.press(getByText("Share Badge"));
+      await waitFor(() => {
+        expect(firebaseLogEvent).toHaveBeenCalledWith(
+          expect.anything(),
+          "badge_shared",
+          expect.objectContaining({
+            badge_id: expect.any(String),
+            category: expect.any(String),
+          })
+        );
+      });
+
+      // Close badge modal and inspect badge card
+      fireEvent.press(getByTestId("modal-overlay"));
+      fireEvent.press(getByText("First Step Hero"));
+      expect(firebaseLogEvent).toHaveBeenCalledWith(
+        expect.anything(),
+        "completion_badge_inspected",
+        expect.objectContaining({
+          badge_id: "first_step_hero",
+          category: expect.any(String),
+        })
+      );
+
+      // Close modal, then test share workout, rate app, awards, restart
+      fireEvent.press(getByTestId("modal-overlay"));
+
+      fireEvent.press(getByTestId("btn-share-workout"));
+      await waitFor(() => {
+        expect(firebaseLogEvent).toHaveBeenCalledWith(
+          expect.anything(),
+          "timer_shared",
+          { method: "completion_card", count: 1 }
+        );
+      });
+
+      fireEvent.press(getByTestId("btn-rate-app"));
+      expect(firebaseLogEvent).toHaveBeenCalledWith(
+        expect.anything(),
+        "completion_rate_app_tapped",
+        { platform: Platform.OS }
+      );
+
+      fireEvent.press(getByTestId("btn-completion-achievements"));
+      expect(firebaseLogEvent).toHaveBeenCalledWith(
+        expect.anything(),
+        "completion_awards_tapped",
+        { newly_unlocked_count: expect.any(Number) }
+      );
+
+      fireEvent.press(getByTestId("btn-restart-workout"));
+      expect(firebaseLogEvent).toHaveBeenCalledWith(
+        expect.anything(),
+        "completion_restart_tapped",
+        { is_ai_generated: false, total_seconds: 90 }
+      );
+    } finally {
+      (global as any).__DEV__ = originalDev;
+      shareSpy.mockRestore();
+      openUrlSpy.mockRestore();
     }
   });
 });

@@ -3,6 +3,9 @@ import { Animated, FlatList, StyleSheet } from "react-native";
 import { render, fireEvent, act, within } from "@testing-library/react-native";
 import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
 import * as ScreenOrientation from "expo-screen-orientation";
+import { createAudioPlayer } from "expo-audio";
+import { logEvent as firebaseLogEvent } from "@react-native-firebase/analytics";
+import { recordError as firebaseRecordError } from "@react-native-firebase/crashlytics";
 import TimerScreen from "../TimerScreen";
 import {
   INTERVAL_TIMELINE_ROW_HEIGHT,
@@ -698,6 +701,80 @@ describe("TimerScreen", () => {
     } finally {
       dimSpy.mockRestore();
       insetsSpy.mockRestore();
+    }
+  });
+
+  it("emits timer_started on launch, timer_abandoned on early exit, and records non-fatal on audio failure", () => {
+    const originalDev = (global as any).__DEV__;
+    (global as any).__DEV__ = false;
+    const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+
+    try {
+      const audioError = new Error("audio codec error");
+      (createAudioPlayer as jest.Mock).mockImplementationOnce(() => {
+        throw audioError;
+      });
+
+      const mockNavigation: any = {
+        navigate: jest.fn(),
+        goBack: jest.fn(),
+        canGoBack: jest.fn(() => true),
+        replace: jest.fn(),
+        popToTop: jest.fn(),
+      };
+
+      const { getByTestId, getByText } = render(
+        <AlertProvider>
+          <TimerScreen
+            navigation={mockNavigation}
+            route={{
+              params: {
+                timer: { ...mockTimer, isAiGenerated: true },
+              },
+            } as any}
+          />
+        </AlertProvider>
+      );
+
+      expect(firebaseLogEvent).toHaveBeenCalledWith(
+        expect.anything(),
+        "timer_started",
+        {
+          is_ai_generated: true,
+          interval_count: 2,
+          rounds: 2,
+          total_seconds: 6,
+        }
+      );
+
+      expect(firebaseRecordError).toHaveBeenCalledWith(
+        expect.anything(),
+        audioError,
+        "audio.interval_sound"
+      );
+
+      // Advance 3 seconds (50% of 6s total)
+      act(() => {
+        jest.advanceTimersByTime(3000);
+      });
+
+      // Exit workout early
+      fireEvent.press(getByTestId("timer-back-button"));
+      fireEvent.press(getByText("Leave"));
+
+      expect(firebaseLogEvent).toHaveBeenCalledWith(
+        expect.anything(),
+        "timer_abandoned",
+        {
+          is_ai_generated: true,
+          total_seconds: 6,
+          performed_seconds: 3,
+          completion_pct: 50,
+        }
+      );
+    } finally {
+      (global as any).__DEV__ = originalDev;
+      warnSpy.mockRestore();
     }
   });
 });

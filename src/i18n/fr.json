@@ -1644,5 +1644,10 @@
     "appVersionLabel": "Interval v%{version}",
     "termsNotice": "En appuyant sur 'Je Comprends et J'Accepte', vous confirmez avoir lu et accepté ces conditions.",
     "agreedOnDate": "Accepté le %{date}"
+  },
+  "errorBoundary": {
+    "title": "Une erreur est survenue",
+    "message": "Une erreur inattendue s'est produite. Veuillez réessayer pour continuer votre entraînement.",
+    "tryAgain": "Réessayer"
   }
 }

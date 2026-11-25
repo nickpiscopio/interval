@@ -30,6 +30,8 @@ import { Exercise } from "../model/Exercise";
 import { EditIntervalModal } from "../components/EditIntervalModal";
 import { t } from "../i18n";
 import { useAlert } from "../context/AlertContext";
+import { logEvent } from "../services/analyticsService";
+import { recordNonFatalError } from "../services/crashlyticsService";
 import Spacing, { RADIUS, TOUCH_TARGET, SHADOWS, REORDER_SPRING_CONFIG } from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
 import Colors from "../constants/Colors";
@@ -388,8 +390,16 @@ export default function CreateTimerScreen({
       }
 
       await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(savedTimers));
+      void logEvent("timer_saved", {
+        mode: existingIndex >= 0 ? "edit" : "create",
+        is_ai_generated: Boolean(timerToSave.isAiGenerated),
+        interval_count: intervals.length,
+        rounds,
+        total_seconds: totalTimeSeconds,
+      });
       navigation.popToTop();
     } catch (e) {
+      recordNonFatalError(e, "storage.saveTimer");
       console.error(e);
       showAlert({
         title: t("common.appName"),
@@ -443,9 +453,11 @@ export default function CreateTimerScreen({
                 const savedTimers: Timer[] = JSON.parse(data);
                 const filtered = savedTimers.filter((t) => t.id !== editTimer.id);
                 await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(filtered));
+                void logEvent("timer_deleted", { count: 1 });
               }
               navigation.popToTop();
             } catch (e) {
+              recordNonFatalError(e, "storage.deleteTimer");
               console.error(e);
             }
           },

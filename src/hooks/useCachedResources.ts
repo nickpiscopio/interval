@@ -2,6 +2,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import * as Font from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useState } from "react";
+import { recordNonFatalError } from "../services/crashlyticsService";
 
 export default function useCachedResources() {
   const [isLoadingComplete, setLoadingComplete] = useState(false);
@@ -21,7 +22,7 @@ export default function useCachedResources() {
           "Poppins-Bold": require("../../assets/fonts/Poppins-Bold.ttf"),
         });
       } catch (e) {
-        // We might want to provide this error information to an error reporting service
+        recordNonFatalError(e, "resources.loadCachedResources");
         console.warn(e);
       } finally {
         setLoadingComplete(true);

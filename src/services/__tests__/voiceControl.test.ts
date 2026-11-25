@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { recordError as firebaseRecordError } from "@react-native-firebase/crashlytics";
 import {
   VOICE_CONTROL_ENABLED_KEY,
   VOICE_CONTROL_COOLDOWN_MS,
@@ -144,12 +145,31 @@ describe("voiceControl service", () => {
       expect(AsyncStorage.setItem).toHaveBeenCalledWith(VOICE_CONTROL_ENABLED_KEY, "false");
     });
 
-    it("handles AsyncStorage errors gracefully", async () => {
-      (AsyncStorage.getItem as jest.Mock).mockRejectedValueOnce(new Error("read fail"));
-      expect(await getVoiceControlEnabled()).toBe(false);
+    it("handles AsyncStorage errors gracefully and records non-fatal errors to Crashlytics", async () => {
+      const originalDev = (global as any).__DEV__;
+      (global as any).__DEV__ = false;
 
-      (AsyncStorage.setItem as jest.Mock).mockRejectedValueOnce(new Error("write fail"));
-      await expect(setVoiceControlEnabled(true)).resolves.toBeUndefined();
+      try {
+        const readErr = new Error("read fail");
+        (AsyncStorage.getItem as jest.Mock).mockRejectedValueOnce(readErr);
+        expect(await getVoiceControlEnabled()).toBe(false);
+        expect(firebaseRecordError).toHaveBeenCalledWith(
+          expect.anything(),
+          readErr,
+          "storage.getVoiceControlEnabled"
+        );
+
+        const writeErr = new Error("write fail");
+        (AsyncStorage.setItem as jest.Mock).mockRejectedValueOnce(writeErr);
+        await expect(setVoiceControlEnabled(true)).resolves.toBeUndefined();
+        expect(firebaseRecordError).toHaveBeenCalledWith(
+          expect.anything(),
+          writeErr,
+          "storage.setVoiceControlEnabled"
+        );
+      } finally {
+        (global as any).__DEV__ = originalDev;
+      }
     });
   });
 });

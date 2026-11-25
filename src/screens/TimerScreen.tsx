@@ -26,6 +26,8 @@ import { PAUSE_SOUND_SOURCE, resolveSoundId, resolveSoundSource } from "../const
 import FontSize from "../constants/FontSize";
 import IntervalTimeline from "../components/IntervalTimeline";
 import { useTimerVoiceControl } from "../hooks/useTimerVoiceControl";
+import { logEvent } from "../services/analyticsService";
+import { recordNonFatalError } from "../services/crashlyticsService";
 
 const KEEP_AWAKE_TAG = "timer-running";
 const COMPLETION_INTEGRITY_THRESHOLD = 0.85;
@@ -137,6 +139,7 @@ export default function TimerScreen({
       activePlayerRef.current = player;
       player.play();
     } catch (e) {
+      recordNonFatalError(e, `audio.${label.replace(/\s+/g, "_")}`);
       console.warn(`Failed to play ${label}:`, e);
     }
   }
@@ -211,6 +214,14 @@ export default function TimerScreen({
 
     activateScreenLock();
     startCountDown();
+
+    const totalSeconds = list.reduce((sum, int) => sum + (int.duration || 0), 0);
+    void logEvent("timer_started", {
+      is_ai_generated: Boolean(timer.isAiGenerated),
+      interval_count: timer.intervals.length,
+      rounds: timer.rounds,
+      total_seconds: totalSeconds,
+    });
 
     return () => {
       clearInterval(timerIdRef.current);
@@ -433,6 +444,33 @@ export default function TimerScreen({
             deactivateScreenLock();
             lockPortraitOrientation();
             voiceControl.stopVoiceControlForExit();
+
+            const totalSeconds = flatIntervalsRef.current.reduce(
+              (sum, int) => sum + (int.duration || 0),
+              0
+            );
+            const totalCreditedMs = creditedMsRef.current.reduce(
+              (sum, ms) => sum + ms,
+              0
+            );
+            const performedSeconds = Math.min(
+              totalSeconds,
+              Math.round(totalCreditedMs / 1000)
+            );
+            const completionPct =
+              totalSeconds > 0
+                ? Math.min(
+                    100,
+                    Math.round((totalCreditedMs / (totalSeconds * 1000)) * 100)
+                  )
+                : 0;
+            void logEvent("timer_abandoned", {
+              is_ai_generated: Boolean(timer.isAiGenerated),
+              total_seconds: totalSeconds,
+              performed_seconds: performedSeconds,
+              completion_pct: completionPct,
+            });
+
             if (navigation.canGoBack?.()) {
               navigation.goBack();
             } else {

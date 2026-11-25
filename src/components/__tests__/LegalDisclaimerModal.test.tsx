@@ -1,6 +1,7 @@
 import React from "react";
 import { StyleSheet } from "react-native";
 import { render, fireEvent } from "@testing-library/react-native";
+import { logEvent as firebaseLogEvent } from "@react-native-firebase/analytics";
 import { LegalDisclaimerModal } from "../LegalDisclaimerModal";
 import Spacing, { TOUCH_TARGET } from "../../constants/Spacing";
 
@@ -183,5 +184,32 @@ describe("LegalDisclaimerModal Component", () => {
     expect(closeBtnStyle.marginTop).toBeGreaterThanOrEqual(-Spacing.md);
     expect(closeBtnStyle.marginRight).toBeLessThan(0);
     expect(closeBtnStyle.marginRight).toBeGreaterThanOrEqual(-Spacing.md);
+  });
+
+  it("emits legal_disclaimer_accepted with app_version when user agrees", () => {
+    const originalDev = (global as any).__DEV__;
+    (global as any).__DEV__ = false;
+    jest.clearAllMocks();
+
+    try {
+      const { getByTestId } = render(
+        <LegalDisclaimerModal
+          visible={true}
+          mode="gate"
+          appVersion="2026.11.24"
+          onAccept={jest.fn()}
+        />
+      );
+
+      fireEvent.press(getByTestId("legal-agree-button"));
+
+      expect(firebaseLogEvent).toHaveBeenCalledWith(
+        expect.anything(),
+        "legal_disclaimer_accepted",
+        { app_version: "2026.11.24" }
+      );
+    } finally {
+      (global as any).__DEV__ = originalDev;
+    }
   });
 });

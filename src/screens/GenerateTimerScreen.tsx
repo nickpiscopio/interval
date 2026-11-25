@@ -14,6 +14,7 @@ import * as Haptics from "expo-haptics";
 
 import { RootStackScreenProps } from "../types";
 import { generateWorkout, GeneratorParams } from "../services/timerGenerator";
+import { logEvent } from "../services/analyticsService";
 import { t } from "../i18n";
 import Spacing, { RADIUS, TOUCH_TARGET, SHADOWS } from "../constants/Spacing";
 import FontSize from "../constants/FontSize";
@@ -35,6 +36,13 @@ export default function GenerateTimerScreen({
     // Simulate AI thinking for a premium feel
     setTimeout(() => {
       const generatedTimer = generateWorkout({ goal, area, experience });
+      void logEvent("timer_generated", {
+        goal,
+        area,
+        experience,
+        interval_count: generatedTimer.intervals.length,
+        rounds: generatedTimer.rounds,
+      });
       setGenerating(false);
       // Route to CreateTimer in preview state
       navigation.navigate("CreateTimer", { timer: generatedTimer });

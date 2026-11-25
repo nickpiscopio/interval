@@ -19,11 +19,13 @@
       "**/*"
     ],
     "ios": {
+      "googleServicesFile": "./firebase/GoogleService-Info.plist",
       "supportsTablet": true,
       "bundleIdentifier": "com.plyonest.interval",
       "buildNumber": "41"
     },
     "android": {
+      "googleServicesFile": "./firebase/google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -62,7 +64,18 @@
           "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone for hands-free voice control during workouts.",
           "speechRecognitionPermission": "Allow $(PRODUCT_NAME) to recognize Play and Pause voice commands during workouts."
         }
-      ]
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ],
+      "@react-native-firebase/app",
+      "@react-native-firebase/analytics",
+      "@react-native-firebase/crashlytics"
     ],
     "runtimeVersion": {
       "policy": "sdkVersion"

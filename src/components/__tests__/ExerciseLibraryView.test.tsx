@@ -1,6 +1,7 @@
 import React from "react";
 import { StyleSheet } from "react-native";
 import { render, fireEvent, waitFor } from "@testing-library/react-native";
+import { logEvent as firebaseLogEvent } from "@react-native-firebase/analytics";
 import { ExerciseLibraryView } from "../ExerciseLibraryView";
 import Spacing from "../../constants/Spacing";
 import FontSize from "../../constants/FontSize";
@@ -220,5 +221,47 @@ describe("ExerciseLibraryView Component", () => {
     const headerStyle = StyleSheet.flatten(resultsHeader.props.style);
     expect(headerStyle.marginTop).toBe(Spacing.md);
     expect(headerStyle.marginBottom).toBe(0);
+  });
+
+  it("emits exercise_filtered and exercise_viewed telemetry events", () => {
+    const originalDev = (global as any).__DEV__;
+    (global as any).__DEV__ = false;
+    jest.clearAllMocks();
+
+    try {
+      const { getAllByText, getByTestId } = render(
+        <ExerciseLibraryView
+          onStartQuickRoutine={jest.fn()}
+          onCreateCustomTimer={jest.fn()}
+        />
+      );
+
+      fireEvent.press(getAllByText("Physical Therapy")[0]);
+      expect(firebaseLogEvent).toHaveBeenCalledWith(
+        expect.anything(),
+        "exercise_filtered",
+        { filter_type: "category", value: "corrective" }
+      );
+
+      fireEvent.press(getAllByText("Ankle & Feet")[0]);
+      expect(firebaseLogEvent).toHaveBeenCalledWith(
+        expect.anything(),
+        "exercise_filtered",
+        { filter_type: "body_part", value: "ankle_feet" }
+      );
+
+      fireEvent.press(getByTestId("exercise-card-tibialis_raises"));
+      expect(firebaseLogEvent).toHaveBeenCalledWith(
+        expect.anything(),
+        "exercise_viewed",
+        expect.objectContaining({
+          exercise_id: "tibialis_raises",
+          category: "corrective",
+          has_video: expect.any(Boolean),
+        })
+      );
+    } finally {
+      (global as any).__DEV__ = originalDev;
+    }
   });
 });

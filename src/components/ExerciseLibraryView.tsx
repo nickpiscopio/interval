@@ -23,6 +23,7 @@ import {
 } from "../constants/exerciseCatalog";
 import { ExerciseDetailModal } from "./ExerciseDetailModal";
 import { recordExerciseSearch, recordExerciseInspection } from "../services/badgeService";
+import { logEvent } from "../services/analyticsService";
 import { t } from "../i18n";
 
 export interface ExerciseLibraryViewProps {
@@ -100,6 +101,11 @@ export function ExerciseLibraryView({
   function handleCardPress(exercise: Exercise) {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     recordExerciseInspection(exercise.id, exercise.bodyParts);
+    void logEvent("exercise_viewed", {
+      exercise_id: exercise.id,
+      category: exercise.category,
+      has_video: Boolean(exercise.videoUrl),
+    });
     setSelectedExercise(exercise);
   }
 
@@ -121,6 +127,10 @@ export function ExerciseLibraryView({
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setSelectedBodyPart(bpId);
     recordExerciseSearch(bpId);
+    void logEvent("exercise_filtered", {
+      filter_type: "body_part",
+      value: bpId,
+    });
   }
 
   const categoryColorMap: Record<string, string> = {
@@ -221,6 +231,10 @@ export function ExerciseLibraryView({
                 onPress={() => {
                   Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   setSelectedCategory(cat);
+                  void logEvent("exercise_filtered", {
+                    filter_type: "category",
+                    value: cat,
+                  });
                 }}
               >
                 {isCorrective && (
@@ -267,6 +281,10 @@ export function ExerciseLibraryView({
             onPress={() => {
               Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               setSelectedBodyPart("all");
+              void logEvent("exercise_filtered", {
+                filter_type: "body_part",
+                value: "all",
+              });
             }}
           >
             <Text

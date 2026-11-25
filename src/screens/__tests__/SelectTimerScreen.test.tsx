@@ -2,6 +2,8 @@ import React from "react";
 import { render, fireEvent, waitFor } from "@testing-library/react-native";
 import { Share } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { logEvent as firebaseLogEvent } from "@react-native-firebase/analytics";
+import { recordError as firebaseRecordError } from "@react-native-firebase/crashlytics";
 import SelectTimerScreen from "../SelectTimerScreen";
 import { AlertProvider } from "../../context/AlertContext";
 import { DEFAULT_AI_TIMERS } from "../../constants/defaultTimers";
@@ -435,6 +437,96 @@ describe("SelectTimerScreen", () => {
     await waitFor(() => {
       expect(queryByText(firstTimerName)).toBeNull();
     });
+  });
+
+  it("emits timer_shared only on completed share and timer_deleted on delete", async () => {
+    const originalDev = (global as any).__DEV__;
+    (global as any).__DEV__ = false;
+
+    try {
+      const shareSpy = jest
+        .spyOn(Share, "share")
+        .mockResolvedValueOnce({ action: Share.dismissedAction })
+        .mockResolvedValueOnce({
+          action: Share.sharedAction,
+          activityType: "com.apple.UIKit.activity.CopyToPasteboard",
+        });
+
+      const { getByTestId, getByText } = renderWithAlert(
+        <SelectTimerScreen navigation={{} as any} route={{} as any} />
+      );
+
+      await waitFor(() => {
+        expect(getByText(DEFAULT_AI_TIMERS[0].name)).toBeTruthy();
+      }, { timeout: 3500 });
+
+      const firstCard = getByTestId(`timer-card-${DEFAULT_AI_TIMERS[0].id}`);
+      fireEvent(firstCard, "longPress");
+
+      // Dismissed share must not emit timer_shared
+      fireEvent.press(getByTestId("btn-header-share"));
+      await waitFor(() => {
+        expect(shareSpy).toHaveBeenCalledTimes(1);
+      });
+      expect(firebaseLogEvent).not.toHaveBeenCalledWith(
+        expect.anything(),
+        "timer_shared",
+        expect.anything()
+      );
+
+      // Completed share emits timer_shared
+      fireEvent.press(getByTestId("btn-header-share"));
+      await waitFor(() => {
+        expect(firebaseLogEvent).toHaveBeenCalledWith(
+          expect.anything(),
+          "timer_shared",
+          { method: "link", count: 1 }
+        );
+      });
+
+      // Delete emits timer_deleted
+      fireEvent.press(getByTestId("btn-header-delete"));
+      await waitFor(() => {
+        expect(getByText("Delete")).toBeTruthy();
+      });
+      fireEvent.press(getByText("Delete"));
+      await waitFor(() => {
+        expect(firebaseLogEvent).toHaveBeenCalledWith(
+          expect.anything(),
+          "timer_deleted",
+          { count: 1 }
+        );
+      });
+
+      shareSpy.mockRestore();
+    } finally {
+      (global as any).__DEV__ = originalDev;
+    }
+  });
+
+  it("records Crashlytics non-fatal error when loading timers from storage fails", async () => {
+    const originalDev = (global as any).__DEV__;
+    (global as any).__DEV__ = false;
+    const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+    const storageError = new Error("disk error");
+    (AsyncStorage.getItem as jest.Mock).mockRejectedValueOnce(storageError);
+
+    try {
+      renderWithAlert(
+        <SelectTimerScreen navigation={{} as any} route={{} as any} />
+      );
+
+      await waitFor(() => {
+        expect(firebaseRecordError).toHaveBeenCalledWith(
+          expect.anything(),
+          storageError,
+          "storage.loadTimers"
+        );
+      }, { timeout: 3500 });
+    } finally {
+      (global as any).__DEV__ = originalDev;
+      warnSpy.mockRestore();
+    }
   });
 });
 

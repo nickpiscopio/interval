@@ -1644,5 +1644,10 @@
     "appVersionLabel": "Interval v%{version}",
     "termsNotice": "By tapping 'I Understand & Agree', you confirm that you have read and agreed to these terms.",
     "agreedOnDate": "Agreed on %{date}"
+  },
+  "errorBoundary": {
+    "title": "Something went wrong",
+    "message": "An unexpected error occurred. Please try again to continue your workout.",
+    "tryAgain": "Try Again"
   }
 }

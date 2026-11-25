@@ -4,6 +4,11 @@ import { render, fireEvent, act, within } from "@testing-library/react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createAudioPlayer } from "expo-audio";
 import { deactivateKeepAwake } from "expo-keep-awake";
+import { logEvent as firebaseLogEvent } from "@react-native-firebase/analytics";
+import {
+  recordError as firebaseRecordError,
+  setAttribute as firebaseSetAttribute,
+} from "@react-native-firebase/crashlytics";
 import TimerScreen from "../TimerScreen";
 import { AlertProvider } from "../../context/AlertContext";
 import { Timer } from "../../model/Timer";
@@ -756,5 +761,102 @@ describe("TimerScreen Voice Control", () => {
     expect(queryByText("Timer Paused")).toBeNull();
 
     addEventListenerSpy.mockRestore();
+  });
+
+  it("emits voice_control_toggled, voice_command_triggered, updates Crashlytics attribute, and filters speech errors", async () => {
+    const originalDev = (global as any).__DEV__;
+    (global as any).__DEV__ = false;
+
+    try {
+      const { getByTestId, getByText } = renderTimerScreen();
+      await flushMicrotasks();
+
+      // Enable voice control
+      await act(async () => {
+        fireEvent.press(getByTestId("timer-voice-toggle"));
+      });
+      await flushMicrotasks();
+
+      await act(async () => {
+        fireEvent.press(getByText("Enable"));
+      });
+      await flushMicrotasks();
+
+      expect(firebaseLogEvent).toHaveBeenCalledWith(
+        expect.anything(),
+        "voice_control_toggled",
+        { enabled: true }
+      );
+      expect(firebaseSetAttribute).toHaveBeenCalledWith(
+        expect.anything(),
+        "voice_control_enabled",
+        "true"
+      );
+
+      // Trigger pause voice command
+      act(() => {
+        __emitSpeechRecognitionEvent("result", {
+          results: [{ transcript: "pause timer" }],
+        });
+      });
+      expect(firebaseLogEvent).toHaveBeenCalledWith(
+        expect.anything(),
+        "voice_command_triggered",
+        { command: "pause" }
+      );
+
+      // Advance past cooldown and trigger play voice command
+      act(() => {
+        jest.advanceTimersByTime(VOICE_CONTROL_COOLDOWN_MS + 100);
+        __emitSpeechRecognitionEvent("result", {
+          results: [{ transcript: "play timer" }],
+        });
+      });
+      expect(firebaseLogEvent).toHaveBeenCalledWith(
+        expect.anything(),
+        "voice_command_triggered",
+        { command: "play" }
+      );
+
+      // Recoverable & permission speech errors must NOT record Crashlytics non-fatal
+      jest.clearAllMocks();
+      act(() => {
+        __emitSpeechRecognitionEvent("error", { error: "no-speech" });
+        __emitSpeechRecognitionEvent("error", { error: "speech-timeout" });
+      });
+      expect(firebaseRecordError).not.toHaveBeenCalled();
+
+      // Unexpected speech error MUST record Crashlytics non-fatal
+      act(() => {
+        __emitSpeechRecognitionEvent("error", {
+          error: "audio-capture",
+          message: "mic hardware error",
+        });
+      });
+      expect(firebaseRecordError).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({ message: "mic hardware error" }),
+        "speech.error.audio-capture"
+      );
+
+      // Disable voice control
+      await act(async () => {
+        fireEvent.press(getByTestId("timer-voice-toggle"));
+      });
+      await flushMicrotasks();
+
+      expect(firebaseLogEvent).toHaveBeenCalledWith(
+        expect.anything(),
+        "voice_control_toggled",
+        { enabled: false }
+      );
+      expect(firebaseSetAttribute).toHaveBeenCalledWith(
+        expect.anything(),
+        "voice_control_enabled",
+        "false"
+      );
+    } finally {
+      (global as any).__DEV__ = originalDev;
+    }
   });
 });

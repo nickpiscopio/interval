@@ -395,3 +395,51 @@ jest.mock("expo-speech-recognition", () => {
     __resetSpeechRecognitionMock,
   };
 });
+
+// Expose Firebase TurboModule stubs on TurboModuleRegistry.get so telemetry
+// wrappers recognize native Firebase as registered in Jest by default.
+const { TurboModuleRegistry } = require("react-native");
+if (TurboModuleRegistry && typeof TurboModuleRegistry.get === "function") {
+  const originalTurboModuleGet = TurboModuleRegistry.get.bind(TurboModuleRegistry);
+  const firebaseTurboModules = new Set([
+    "NativeRNFBTurboApp",
+    "NativeRNFBTurboAnalytics",
+    "NativeRNFBTurboCrashlytics",
+  ]);
+  jest.spyOn(TurboModuleRegistry, "get").mockImplementation((name) => {
+    if (firebaseTurboModules.has(name)) {
+      return {};
+    }
+    return originalTurboModuleGet(name);
+  });
+}
+
+// Mock @react-native-firebase/app
+jest.mock("@react-native-firebase/app", () => ({
+  getApp: jest.fn(() => ({ name: "[DEFAULT]" })),
+}));
+
+// Mock @react-native-firebase/analytics
+jest.mock("@react-native-firebase/analytics", () => {
+  const mockAnalyticsInstance = { app: { name: "[DEFAULT]" } };
+  return {
+    getAnalytics: jest.fn(() => mockAnalyticsInstance),
+    logEvent: jest.fn().mockResolvedValue(undefined),
+    setAnalyticsCollectionEnabled: jest.fn().mockResolvedValue(undefined),
+    __mockAnalyticsInstance: mockAnalyticsInstance,
+  };
+});
+
+// Mock @react-native-firebase/crashlytics
+jest.mock("@react-native-firebase/crashlytics", () => {
+  const mockCrashlyticsInstance = { app: { name: "[DEFAULT]" } };
+  return {
+    getCrashlytics: jest.fn(() => mockCrashlyticsInstance),
+    setCrashlyticsCollectionEnabled: jest.fn().mockResolvedValue(null),
+    recordError: jest.fn(),
+    log: jest.fn(),
+    setAttribute: jest.fn().mockResolvedValue(null),
+    setAttributes: jest.fn().mockResolvedValue(null),
+    __mockCrashlyticsInstance: mockCrashlyticsInstance,
+  };
+});

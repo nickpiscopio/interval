@@ -3,6 +3,17 @@ import { Badge, UserStats } from "../model/Badge";
 import { Timer } from "../model/Timer";
 import { BADGE_CATALOG } from "../constants/badges";
 import { EXERCISE_CATALOG } from "../constants/exerciseCatalog";
+import { logEvent } from "./analyticsService";
+import { recordNonFatalError } from "./crashlyticsService";
+
+function logUnlockedBadges(newlyUnlocked: Badge[]): void {
+  newlyUnlocked.forEach((badge) => {
+    void logEvent("badge_unlocked", {
+      badge_id: badge.id,
+      category: badge.category,
+    });
+  });
+}
 
 const USER_STATS_KEY = "@interval_user_stats";
 const UNLOCKED_TIMESTAMPS_KEY = "@interval_badge_timestamps";
@@ -49,6 +60,7 @@ export async function getUserStats(): Promise<UserStats> {
     if (!raw) return DEFAULT_USER_STATS;
     return { ...DEFAULT_USER_STATS, ...JSON.parse(raw) };
   } catch (error) {
+    recordNonFatalError(error, "storage.getUserStats");
     console.warn("Failed to load user stats:", error);
     return DEFAULT_USER_STATS;
   }
@@ -58,6 +70,7 @@ export async function saveUserStats(stats: UserStats): Promise<void> {
   try {
     await AsyncStorage.setItem(USER_STATS_KEY, JSON.stringify(stats));
   } catch (error) {
+    recordNonFatalError(error, "storage.saveUserStats");
     console.warn("Failed to save user stats:", error);
   }
 }
@@ -67,7 +80,8 @@ export async function getBadgeTimestamps(): Promise<Record<string, number>> {
     const raw = await AsyncStorage.getItem(UNLOCKED_TIMESTAMPS_KEY);
     if (!raw) return {};
     return JSON.parse(raw);
-  } catch {
+  } catch (error) {
+    recordNonFatalError(error, "storage.getBadgeTimestamps");
     return {};
   }
 }
@@ -76,6 +90,7 @@ export async function saveBadgeTimestamps(timestamps: Record<string, number>): P
   try {
     await AsyncStorage.setItem(UNLOCKED_TIMESTAMPS_KEY, JSON.stringify(timestamps));
   } catch (error) {
+    recordNonFatalError(error, "storage.saveBadgeTimestamps");
     console.warn("Failed to save badge timestamps:", error);
   }
 }
@@ -292,6 +307,7 @@ export async function recordWorkoutCompletion(
   await saveUserStats(updatedStats);
   if (newlyUnlocked.length > 0) {
     await saveBadgeTimestamps(timestamps);
+    logUnlockedBadges(newlyUnlocked);
   }
 
   return { newlyUnlocked, stats: updatedStats };
@@ -337,6 +353,7 @@ export async function recordExerciseSearch(
   await saveUserStats(updatedStats);
   if (newlyUnlocked.length > 0) {
     await saveBadgeTimestamps(timestamps);
+    logUnlockedBadges(newlyUnlocked);
   }
 
   return { newlyUnlocked, stats: updatedStats };
@@ -387,6 +404,7 @@ export async function recordExerciseInspection(
   await saveUserStats(updatedStats);
   if (newlyUnlocked.length > 0) {
     await saveBadgeTimestamps(timestamps);
+    logUnlockedBadges(newlyUnlocked);
   }
 
   return { newlyUnlocked, stats: updatedStats };
@@ -456,6 +474,7 @@ export async function recordShare(
   await saveUserStats(updatedStats);
   if (newlyUnlocked.length > 0) {
     await saveBadgeTimestamps(timestamps);
+    logUnlockedBadges(newlyUnlocked);
   }
 
   return { newlyUnlocked, stats: updatedStats };

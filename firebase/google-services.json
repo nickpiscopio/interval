@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "595794971508",
+    "project_id": "interval-free",
+    "storage_bucket": "interval-free.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:595794971508:android:25dfb65278963ccb087a21",
+        "android_client_info": {
+          "package_name": "com.plyonest.interval"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCoKnQrrtkMPLVKcpfZkpuFW960bUfi2Qw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      },
+      "admob_app_id": "ca-app-pub-5374197170542924~6701396259"
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,6 +1,7 @@
 import React from "react";
 import { StyleSheet } from "react-native";
 import { render, fireEvent, act } from "@testing-library/react-native";
+import { logEvent as firebaseLogEvent } from "@react-native-firebase/analytics";
 import GenerateTimerScreen from "../GenerateTimerScreen";
 import Spacing from "../../constants/Spacing";
 
@@ -120,5 +121,44 @@ describe("GenerateTimerScreen", () => {
     fireEvent.press(backBtn);
 
     expect(mockNavigation.goBack).toHaveBeenCalled();
+  });
+
+  it("emits timer_generated with preset parameters when generating a workout", () => {
+    const originalDev = (global as any).__DEV__;
+    (global as any).__DEV__ = false;
+    jest.clearAllMocks();
+
+    try {
+      const mockNavigation: any = {
+        navigate: jest.fn(),
+      };
+
+      const { getByText } = render(
+        <GenerateTimerScreen navigation={mockNavigation} route={{} as any} />
+      );
+
+      fireEvent.press(getByText("Get toned"));
+      fireEvent.press(getByText("Abs"));
+      fireEvent.press(getByText("Intermediate"));
+      fireEvent.press(getByText("Generate Timer"));
+
+      act(() => {
+        jest.advanceTimersByTime(1600);
+      });
+
+      expect(firebaseLogEvent).toHaveBeenCalledWith(
+        expect.anything(),
+        "timer_generated",
+        expect.objectContaining({
+          goal: "tone",
+          area: "abs",
+          experience: "intermediate",
+          interval_count: expect.any(Number),
+          rounds: expect.any(Number),
+        })
+      );
+    } finally {
+      (global as any).__DEV__ = originalDev;
+    }
   });
 });

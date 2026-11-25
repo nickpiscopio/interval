@@ -24,6 +24,7 @@ import { Exercise } from "../model/Exercise";
 import { Spacer } from "./Spacer";
 import { BottomSheetFrame } from "./BottomSheetFrame";
 import { ExercisePickerView } from "./ExercisePickerView";
+import { recordNonFatalError } from "../services/crashlyticsService";
 import { t } from "../i18n";
 import {
   INTERVAL_SOUNDS,
@@ -139,6 +140,7 @@ export function EditIntervalModal({
       previewPlayerRef.current = player;
       player.play();
     } catch (e) {
+      recordNonFatalError(e, "audio.preview_sound");
       console.warn("Failed to preview sound:", e);
     }
   }

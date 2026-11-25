@@ -18,6 +18,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { RootStackScreenProps } from "../types";
 import { Badge, UserStats } from "../model/Badge";
 import { getAllBadgesWithStatus, getUserStats, recordShare } from "../services/badgeService";
+import { logEvent } from "../services/analyticsService";
 import { getLocalizedBadge } from "../constants/badges";
 import { t, getLocale } from "../i18n";
 import Spacing, { RADIUS, TOUCH_TARGET, SHADOWS } from "../constants/Spacing";
@@ -70,6 +71,10 @@ export default function AwardsScreen({ navigation }: RootStackScreenProps<"Award
       });
 
       if (result.action === Share.sharedAction) {
+        void logEvent("badge_shared", {
+          badge_id: badge.id,
+          category: badge.category,
+        });
         const { newlyUnlocked, stats: updatedStats } = await recordShare(result.activityType);
         setStats(updatedStats);
         await loadData();

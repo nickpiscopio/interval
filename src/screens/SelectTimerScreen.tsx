@@ -35,6 +35,9 @@ import { ExerciseLibraryView } from "../components/ExerciseLibraryView";
 import { LegalDisclaimerModal } from "../components/LegalDisclaimerModal";
 import { useAlert } from "../context/AlertContext";
 import { t } from "../i18n";
+import { logEvent } from "../services/analyticsService";
+import { recordNonFatalError } from "../services/crashlyticsService";
+import { trackRootTabScreen } from "../navigation/screenTracking";
 
 const STORAGE_KEY = "@hiit_timers";
 const INITIALIZED_KEY = "@hiit_initialized";
@@ -103,6 +106,7 @@ export default function SelectTimerScreen({
         }
       }
     } catch (e) {
+      recordNonFatalError(e, "storage.loadTimers");
       console.warn("Failed to load timers from AsyncStorage:", e);
     } finally {
       if (isInitial) {
@@ -128,6 +132,7 @@ export default function SelectTimerScreen({
       await AsyncStorage.setItem(LEGAL_ACCEPTED_DATE_KEY, todayFormatted);
       setLegalAcceptedDate(todayFormatted);
     } catch (e) {
+      recordNonFatalError(e, "storage.saveLegalAcceptance");
       console.warn("Failed to save legal acceptance:", e);
     } finally {
       setShowLegalGate(false);
@@ -188,6 +193,7 @@ export default function SelectTimerScreen({
 
       if (result.action === Share.sharedAction) {
         await recordShare(result.activityType);
+        void logEvent("timer_shared", { method: "link", count: 1 });
       }
     } catch (e) {
       console.warn("Failed to share timer:", e);
@@ -294,9 +300,15 @@ export default function SelectTimerScreen({
           text: t("common.delete"),
           style: "destructive",
           onPress: async () => {
+            const deletedCount = selectedTimerIds.length;
             const remaining = timers.filter((t) => !selectedTimerIds.includes(t.id));
             setTimers(remaining);
-            await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(remaining));
+            try {
+              await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(remaining));
+            } catch (e) {
+              recordNonFatalError(e, "storage.deleteTimers");
+            }
+            void logEvent("timer_deleted", { count: deletedCount });
             exitSelectionMode();
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
           },
@@ -441,7 +453,9 @@ export default function SelectTimerScreen({
             }}
             onDragEnd={({ data }) => {
               setTimers(data);
-              AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+              AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(data)).catch(
+                (e) => recordNonFatalError(e, "storage.reorderTimers")
+              );
             }}
             renderItem={renderTimerCard}
             contentContainerStyle={[
@@ -693,7 +707,10 @@ export default function SelectTimerScreen({
           activeOpacity={0.8}
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            setActiveTab("workouts");
+            if (activeTab !== "workouts") {
+              setActiveTab("workouts");
+              trackRootTabScreen("Workouts");
+            }
           }}
         >
           <Ionicons
@@ -713,7 +730,10 @@ export default function SelectTimerScreen({
           activeOpacity={0.8}
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            setActiveTab("library");
+            if (activeTab !== "library") {
+              setActiveTab("library");
+              trackRootTabScreen("ExerciseLibrary");
+            }
           }}
         >
           <Ionicons

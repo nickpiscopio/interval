@@ -32,6 +32,11 @@ import {
   normalizeVoiceTranscript,
   setVoiceControlEnabled,
 } from "../services/voiceControl";
+import { logEvent } from "../services/analyticsService";
+import {
+  recordNonFatalError,
+  setTelemetryAttribute,
+} from "../services/crashlyticsService";
 
 export interface UseTimerVoiceControlParams {
   isPausedRef: React.MutableRefObject<boolean>;
@@ -143,7 +148,8 @@ export function useTimerVoiceControl({
       });
       isRecognizingRef.current = true;
       setIsListening(true);
-    } catch {
+    } catch (e) {
+      recordNonFatalError(e, "speech.start");
       isRecognizingRef.current = false;
       setIsListening(false);
     }
@@ -184,16 +190,21 @@ export function useTimerVoiceControl({
           if (perm?.granted) {
             isEnabledRef.current = true;
             setIsEnabled(true);
+            void setTelemetryAttribute("voice_control_enabled", "true");
             startRecognition();
           } else {
             isEnabledRef.current = false;
             setIsEnabled(false);
+            void setTelemetryAttribute("voice_control_enabled", "false");
             await setVoiceControlEnabled(false);
           }
         } catch {
           isEnabledRef.current = false;
           setIsEnabled(false);
+          void setTelemetryAttribute("voice_control_enabled", "false");
         }
+      } else {
+        void setTelemetryAttribute("voice_control_enabled", "false");
       }
     })();
 
@@ -262,6 +273,7 @@ export function useTimerVoiceControl({
       return;
     }
     lastCommandTimestampRef.current = now;
+    void logEvent("voice_command_triggered", { command: match.command });
 
     if (match.command === "play") {
       callbacksRef.current.onVoicePlay();
@@ -291,13 +303,21 @@ export function useTimerVoiceControl({
         setIsListening(false);
       }
       void setVoiceControlEnabled(false);
+      void setTelemetryAttribute("voice_control_enabled", "false");
       return;
     }
 
-    if (RECOVERABLE_ERRORS.has(errorCode) && canRecognize()) {
-      startRecognition();
+    if (RECOVERABLE_ERRORS.has(errorCode)) {
+      if (canRecognize()) {
+        startRecognition();
+      }
       return;
     }
+
+    recordNonFatalError(
+      new Error(event?.message || String(errorCode || "unknown_speech_error")),
+      `speech.error.${String(errorCode || "unknown")}`
+    );
 
     if (isMountedRef.current) {
       setIsListening(false);
@@ -315,6 +335,8 @@ export function useTimerVoiceControl({
           isEnabledRef.current = true;
           setIsEnabled(true);
           await setVoiceControlEnabled(true);
+          void logEvent("voice_control_toggled", { enabled: true });
+          void setTelemetryAttribute("voice_control_enabled", "true");
           callbacksRef.current.restoreAfterModal(wasPaused);
           startRecognition();
         } else {
@@ -362,6 +384,8 @@ export function useTimerVoiceControl({
       setIsEnabled(false);
       stopRecognition();
       await setVoiceControlEnabled(false);
+      void logEvent("voice_control_toggled", { enabled: false });
+      void setTelemetryAttribute("voice_control_enabled", "false");
       return;
     }
 

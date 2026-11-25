@@ -5,8 +5,7 @@
  */
 import {
   NavigationContainer,
-  DefaultTheme,
-  DarkTheme,
+  useNavigationContainerRef,
 } from "@react-navigation/native";
 import {
   createStackNavigator,
@@ -14,7 +13,6 @@ import {
 } from "@react-navigation/stack";
 import * as React from "react";
 
-import { t } from "../i18n";
 import SelectTimerScreen from "../screens/SelectTimerScreen";
 import NotFoundScreen from "../screens/NotFoundScreen";
 import { RootStackParamList } from "../types";
@@ -24,10 +22,33 @@ import TimerScreen from "../screens/TimerScreen";
 import GenerateTimerScreen from "../screens/GenerateTimerScreen";
 import CompletionScreen from "../screens/CompletionScreen";
 import AwardsScreen from "../screens/AwardsScreen";
+import {
+  resetActiveRootTab,
+  resolveRouteScreenName,
+  trackScreenIfChanged,
+} from "./screenTracking";
 
 export default function Navigation() {
+  const navigationRef = useNavigationContainerRef<RootStackParamList>();
+
+  React.useEffect(() => {
+    resetActiveRootTab();
+  }, []);
+
+  const syncCurrentScreen = () => {
+    const currentScreen = resolveRouteScreenName(
+      navigationRef.getCurrentRoute()?.name
+    );
+    trackScreenIfChanged(currentScreen);
+  };
+
   return (
-    <NavigationContainer linking={LinkingConfiguration}>
+    <NavigationContainer
+      ref={navigationRef}
+      linking={LinkingConfiguration}
+      onReady={syncCurrentScreen}
+      onStateChange={syncCurrentScreen}
+    >
       <RootNavigator />
     </NavigationContainer>
   );

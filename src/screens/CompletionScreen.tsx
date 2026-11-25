@@ -22,6 +22,8 @@ import { RootStackScreenProps } from "../types";
 import { encodeBase64 } from "../utils/base64";
 import { recordWorkoutCompletion, recordShare, getUserStats } from "../services/badgeService";
 import { getMotivationalCompletionMessage } from "../services/motivationalMessageService";
+import { logEvent } from "../services/analyticsService";
+import { recordNonFatalError } from "../services/crashlyticsService";
 import { Badge, UserStats } from "../model/Badge";
 import { getLocalizedBadge } from "../constants/badges";
 import { resolveSoundSource } from "../constants/Sounds";
@@ -75,6 +77,7 @@ export default function CompletionScreen({
         player = createAudioPlayer(source);
         player.play();
       } catch (error) {
+        recordNonFatalError(error, "audio.completion_sound");
         console.warn("Failed to play completion sound:", error);
       }
     }
@@ -91,6 +94,13 @@ export default function CompletionScreen({
 
   // Record workout completion and check for new badges (only when >= 85% threshold met)
   useEffect(() => {
+    void logEvent("timer_completed", {
+      is_ai_generated: Boolean(timer.isAiGenerated),
+      total_seconds: totalSeconds,
+      performed_seconds: displaySeconds,
+      qualifies_for_credit: qualifiesForCredit,
+    });
+
     async function processCompletion() {
       try {
         if (!qualifiesForCredit) {
@@ -109,6 +119,7 @@ export default function CompletionScreen({
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         }
       } catch (error) {
+        recordNonFatalError(error, "completion.processCompletion");
         console.warn("Failed to record workout completion stats:", error);
       }
     }
@@ -158,6 +169,7 @@ export default function CompletionScreen({
       });
 
       if (result.action === Share.sharedAction) {
+        void logEvent("timer_shared", { method: "completion_card", count: 1 });
         const { newlyUnlocked, stats } = await recordShare(result.activityType);
         setUserStats(stats);
         if (newlyUnlocked.length > 0) {
@@ -173,6 +185,7 @@ export default function CompletionScreen({
   }
 
   async function handleRateApp() {
+    void logEvent("completion_rate_app_tapped", { platform: Platform.OS });
     try {
       const storeUrl = Platform.OS === "ios" ? APP_STORE_LINK : PLAY_STORE_LINK;
       await Linking.openURL(storeUrl);
@@ -198,6 +211,10 @@ export default function CompletionScreen({
       });
 
       if (result.action === Share.sharedAction) {
+        void logEvent("badge_shared", {
+          badge_id: badge.id,
+          category: badge.category,
+        });
         const { newlyUnlocked, stats } = await recordShare(result.activityType);
         setUserStats(stats);
         if (newlyUnlocked.length > 0) {
@@ -234,7 +251,12 @@ export default function CompletionScreen({
         accessibilityLabel={t("awards.title")}
         style={styles.trophyIconWrap}
         activeOpacity={0.8}
-        onPress={() => navigation.navigate("Awards")}
+        onPress={() => {
+          void logEvent("completion_awards_tapped", {
+            newly_unlocked_count: newlyUnlockedBadges.length,
+          });
+          navigation.navigate("Awards");
+        }}
       >
         <Ionicons name="trophy" size={22} color="#F59E0B" />
       </TouchableOpacity>
@@ -333,7 +355,13 @@ export default function CompletionScreen({
                 key={badge.id}
                 style={styles.unlockedBadgeCard}
                 activeOpacity={0.85}
-                onPress={() => setActiveModalBadge(badge)}
+                onPress={() => {
+                  void logEvent("completion_badge_inspected", {
+                    badge_id: badge.id,
+                    category: badge.category,
+                  });
+                  setActiveModalBadge(badge);
+                }}
               >
                 <LinearGradient
                   colors={badge.gradientColors}
@@ -370,7 +398,13 @@ export default function CompletionScreen({
             accessibilityLabel={t("completion.restartWorkout")}
             style={styles.actionIconButton}
             activeOpacity={0.8}
-            onPress={() => navigation.replace("Timer", { timer })}
+            onPress={() => {
+              void logEvent("completion_restart_tapped", {
+                is_ai_generated: Boolean(timer.isAiGenerated),
+                total_seconds: totalSeconds,
+              });
+              navigation.replace("Timer", { timer });
+            }}
           >
             <MaterialIcons name="replay" size={24} color={Colors.white} />
           </TouchableOpacity>

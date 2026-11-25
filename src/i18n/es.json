@@ -1644,5 +1644,10 @@
     "appVersionLabel": "Interval v%{version}",
     "termsNotice": "Al presionar 'Entiendo y Acepto', confirmas que has leído y aceptado estos términos.",
     "agreedOnDate": "Aceptado el %{date}"
+  },
+  "errorBoundary": {
+    "title": "Algo salió mal",
+    "message": "Ocurrió un error inesperado. Inténtalo de nuevo para continuar con tu entrenamiento.",
+    "tryAgain": "Intentar de nuevo"
   }
 }

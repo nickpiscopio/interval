@@ -2,6 +2,8 @@ import React from "react";
 import { StyleSheet } from "react-native";
 import { render, fireEvent, waitFor, act } from "@testing-library/react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { logEvent as firebaseLogEvent } from "@react-native-firebase/analytics";
+import { recordError as firebaseRecordError } from "@react-native-firebase/crashlytics";
 import CreateTimerScreen from "../CreateTimerScreen";
 import { AlertProvider } from "../../context/AlertContext";
 import { Timer } from "../../model/Timer";
@@ -585,5 +587,88 @@ describe("CreateTimerScreen", () => {
     );
 
     expect(contentContainerStyle.paddingBottom).toBe(48);
+  });
+
+  it("emits timer_saved for create and edit modes without PII and records non-fatal on storage failure", async () => {
+    const originalDev = (global as any).__DEV__;
+    (global as any).__DEV__ = false;
+
+    try {
+      // Create mode
+      const { getByPlaceholderText, getByTestId, unmount } =
+        renderCreateTimerScreen();
+
+      fireEvent.changeText(getByPlaceholderText("Morning Blast"), "Secret Name");
+      fireEvent.press(getByTestId("icon-save-outline"));
+
+      await waitFor(() => {
+        expect(firebaseLogEvent).toHaveBeenCalledWith(
+          expect.anything(),
+          "timer_saved",
+          {
+            mode: "create",
+            is_ai_generated: false,
+            interval_count: 2,
+            rounds: 3,
+            total_seconds: 135,
+          }
+        );
+      });
+      unmount();
+
+      // Edit mode
+      jest.clearAllMocks();
+      const existing: Timer = {
+        id: "timer_existing_1",
+        name: "My Existing Timer",
+        rounds: 2,
+        isAiGenerated: true,
+        createdAt: 1000,
+        intervals: [
+          { id: "i1", name: "Work", duration: 40, color: "#1ACC6C" },
+        ],
+      };
+      await AsyncStorage.setItem("@hiit_timers", JSON.stringify([existing]));
+
+      const editView = renderCreateTimerScreen({ timer: existing });
+      fireEvent.press(editView.getByTestId("icon-save-outline"));
+
+      await waitFor(() => {
+        expect(firebaseLogEvent).toHaveBeenCalledWith(
+          expect.anything(),
+          "timer_saved",
+          {
+            mode: "edit",
+            is_ai_generated: true,
+            interval_count: 1,
+            rounds: 2,
+            total_seconds: 80,
+          }
+        );
+      });
+      editView.unmount();
+
+      // Storage failure
+      const consoleErrorSpy = jest
+        .spyOn(console, "error")
+        .mockImplementation(() => {});
+      const saveErr = new Error("storage full");
+      (AsyncStorage.setItem as jest.Mock).mockRejectedValueOnce(saveErr);
+
+      const errView = renderCreateTimerScreen({ timer: existing });
+      fireEvent.press(errView.getByTestId("icon-save-outline"));
+
+      await waitFor(() => {
+        expect(firebaseRecordError).toHaveBeenCalledWith(
+          expect.anything(),
+          saveErr,
+          "storage.saveTimer"
+        );
+      });
+
+      consoleErrorSpy.mockRestore();
+    } finally {
+      (global as any).__DEV__ = originalDev;
+    }
   });
 });
