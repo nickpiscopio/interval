@@ -307,41 +307,30 @@ describe("ExerciseLibraryView Component", () => {
         expect(getByTestId("exercise-list-scroll-shadow")).toBeTruthy();
       };
 
+      const expectScrollResetAfter = (action: () => void) => {
+        scrollDown();
+        scrollToOffsetSpy.mockClear();
+        action();
+        expect(queryByTestId("exercise-list-scroll-shadow")).toBeNull();
+        expect(scrollToOffsetSpy).toHaveBeenCalledWith({ offset: 0, animated: false });
+      };
+
+      const searchInput = getByPlaceholderText("Search exercises, body parts, or instructions...");
+
       // 1. Changing category resets scroll and hides shadow
-      scrollDown();
-      scrollToOffsetSpy.mockClear();
-      fireEvent.press(getAllByText("Cardio")[0]);
-      expect(queryByTestId("exercise-list-scroll-shadow")).toBeNull();
-      expect(scrollToOffsetSpy).toHaveBeenCalledWith({ offset: 0, animated: false });
+      expectScrollResetAfter(() => fireEvent.press(getAllByText("Cardio")[0]));
 
       // 2. Changing Body Part Focus resets scroll and hides shadow
-      scrollDown();
-      scrollToOffsetSpy.mockClear();
-      fireEvent.press(getAllByText("Ankle & Feet")[0]);
-      expect(queryByTestId("exercise-list-scroll-shadow")).toBeNull();
-      expect(scrollToOffsetSpy).toHaveBeenCalledWith({ offset: 0, animated: false });
+      expectScrollResetAfter(() => fireEvent.press(getAllByText("Ankle & Feet")[0]));
 
       // 3. Resetting Body Part Focus to All Body Parts resets scroll and hides shadow
-      scrollDown();
-      scrollToOffsetSpy.mockClear();
-      fireEvent.press(getByText("All Body Parts"));
-      expect(queryByTestId("exercise-list-scroll-shadow")).toBeNull();
-      expect(scrollToOffsetSpy).toHaveBeenCalledWith({ offset: 0, animated: false });
+      expectScrollResetAfter(() => fireEvent.press(getByText("All Body Parts")));
 
       // 4. Typing a search query resets scroll and hides shadow
-      scrollDown();
-      scrollToOffsetSpy.mockClear();
-      const searchInput = getByPlaceholderText("Search exercises, body parts, or instructions...");
-      fireEvent.changeText(searchInput, "sciatica");
-      expect(queryByTestId("exercise-list-scroll-shadow")).toBeNull();
-      expect(scrollToOffsetSpy).toHaveBeenCalledWith({ offset: 0, animated: false });
+      expectScrollResetAfter(() => fireEvent.changeText(searchInput, "sciatica"));
 
       // 5. Clearing the search query resets scroll and hides shadow
-      scrollDown();
-      scrollToOffsetSpy.mockClear();
-      fireEvent.press(getByTestId("clear-search-btn"));
-      expect(queryByTestId("exercise-list-scroll-shadow")).toBeNull();
-      expect(scrollToOffsetSpy).toHaveBeenCalledWith({ offset: 0, animated: false });
+      expectScrollResetAfter(() => fireEvent.press(getByTestId("clear-search-btn")));
     } finally {
       scrollToOffsetSpy.mockRestore();
     }

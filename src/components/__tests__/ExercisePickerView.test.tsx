@@ -5,8 +5,8 @@ import { ExercisePickerView } from "../ExercisePickerView";
 import Spacing from "../../constants/Spacing";
 
 describe("ExercisePickerView", () => {
-  it("renders search bar, self-describing category and body part pills without section labels, and catalog list", () => {
-    const { getByPlaceholderText, getByText, queryByText } = render(
+  it("renders search bar, self-describing category and body part pills without section labels, and functional reset pills", () => {
+    const { getByPlaceholderText, getByText, getAllByText, queryByText } = render(
       <ExercisePickerView onSelect={jest.fn()} />
     );
 
@@ -15,6 +15,18 @@ describe("ExercisePickerView", () => {
     expect(queryByText("Body Part")).toBeNull();
     expect(getByText("All Categories")).toBeTruthy();
     expect(getByText("All Body Parts")).toBeTruthy();
+    expect(getByText("Tibialis Raises")).toBeTruthy();
+
+    // Filter by category and restore full catalog via "All Categories"
+    fireEvent.press(getAllByText("Cardio")[0]);
+    expect(queryByText("Tibialis Raises")).toBeNull();
+    fireEvent.press(getByText("All Categories"));
+    expect(getByText("Tibialis Raises")).toBeTruthy();
+
+    // Filter by body part and restore full catalog via "All Body Parts"
+    fireEvent.press(getAllByText("Lower Back")[0]);
+    expect(queryByText("Tibialis Raises")).toBeNull();
+    fireEvent.press(getByText("All Body Parts"));
     expect(getByText("Tibialis Raises")).toBeTruthy();
   });
 
