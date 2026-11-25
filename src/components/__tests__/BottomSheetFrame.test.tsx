@@ -115,22 +115,13 @@ describe("BottomSheetFrame", () => {
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
-  it("closes only the topmost sheet when two are stacked", () => {
-    const lower = jest.fn();
-    const upper = jest.fn();
-    render(
-      <>
-        <BottomSheetFrame visible onClose={lower}>
-          <Text>lower</Text>
-        </BottomSheetFrame>
-        <BottomSheetFrame visible onClose={upper}>
-          <Text>upper</Text>
-        </BottomSheetFrame>
-      </>
+  it("enforces single-overlay presentation with stackBehavior='replace'", () => {
+    const utils = render(
+      <BottomSheetFrame visible onClose={jest.fn()}>
+        <Text>x</Text>
+      </BottomSheetFrame>
     );
-    expect(pressBack()).toBe(true);
-    expect(upper).toHaveBeenCalledTimes(1);
-    expect(lower).not.toHaveBeenCalled();
+    expect(sheetProps(utils).stackBehavior).toBe("replace");
   });
 
   it("does not intercept back when not visible", () => {
