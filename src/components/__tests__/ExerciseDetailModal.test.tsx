@@ -166,7 +166,10 @@ describe("ExerciseDetailModal Component", () => {
     expect(modal.props.sheetProps.snapPoints).toEqual(["90%"]);
 
     const sheetContainer = getByTestId("exercise-detail-sheet-container");
-    expect(StyleSheet.flatten(sheetContainer.props.style).flex).toBe(1);
+    const sheetContainerStyle = StyleSheet.flatten(sheetContainer.props.style);
+    expect(sheetContainerStyle.flex).toBe(1);
+    expect(sheetContainerStyle.paddingTop).toBeUndefined();
+    expect(sheetContainerStyle.paddingHorizontal).toBeUndefined();
 
     const scrollView = getByTestId("exercise-detail-scroll");
     expect(StyleSheet.flatten(scrollView.props.style).flex).toBe(1);
