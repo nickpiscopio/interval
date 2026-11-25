@@ -437,7 +437,13 @@ export default function SelectTimerScreen({
             <ActivityIndicator size="large" color={Colors.primary} />
           </View>
         ) : timers.length === 0 ? (
-          <View style={[styles.emptyContainer, { paddingTop: headerHeight + Spacing.lg }]}>
+          <View
+            testID="empty-timers-state"
+            style={[
+              styles.emptyContainer,
+              { paddingTop: headerHeight, paddingBottom: bottomDockOffset },
+            ]}
+          >
             <Ionicons name="timer-outline" size={64} color={Colors.textScale.muted} />
             <Text style={styles.emptyTitle}>{t("selectTimer.emptyTitle")}</Text>
             <Text style={styles.emptySubtitle}>{t("selectTimer.emptySubtitle")}</Text>
@@ -497,6 +503,7 @@ export default function SelectTimerScreen({
 
       {/* Header with Greeting & Contextual Selection Bar */}
       <View
+        testID="select-timer-header"
         onLayout={(e) => setHeaderHeight(e.nativeEvent.layout.height)}
         style={[
           styles.header,

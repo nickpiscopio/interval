@@ -1,6 +1,6 @@
 import React from "react";
 import { render, fireEvent, waitFor } from "@testing-library/react-native";
-import { Share } from "react-native";
+import { Share, StyleSheet } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { logEvent as firebaseLogEvent } from "@react-native-firebase/analytics";
 import { recordError as firebaseRecordError } from "@react-native-firebase/crashlytics";
@@ -526,6 +526,78 @@ describe("SelectTimerScreen", () => {
     } finally {
       (global as any).__DEV__ = originalDev;
       warnSpy.mockRestore();
+    }
+  });
+
+  it("centers the empty-timers state between the measured header height and Floating Navigation Bar", async () => {
+    await AsyncStorage.setItem("@legal_disclaimer_accepted", "true");
+    await AsyncStorage.setItem("@hiit_initialized", "true");
+    await AsyncStorage.setItem("@hiit_timers", JSON.stringify([]));
+
+    const { getByText, getByTestId } = renderWithAlert(
+      <SelectTimerScreen navigation={{} as any} route={{} as any} />
+    );
+
+    await waitFor(() => {
+      expect(getByText("No Timers Yet")).toBeTruthy();
+      expect(
+        getByText("Create your first timer or browse the exercise library to start.")
+      ).toBeTruthy();
+    }, { timeout: 3500 });
+
+    const emptyContainer = getByTestId("empty-timers-state");
+    expect(StyleSheet.flatten(emptyContainer.props.style)).toEqual(
+      expect.objectContaining({
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center",
+        paddingTop: 120,
+        paddingBottom: 98,
+      })
+    );
+
+    const header = getByTestId("select-timer-header");
+    fireEvent(header, "layout", {
+      nativeEvent: { layout: { height: 156 } },
+    });
+
+    expect(StyleSheet.flatten(getByTestId("empty-timers-state").props.style)).toEqual(
+      expect.objectContaining({
+        paddingTop: 156,
+        paddingBottom: 98,
+      })
+    );
+  });
+
+  it("balances empty-timers bottom padding against the minimum Floating Navigation Bar offset when bottom inset is zero", async () => {
+    const safeAreaContext = require("react-native-safe-area-context");
+    const insetsSpy = jest.spyOn(safeAreaContext, "useSafeAreaInsets").mockReturnValue({
+      top: 20,
+      bottom: 0,
+      left: 0,
+      right: 0,
+    });
+    await AsyncStorage.setItem("@legal_disclaimer_accepted", "true");
+    await AsyncStorage.setItem("@hiit_initialized", "true");
+    await AsyncStorage.setItem("@hiit_timers", JSON.stringify([]));
+
+    try {
+      const { getByTestId } = renderWithAlert(
+        <SelectTimerScreen navigation={{} as any} route={{} as any} />
+      );
+
+      await waitFor(() => {
+        expect(getByTestId("empty-timers-state")).toBeTruthy();
+      }, { timeout: 3500 });
+
+      expect(StyleSheet.flatten(getByTestId("empty-timers-state").props.style)).toEqual(
+        expect.objectContaining({
+          paddingTop: 120,
+          paddingBottom: 76,
+        })
+      );
+    } finally {
+      insetsSpy.mockRestore();
     }
   });
 });

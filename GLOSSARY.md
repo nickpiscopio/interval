@@ -57,7 +57,7 @@ A translucent floating bottom bar for switching between Workouts and Exercise Li
 _Avoid_: Tab Bar Dock, Bottom Action Sheet
 
 **Input Label**:
-A micro-typography field identifier placed directly above interactive inputs, form fields, filter carousels (e.g., 'Category' and 'Body Part' in the Exercise Library), and selector palettes (`FontSize.xs: 12`, `Poppins-Bold`, `Colors.textScale.secondary`) with optical spacing (`Spacing.inputLabelGap: 4`).
+A micro-typography field identifier placed directly above interactive inputs, form fields, and selector palettes (`FontSize.xs: 12`, `Poppins-Bold`, `Colors.textScale.secondary`) with optical spacing (`Spacing.inputLabelGap: 4`).
 _Avoid_: Field Header, Input Header, Form Header
 
 **Design System Tokens & Hierarchy**:
